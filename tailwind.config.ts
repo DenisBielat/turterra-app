@@ -12,6 +12,11 @@ const config: Config = {
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+			brand: {
+				500: '#00c35e',
+				950: '#16261f',
+				white: '#fafafa'
+			},
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -51,6 +56,10 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
+		fontFamily: {
+			outfit: ['Outfit', 'sans-serif'],
+			averta: ['Averta', 'sans-serif'],
+		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

@@ -1,16 +1,43 @@
 import type { Metadata } from "next";
+import { Outfit } from 'next/font/google';
 import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from '@/components/navigation/navbar';
 
+// Existing Geist fonts
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
   weight: "100 900",
 });
+
 const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
+});
+
+// Add Outfit font
+const outfit = Outfit({
+  subsets: ['latin'],
+  variable: '--font-outfit',
+});
+
+// Add Averta font
+const averta = localFont({
+  src: [
+    {
+      path: './fonts/averta/averta-regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: './fonts/averta/averta-bold.otf',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-averta',
 });
 
 export const metadata: Metadata = {
@@ -26,8 +53,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} ${averta.variable} antialiased`}
       >
+        <Navbar />
         {children}
       </body>
     </html>
