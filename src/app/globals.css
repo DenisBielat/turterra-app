@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  @apply font-sans; /* Default body text */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading; /* Default heading text */
 }
 
 @layer base {

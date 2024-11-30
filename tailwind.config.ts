@@ -10,13 +10,39 @@ const config: Config = {
   theme: {
   	extend: {
   		colors: {
+			transparent: 'transparent',
+			currentColor: 'currentColor',
+			white: '#fafafa',
+			black: '#0e0e0e',
+			warm: '#f2f0e7',
+			green: {
+				50: '#eefff5',
+				100: '#d7ffea',
+				200: '#b2ffd6',
+				300: '#76ffb7',
+				400: '#33f590',
+				500: '#09de6f',
+				600: '#00c35e',
+				700: '#049149',
+				800: '#0a713d',
+				900: '#0a5d34',
+				950: '#00341b',
+    		},
+			blue: {
+				50: '#eff5ff',
+				100: '#dce8fd',
+				200: '#c0d8fd',
+				300: '#95c0fb',
+				400: '#649df6',
+				500: '#3f79f2',
+				600: '#3765e8',
+				700: '#2146d4',
+				800: '#213bac',
+				900: '#203588',
+				950: '#182353',
+			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
-			brand: {
-				500: '#00c35e',
-				950: '#16261f',
-				white: '#fafafa'
-			},
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -57,8 +83,8 @@ const config: Config = {
   			}
   		},
 		fontFamily: {
-			outfit: ['Outfit', 'sans-serif'],
-			averta: ['Averta', 'sans-serif'],
+			sans: ['var(--font-averta)', 'system-ui', 'sans-serif'], // Body font
+			heading: ['var(--font-outfit)', 'Arial', 'sans-serif'],  // Heading font
 		},
   		borderRadius: {
   			lg: 'var(--radius)',
