@@ -3,11 +3,17 @@
 @tailwind utilities;
 
 body {
-  @apply font-sans; /* Default body text */
+  @apply font-body;
+  @apply font-normal;
+  @apply leading-normal;
+  @apply tracking-normal;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  @apply font-heading; /* Default heading text */
+  @apply font-heading;
+  @apply font-bold;
+  @apply leading-normal;
+  @apply tracking-tight;
 }
 
 @layer base {

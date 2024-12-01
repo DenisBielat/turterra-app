@@ -8,12 +8,26 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+	colors: {
+		transparent: 'transparent',
+		currentColor: 'currentColor',
+		white: '#fafafa',
+		black: '#0e0e0e',
+		gray: {
+			50: '#f6f6f6',
+			100: '#e7e7e7',
+			200: '#d1d1d1',
+			300: '#b0b0b0',
+			400: '#888888',
+			500: '#6d6d6d',
+			600: '#5d5d5d',
+			700: '#4f4f4f',
+			800: '#454545',
+			900: '#3d3d3d',
+		},
+	},
   	extend: {
   		colors: {
-			transparent: 'transparent',
-			currentColor: 'currentColor',
-			white: '#fafafa',
-			black: '#0e0e0e',
 			warm: '#f2f0e7',
 			green: {
 				50: '#eefff5',
@@ -40,6 +54,19 @@ const config: Config = {
 				800: '#213bac',
 				900: '#203588',
 				950: '#182353',
+			},
+			orange: {
+				50: '#fef9ec',
+				100: '#fbefca',
+				200: '#f6de91',
+				300: '#f2c757',
+				400: '#eeb231',
+				500: '#e79319',
+				600: '#cc6f13',
+				700: '#aa4f13',
+				800: '#8a3e16',
+				900: '#723415',
+				950: '#411907',
 			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
@@ -83,8 +110,8 @@ const config: Config = {
   			}
   		},
 		fontFamily: {
-			sans: ['var(--font-averta)', 'system-ui', 'sans-serif'], // Body font
-			heading: ['var(--font-outfit)', 'Arial', 'sans-serif'],  // Heading font
+			body: ['var(--font-averta)', 'system-ui', 'sans-serif'],
+			heading: ['var(--font-outfit)', 'Arial', 'sans-serif'],
 		},
   		borderRadius: {
   			lg: 'var(--radius)',
