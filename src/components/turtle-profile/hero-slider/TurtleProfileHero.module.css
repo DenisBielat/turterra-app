@@ -1,0 +1,114 @@
+.sliderWrapper {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  overflow: hidden;
+}
+
+.swiperContainer {
+  position: relative;
+  width: 100%;
+  max-width: 2560px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.swiperContainer:hover .navButton {
+  opacity: 1;
+}
+
+.swiperSlide {
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 10px;
+  margin-bottom: 6rem;
+  max-width: calc(100vw - 60px);
+  height: 472px;
+}
+
+.mediaData {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  margin: 0 auto;
+  border-radius: 1rem;
+  overflow: hidden;
+  height: 100%;
+}
+
+.image {
+  display: inline-block;
+  width: auto;
+  height: 100%;
+  max-width: unset;
+  max-height: 100%;
+}
+
+.image:hover {
+  cursor: grab;
+}
+
+.mediaAttribution {
+  position: absolute;
+  bottom: -45px;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.5rem 0 0;
+  width: 100%;
+  height: 45px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.mediaAttribution.visible {
+  opacity: 1;
+}
+
+.navContainer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.navButton {
+  position: absolute;
+  top: calc(50% - 50px);
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: white;
+  color: rgb(20, 83, 45); /* green-900 */
+  border: 1px solid rgb(209, 213, 219); /* gray-300 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  opacity: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.navButton:hover {
+  border-color: rgb(20, 83, 45); /* green-900 */
+  background-color: rgb(22, 101, 52); /* green-800 */
+  color: white;
+}
+
+.navButtonLeft {
+  left: 5rem;
+}
+
+.navButtonRight {
+  right: 5rem;
+}
+
+.navButton[class*="swiper-button-disabled"] {
+  display: none;
+}

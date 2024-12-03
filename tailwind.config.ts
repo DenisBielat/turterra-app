@@ -40,7 +40,7 @@ const config: Config = {
 				700: '#049149',
 				800: '#0a713d',
 				900: '#0a5d34',
-				950: '#00341b',
+				950: '#16261f',
     		},
 			blue: {
 				50: '#eff5ff',
@@ -112,6 +112,9 @@ const config: Config = {
 		fontFamily: {
 			body: ['var(--font-averta)', 'system-ui', 'sans-serif'],
 			heading: ['var(--font-outfit)', 'Arial', 'sans-serif'],
+		},
+		maxWidth: {
+			'8xl': '90rem',
 		},
   		borderRadius: {
   			lg: 'var(--radius)',
