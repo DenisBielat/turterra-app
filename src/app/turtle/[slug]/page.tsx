@@ -1,6 +1,13 @@
 import TurtleProfileHero from "@/components/turtle-profile/hero-slider/turtle-profile-hero";
 
-export default function Page({ params }: { params: { slug: string } }) {
+type Props = {
+  params: {
+    slug: string
+  }
+  searchParams?: { [key: string]: string | string[] | undefined }
+}
+
+export default async function Page({ params }: Props) {
   return (
     <main>
       {/* Other components or sections */}
