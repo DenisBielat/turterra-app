@@ -121,6 +121,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
               >
                 {/* Image */}
                 <div className={styles.mediaData}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={image.secure_url}
                     alt={`${turtleName} image`}

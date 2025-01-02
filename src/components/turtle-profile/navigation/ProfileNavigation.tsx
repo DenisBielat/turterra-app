@@ -10,9 +10,9 @@ interface ProfileNavigationProps {
 }
 
 export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigationProps) => {
-  if (!imageUrl) return null;  // Don't render if no image is available
-
   const [activeSection, setActiveSection] = useState('intro')
+
+  if (!imageUrl) return null;
 
   const navItems = [
     {

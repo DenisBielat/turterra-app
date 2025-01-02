@@ -17,7 +17,6 @@ export default function TurtleSearchNav() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const debouncedSearch = debounce(async (query: string) => {
@@ -33,7 +32,6 @@ export default function TurtleSearchNav() {
       return;
     }
 
-    setIsLoading(true);
     try {
       const response = await fetch(`/api/search-turtles?query=${encodeURIComponent(query)}`);
       const data = await response.json();
@@ -43,8 +41,6 @@ export default function TurtleSearchNav() {
       console.error('Error searching turtles:', error);
       setSearchResults([]);
       setMessage("An error occurred while searching. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   }, 500);
 
@@ -64,7 +60,7 @@ export default function TurtleSearchNav() {
     if (searchQuery) {
       debouncedSearch(searchQuery);
     }
-  }, [searchQuery]);
+  }, [searchQuery, debouncedSearch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

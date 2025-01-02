@@ -4,7 +4,8 @@ import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const turtleData = await getTurtleData(params.slug)
 
   if (!turtleData) {
