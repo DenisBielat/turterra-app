@@ -14,8 +14,8 @@ import {
 
 const Navbar = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2">
-      <div className="container mx-auto max-w-8xl flex h-16 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2 px-10">
+      <div className="container mx-auto max-w-8xl flex h-16 items-center justify-between">
         <div className="flex items-center gap-16">
           <Link href="/" className="flex-shrink-0">
             <Image

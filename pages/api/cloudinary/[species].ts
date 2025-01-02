@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import cloudinary from "@/lib/cloudinary";
+import cloudinary from "@/lib/db/cloudinary";
 
 type CloudinaryResource = {
   public_id: string;

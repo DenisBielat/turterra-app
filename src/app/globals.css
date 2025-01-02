@@ -7,6 +7,7 @@ body {
   @apply font-normal;
   @apply leading-normal;
   @apply tracking-normal;
+  @apply text-black
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -14,6 +15,7 @@ h1, h2, h3, h4, h5, h6 {
   @apply font-bold;
   @apply leading-normal;
   @apply tracking-tight;
+  @apply text-black
 }
 
 @layer base {

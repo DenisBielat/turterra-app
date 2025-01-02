@@ -39,7 +39,7 @@ const config: Config = {
 				600: '#00c35e',
 				700: '#049149',
 				800: '#0a713d',
-				900: '#0a5d34',
+				900: '#00472c',
 				950: '#16261f',
     		},
 			blue: {
@@ -61,7 +61,7 @@ const config: Config = {
 				200: '#f6de91',
 				300: '#f2c757',
 				400: '#eeb231',
-				500: '#e79319',
+				500: '#ffa91e',
 				600: '#cc6f13',
 				700: '#aa4f13',
 				800: '#8a3e16',
@@ -110,8 +110,8 @@ const config: Config = {
   			}
   		},
 		fontFamily: {
-			body: ['var(--font-averta)', 'system-ui', 'sans-serif'],
-			heading: ['var(--font-outfit)', 'Arial', 'sans-serif'],
+			body: ['var(--font-averta)'],
+			heading: ['var(--font-outfit)'],
 		},
 		maxWidth: {
 			'8xl': '90rem',
