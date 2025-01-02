@@ -24,7 +24,12 @@ interface ImageData {
   };
 }
 
-export default function TurtleProfileHero({ slug }: { slug: string }) {
+interface TurtleProfileHeroProps {
+  slug: string;
+  onPrimaryImageLoad?: (imageUrl: string) => void;
+}
+
+export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtleProfileHeroProps) {
   const [images, setImages] = useState<ImageData[]>([]);
   const [turtleName, setTurtleName] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -56,26 +61,23 @@ export default function TurtleProfileHero({ slug }: { slug: string }) {
     async function fetchTurtleImages() {
       try {
         const response = await fetch(`/api/cloudinary/${slug}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch images from Cloudinary");
-        }
-
+        if (!response.ok) throw new Error("Failed to fetch images");
         const data = await response.json();
 
-        // Sort primary photo to appear first
-        const sortedData = data.sort(
-          (a: ImageData, b: ImageData) =>
-            (b.metadata.primary_photo ? 1 : 0) - (a.metadata.primary_photo ? 1 : 0)
-        );
+        // Find and set primary photo
+        const primaryPhoto = data.find((img: ImageData) => img.metadata.primary_photo);
+        if (primaryPhoto && onPrimaryImageLoad) {
+          onPrimaryImageLoad(primaryPhoto.secure_url);
+        }
 
-        setImages(sortedData);
+        setImages(data);
       } catch (error) {
         console.error("Error fetching turtle images:", error);
       }
     }
 
     fetchTurtleImages();
-  }, [slug]);
+  }, [slug, onPrimaryImageLoad]);
 
   return (
     <section className="bg-green-950 text-white">

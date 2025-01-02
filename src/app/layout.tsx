@@ -14,17 +14,17 @@ const outfit = Outfit({
 const averta = localFont({
   src: [
     {
-      path: "./fonts/averta/averta-regular-webfont.woff2",
+      path: "./fonts/averta/averta-regular-webfont.woff",
       weight: "400",
       style: "normal",
     },
     {
-      path: "./fonts/averta/averta-semibold-webfont.woff2",
+      path: "./fonts/averta/averta-semibold-webfont.woff",
       weight: "600",
       style: "normal",
     },
     {
-      path: "./fonts/averta/averta-bold-webfont.woff2",
+      path: "./fonts/averta/averta-bold-webfont.woff",
       weight: "700",
       style: "normal",
     },
@@ -48,9 +48,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" type="image/png" sizes="256x256" href="/images/turterra-favicon-256.png" />
       </head>
-      <body
-        className={`${outfit.variable} ${averta.variable} antialiased`}
-      >
+      <body className={`${outfit.variable} ${averta.variable} antialiased`}>
         <Navbar />
         {children}
       </body>

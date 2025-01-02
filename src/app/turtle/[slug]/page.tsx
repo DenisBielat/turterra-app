@@ -2,12 +2,12 @@ import { getTurtleData } from '@/lib/db/queries/turtle-profile'
 import TurtleProfileHero from "@/components/turtle-profile/hero-slider/turtle-profile-hero";
 import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
+import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const turtleData = await getTurtleData(params.slug)
 
   if (!turtleData) {
-    // Handle the case where no turtle is found
     return <div>No turtle data found</div>
   }
 
@@ -25,7 +25,11 @@ export default async function Page({ params }: { params: { slug: string } }) {
             <div className="grid grid-cols-12 gap-4">
               {/* Left sidebar */}
               <div className="col-span-3 flex flex-col">
-                Left Navigation Content
+                <ProfileNavigation 
+                  name={turtleData.commonName}
+                  species={turtleData.scientificName}
+                  imageUrl={turtleData.profileImage || "/images/image-placeholder.png"}
+                />
               </div>
 
               {/* Right content area */}

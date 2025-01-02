@@ -91,7 +91,7 @@ const Navbar = () => {
                       iconSrc="/images/nav-menu-icons/vet-finder.png"
                       iconAlt="Vet Finder Icon"
                       title="Find a Vet"
-                      description="Vets near you that are known to handle turtle with care"
+                      description="Vets near you that are known to handle turtles with care"
                     />
                   </div>
                 </NavigationMenuContent>
@@ -117,7 +117,7 @@ const Navbar = () => {
           </Link>
           <Link
             href="/join"
-            className="font-semibold rounded-full bg-green-600 px-6 py-3 text-white hover:bg-green-900 transition-all"
+            className="font-semibold rounded-full border-2 border-green-600 bg-green-600 px-6 py-3 text-white hover:bg-green-900 hover:border-green-900 transition-all"
           >
             Join the Community
           </Link>

@@ -29,6 +29,24 @@ interface EcologyRow {
 }
 
 interface TurtleData {
+  species_common_name: string;
+  species_scientific_name: string;
+  avatar_image_url: string;
+  description: string;
+  conservationStatus: {
+    status: string;
+    code: string;
+    year: number;
+  };
+  stats: {
+    population: string;
+    populationTrend: string;
+    habitat: string;
+    region: string;
+    ecology: string;
+    category: string;
+  };
+  commonNames: string[];
   species_intro_description: string;
   other_common_names: string[];
   turtle_species_conservation_history?: ConservationHistory[];
@@ -47,6 +65,7 @@ export async function getTurtleData(slug: string) {
       species_scientific_name,
       species_intro_description,
       other_common_names,
+      avatar_image_url,
       turtle_species_conservation_history(
         year_status_assigned,
         conservation_statuses(
@@ -135,6 +154,9 @@ export async function getTurtleData(slug: string) {
   }
 
   return {
+    commonName: turtle.species_common_name,
+    scientificName: turtle.species_scientific_name,
+    profileImage: turtle.avatar_image_url || "",
     description: species_intro_description,
     conservationStatus,
     stats,
