@@ -1,4 +1,3 @@
-// scripts/generate-icon-types.ts
 import fs from 'fs/promises';
 import path from 'path';
 

@@ -19,6 +19,11 @@ const averta = localFont({
       style: "normal",
     },
     {
+      path: "./fonts/averta/averta-regularitalic-webfont.woff",
+      weight: "400",
+      style: "italic",
+    },
+    {
       path: "./fonts/averta/averta-semibold-webfont.woff",
       weight: "600",
       style: "normal",
