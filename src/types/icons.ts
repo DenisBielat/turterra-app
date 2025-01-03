@@ -4,6 +4,8 @@ export type IconStyle = 'line' | 'filled' | 'color';
 export type LineIconName = 
   | 'add'
   | 'animal-skin'
+  | 'arrow-left-1'
+  | 'arrow-right-1'
   | 'bulleted-list'
   | 'calendar'
   | 'category'
@@ -17,6 +19,7 @@ export type LineIconName =
   | 'hand-shake-heart'
   | 'hierarchy'
   | 'information-circle'
+  | 'instagram'
   | 'kettlebell'
   | 'male'
   | 'map-marks'
@@ -28,6 +31,7 @@ export type LineIconName =
   | 'split'
   | 'tree'
   | 'turtle'
+  | 'twitter'
   | 'warp-shell-lower'
   | 'warp-shell-upper'
   | 'water-droplet';
@@ -37,13 +41,16 @@ export type FilledIconName =
   | 'checkmark'
   | 'close'
   | 'eyeball'
+  | 'facebook'
   | 'flow-arrow-1'
   | 'hand-shake-heart'
+  | 'linkedin'
   | 'lock'
   | 'marine-turtle'
   | 'outdoors-tree-valley'
   | 'trip-map-markers'
-  | 'vegetables-salad';
+  | 'vegetables-salad'
+  | 'youtube';
 
 export type ColorIconName = 
   | 'algae'

@@ -3,6 +3,8 @@ import { Outfit } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/navigation/navbar";
+import { Footer } from '@/components/layout/Footer';
+import { footerConfig } from '@/config/footer';
 
 // Add Outfit font (Google Font)
 const outfit = Outfit({
@@ -55,7 +57,10 @@ export default function RootLayout({
       </head>
       <body className={`${outfit.variable} ${averta.variable} antialiased`}>
         <Navbar />
-        {children}
+        <main>
+          {children}
+        </main>
+        <Footer {...footerConfig} />
       </body>
     </html>
   );

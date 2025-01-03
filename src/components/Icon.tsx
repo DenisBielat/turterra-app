@@ -1,4 +1,3 @@
-// import { FC } from 'react';
 import { IconStyle, IconNameMap } from '@/types/icons';
 
 interface IconProps<T extends IconStyle> {
