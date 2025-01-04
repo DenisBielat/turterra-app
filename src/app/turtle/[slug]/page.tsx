@@ -3,6 +3,7 @@ import TurtleProfileHero from "@/components/turtle-profile/hero-slider/turtle-pr
 import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
+import Identification from "@/components/turtle-profile/content-sections/Identification";
 
 export default async function Page(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -23,9 +24,9 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
       <div className="bg-warm">
         <div className="px-10 py-12">
           <div className="max-w-[90rem] mx-auto">
-            <div className="grid grid-cols-12 gap-4">
+            <div className="grid grid-cols-12 gap-4 relative">
               {/* Left sidebar */}
-              <div className="col-span-3 flex flex-col">
+              <div className="flex flex-col col-span-3 justify-start w-full overflow-visible">
                 <ProfileNavigation 
                   name={turtleData.commonName}
                   species={turtleData.scientificName}
@@ -40,6 +41,17 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
                   conservationStatus={turtleData.conservationStatus}
                   stats={turtleData.stats}
                   commonNames={turtleData.commonNames}
+                />
+                
+                {/* Divider */}
+                <div className="w-full mt-12 mb-20">
+                  <div className="w-full h-px bg-gray-200"></div>
+                </div>
+                
+                <Identification
+                  description={turtleData.identification.description}
+                  physicalFeatures={turtleData.identification.physicalFeatures}
+                  measurements={turtleData.identification.measurements}
                 />
               </div>
             </div>

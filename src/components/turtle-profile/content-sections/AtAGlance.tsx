@@ -22,12 +22,19 @@ interface TurtleAtAGlanceProps {
 
 const STAT_ICONS = {
   population: 'turtle',
-  populationTrend: 'graph-stats-descend',
   habitat: 'outdoors-tree-valley',
   region: 'map-marks',
   ecology: 'split',
   category: 'category'
 } as const;
+
+// Add a helper function to determine the population trend icon
+const getPopulationTrendIcon = (trend: string) => {
+  const normalizedTrend = trend.toLowerCase();
+  if (normalizedTrend.includes('increasing')) return 'graph-stats-ascend';
+  if (normalizedTrend.includes('decreasing')) return 'graph-stats-descend';
+  return 'dotted-line-horizontal';
+};
 
 export default function TurtleAtAGlance({
   description,
@@ -36,7 +43,7 @@ export default function TurtleAtAGlance({
   commonNames,
 }: TurtleAtAGlanceProps) {
   return (
-    <section className="pb-12">
+    <section>
       <h2 id="intro" className="scroll-m-20 text-5xl">
         At a Glance
       </h2>
@@ -73,10 +80,11 @@ export default function TurtleAtAGlance({
                   key={key}
                   className="w-[calc(50%-10px)] border-t border-t-gray-200 py-4"
                 >
-                  {/* Header with icon */}
                   <div className="flex items-center gap-2">
                     <Icon 
-                      name={STAT_ICONS[key as keyof typeof STAT_ICONS]} 
+                      name={key === 'populationTrend' 
+                        ? getPopulationTrendIcon(value)
+                        : STAT_ICONS[key as keyof typeof STAT_ICONS]} 
                       style="line" 
                       size="base" 
                       className="text-green-700" 
@@ -85,7 +93,6 @@ export default function TurtleAtAGlance({
                       {key.replace(/([A-Z])/g, ' $1').trim()}
                     </div>
                   </div>
-                  {/* Value aligned with icon */}
                   <div className="mt-1 text-sm">
                     {value}
                   </div>

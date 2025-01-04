@@ -110,9 +110,8 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
   }
 
   return (
-    <div className="flex flex-col w-full">
-      <div className="sticky top-40 bg-neutral rounded-2xl max-w-[15rem] w-full mb-4">
-        <div className="flex flex-col gap-2 items-center justify-center relative -mt-20 mb-4 text-center">
+      <div className="sticky top-40 z-[2] bg-neutral rounded-2xl w-full max-w-[15rem] mb-8">
+        <div className="flex flex-col gap-4 items-center justify-center relative -mt-20 mb-4 text-center">
           <Image
             src={imageUrl}
             alt={`Profile image of ${name}`}
@@ -151,6 +150,5 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
           </button>
         </div>
       </div>
-    </div>
   )
 } 

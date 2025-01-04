@@ -28,6 +28,21 @@ interface EcologyRow {
   }
 }
 
+interface Measurements {
+  adult_weight: number;
+  length_female_max_scl: number;
+  length_male_max_scl: number;
+  lifespan_wild_min: number;
+  lifespan_wild_max: number;
+  lifespan_captivity_min: number;
+  lifespan_captivity_max: number;
+}
+
+interface SectionDescriptions {
+  at_a_glance?: string;
+  identification?: string;
+}
+
 interface TurtleData {
   species_common_name: string;
   species_scientific_name: string;
@@ -53,6 +68,8 @@ interface TurtleData {
   turtle_species_population_estimate_history?: PopulationHistory[];
   turtle_species_habitats?: HabitatRow[];
   turtle_species_ecologies?: EcologyRow[];
+  turtle_species_measurements?: Measurements[];
+  turtle_species_section_descriptions?: SectionDescriptions[];
 }
 
 
@@ -66,6 +83,19 @@ export async function getTurtleData(slug: string) {
       species_intro_description,
       other_common_names,
       avatar_image_url,
+      turtle_species_section_descriptions (
+        at_a_glance,
+        identification
+      ),
+      turtle_species_measurements (
+        adult_weight,
+        length_female_max_scl,
+        length_male_max_scl,
+        lifespan_wild_min,
+        lifespan_wild_max,
+        lifespan_captivity_min,
+        lifespan_captivity_max
+      ),
       turtle_species_conservation_history(
         year_status_assigned,
         conservation_statuses(
@@ -153,6 +183,45 @@ export async function getTurtleData(slug: string) {
     category
   }
 
+  // Format measurements data
+  const measurementData = turtle.turtle_species_measurements?.[0];  // Get first element
+  const measurements = measurementData
+    ? {
+        adultWeight: measurementData.adult_weight 
+          ? `${measurementData.adult_weight} lbs`
+          : 'Unknown',
+        length: {
+          female: measurementData.length_female_max_scl 
+            ? `${measurementData.length_female_max_scl} cm`
+            : 'Unknown',
+          male: measurementData.length_male_max_scl 
+            ? `${measurementData.length_male_max_scl} cm`
+            : 'Unknown'
+        },
+        lifespan: {
+          wild: measurementData.lifespan_wild_max 
+            ? `${measurementData.lifespan_wild_max} years`
+            : 'Unknown',
+          captivity: measurementData.lifespan_captivity_max
+            ? `${measurementData.lifespan_captivity_max} years`
+            : 'Unknown'
+        }
+      }
+    : {
+        adultWeight: 'Unknown',
+        length: {
+          female: 'Unknown',
+          male: 'Unknown'
+        },
+        lifespan: {
+          wild: 'Unknown',
+          captivity: 'Unknown'
+        }
+      };
+
+  // Get the first (and should be only) section description object
+  const sectionDescriptions = turtle.turtle_species_section_descriptions?.[0];
+
   return {
     commonName: turtle.species_common_name,
     scientificName: turtle.species_scientific_name,
@@ -160,6 +229,11 @@ export async function getTurtleData(slug: string) {
     description: species_intro_description,
     conservationStatus,
     stats,
-    commonNames: other_common_names || []
+    commonNames: other_common_names || [],
+    identification: {
+      description: sectionDescriptions?.identification || "",
+      physicalFeatures: "Congue nec diam sollicitudin vel primis interdum ex. Rutrum imperdiet nisl, litora conubia luctus curae facilisi morbi. Proin magna scelerisque phasellus placerat, himenaeos euismod neque.",
+      measurements
+    }
   }
 }

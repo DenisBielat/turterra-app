@@ -7,6 +7,7 @@ import { supabase } from "@/lib/db/supabaseClient";
 import "swiper/css";
 import "swiper/css/navigation";
 import styles from "./TurtleProfileHero.module.css";
+import Icon from "@/components/Icon";
 
 type AssetType = "Image" | "Video" | "Diagram" | "Illustration" | "Artwork";
 type LifeStage = "Adult" | "Juvenile" | "Hatchling" | "Unknown";
@@ -89,12 +90,12 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
       {/* Slider */}
       <div className={styles.sliderWrapper}>
         <div className={styles.swiperContainer}>
-        <div className={styles.navContainer}>
+          <div className={styles.navContainer}>
             <div className={`${styles.navButton} ${styles.navButtonLeft}`}>
-              &lt;
+              <Icon name="arrow-left-1" style="line" size="lg" />
             </div>
             <div className={`${styles.navButton} ${styles.navButtonRight}`}>
-              &gt;
+              <Icon name="arrow-right-1" style="line" size="lg" />
             </div>
           </div>
           
@@ -137,12 +138,12 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                     index === activeIndex ? styles.visible : ""
                   }`}
                 >
-                  <div className="flex justify-end items-center gap-2 text-gray-300">
+                  <div className="flex justify-end items-center gap-2 text-sm text-gray-300">
                     {image.metadata.life_stage && (
-                      <span className="italic">{image.metadata.life_stage}</span>
+                      <span>{image.metadata.life_stage}</span>
                     )}
                     {image.metadata.asset_type && (
-                      <span className="font-semibold">{image.metadata.asset_type}</span>
+                      <span>{image.metadata.asset_type}</span>
                     )}
                     {image.metadata.credits_basic && (
                       <span>{image.metadata.credits_basic}</span>

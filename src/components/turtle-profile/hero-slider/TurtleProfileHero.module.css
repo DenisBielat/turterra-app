@@ -60,7 +60,7 @@
   height: 45px;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-}
+} 
 
 .mediaAttribution.visible {
   opacity: 1;
