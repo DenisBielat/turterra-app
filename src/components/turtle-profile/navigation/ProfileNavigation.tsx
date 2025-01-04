@@ -10,15 +10,8 @@ interface ProfileNavigationProps {
   imageUrl: string
 }
 
-interface NavItem {
-  id: string;
-  label: string;
-  onClick: () => void;
-}
-
 export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigationProps) => {
   const [activeSection, setActiveSection] = useState('intro')
-  const [activeItem, setActiveItem] = useState<string>('')
   
   // Add throttle utility
   const throttle = (func: Function, limit: number) => {
@@ -31,6 +24,42 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
       }
     }
   }
+
+  // Scroll handling logic
+  useEffect(() => {
+    const SCROLL_OFFSET = 100
+
+    const getCurrentSection = () => {
+      const sections = navItems.map(item => document.getElementById(item.id))
+      let currentSection = ''
+      let minDistance = Infinity
+
+      sections.forEach(section => {
+        if (!section) return
+        const rect = section.getBoundingClientRect()
+        const distance = Math.abs(rect.top - SCROLL_OFFSET)
+
+        if (distance < minDistance) {
+          minDistance = distance
+          currentSection = section.id
+        }
+      })
+
+      if (window.scrollY < SCROLL_OFFSET) {
+        currentSection = 'intro'
+      }
+
+      return currentSection
+    }
+
+    const handleScroll = throttle(() => {
+      const current = getCurrentSection()
+      if (current) setActiveSection(current)
+    }, 50)
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // Navigation click handler
   const scrollToSection = (id: string) => {
@@ -79,42 +108,6 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
-
-  // Scroll handling logic
-  useEffect(() => {
-    const SCROLL_OFFSET = 100
-
-    const getCurrentSection = () => {
-      const sections = navItems.map(item => document.getElementById(item.id))
-      let currentSection = ''
-      let minDistance = Infinity
-
-      sections.forEach(section => {
-        if (!section) return
-        const rect = section.getBoundingClientRect()
-        const distance = Math.abs(rect.top - SCROLL_OFFSET)
-
-        if (distance < minDistance) {
-          minDistance = distance
-          currentSection = section.id
-        }
-      })
-
-      if (window.scrollY < SCROLL_OFFSET) {
-        currentSection = 'intro'
-      }
-
-      return currentSection
-    }
-
-    const handleScroll = throttle(() => {
-      const current = getCurrentSection()
-      if (current) setActiveSection(current)
-    }, 50)
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [navItems])
 
   return (
       <div className="sticky top-40 z-[2] bg-neutral rounded-2xl w-full max-w-[15rem] mb-8">
