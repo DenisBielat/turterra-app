@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/db/supabaseClient";
 import Link from "next/link";
+import Image from 'next/image'
 
 const SpeciesGuide = async () => {
   // Fetch turtle data along with primary images
@@ -26,9 +27,11 @@ const SpeciesGuide = async () => {
           <div key={turtle.id} className="border rounded-lg p-4">
             {/* Display thumbnail image if available */}
             {turtle.turtle_species_images?.[0]?.url && (
-              <img
+              <Image
                 src={turtle.turtle_species_images[0].url}
                 alt={`${turtle.species_common_name} thumbnail`}
+                width={500}
+                height={300}
                 className="w-full h-32 object-cover mb-2"
               />
             )}

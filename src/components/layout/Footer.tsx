@@ -7,15 +7,6 @@ import type { FooterProps, FooterLink } from '@/types/footer';
 import { Icon } from '@/components/Icon';
 import type { FilledIconName, LineIconName } from '@/types/icons';
 
-// Add this type to help map social media names to icon names
-type SocialIconMap = {
-  Facebook: 'facebook';
-  LinkedIn: 'linkedin';
-  Youtube: 'youtube';
-  X: 'twitter';
-  Instagram: 'instagram';
-};
-
 // Update the social media icon config
 const socialIconConfig: Record<string, { name: FilledIconName | LineIconName; style: 'line' | 'filled' }> = {
   Facebook: { name: 'facebook', style: 'filled' },

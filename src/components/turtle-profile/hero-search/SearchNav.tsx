@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, ChevronRight, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import debounce from 'lodash/debounce';
+import Image from 'next/image'
 
 interface SearchResult {
   species_common_name: string;
@@ -118,10 +119,12 @@ export default function TurtleSearchNav() {
                       className="flex gap-3 p-3 hover:bg-green-950 transition-colors"
                       onClick={clearSearch}
                     >
-                      <img
+                      <Image
                         src={result.avatar_image_url}
                         alt={result.species_common_name}
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0 self-start mt-1"
+                        width={500}
+                        height={300}
                       />
                       <div className="flex flex-col min-w-0">
                         <p className="font-bold text-white break-words">

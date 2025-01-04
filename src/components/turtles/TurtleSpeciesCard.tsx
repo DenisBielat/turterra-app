@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Info } from 'lucide-react';
+import Image from 'next/image';
 
 interface TurtleSpecies {
   name: string;
@@ -25,10 +26,12 @@ export default function TurtleSpeciesCard() {
   return (
     <Card className="w-full max-w-md hover:shadow-lg transition-shadow">
       <div className="relative">
-        <img
+        <Image 
           src={mockTurtleData.imageUrl}
           alt={mockTurtleData.name}
           className="w-full h-48 object-cover rounded-t-lg"
+          width={500}
+          height={300}
         />
         <Badge 
           className="absolute top-2 right-2 bg-red-500"
