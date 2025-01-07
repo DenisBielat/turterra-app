@@ -94,7 +94,7 @@ export default function PhysicalFeatures({ categories }: PhysicalFeaturesProps) 
         return (
           <div
             key={category.name}
-            className="border border-gray-200 rounded-lg overflow-hidden scroll-mt-24"
+            className="border border-gray-200 rounded-lg overflow-hidden scroll-mt-24 drop-shadow-md"
             id={`feature-${categoryTag}`}
           >
             <button

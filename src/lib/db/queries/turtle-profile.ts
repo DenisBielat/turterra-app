@@ -94,6 +94,7 @@ interface TurtleData {
 
 export async function getTurtleData(slug: string) {
   try {
+    // Fetch turtle data and related information in a single query
     const { data: turtle, error } = await supabase
       .from('turtle_species')
       .select(`
@@ -145,34 +146,27 @@ export async function getTurtleData(slug: string) {
 
     if (!turtle) return null;
 
-    // Separate queries for physical features
-    const { data: physicalFeatures, error: featuresError } = await supabase
-      .from('turtle_species_physical_features')
-      .select('*')
-      .eq('species_id', turtle.id);
+    // Fetch physical features and keys in parallel
+    const [physicalFeatures, featureKeys] = await Promise.all([
+      supabase
+        .from('turtle_species_physical_features')
+        .select('*')
+        .eq('species_id', turtle.id),
+      supabase
+        .from('turtle_species_physical_features_key')
+        .select('*')
+    ]);
 
-    if (featuresError) {
-      console.error('Error fetching physical features:', featuresError);
-      throw featuresError;
+    if (physicalFeatures.error || featureKeys.error) {
+      console.error('Error fetching physical features or keys:', physicalFeatures.error || featureKeys.error);
+      throw physicalFeatures.error || featureKeys.error;
     }
 
-    const { data: featureKeys, error: keysError } = await supabase
-      .from('turtle_species_physical_features_key')
-      .select('*');
+    // Assign fetched data
+    turtle.turtle_species_physical_features = physicalFeatures.data;
+    turtle.turtle_species_physical_features_key = featureKeys.data;
 
-    if (keysError) {
-      console.error('Error fetching feature keys:', keysError);
-      throw keysError;
-    }
-
-    // Rest of your existing code...
-    // Just replace these lines:
-    turtle.turtle_species_physical_features = physicalFeatures;
-    turtle.turtle_species_physical_features_key = featureKeys;
-
-    // Continue with the rest of your data processing...
-
-    // Extract the data we need
+    // Extract and process data
     const {
       species_intro_description,
       other_common_names,
@@ -180,12 +174,11 @@ export async function getTurtleData(slug: string) {
       turtle_species_population_estimate_history,
       turtle_species_habitats,
       turtle_species_ecologies
-    } = turtle
+    } = turtle;
 
-    // Handle Conservation Status:
-    // Sort by year_status_assigned descending and take the first
+    // Process conservation status
     const latestConservation = turtle_species_conservation_history
-      ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0]
+      ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0];
 
     const conservationStatus = latestConservation
       ? {
@@ -197,64 +190,44 @@ export async function getTurtleData(slug: string) {
           status: "Unknown",
           code: "NA",
           year: 0
-        }
+        };
 
-    // Handle Population Data:
-    // Sort by year_of_estimate descending and take the first
+    // Process population data
     const latestPopulation = turtle_species_population_estimate_history
-      ?.sort((a, b) => b.year_of_estimate.localeCompare(a.year_of_estimate))[0]
+      ?.sort((a, b) => b.year_of_estimate.localeCompare(a.year_of_estimate))[0];
 
     const population = latestPopulation?.population_estimate
       ? latestPopulation.population_estimate.toLocaleString()
-      : "Unknown"
+      : "Unknown";
 
-    const populationTrend = latestPopulation?.population_trend || "Unknown"
+    const populationTrend = latestPopulation?.population_trend || "Unknown";
 
-    // Handle Habitats:
-    const habitats = turtle_species_habitats?.map(h => h.habitats.habitat) || []
-    const habitatString = habitats.length > 0 ? habitats.join(", ") : "Unknown"
+    // Process habitats and ecologies
+    const habitatString = turtle_species_habitats?.map(h => h.habitats.habitat).join(", ") || "Unknown";
+    const ecologyString = turtle_species_ecologies?.map(e => e.ecologies.ecology).join(", ") || "Unknown";
 
-    // Handle Ecologies:
-    const ecologies = turtle_species_ecologies?.map(e => e.ecologies.ecology) || []
-    const ecologyString = ecologies.length > 0 ? ecologies.join(", ") : "Unknown"
-
-    // For region and category, since we don't have those tables defined here,
-    // you can either hardcode or handle them similarly. For now, let's just say "Unknown":
-    const region = "Unknown"
-    const category = "Unknown"
-
-    // Construct stats object in the same shape as before
+    // Construct stats object
     const stats = {
       population,
       populationTrend,
       habitat: habitatString,
-      region,
+      region: "Unknown", // Placeholder
       ecology: ecologyString,
-      category
-    }
+      category: "Unknown" // Placeholder
+    };
 
     // Format measurements data
-    const measurementData = turtle.turtle_species_measurements?.[0];  // Get first element
+    const measurementData = turtle.turtle_species_measurements?.[0];
     const measurements = measurementData
       ? {
-          adultWeight: measurementData.adult_weight 
-            ? `${measurementData.adult_weight} lbs`
-            : 'Unknown',
+          adultWeight: measurementData.adult_weight ? `${measurementData.adult_weight} lbs` : 'Unknown',
           length: {
-            female: measurementData.length_female_max_scl 
-              ? `${measurementData.length_female_max_scl} cm`
-              : 'Unknown',
-            male: measurementData.length_male_max_scl 
-              ? `${measurementData.length_male_max_scl} cm`
-              : 'Unknown'
+            female: measurementData.length_female_max_scl ? `${measurementData.length_female_max_scl} cm` : 'Unknown',
+            male: measurementData.length_male_max_scl ? `${measurementData.length_male_max_scl} cm` : 'Unknown'
           },
           lifespan: {
-            wild: measurementData.lifespan_wild_max 
-              ? `${measurementData.lifespan_wild_max} years`
-              : 'Unknown',
-            captivity: measurementData.lifespan_captivity_max
-              ? `${measurementData.lifespan_captivity_max} years`
-              : 'Unknown'
+            wild: measurementData.lifespan_wild_max ? `${measurementData.lifespan_wild_max} years` : 'Unknown',
+            captivity: measurementData.lifespan_captivity_max ? `${measurementData.lifespan_captivity_max} years` : 'Unknown'
           }
         }
       : {
@@ -269,81 +242,44 @@ export async function getTurtleData(slug: string) {
           }
         };
 
-    // Get the first (and should be only) section description object
+    // Get section descriptions
     const sectionDescriptions = turtle.turtle_species_section_descriptions?.[0];
 
-    // Get the default variant (Adult Male)
+    // Get default variant
     const defaultVariant = turtle.turtle_species_physical_features?.find(
       variant => variant.sex === 'Male' && variant.life_stage === 'Adult'
     ) || turtle.turtle_species_physical_features?.[0];
 
-    // Find images tagged with this category
-    const categoryTag = turtle.species_common_name.toLowerCase().replace(/\s+/g, '-');
+    // Fetch images
     const categoryImages = await getPhysicalFeatureImages(turtle.species_common_name);
+    const categoryTag = turtle.species_common_name.toLowerCase().replace(/\s+/g, '-');
     const images = categoryImages
       .filter(img => img.tags.includes(categoryTag))
-      .map(img => ({
-        url: img.url
-      }));
+      .map(img => ({ url: img.url }));
 
     // Transform physical features into categories
-    const featureCategories = (featureKeys || [])
+    const featureCategories = (featureKeys.data || [])
       .filter(key => !key.parent_feature)
-      .reduce<{
-        name: string;
-        image?: { url: string };
-        features: {
-          name: string;
-          value: string;
-          subFeatures: {
-            name: string;
-            value: string;
-          }[];
-        }[];
-      }[]>((acc, key) => {
-        const category = acc.find(c => c.name === key.category) || {
+      .reduce<{ name: string; image?: { url: string }; features: { name: string; value: string; subFeatures: { name: string; value: string; }[]; }[]; }[]>((acc, key) => {
+        const category = acc.find((c: { name: string }) => c.name === key.category) || {
           name: key.category,
           image: undefined,
-          features: [] as {
-            name: string;
-            value: string;
-            subFeatures: {
-              name: string;
-              value: string;
-            }[];
-          }[]
+          features: [] as { name: string; value: string; subFeatures: { name: string; value: string; }[]; }[]
         };
 
-        // Find image for category once
         if (!category.image) {
-          const featureTag = key.category.toLowerCase()
-            .replace(/\//g, '-and-')
-            .replace(/\s+/g, '-');
+          const featureTag = key.category.toLowerCase().replace(/\//g, '-and-').replace(/\s+/g, '-');
           const categoryImage = categoryImages.find(img => img.tags.includes(featureTag));
-          console.log(`Looking for image with tag: ${featureTag}`, categoryImage);
-          
-          category.image = {
-            url: categoryImage?.url || '/images/image-placeholder.png'
-          };
+          category.image = { url: categoryImage?.url || '/images/image-placeholder.png' };
         }
 
-        // Convert feature name to database column name
-        const columnName = key.physical_feature
-          .toLowerCase()
-          .replace(/\s+/g, '_')
-          .replace(/\//g, '_');
-
+        const columnName = key.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
         const value = defaultVariant?.[columnName] || 'Unknown';
-        
-        // Get sub-features
-        const subFeatures = featureKeys
+
+        const subFeatures = featureKeys.data
           .filter(subKey => subKey.parent_feature === key.id)
           .map(subKey => {
-            const subColumnName = subKey.physical_feature
-              .toLowerCase()
-              .replace(/\s+/g, '_')
-              .replace(/\//g, '_');
-            
+            const subColumnName = subKey.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
             return {
               name: subKey.physical_feature,
               value: defaultVariant?.[subColumnName] || 'Unknown'
