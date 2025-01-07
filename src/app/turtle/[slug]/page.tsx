@@ -52,6 +52,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
                   description={turtleData.identification.description}
                   physicalFeatures={turtleData.identification.physicalFeatures}
                   measurements={turtleData.identification.measurements}
+                  featureCategories={turtleData.identification.featureCategories}
                 />
               </div>
             </div>

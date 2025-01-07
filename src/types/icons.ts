@@ -9,6 +9,8 @@ export type LineIconName =
   | 'bulleted-list'
   | 'calendar'
   | 'category'
+  | 'chevron-down'
+  | 'chevron-up'
   | 'clock'
   | 'color-palette'
   | 'compare'
@@ -40,6 +42,7 @@ export type LineIconName =
 
 export type FilledIconName = 
   | 'arrow-right'
+  | 'checkmark-2'
   | 'checkmark'
   | 'close'
   | 'eyeball'
