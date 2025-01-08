@@ -299,10 +299,15 @@ export async function getTurtleData(slug: string) {
         return acc;
       }, []);
 
-    return {
+    const profileData = {
       commonName: turtle.species_common_name,
       scientificName: turtle.species_scientific_name,
       profileImage: turtle.avatar_image_url || "",
+      // ... other top level data
+    };
+
+    return {
+      ...profileData,
       description: species_intro_description,
       conservationStatus,
       stats,
@@ -311,7 +316,17 @@ export async function getTurtleData(slug: string) {
         description: sectionDescriptions?.identification || "",
         physicalFeatures: "Physical features description...",
         measurements,
-        featureCategories
+        featureCategories,
+        speciesCard: {
+          commonName: profileData.commonName,
+          scientificName: profileData.scientificName,
+          avatarUrl: profileData.profileImage,
+          backgroundImageUrl: "/images/textures/grain-overlay.jpg",
+          variant: {
+            sex: "Male",
+            lifeStage: "Adult"
+          }
+        }
       }
     }
   } catch (error) {

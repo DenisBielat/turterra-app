@@ -50,9 +50,9 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
                 
                 <Identification
                   description={turtleData.identification.description}
-                  physicalFeatures={turtleData.identification.physicalFeatures}
                   measurements={turtleData.identification.measurements}
                   featureCategories={turtleData.identification.featureCategories}
+                  speciesCard={turtleData.identification.speciesCard}
                 />
               </div>
             </div>

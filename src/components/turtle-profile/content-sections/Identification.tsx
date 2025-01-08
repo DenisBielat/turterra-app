@@ -1,9 +1,9 @@
 import { Icon } from '@/components/Icon';
-import PhysicalFeatures from './PhysicalFeatures';
+import PhysicalFeatures from '../physical-features/PhysicalFeatures';
+import SpeciesCard from '../physical-features/SpeciesCard';
 
 interface IdentificationProps {
   description: string;
-  physicalFeatures: string;
   measurements: {
     adultWeight: string;
     length: {
@@ -26,13 +26,23 @@ interface IdentificationProps {
       }[];
     }[];
   }[];
+  speciesCard: {
+    commonName: string;
+    scientificName: string;
+    avatarUrl: string;
+    backgroundImageUrl?: string;
+    variant: {
+      sex: string;
+      lifeStage: string;
+    };
+  };
 }
 
 export default function Identification({
   description,
-  physicalFeatures,
   measurements,
   featureCategories,
+  speciesCard,
 }: IdentificationProps) {
   return (
     <section className="pb-12">
@@ -132,14 +142,19 @@ export default function Identification({
         {/* Physical Features Header*/}
         <div className="mt-12 max-w-lg">
           <h3 className="text-3xl font-bold">Physical Features</h3>
-          <p className="mt-2 text-base">{physicalFeatures}</p>
+          <p className="mt-2 text-base">
+            Congue nec diam sollicitudin vel primis interdum ex. Rutrum imperdiet nisl, litora conubia luctus curae facilisi morbi. Proin magna scelerisque phasellus placerat, himenaeos euismod neque.
+          </p>
         </div>
 
-        {/* Physical Features */}
+        {/* Physical Features Accordions/Tables Row */}
         <div className="mt-8">
           <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_minmax(16px,24px)_1fr_1fr_1fr_1fr_1fr] gap-4">
             {/* Turtle Physical Features Accordion */}
             <div className="col-span-5">
+              <div className="mb-6">
+                <SpeciesCard {...speciesCard} />
+              </div>
               <PhysicalFeatures categories={featureCategories} />
             </div>
 
@@ -148,7 +163,7 @@ export default function Identification({
 
             {/* Right content area - Future complex component */}
             <div className="col-span-5">
-              {/* Accordion Comparison Component */}
+              
             </div>
           </div>
         </div>
