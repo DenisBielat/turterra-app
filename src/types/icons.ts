@@ -32,10 +32,13 @@ export type LineIconName =
   | 'pattern'
   | 'ruler'
   | 'scale'
+  | 'split-2'
+  | 'split-3'
   | 'split'
   | 'tree'
   | 'turtle'
   | 'twitter'
+  | 'two-arrows'
   | 'warp-shell-lower'
   | 'warp-shell-upper'
   | 'water-droplet';

@@ -1,6 +1,7 @@
 import { Icon } from '@/components/Icon';
 import PhysicalFeatures from '../physical-features/PhysicalFeatures';
 import SpeciesCard from '../physical-features/SpeciesCard';
+import SpeciesComparison from '../physical-features/SpeciesComparison';
 
 interface IdentificationProps {
   description: string;
@@ -143,29 +144,18 @@ export default function Identification({
         <div className="mt-12 max-w-lg">
           <h3 className="text-3xl font-bold">Physical Features</h3>
           <p className="mt-2 text-base">
-            Congue nec diam sollicitudin vel primis interdum ex. Rutrum imperdiet nisl, litora conubia luctus curae facilisi morbi. Proin magna scelerisque phasellus placerat, himenaeos euismod neque.
+          This section highlights each physical feature of the turtle as observed in the “reference” variant (Adult Male). If you see a variant icon next to a feature, it means there are known differences in that feature for other sexes or life stages (e.g., juvenile, hatchling). Clicking the icon will display a quick comparison, so you can see exactly how that feature varies across the same turtle species. 
           </p>
         </div>
 
         {/* Physical Features Accordions/Tables Row */}
         <div className="mt-8">
-          <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_minmax(16px,24px)_1fr_1fr_1fr_1fr_1fr] gap-4">
-            {/* Turtle Physical Features Accordion */}
-            <div className="col-span-5">
-              <div className="mb-6">
-                <SpeciesCard {...speciesCard} />
-              </div>
-              <PhysicalFeatures categories={featureCategories} />
-            </div>
-
-            {/* Empty column for spacing - now with custom width */}
-            <div className="col-span-1" />
-
-            {/* Right content area - Future complex component */}
-            <div className="col-span-5">
-              
-            </div>
-          </div>
+          <SpeciesComparison 
+            primarySpecies={{
+              speciesCard,
+              featureCategories
+            }}
+          />
         </div>
       </div>
     </section>
