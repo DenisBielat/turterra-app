@@ -20,7 +20,7 @@ export default function SpeciesCard({
   variant,
 }: SpeciesCardProps) {
   return (
-    <div className="relative flex flex-col gap-4 p-4 border border-gray-400 rounded-lg bg-green-800 cursor-pointer">
+    <div className="relative flex flex-col gap-4 p-4 border border-gray-400 rounded-lg bg-green-800">
       {/* Toolbar */}
       <div className="relative z-20 flex justify-between items-center">
         <div className="flex gap-2">

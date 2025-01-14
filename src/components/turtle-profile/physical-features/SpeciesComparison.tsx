@@ -64,38 +64,47 @@ export default function SpeciesComparison({
   relatedSpecies 
 }: SpeciesComparisonProps) {
   return (
-    <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_minmax(16px,24px)_1fr_1fr_1fr_1fr_1fr] gap-4">
-      {/* Primary Species */}
-      <div className="col-span-5">
-        <div className="mb-6">
+    <div className="space-y-6">
+      {/* Top Grid - Species Cards */}
+      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_minmax(16px,24px)_1fr_1fr_1fr_1fr_1fr] gap-4">
+        {/* Primary Species Card */}
+        <div className="col-span-5">
           <SpeciesCard {...primarySpecies.speciesCard} />
         </div>
-        <PhysicalFeatures categories={primarySpecies.featureCategories} />
-      </div>
 
-      {/* Empty column for spacing */}
-      <div className="col-span-1" />
+        {/* Empty column for spacing */}
+        <div className="col-span-1" />
 
-      {/* Comparison Species or Compare UI */}
-      <div className="col-span-5">
-        {comparisonSpecies ? (
-          <>
-            <div className="mb-6">
-              <SpeciesCard {...comparisonSpecies.speciesCard} />
-            </div>
-            <PhysicalFeatures categories={comparisonSpecies.featureCategories} />
-          </>
-        ) : (
-          <div className="space-y-8">
-            {/* Compare Button Area - Matching SpeciesCard height */}
-            <button className="w-full h-[140px] flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg hover:bg-green-900/20 transition-all mb-6">
+        {/* Comparison Species Card or Compare UI */}
+        <div className="col-span-5">
+          {comparisonSpecies ? (
+            <SpeciesCard {...comparisonSpecies.speciesCard} />
+          ) : (
+            <button className="w-full h-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg hover:bg-green-900/20 transition-all">
               <Icon name="add" size="sm" style="line" className="mb-2" />
               <span className="text-sm">
                 Compare against a different species
               </span>
             </button>
+          )}
+        </div>
+      </div>
 
-            {/* Related Species Section */}
+      {/* Bottom Grid - Physical Features */}
+      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_minmax(16px,24px)_1fr_1fr_1fr_1fr_1fr] gap-4">
+        {/* Primary Species Features */}
+        <div className="col-span-5">
+          <PhysicalFeatures categories={primarySpecies.featureCategories} />
+        </div>
+
+        {/* Empty column for spacing */}
+        <div className="col-span-1" />
+
+        {/* Comparison Species Features or Related Species */}
+        <div className="col-span-5">
+          {comparisonSpecies ? (
+            <PhysicalFeatures categories={comparisonSpecies.featureCategories} />
+          ) : (
             <div>
               <p className="text-xs mb-4 text-gray-700">Related Species | Quick Add</p>
               <div className="space-y-3">
@@ -136,8 +145,8 @@ export default function SpeciesComparison({
                 ))}
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
