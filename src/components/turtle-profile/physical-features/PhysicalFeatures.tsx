@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 
 interface Feature {
@@ -21,11 +20,13 @@ interface Category {
 
 interface PhysicalFeaturesProps {
   categories: Category[];
+  openCategory: string;
+  onCategoryClick: (categoryName: string, isOpen: boolean) => void;
 }
 
 function formatValue(value: any): React.ReactNode {
-  // Handle null/undefined
-  if (!value) return 'Unknown';
+  // Handle null/undefined/unknown
+  if (!value || value === 'Unknown') return '-';
 
   // Convert to string if it's not already
   const stringValue = String(value);
@@ -48,9 +49,11 @@ function formatValue(value: any): React.ReactNode {
   return stringValue.charAt(0).toUpperCase() + stringValue.slice(1).toLowerCase();
 }
 
-export default function PhysicalFeatures({ categories }: PhysicalFeaturesProps) {
-  const [openCategory, setOpenCategory] = useState<string>(categories[0]?.name);
-
+export default function PhysicalFeatures({ 
+  categories,
+  openCategory,
+  onCategoryClick
+}: PhysicalFeaturesProps) {
   const toCategoryTag = (category: string) => {
     return category
       .toLowerCase()
@@ -66,22 +69,18 @@ export default function PhysicalFeatures({ categories }: PhysicalFeaturesProps) 
 
   const handleCategoryClick = (e: React.MouseEvent, categoryName: string, isOpen: boolean) => {
     e.preventDefault();
-    const header = e.currentTarget;
+    onCategoryClick(categoryName, isOpen);
     
-    // Close all sections first
-    setOpenCategory(isOpen ? '' : categoryName);
-
-    // If opening a section, wait for transition then scroll
-    if (!isOpen) {
-      const content = header.nextElementSibling;
-      if (content instanceof HTMLElement) {
-        content.addEventListener('transitionend', function onTransitionEnd(event: TransitionEvent) {
-          if (event.propertyName === 'max-height') {
-            content.removeEventListener('transitionend', onTransitionEnd);
-            scrollToSection(header as HTMLElement);
-          }
-        });
-      }
+    const header = e.currentTarget;
+    const content = header.nextElementSibling;
+    
+    if (!isOpen && content instanceof HTMLElement) {
+      content.addEventListener('transitionend', function onTransitionEnd(event: TransitionEvent) {
+        if (event.propertyName === 'max-height') {
+          content.removeEventListener('transitionend', onTransitionEnd);
+          scrollToSection(header as HTMLElement);
+        }
+      });
     }
   };
 

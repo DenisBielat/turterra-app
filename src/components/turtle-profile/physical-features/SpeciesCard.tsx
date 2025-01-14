@@ -10,6 +10,8 @@ interface SpeciesCardProps {
     sex: string;
     lifeStage: string;
   };
+  isComparison?: boolean;
+  onRemove?: () => void;
 }
 
 export default function SpeciesCard({
@@ -18,21 +20,39 @@ export default function SpeciesCard({
   avatarUrl,
   backgroundImageUrl,
   variant,
+  isComparison = false,
+  onRemove
 }: SpeciesCardProps) {
   return (
-    <div className="relative flex flex-col gap-4 p-4 border border-gray-400 rounded-lg bg-green-800">
+    <div className={`relative flex flex-col gap-4 p-4 border border-gray-400 rounded-lg ${
+      isComparison ? 'bg-orange-600' : 'bg-green-800'
+    }`}>
       {/* Toolbar */}
       <div className="relative z-20 flex justify-between items-center">
         <div className="flex gap-2">
           {['lifeStage', 'sex'].map((type) => (
-            <div key={type} className="px-4 py-1 flex items-center rounded bg-green-600">
+            <div 
+              key={type} 
+              className={`px-4 py-1 flex items-center rounded ${
+                isComparison ? 'bg-orange-500' : 'bg-green-600'
+              }`}
+            >
               <span className="h-[18px] text-xs font-semibold text-white">
                 {variant[type as keyof typeof variant]}
               </span>
             </div>
           ))}
         </div>
-        <Icon name="lock" size="sm" style="filled" className="text-orange-500" />
+        {!isComparison ? (
+          <Icon name="lock" size="sm" style="filled" className="text-orange-500" />
+        ) : (
+          <button
+            onClick={onRemove}
+            className="p-1 flex items-center justify-center rounded-full hover:bg-orange-700 transition-colors"
+          >
+            <Icon name="add" size="sm" style="line" className="text-white rotate-45" />
+          </button>
+        )}
       </div>
 
       {/* Species Info */}
