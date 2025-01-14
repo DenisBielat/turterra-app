@@ -37,6 +37,11 @@ interface IdentificationProps {
       lifeStage: string;
     };
   };
+  relatedSpecies: {
+    commonName: string;
+    scientificName: string;
+    avatarUrl: string;
+  }[];
 }
 
 export default function Identification({
@@ -44,6 +49,7 @@ export default function Identification({
   measurements,
   featureCategories,
   speciesCard,
+  relatedSpecies = [],
 }: IdentificationProps) {
   return (
     <section className="pb-12">
@@ -155,6 +161,7 @@ export default function Identification({
               speciesCard,
               featureCategories
             }}
+            relatedSpecies={relatedSpecies}
           />
         </div>
       </div>

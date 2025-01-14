@@ -59,11 +59,19 @@ interface PhysicalFeatureData {
   [key: string]: any; // For dynamic feature columns
 }
 
+interface RelatedSpecies {
+  commonName: string;
+  scientificName: string;
+  avatarUrl: string;
+}
+
 interface TurtleData {
   id: number;
   species_common_name: string;
   species_scientific_name: string;
-  avatar_image_url: string;
+  avatar_image_circle_url: string;
+  avatar_image_full_url: string;
+  tax_parent_genus: number;
   description: string;
   conservationStatus: {
     status: string;
@@ -89,8 +97,20 @@ interface TurtleData {
   turtle_species_section_descriptions?: SectionDescriptions[];
   turtle_species_physical_features?: PhysicalFeatureData[];
   turtle_species_physical_features_key?: PhysicalFeature[];
+  related_species?: RelatedSpecies[];
 }
 
+interface FeatureCategory {
+  name: string;
+  image?: { url: string };
+  features: Feature[];
+}
+
+interface Feature {
+  name: string;
+  value: string;
+  subFeatures: { name: string; value: string; }[];
+}
 
 export async function getTurtleData(slug: string) {
   try {
@@ -103,7 +123,9 @@ export async function getTurtleData(slug: string) {
         species_scientific_name,
         species_intro_description,
         other_common_names,
-        avatar_image_url,
+        avatar_image_circle_url,
+        avatar_image_full_url,
+        tax_parent_genus,
         turtle_species_section_descriptions (
           at_a_glance,
           identification
@@ -165,6 +187,30 @@ export async function getTurtleData(slug: string) {
     // Assign fetched data
     turtle.turtle_species_physical_features = physicalFeatures.data;
     turtle.turtle_species_physical_features_key = featureKeys.data;
+
+    // Fetch related species in the same family
+    const { data: relatedSpecies, error: relatedError } = await supabase
+      .from('turtle_species')
+      .select(`
+        species_common_name,
+        species_scientific_name,
+        avatar_image_full_url
+      `)
+      .eq('tax_parent_genus', turtle.tax_parent_genus)
+      .neq('id', turtle.id)
+      .limit(5);
+
+    if (relatedError) {
+      console.error('Error fetching related species:', relatedError);
+      throw relatedError;
+    }
+
+    // Transform related species data
+    const formattedRelatedSpecies = relatedSpecies?.map(species => ({
+      commonName: species.species_common_name,
+      scientificName: species.species_scientific_name,
+      avatarUrl: species.avatar_image_full_url || '/images/image-placeholder.png'
+    })) || [];
 
     // Extract and process data
     const {
@@ -260,11 +306,11 @@ export async function getTurtleData(slug: string) {
     // Transform physical features into categories
     const featureCategories = (featureKeys.data || [])
       .filter(key => !key.parent_feature)
-      .reduce<{ name: string; image?: { url: string }; features: { name: string; value: string; subFeatures: { name: string; value: string; }[]; }[]; }[]>((acc, key) => {
-        const category = acc.find((c: { name: string }) => c.name === key.category) || {
+      .reduce<FeatureCategory[]>((acc, key) => {
+        const category: FeatureCategory = acc.find((c) => c.name === key.category) || {
           name: key.category,
           image: undefined,
-          features: [] as { name: string; value: string; subFeatures: { name: string; value: string; }[]; }[]
+          features: []
         };
 
         if (!category.image) {
@@ -290,7 +336,7 @@ export async function getTurtleData(slug: string) {
           name: key.physical_feature,
           value: Array.isArray(value) ? value.join(', ') : String(value),
           subFeatures
-        });
+        } as Feature);
 
         if (!acc.find(c => c.name === key.category)) {
           acc.push(category);
@@ -302,7 +348,7 @@ export async function getTurtleData(slug: string) {
     const profileData = {
       commonName: turtle.species_common_name,
       scientificName: turtle.species_scientific_name,
-      profileImage: turtle.avatar_image_url || "",
+      profileImage: turtle.avatar_image_circle_url || "",
       // ... other top level data
     };
 
@@ -326,7 +372,8 @@ export async function getTurtleData(slug: string) {
             sex: "Male",
             lifeStage: "Adult"
           }
-        }
+        },
+        relatedSpecies: formattedRelatedSpecies
       }
     }
   } catch (error) {

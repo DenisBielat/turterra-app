@@ -5,11 +5,10 @@ import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGla
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
 
-export default async function Page(props: { params: Promise<{ slug: string }> }) {
-  const params = await props.params;
-  const turtleData = await getTurtleData(params.slug)
-
-  if (!turtleData) {
+export default async function TurtlePage({ params }: { params: { slug: string } }) {
+  const data = await getTurtleData(params.slug);
+  
+  if (!data) {
     return <div>No turtle data found</div>
   }
 
@@ -28,19 +27,19 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
               {/* Left sidebar */}
               <div className="flex flex-col col-span-3 justify-start w-full overflow-visible">
                 <ProfileNavigation 
-                  name={turtleData.commonName}
-                  species={turtleData.scientificName}
-                  imageUrl={turtleData.profileImage || "/images/image-placeholder.png"}
+                  name={data.commonName}
+                  species={data.scientificName}
+                  imageUrl={data.profileImage || "/images/image-placeholder.png"}
                 />
               </div>
 
               {/* Right content area */}
               <div className="col-span-9 flex flex-col">
                 <TurtleAtAGlance 
-                  description={turtleData.description}
-                  conservationStatus={turtleData.conservationStatus}
-                  stats={turtleData.stats}
-                  commonNames={turtleData.commonNames}
+                  description={data.description}
+                  conservationStatus={data.conservationStatus}
+                  stats={data.stats}
+                  commonNames={data.commonNames}
                 />
                 
                 {/* Divider */}
@@ -49,10 +48,11 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
                 </div>
                 
                 <Identification
-                  description={turtleData.identification.description}
-                  measurements={turtleData.identification.measurements}
-                  featureCategories={turtleData.identification.featureCategories}
-                  speciesCard={turtleData.identification.speciesCard}
+                  description={data.identification.description}
+                  measurements={data.identification.measurements}
+                  featureCategories={data.identification.featureCategories}
+                  speciesCard={data.identification.speciesCard}
+                  relatedSpecies={data.identification.relatedSpecies}
                 />
               </div>
             </div>
