@@ -1,6 +1,18 @@
 import { supabase } from '@/lib/db/supabaseClient'
 import { getPhysicalFeatureImages } from '@/lib/db/cloudinary'
 
+interface Variant {
+  sex: string;
+  lifeStage: string;
+  value: string;
+}
+
+interface VariantData {
+  sex: string;
+  life_stage: string;
+  [key: string]: any;
+}
+
 interface ConservationStatus {
   status: string;
   abbreviation: string;
@@ -109,7 +121,61 @@ interface FeatureCategory {
 interface Feature {
   name: string;
   value: string;
-  subFeatures: { name: string; value: string; }[];
+  variants?: {
+    reference: string;
+    variants: Variant[];
+  };
+  subFeatures: { 
+    name: string; 
+    value: string;
+    variants?: {
+      reference: string;
+      variants: Variant[];
+    };
+  }[];
+}
+
+function normalizeValue(value: any): string | null {
+  // Special handling for boolean false
+  if (value === false) {
+    return 'false';
+  }
+
+  // Return null for empty/missing values to skip comparison
+  if (!value || value === 'Unknown' || value === '-') {
+    return null;
+  }
+
+  // Handle boolean values
+  if (typeof value === 'boolean' || value === 'true' || value === 'false') {
+    return String(value).toLowerCase();
+  }
+
+  // Handle array values
+  if (Array.isArray(value)) {
+    return value
+      .map(v => v.toLowerCase().trim())
+      .sort()
+      .join(', ');
+  }
+
+  // Handle string array
+  if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map(v => v.toLowerCase().trim())
+          .sort()
+          .join(', ');
+      }
+    } catch (e) {
+      // Silent fail for parsing errors
+    }
+  }
+
+  // Regular string
+  return String(value).toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
 export async function getTurtleData(slug: string) {
@@ -168,12 +234,17 @@ export async function getTurtleData(slug: string) {
 
     if (!turtle) return null;
 
+    // Fetch images
+    const categoryImages = await getPhysicalFeatureImages(turtle.species_common_name);
+
     // Fetch physical features and keys in parallel
     const [physicalFeatures, featureKeys] = await Promise.all([
       supabase
         .from('turtle_species_physical_features')
         .select('*')
-        .eq('species_id', turtle.id),
+        .eq('species_id', turtle.id)
+        .order('sex')
+        .order('life_stage'),
       supabase
         .from('turtle_species_physical_features_key')
         .select('*')
@@ -291,19 +362,17 @@ export async function getTurtleData(slug: string) {
     // Get section descriptions
     const sectionDescriptions = turtle.turtle_species_section_descriptions?.[0];
 
-    // Get default variant
-    const defaultVariant = turtle.turtle_species_physical_features?.find(
+    // Get reference variant (Adult Male)
+    const referenceVariant = physicalFeatures.data?.find(
       variant => variant.sex === 'Male' && variant.life_stage === 'Adult'
-    ) || turtle.turtle_species_physical_features?.[0];
+    ) || physicalFeatures.data?.[0];
 
-    // Fetch images
-    const categoryImages = await getPhysicalFeatureImages(turtle.species_common_name);
-    const categoryTag = turtle.species_common_name.toLowerCase().replace(/\s+/g, '-');
-    const images = categoryImages
-      .filter(img => img.tags.includes(categoryTag))
-      .map(img => ({ url: img.url }));
+    // Group other variants
+    const otherVariants = physicalFeatures.data?.filter(
+      variant => !(variant.sex === 'Male' && variant.life_stage === 'Adult')
+    );
 
-    // Transform physical features into categories
+    // Transform physical features into categories with variant data
     const featureCategories = (featureKeys.data || [])
       .filter(key => !key.parent_feature)
       .reduce<FeatureCategory[]>((acc, key) => {
@@ -320,23 +389,66 @@ export async function getTurtleData(slug: string) {
         }
 
         const columnName = key.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
-        const value = defaultVariant?.[columnName] || 'Unknown';
+        const referenceValue = referenceVariant?.[columnName] || '-';
 
+        // Check for variants with different values
+        const variantDifferences = otherVariants?.reduce<Variant[]>((variants, variant) => {
+          const variantValue = normalizeValue(variant[columnName]);
+          const referenceNormalized = normalizeValue(referenceValue);
+          
+          if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
+            variants.push({
+              sex: variant.sex,
+              lifeStage: variant.life_stage,
+              value: variant[columnName]
+            });
+          }
+          return variants;
+        }, []);
+
+        // Only include variants if differences exist
+        const featureVariants = variantDifferences?.length ? {
+          reference: referenceValue,
+          variants: variantDifferences
+        } : undefined;
+
+        // Handle sub-features with the same variant logic
         const subFeatures = featureKeys.data
           .filter(subKey => subKey.parent_feature === key.id)
           .map(subKey => {
             const subColumnName = subKey.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
+            const subReferenceValue = referenceVariant?.[subColumnName] || '-';
+
+            const subVariantDifferences = otherVariants?.reduce<Variant[]>((variants, variant) => {
+              const variantValue = normalizeValue(variant[subColumnName]);
+              const referenceNormalized = normalizeValue(subReferenceValue);
+              
+              if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
+                variants.push({
+                  sex: variant.sex,
+                  lifeStage: variant.life_stage,
+                  value: variant[subColumnName]
+                });
+              }
+              return variants;
+            }, []);
+
             return {
               name: subKey.physical_feature,
-              value: defaultVariant?.[subColumnName] || 'Unknown'
+              value: subReferenceValue,
+              variants: subVariantDifferences?.length ? {
+                reference: subReferenceValue,
+                variants: subVariantDifferences
+              } : undefined
             };
           });
 
         category.features.push({
           name: key.physical_feature,
-          value: Array.isArray(value) ? value.join(', ') : String(value),
+          value: referenceValue,
+          variants: featureVariants,
           subFeatures
-        } as Feature);
+        });
 
         if (!acc.find(c => c.name === key.category)) {
           acc.push(category);
@@ -437,12 +549,17 @@ export async function getTurtleDataByScientificName(scientificName: string) {
 
     if (!turtle) return null;
 
+    // Fetch images
+    const categoryImages = await getPhysicalFeatureImages(turtle.species_common_name);
+
     // Fetch physical features and keys in parallel
     const [physicalFeatures, featureKeys] = await Promise.all([
       supabase
         .from('turtle_species_physical_features')
         .select('*')
-        .eq('species_id', turtle.id),
+        .eq('species_id', turtle.id)
+        .order('sex')
+        .order('life_stage'),
       supabase
         .from('turtle_species_physical_features_key')
         .select('*')
@@ -560,19 +677,17 @@ export async function getTurtleDataByScientificName(scientificName: string) {
     // Get section descriptions
     const sectionDescriptions = turtle.turtle_species_section_descriptions?.[0];
 
-    // Get default variant
-    const defaultVariant = turtle.turtle_species_physical_features?.find(
+    // Get reference variant (Adult Male)
+    const referenceVariant = physicalFeatures.data?.find(
       variant => variant.sex === 'Male' && variant.life_stage === 'Adult'
-    ) || turtle.turtle_species_physical_features?.[0];
+    ) || physicalFeatures.data?.[0];
 
-    // Fetch images
-    const categoryImages = await getPhysicalFeatureImages(turtle.species_common_name);
-    const categoryTag = turtle.species_common_name.toLowerCase().replace(/\s+/g, '-');
-    const images = categoryImages
-      .filter(img => img.tags.includes(categoryTag))
-      .map(img => ({ url: img.url }));
+    // Group other variants
+    const otherVariants = physicalFeatures.data?.filter(
+      variant => !(variant.sex === 'Male' && variant.life_stage === 'Adult')
+    );
 
-    // Transform physical features into categories
+    // Transform physical features into categories with variant data
     const featureCategories = (featureKeys.data || [])
       .filter(key => !key.parent_feature)
       .reduce<FeatureCategory[]>((acc, key) => {
@@ -589,23 +704,66 @@ export async function getTurtleDataByScientificName(scientificName: string) {
         }
 
         const columnName = key.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
-        const value = defaultVariant?.[columnName] || 'Unknown';
+        const referenceValue = referenceVariant?.[columnName] || '-';
 
+        // Check for variants with different values
+        const variantDifferences = otherVariants?.reduce<Variant[]>((variants, variant) => {
+          const variantValue = normalizeValue(variant[columnName]);
+          const referenceNormalized = normalizeValue(referenceValue);
+          
+          if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
+            variants.push({
+              sex: variant.sex,
+              lifeStage: variant.life_stage,
+              value: variant[columnName]
+            });
+          }
+          return variants;
+        }, []);
+
+        // Only include variants if differences exist
+        const featureVariants = variantDifferences?.length ? {
+          reference: referenceValue,
+          variants: variantDifferences
+        } : undefined;
+
+        // Handle sub-features with the same variant logic
         const subFeatures = featureKeys.data
           .filter(subKey => subKey.parent_feature === key.id)
           .map(subKey => {
             const subColumnName = subKey.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
+            const subReferenceValue = referenceVariant?.[subColumnName] || '-';
+
+            const subVariantDifferences = otherVariants?.reduce<Variant[]>((variants, variant) => {
+              const variantValue = normalizeValue(variant[subColumnName]);
+              const referenceNormalized = normalizeValue(subReferenceValue);
+              
+              if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
+                variants.push({
+                  sex: variant.sex,
+                  lifeStage: variant.life_stage,
+                  value: variant[subColumnName]
+                });
+              }
+              return variants;
+            }, []);
+
             return {
               name: subKey.physical_feature,
-              value: defaultVariant?.[subColumnName] || 'Unknown'
+              value: subReferenceValue,
+              variants: subVariantDifferences?.length ? {
+                reference: subReferenceValue,
+                variants: subVariantDifferences
+              } : undefined
             };
           });
 
         category.features.push({
           name: key.physical_feature,
-          value: Array.isArray(value) ? value.join(', ') : String(value),
+          value: referenceValue,
+          variants: featureVariants,
           subFeatures
-        } as Feature);
+        });
 
         if (!acc.find(c => c.name === key.category)) {
           acc.push(category);
