@@ -82,6 +82,7 @@ export default function SpeciesComparison({
   );
   const [isLoading, setIsLoading] = useState(false);
   const [openCategory, setOpenCategory] = useState<string>('Head/Neck');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleAddRelatedSpecies = async (species: RelatedSpecies) => {
     setIsLoading(true);
@@ -135,7 +136,10 @@ export default function SpeciesComparison({
               onRemove={handleRemoveComparison}
             />
           ) : (
-            <button className="w-full h-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg hover:bg-green-900/20 transition-all">
+            <button 
+              onClick={() => setIsSearchOpen(true)} 
+              className="w-full h-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg hover:bg-green-900/20 transition-all"
+            >
               <Icon name="add" size="sm" style="line" className="mb-2" />
               <span className="text-sm">
                 Compare against a different species
@@ -218,6 +222,27 @@ export default function SpeciesComparison({
           )}
         </div>
       </div>
+
+      {/* Add Search Modal */}
+      {isSearchOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl m-4 p-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl">Find a Species</h3>
+              <button 
+                onClick={() => setIsSearchOpen(false)}
+                className="flex items-center justify-center text-gray-500 hover:text-black"
+              >
+                <Icon name="close" size="sm" style="line" />
+              </button>
+            </div>
+            
+            <div className="text-center py-8 text-gray-500">
+              Search functionality coming soon...
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
