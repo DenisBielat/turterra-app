@@ -1,33 +1,15 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import VariantModal from './VariantModal';
-import { Variant, FeatureVariants } from '@/types/features';
 
-interface Feature {
-  name: string;
-  value: string;
-  variants?: FeatureVariants;  // Add this to track differences
-  subFeatures: {
-    name: string;
-    value: string;
-    variants?: FeatureVariants;  // Also for sub-features
-  }[];
-  images?: { url: string }[];
-}
-
-interface Category {
-  name: string;
-  features: Feature[];
-  image?: { url: string };
-}
-
-interface PhysicalFeaturesProps {
-  categories: Category[];
-  openCategory: string;
-  onCategoryClick: (categoryName: string, isOpen: boolean) => void;
-}
+// Import the types
+import {
+  Variant,
+  FeatureVariants,
+  PhysicalFeaturesProps
+} from '@/types/turtleTypes';
 
 function formatValue(value: any): React.ReactNode {
   // Handle null/undefined/unknown
@@ -131,9 +113,11 @@ export default function PhysicalFeatures({
               <div className="relative">
                 <div className="accordion-animated-content">
                   {/* Category Image Container */}
-                  <div className={`transition-all duration-500 ease-in-out ${
-                    isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}>
+                  <div
+                    className={`transition-all duration-500 ease-in-out ${
+                      isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+                  >
                     {category.image && (
                       <div className="p-4 bg-white">
                         <img
@@ -149,9 +133,7 @@ export default function PhysicalFeatures({
                   <div
                     id={`content-${categoryTag}`}
                     className={`transition-all duration-500 ease-in-out ${
-                      isOpen
-                        ? 'max-h-[2000px] opacity-100'
-                        : 'max-h-0 opacity-0'
+                      isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
                     }`}
                   >
                     {/* Header Row */}
@@ -162,34 +144,39 @@ export default function PhysicalFeatures({
 
                     {/* Features */}
                     {category.features.map((feature, index) => (
-                      <div 
-                        key={feature.name} 
+                      <div
+                        key={feature.name}
                         className={`feature-group ${
                           index % 2 === 0 ? 'bg-white' : 'bg-[#f2f2f2]'
-                        } ${
-                          index === category.features.length - 1 ? 'pb-2' : ''
-                        }`}
+                        } ${index === category.features.length - 1 ? 'pb-2' : ''}`}
                       >
-                        <div className={`grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 py-2 ${
-                          index > 0 ? 'border-t border-gray-200' : ''
-                        }`}>
-                          <div className="font-semibold">
-                            {feature.name}
-                          </div>
+                        <div
+                          className={`grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 py-2 ${
+                            index > 0 ? 'border-t border-gray-200' : ''
+                          }`}
+                        >
+                          <div className="font-semibold">{feature.name}</div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center h-5">
                               {formatValue(feature.value)}
                             </div>
                             {feature.variants && (
                               <button
-                                onClick={() => feature.variants && setSelectedVariant({
-                                  name: feature.name,
-                                  variants: feature.variants
-                                })}
+                                onClick={() =>
+                                  setSelectedVariant({
+                                    name: feature.name,
+                                    variants: feature.variants!
+                                  })
+                                }
                                 className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm"
                                 title="View variant differences"
                               >
-                                <Icon name="split-3" size="sm" style="line" className="text-violet-800" />
+                                <Icon
+                                  name="split-3"
+                                  size="sm"
+                                  style="line"
+                                  className="text-violet-800"
+                                />
                               </button>
                             )}
                           </div>
@@ -197,7 +184,10 @@ export default function PhysicalFeatures({
 
                         {/* Sub-features */}
                         {feature.subFeatures.map((sub) => (
-                          <div key={sub.name} className="grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 pb-2">
+                          <div
+                            key={sub.name}
+                            className="grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 pb-2"
+                          >
                             <div className="pl-10 relative flex items-center">
                               <Icon
                                 name="flow-arrow-1"
@@ -213,14 +203,21 @@ export default function PhysicalFeatures({
                               </div>
                               {sub.variants && (
                                 <button
-                                  onClick={() => sub.variants && setSelectedVariant({
-                                    name: sub.name,
-                                    variants: sub.variants
-                                  })}
+                                  onClick={() =>
+                                    setSelectedVariant({
+                                      name: sub.name,
+                                      variants: sub.variants!
+                                    })
+                                  }
                                   className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm"
                                   title="View variant differences"
                                 >
-                                  <Icon name="split-3" size="sm" style="line" className="text-violet-800"/>
+                                  <Icon
+                                    name="split-3"
+                                    size="sm"
+                                    style="line"
+                                    className="text-violet-800"
+                                  />
                                 </button>
                               )}
                             </div>
@@ -247,4 +244,4 @@ export default function PhysicalFeatures({
       )}
     </>
   );
-} 
+}

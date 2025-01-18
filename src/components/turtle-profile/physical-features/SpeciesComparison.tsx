@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
 import SpeciesCard from './SpeciesCard';
@@ -6,71 +6,12 @@ import PhysicalFeatures from './PhysicalFeatures';
 import { Icon } from '@/components/Icon';
 import Image from 'next/image';
 
-interface Feature {
-  name: string;
-  value: string;
-  subFeatures: {
-    name: string;
-    value: string;
-  }[];
-  images?: { url: string }[];
-}
-
-interface Category {
-  name: string;
-  features: Feature[];
-  image?: { url: string };
-}
-
-interface RelatedSpecies {
-  commonName: string;
-  scientificName: string;
-  avatarUrl: string;
-}
-
-interface ComparisonSpecies {
-  speciesCard: {
-    commonName: string;
-    scientificName: string;
-    avatarUrl: string;
-    backgroundImageUrl?: string;
-    variant: {
-      sex: string;
-      lifeStage: string;
-    };
-  };
-  featureCategories: Category[];
-}
-
-interface SpeciesComparisonProps {
-  primarySpecies: {
-    speciesCard: {
-      commonName: string;
-      scientificName: string;
-      avatarUrl: string;
-      backgroundImageUrl?: string;
-      variant: {
-        sex: string;
-        lifeStage: string;
-      };
-    };
-    featureCategories: Category[];
-  };
-  comparisonSpecies?: {
-    speciesCard: {
-      commonName: string;
-      scientificName: string;
-      avatarUrl: string;
-      backgroundImageUrl?: string;
-      variant: {
-        sex: string;
-        lifeStage: string;
-      };
-    };
-    featureCategories: Category[];
-  };
-  relatedSpecies: RelatedSpecies[];
-}
+// Import interfaces
+import {
+  SpeciesComparisonProps,
+  RelatedSpecies,
+  ComparisonSpecies
+} from '@/types/turtleTypes';
 
 export default function SpeciesComparison({ 
   primarySpecies, 
@@ -194,6 +135,7 @@ export default function SpeciesComparison({
                           alt={species.commonName}
                           fill
                           className="object-cover rounded-l-lg"
+                          sizes="(max-width: 768px) 100vw, 33vw"
                         />
                       </div>
                       <div className="flex flex-col items-start gap-1 px-4">
@@ -245,4 +187,4 @@ export default function SpeciesComparison({
       )}
     </div>
   );
-} 
+}

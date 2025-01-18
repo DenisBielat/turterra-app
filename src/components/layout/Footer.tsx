@@ -42,6 +42,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                         width={240}
                         height={60}
                         className="h-12 w-auto"
+                        sizes="(max-width: 768px) 100vw, 32vw"
                       />
                     </Link>
                     <div className="mt-6">

@@ -137,25 +137,52 @@ export interface Variant {
   
   export interface FeatureCategory {
     name: string;
-    image?: { url: string };
     features: Feature[];
+    image?: { url: string };
+  }
+  
+  export interface FeatureVariants {
+    reference: string;
+    variants: Variant[];
   }
   
   export interface Feature {
     name: string;
     value: string;
-    variants?: {
-      reference: string;
-      variants: Variant[];
-    };
+    variants?: FeatureVariants;
     subFeatures: SubFeature[];
+    images?: { url: string }[];
   }
   
   export interface SubFeature {
     name: string;
     value: string;
-    variants?: {
-      reference: string;
-      variants: Variant[];
+    variants?: FeatureVariants;
+  }
+  
+  export interface ComparisonSpecies {
+    speciesCard: {
+      commonName: string;
+      scientificName: string;
+      avatarUrl: string;
+      backgroundImageUrl?: string;
+      variant: {
+        sex: string;
+        lifeStage: string;
+      };
     };
-  }  
+    featureCategories: FeatureCategory[];
+  }
+  
+  export interface SpeciesComparisonProps {
+    primarySpecies: ComparisonSpecies;
+    comparisonSpecies?: ComparisonSpecies;
+    relatedSpecies: RelatedSpecies[];
+  }
+  
+  // Props for the PhysicalFeatures component
+  export interface PhysicalFeaturesProps {
+    categories: FeatureCategory[];
+    openCategory: string;
+    onCategoryClick: (categoryName: string, isOpen: boolean) => void;
+  }

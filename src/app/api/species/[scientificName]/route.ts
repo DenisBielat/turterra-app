@@ -1,10 +1,8 @@
 import { getTurtleDataByScientificName } from '@/lib/db/queries/turtle-profile';
 import { NextResponse } from 'next/server';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { scientificName: string } }
-) {
+export async function GET(request: Request, props: { params: Promise<{ scientificName: string }> }) {
+  const params = await props.params;
   try {
     const decodedName = decodeURIComponent(params.scientificName);
     const data = await getTurtleDataByScientificName(decodedName);

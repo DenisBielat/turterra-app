@@ -118,6 +118,7 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
             width={160}
             height={160}
             className="rounded-full w-40 h-40 object-cover aspect-square"
+            sizes="(max-width: 768px) 100vw, 32vw"
           />
           <h5 className="font-heading font-bold text-2xl">{name}</h5>
           <div className="italic">{species}</div>

@@ -5,9 +5,10 @@ import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGla
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
 
-export default async function TurtlePage({ params }: { params: { slug: string } }) {
+export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const data = await getTurtleData(params.slug);
-  
+
   if (!data) {
     return <div>No turtle data found</div>
   }

@@ -63,6 +63,7 @@ export default function SpeciesCard({
             alt={commonName}
             fill
             className="object-cover rounded-full"
+            sizes="(max-width: 768px) 100vw, 32vw"
           />
         </div>
         <div>

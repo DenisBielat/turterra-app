@@ -370,7 +370,7 @@ function transformTurtleDataToProfile(
     scientificName: species_scientific_name,
     profileImage: avatar_image_circle_url || "",
     description: species_intro_description,
-    conservationStatus,
+    conservationStatus, 
     stats,
     commonNames: other_common_names || [],
     identification: {
