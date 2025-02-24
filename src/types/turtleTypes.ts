@@ -180,9 +180,28 @@ export interface Variant {
     relatedSpecies: RelatedSpecies[];
   }
   
-  // Props for the PhysicalFeatures component
   export interface PhysicalFeaturesProps {
     categories: FeatureCategory[];
     openCategory: string;
     onCategoryClick: (categoryName: string, isOpen: boolean) => void;
+  }
+
+  export interface SpeciesCardProps {
+    commonName: string;
+    scientificName: string;
+    avatarUrl: string;
+    backgroundImageUrl?: string;
+    variant: {
+      sex: string;
+      lifeStage: string;
+    };
+    isComparison?: boolean;
+    onRemove?: () => void;
+  }
+
+  export interface VariantModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    featureName: string;
+    variants: FeatureVariants;
   }

@@ -1,106 +1,118 @@
-'use client'
+'use client';
 
+import { useCallback } from 'react';
+// Shadcn UI imports
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table';
+// Local imports
 import { Icon } from '@/components/Icon';
-import { useEffect, useRef } from 'react';
-import { Variant, FeatureVariants } from '@/types/features';
+// Import types from turtleTypes.ts
+import { VariantModalProps, Variant } from '@/types/turtleTypes';
 
-interface VariantModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  featureName: string;
-  variants: FeatureVariants;
-}
-
-function formatModalValue(value: any): React.ReactNode {
+function formatModalValue(value: unknown): React.ReactNode {
+  // Handle null, undefined, or empty
   if (!value && value !== false) return '-';
 
   const stringValue = String(value);
 
+  // Boolean true
   if (stringValue.toLowerCase() === 'true' || value === true) {
     return <Icon name="checkmark-2" size="sm" style="filled" className="text-green-600" />;
   }
+  // Boolean false
   if (stringValue.toLowerCase() === 'false' || value === false) {
     return <Icon name="close" size="sm" style="filled" className="text-red-500" />;
   }
 
+  // Otherwise, just capitalize
   return stringValue.charAt(0).toUpperCase() + stringValue.slice(1).toLowerCase();
 }
 
-export default function VariantModal({ isOpen, onClose, featureName, variants }: VariantModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
+export default function VariantModal({
+  isOpen,
+  onClose,
+  featureName,
+  variants
+}: VariantModalProps) {
+  // Optional: useCallback for close if you want
+  const handleChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-    
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
+  // If you want to skip rendering entirely when closed:
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div 
-        ref={modalRef}
-        className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl m-4"
-      >
-        {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-lg">{featureName} Differences</h3>
-          <button onClick={onClose} className="flex items-center justify-center text-gray-500 hover:text-black">
-            <Icon name="close" size="sm" style="line" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-4">
-          <p className="text-sm text-gray-600 mb-4">
+    <Dialog open={isOpen} onOpenChange={handleChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="font-heading font-bold">{featureName} | Differences</DialogTitle>
+          <DialogDescription className="text-gray-500">
             Comparing Male Adult (reference) to other variants
-          </p>
-          
-          <div className="border rounded-lg overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="font-heading px-4 py-2 text-left text-sm">Variant</th>
-                  <th className="font-heading px-4 py-2 text-left text-sm">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-t">
-                  <td className="px-4 py-2 text-sm align-middle">Reference (Male Adult)</td>
-                  <td className="px-4 py-2 text-sm">
-                    <div className="flex items-center h-5">
-                      {formatModalValue(variants.reference)}
-                    </div>
-                  </td>
-                </tr>
-                {variants.variants.map((variant, index) => (
-                  <tr key={`${variant.sex}-${variant.lifeStage}`} className="border-t">
-                    <td className="px-4 py-2 text-sm align-middle">
-                      {variant.sex} {variant.lifeStage}
-                    </td>
-                    <td className="px-4 py-2 text-sm">
-                      <div className="flex items-center h-5">
-                        {formatModalValue(variant.value)}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Table of variants */}
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Variant</TableHead>
+              <TableHead>Value</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {/* Reference Row */}
+            <TableRow>
+              <TableCell className="text-sm">Reference (Male Adult)</TableCell>
+              <TableCell className="text-sm">
+                <div className="flex items-center">
+                  {formatModalValue(variants.reference)}
+                </div>
+              </TableCell>
+            </TableRow>
+
+            {/* Other Variant Rows */}
+            {variants.variants.map((variant: Variant) => (
+              <TableRow key={`${variant.sex}-${variant.lifeStage}`}>
+                <TableCell className="text-sm">
+                  {variant.sex} {variant.lifeStage}
+                </TableCell>
+                <TableCell className="text-sm">
+                  <div className="flex items-center">
+                    {formatModalValue(variant.value)}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
-} 
+}
