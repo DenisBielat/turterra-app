@@ -4,6 +4,7 @@ import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
+import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -55,6 +56,10 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                   speciesCard={data.identification.speciesCard}
                   relatedSpecies={data.identification.relatedSpecies}
                 />
+
+                <div className="w-full mt-12 mb-20">
+                  <DistributionSection />
+                </div>
               </div>
             </div>
           </div>

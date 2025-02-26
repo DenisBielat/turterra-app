@@ -20,9 +20,11 @@
     "clsx": "^2.1.1",
     "lodash": "^4.17.21",
     "lucide-react": "^0.454.0",
-    "next": "15.0.2",
+    "mapbox-gl": "^3.10.0",
+    "next": "^15.1.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-map-gl": "^8.0.1",
     "react-markdown": "^9.0.1",
     "remark-gfm": "^4.0.0",
     "swiper": "^11.1.15",
@@ -30,6 +32,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/mapbox-gl": "^3.4.1",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
