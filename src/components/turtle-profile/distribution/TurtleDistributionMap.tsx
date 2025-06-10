@@ -58,6 +58,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     introduced: true,
     extinct: true
   });
+  // setActiveLayers is kept for future layer toggle functionality
   
   // Fetch distribution GeoJSON for selected species
   useEffect(() => {
@@ -251,7 +252,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           zoom: 1.5
         }}
         interactiveLayerIds={
-          speciesData.flatMap((species, speciesIndex) => 
+          speciesData.flatMap((species) => 
             (Object.keys(activeLayers) as Array<keyof LayerState>)
               .filter(type => activeLayers[type])
               .map(type => `species-${species.speciesId}-${type}-fill`)
