@@ -8,32 +8,11 @@ import {
   Variant
 } from '@/types/turtleTypes';
 
-function normalizeValue(value: string | boolean | string[] | null | undefined): string | null {
-  if (value === false) return 'false';
-  if (!value || value === 'Unknown' || value === '-') return null;
-  if (typeof value === 'boolean' || value === 'true' || value === 'false') {
-    return String(value).toLowerCase();
-  }
-  if (Array.isArray(value)) {
-    return value
-      .map(v => v.toLowerCase().trim())
-      .sort()
-      .join(', ');
-  }
-  if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
-    try {
-      const parsed = JSON.parse(value);
-      if (Array.isArray(parsed)) {
-        return parsed
-          .map((v: string) => v.toLowerCase().trim())
-          .sort()
-          .join(', ');
-      }
-    } catch {
-      // Ignore parse errors
-    }
-  }
-  return String(value).toLowerCase().trim().replace(/\s+/g, ' ');
+function normalizeValue(value: string | boolean | string[] | number | null | undefined): string {
+  if (value === null || value === undefined) return '-';
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if (Array.isArray(value)) return value.map(String).join(', ');
+  return String(value).toLowerCase().trim();
 }
 
 async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', value: string) {
@@ -183,16 +162,16 @@ function buildFeatureCategories({
 
       // Reference & variants
       const columnName = key.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
-      const referenceValue = referenceVariant?.[columnName] || '-';
+      const referenceValue = String(referenceVariant?.[columnName] || '-');
 
       const variantDifferences = otherVariants.reduce<Variant[]>((variants, variant) => {
         const variantValue = normalizeValue(variant[columnName]);
         const referenceNormalized = normalizeValue(referenceValue);
-        if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
+        if (variantValue !== referenceNormalized) {
           variants.push({
             sex: variant.sex,
             lifeStage: variant.life_stage,
-            value: variant[columnName]
+            value: String(variant[columnName])
           });
         }
         return variants;
@@ -210,16 +189,16 @@ function buildFeatureCategories({
             .toLowerCase()
             .replace(/\s+/g, '_')
             .replace(/\//g, '_');
-          const subReferenceValue = referenceVariant?.[subColumnName] || '-';
+          const subReferenceValue = String(referenceVariant?.[subColumnName] || '-');
 
           const subVariantDifferences = otherVariants.reduce<Variant[]>((variants, variant) => {
             const variantValue = normalizeValue(variant[subColumnName]);
             const referenceNormalized = normalizeValue(subReferenceValue);
-            if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
+            if (variantValue !== referenceNormalized) {
               variants.push({
                 sex: variant.sex,
                 lifeStage: variant.life_stage,
-                value: variant[subColumnName]
+                value: String(variant[subColumnName])
               });
             }
             return variants;
