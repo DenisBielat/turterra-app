@@ -53,12 +53,12 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
   const [hoveredFeature, setHoveredFeature] = useState<HoveredFeature | null>(null);
-  const [activeLayers, setActiveLayers] = useState<LayerState>({
+  const [activeLayers, _setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
     extinct: true
   });
-  // setActiveLayers is kept for future layer toggle functionality
+  // _setActiveLayers is kept for future layer toggle functionality
   
   // Fetch distribution GeoJSON for selected species
   useEffect(() => {
