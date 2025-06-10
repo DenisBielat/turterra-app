@@ -3,28 +3,29 @@
 import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import VariantModal from './VariantModal';
+import Image from 'next/image';
 
 // Import the types
 import {
-  Variant,
   FeatureVariants,
   PhysicalFeaturesProps
 } from '@/types/turtleTypes';
 
-function formatValue(value: any): React.ReactNode {
+function formatValue(value: string | boolean | null | undefined): React.ReactNode {
   // Handle null/undefined/unknown
-  if (!value || value === 'Unknown') return '-';
-
-  // Convert to string if it's not already
-  const stringValue = String(value);
+  if (!value || (typeof value === 'string' && value === 'Unknown')) return '-';
 
   // Handle boolean values
-  if (stringValue.toLowerCase() === 'true' || value === true) {
-    return <Icon name="checkmark-2" size="sm" style="filled" className="text-green-600" />;
+  if (typeof value === 'boolean') {
+    return value ? (
+      <Icon name="checkmark-2" size="sm" style="filled" className="text-green-600" />
+    ) : (
+      <Icon name="close" size="sm" style="filled" className="text-gray-400" />
+    );
   }
-  if (stringValue.toLowerCase() === 'false' || value === false) {
-    return <Icon name="close" size="sm" style="filled" className="text-gray-400" />;
-  }
+
+  // Handle string values
+  const stringValue = String(value);
 
   // Handle comma-separated values
   if (stringValue.includes(',')) {
@@ -120,11 +121,14 @@ export default function PhysicalFeatures({
                   >
                     {category.image && (
                       <div className="p-4 bg-white">
-                        <img
-                          src={category.image.url}
-                          alt={`${category.name} features`}
-                          className="w-full h-auto rounded-lg"
-                        />
+                        <div className="relative w-full aspect-video">
+                          <Image
+                            src={category.image.url}
+                            alt={`${category.name} features`}
+                            fill
+                            className="rounded-lg object-cover"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>

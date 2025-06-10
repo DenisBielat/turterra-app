@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Map, { Source, Layer, NavigationControl, Popup, MapMouseEvent, ViewState, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/lib/db/supabaseClient';
-import type { FeatureCollection, Feature, MultiPolygon } from 'geojson';
+import type { FeatureCollection, Feature, MultiPolygon, GeoJsonProperties } from 'geojson';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -140,20 +140,12 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     return colorScales[index % colorScales.length];
   }, []);
   
-  // Toggle layer visibility
-  const toggleLayer = (layerType: keyof LayerState) => {
-    setActiveLayers(prev => ({
-      ...prev,
-      [layerType]: !prev[layerType]
-    }));
-  };
-
   // Memoize filterFeaturesByType
-  const filterFeaturesByType = useMemo(() => (features: any[], type: string) => {
+  const filterFeaturesByType = useMemo(() => (features: Feature<MultiPolygon, GeoJsonProperties>[], type: string) => {
     if (!features || !Array.isArray(features)) return [];
     
     return features.filter(f => {
-      const status = f.properties.presence_status;
+      const status = f.properties?.presence_status;
       switch(type.toLowerCase()) {
         case 'native': return status === 'Native';
         case 'introduced': return status === 'Introduced';

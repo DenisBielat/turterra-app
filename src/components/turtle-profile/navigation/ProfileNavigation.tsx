@@ -14,9 +14,9 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
   const [activeSection, setActiveSection] = useState('intro')
   
   // Add throttle utility
-  const throttle = (func: Function, limit: number) => {
+  const throttle = (func: (...args: unknown[]) => void, limit: number) => {
     let inThrottle: boolean
-    return (...args: any[]) => {
+    return (...args: unknown[]) => {
       if (!inThrottle) {
         func(...args)
         inThrottle = true
@@ -24,6 +24,35 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
       }
     }
   }
+
+  // Define navItems before useEffect
+  const navItems = [
+    {
+      id: 'intro',
+      label: 'At a Glance',
+      icon: <Icon name="eyeball" style="filled" size="base" />
+    },
+    {
+      id: 'identification',
+      label: 'Identification',
+      icon: <Icon name="marine-turtle" style="filled" size="base" />
+    },
+    {
+      id: 'distribution',
+      label: 'Distribution',
+      icon: <Icon name="trip-map-markers" style="filled" size="base" />
+    },
+    {
+      id: 'habitat',
+      label: 'Habitat & Behavior',
+      icon: <Icon name="outdoors-tree-valley" style="filled" size="base" />
+    },
+    {
+      id: 'conservation',
+      label: 'Conservation',
+      icon: <Icon name="hand-shake-heart" style="filled" size="base" />
+    }
+  ]
 
   // Scroll handling logic
   useEffect(() => {
@@ -59,7 +88,7 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [navItems]) // Add navItems to dependency array
 
   // Navigation click handler
   const scrollToSection = (id: string) => {
@@ -76,34 +105,6 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
   }
 
   if (!imageUrl) return null;
-
-  const navItems = [
-    {
-      id: 'intro',
-      label: 'At a Glance',
-      icon: <Icon name="eyeball" style="filled" size="base" />
-    },
-    {
-      id: 'identification',
-      label: 'Identification',
-      icon: <Icon name="marine-turtle" style="filled" size="base" />
-    },
-    {
-      id: 'distribution',
-      label: 'Distribution',
-      icon: <Icon name="trip-map-markers" style="filled" size="base" />
-    },
-    {
-      id: 'habitat',
-      label: 'Habitat & Behavior',
-      icon: <Icon name="outdoors-tree-valley" style="filled" size="base" />
-    },
-    {
-      id: 'conservation',
-      label: 'Conservation',
-      icon: <Icon name="hand-shake-heart" style="filled" size="base" />
-    }
-  ]
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })

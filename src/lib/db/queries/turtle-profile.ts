@@ -8,7 +8,7 @@ import {
   Variant
 } from '@/types/turtleTypes';
 
-function normalizeValue(value: any): string | null {
+function normalizeValue(value: string | boolean | string[] | null | undefined): string | null {
   if (value === false) return 'false';
   if (!value || value === 'Unknown' || value === '-') return null;
   if (typeof value === 'boolean' || value === 'true' || value === 'false') {

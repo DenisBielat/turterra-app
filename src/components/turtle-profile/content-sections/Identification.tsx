@@ -1,6 +1,4 @@
 import { Icon } from '@/components/Icon';
-import PhysicalFeatures from '../physical-features/PhysicalFeatures';
-import SpeciesCard from '../physical-features/SpeciesCard';
 import SpeciesComparison from '../physical-features/SpeciesComparison';
 
 interface IdentificationProps {
@@ -150,7 +148,7 @@ export default function Identification({
         <div className="mt-12 max-w-lg">
           <h3 className="text-3xl font-bold">Physical Features</h3>
           <p className="mt-2 text-base">
-          This section highlights each physical feature of the turtle as observed in the “reference” variant (Adult Male). If you see a variant icon next to a feature, it means there are known differences in that feature for other sexes or life stages (e.g., juvenile, hatchling). Clicking the icon will display a quick comparison, so you can see exactly how that feature varies across the same turtle species. 
+          This section highlights each physical feature of the turtle as observed in the "reference" variant (Adult Male). If you see a variant icon next to a feature, it means there are known differences in that feature for other sexes or life stages (e.g., juvenile, hatchling). Clicking the icon will display a quick comparison, so you can see exactly how that feature varies across the same turtle species. 
           </p>
         </div>
 

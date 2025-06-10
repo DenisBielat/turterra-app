@@ -1,6 +1,7 @@
 // components/SpeciesSelector.js
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/db/supabaseClient';
+import Image from 'next/image';
 
 interface Species {
   id: string | number;
@@ -65,7 +66,7 @@ const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({ onChange, maxSpecies 
 
   // Handle species selection
   const toggleSpecies = (species: Species) => {
-    let newSelected = [...selectedSpecies];
+    const newSelected = [...selectedSpecies];
     
     const index = newSelected.findIndex(s => s.id === species.id);
     if (index > -1) {
@@ -146,11 +147,14 @@ const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({ onChange, maxSpecies 
                 ${selectedSpecies.some(s => s.id === species.id) ? 'bg-green-50' : ''}`}
             >
               {species.avatar_image_circle_url && (
-                <img 
-                  src={species.avatar_image_circle_url} 
-                  alt={species.species_common_name}
-                  className="w-10 h-10 rounded-full mr-3 object-cover"
-                />
+                <div className="relative w-10 h-10 mr-3">
+                  <Image 
+                    src={species.avatar_image_circle_url} 
+                    alt={species.species_common_name}
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                </div>
               )}
               <div>
                 <div className="font-medium">{species.species_common_name}</div>
