@@ -280,8 +280,8 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         <NavigationControl position="top-right" />
         
         {/* Render each species distribution */}
-        {speciesData.map((species, speciesIndex) => {
-          const colorScale = getColorScale(speciesIndex);
+        {speciesData.map((species) => {
+          const colorScale = getColorScale(speciesData.indexOf(species));
           
           if (!species.geojson || !species.geojson.features) {
             console.log('Invalid GeoJSON data for species:', species);

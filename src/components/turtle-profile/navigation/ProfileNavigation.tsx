@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Icon } from '@/components/Icon'
 
 interface ProfileNavigationProps {
@@ -25,8 +25,8 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
     }
   }
 
-  // Define navItems before useEffect
-  const navItems = [
+  // Memoize navItems
+  const navItems = useMemo(() => [
     {
       id: 'intro',
       label: 'At a Glance',
@@ -52,7 +52,7 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
       label: 'Conservation',
       icon: <Icon name="hand-shake-heart" style="filled" size="base" />
     }
-  ]
+  ], []);
 
   // Scroll handling logic
   useEffect(() => {

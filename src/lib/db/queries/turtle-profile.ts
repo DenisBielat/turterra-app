@@ -29,7 +29,7 @@ function normalizeValue(value: string | boolean | string[] | null | undefined): 
           .sort()
           .join(', ');
       }
-    } catch (e) {
+    } catch {
       // Ignore parse errors
     }
   }
