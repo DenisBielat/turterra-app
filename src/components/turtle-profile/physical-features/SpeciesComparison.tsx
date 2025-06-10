@@ -126,7 +126,7 @@ export default function SpeciesComparison({
                   <button
                     key={species.scientificName}
                     onClick={() => handleAddRelatedSpecies(species)}
-                    className="w-full group flex justify-between items-center bg-green-950 rounded-lg drop-shadow-md transition-all duration-200 ease-[cubic-bezier(0.455,0.03,0.515,0.955)] hover:translate-x-4"
+                    className="w-full group flex justify-between items-center bg-green-950 rounded-lg drop-shadow-md transition-all duration-200 ease-in-out hover:translate-x-4"
                   >
                     <div className="flex items-center">
                       <div className="relative w-32 h-20 overflow-clip">
