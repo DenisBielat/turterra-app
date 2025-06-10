@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Map, { Source, Layer, NavigationControl, Popup, MapMouseEvent, ViewState } from 'react-map-gl/mapbox';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import Map, { Source, Layer, NavigationControl, Popup, MapMouseEvent, ViewState, MapRef } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/lib/db/supabaseClient';
+import type { FeatureCollection, Feature, MultiPolygon } from 'geojson';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -11,19 +12,7 @@ interface SpeciesData {
   speciesName: string;
   scientificName: string;
   avatarUrl: string;
-  geojson: {
-    features: Array<{
-      properties: {
-        presence_status: string;
-        origin: string;
-        region_name: string;
-        species_name: string;
-      };
-      geometry: {
-        coordinates: number[][][];
-      };
-    }>;
-  };
+  geojson: FeatureCollection<MultiPolygon>;
 }
 
 interface LayerState {
@@ -34,6 +23,17 @@ interface LayerState {
 
 interface TurtleDistributionMapProps {
   selectedSpeciesIds?: (string | number)[];
+}
+
+interface HoveredFeature {
+  properties: {
+    region_name: string;
+    presence_status: 'Native' | 'Introduced' | 'Extinct';
+    species_name: string;
+  };
+  geometry: {
+    coordinates: number[][][][];
+  };
 }
 
 const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedSpeciesIds = [] }) => {
@@ -52,7 +52,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   });
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
-  const [hoveredFeature, setHoveredFeature] = useState<any>(null);
+  const [hoveredFeature, setHoveredFeature] = useState<HoveredFeature | null>(null);
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
@@ -62,13 +62,21 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   // Fetch distribution GeoJSON for selected species
   useEffect(() => {
     const fetchDistributions = async () => {
-      if (selectedSpeciesIds.length === 0) return;
+      if (selectedSpeciesIds.length === 0) {
+        setSpeciesData([]);
+        return;
+      }
       
-      // For each selected species, fetch its distribution geojson directly
+      // Add console log to check selected IDs
+      console.log('Fetching distributions for species IDs:', selectedSpeciesIds);
+      
       const promises = selectedSpeciesIds.map(async (speciesId) => {
         // Using the database function we created
         const { data: geojsonData, error: geojsonError } = await supabase
           .rpc('get_species_geojson', { p_species_id: speciesId });
+          
+        // Add console log to check GeoJSON data
+        console.log('GeoJSON data for species', speciesId, ':', geojsonData);
           
         if (geojsonError) {
           console.error('Error fetching distribution:', geojsonError);
@@ -97,6 +105,8 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
       });
       
       const results = await Promise.all(promises);
+      // Add console log to check final processed data
+      console.log('Processed species data:', results.filter((item): item is SpeciesData => item !== null));
       setSpeciesData(results.filter((item): item is SpeciesData => item !== null));
     };
     
@@ -138,25 +148,116 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     }));
   };
 
-  // Helper to filter GeoJSON features by type
-  const filterFeaturesByType = useCallback((features: any[], type: string, origin?: string) => {
+  // Memoize filterFeaturesByType
+  const filterFeaturesByType = useMemo(() => (features: any[], type: string) => {
     if (!features || !Array.isArray(features)) return [];
     
     return features.filter(f => {
-      if (type === 'extinct') {
-        return f.properties.presence_status === 'extinct';
+      const status = f.properties.presence_status;
+      switch(type.toLowerCase()) {
+        case 'native': return status === 'Native';
+        case 'introduced': return status === 'Introduced';
+        case 'extinct': return status === 'Extinct';
+        default: return false;
       }
-      return f.properties.presence_status === 'extant' && f.properties.origin === origin;
     });
   }, []);
   
+  useEffect(() => {
+    console.log('Map configuration:', {
+      token: !!MAPBOX_TOKEN, // just log if it exists, not the actual token
+      style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL || 'mapbox://styles/mapbox/light-v11'
+    });
+  }, []);
+  
+  useEffect(() => {
+    speciesData.forEach(species => {
+      const features = species.geojson?.features || [];
+      console.log('Layer debug for species', species.speciesName, {
+        nativeFeatures: filterFeaturesByType(features, 'native').length,
+        introducedFeatures: filterFeaturesByType(features, 'introduced').length,
+        extinctFeatures: filterFeaturesByType(features, 'extinct').length,
+        allFeatures: features.length,
+        sampleFeature: features[0]?.properties
+      });
+    });
+  }, [speciesData, filterFeaturesByType]);
+  
+  // Add this effect to clean up removed species layers
+  useEffect(() => {
+    // Get all current species IDs
+    const currentSpeciesIds = new Set(speciesData.map(s => s.speciesId));
+    
+    // Get all previously rendered species IDs by checking existing source IDs
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+
+    const style = map.getStyle();
+    if (!style?.sources) return;
+    
+    const existingSources = style.sources;
+    const sourceIds = Object.keys(existingSources);
+    
+    // Remove sources and layers for species that are no longer in speciesData
+    sourceIds.forEach(sourceId => {
+      if (sourceId.startsWith('species-')) {
+        const speciesId = sourceId.split('-')[1];
+        if (!currentSpeciesIds.has(Number(speciesId))) {
+          if (map.getSource(sourceId)) {
+            // Remove associated layers first
+            const layerTypes = ['native', 'introduced', 'extinct'];
+            layerTypes.forEach(type => {
+              const layerId = `species-${speciesId}-${type}-fill`;
+              if (map.getLayer(layerId)) {
+                map.removeLayer(layerId);
+              }
+            });
+            // Then remove the source
+            map.removeSource(sourceId);
+          }
+        }
+      }
+    });
+  }, [speciesData]);
+
+  // Add a map reference
+  const mapRef = useRef<MapRef>(null);
+
+  const transformCoordinates = (geojson: FeatureCollection<MultiPolygon>) => {
+    return {
+      ...geojson,
+      features: geojson.features.map(feature => ({
+        ...feature,
+        geometry: {
+          ...feature.geometry,
+          coordinates: feature.geometry.coordinates.map(polygon =>
+            polygon.map(ring =>
+              ring.map(coord => [
+                Number(coord[0].toFixed(6)),
+                Number(coord[1].toFixed(6))
+              ])
+            )
+          )
+        }
+      }))
+    };
+  };
+
   return (
     <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden">
       <Map
+        ref={mapRef}
         {...viewState}
+        projection="mercator"
         onMove={evt => setViewState(evt.viewState)}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL || 'mapbox://styles/mapbox/light-v11'}
         mapboxAccessToken={MAPBOX_TOKEN}
+        reuseMaps
+        initialViewState={{
+          longitude: 0,
+          latitude: 20,
+          zoom: 1.5
+        }}
         interactiveLayerIds={
           speciesData.flatMap((species, speciesIndex) => 
             (Object.keys(activeLayers) as Array<keyof LayerState>)
@@ -166,7 +267,20 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         }
         onMouseMove={(e: MapMouseEvent) => {
           if (e.features && e.features.length > 0) {
-            setHoveredFeature(e.features[0]);
+            const feature = e.features[0];
+            if (feature.properties && 
+                'region_name' in feature.properties && 
+                'presence_status' in feature.properties && 
+                'species_name' in feature.properties) {
+              setHoveredFeature({
+                properties: {
+                  region_name: feature.properties.region_name as string,
+                  presence_status: feature.properties.presence_status as 'Native' | 'Introduced' | 'Extinct',
+                  species_name: feature.properties.species_name as string
+                },
+                geometry: feature.geometry as { coordinates: number[][][][] }
+              });
+            }
           }
         }}
         onMouseLeave={() => setHoveredFeature(null)}
@@ -178,108 +292,68 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           const colorScale = getColorScale(speciesIndex);
           
           if (!species.geojson || !species.geojson.features) {
+            console.log('Invalid GeoJSON data for species:', species);
             return null;
           }
           
           return (
-            <React.Fragment key={`species-source-${species.speciesId}`}>
-              {/* Native range */}
-              {activeLayers.native && (
-                <Source
-                  id={`source-${species.speciesId}-native`}
-                  type="geojson"
-                  data={{
-                    type: 'FeatureCollection',
-                    features: filterFeaturesByType(species.geojson.features, 'native', 'native')
+            <React.Fragment key={`species-${species.speciesId}-native-fill`}>
+              <Source 
+                id={`species-${species.speciesId}-native-fill`} 
+                type="geojson" 
+                data={transformCoordinates(species.geojson)}
+              >
+                <Layer
+                  id={`species-${species.speciesId}-native-fill`}
+                  type="fill"
+                  paint={{
+                    'fill-color': colorScale.native.fillColor,
+                    'fill-opacity': 0.5,
+                    'fill-outline-color': colorScale.native.lineColor
                   }}
-                >
-                  <Layer
-                    id={`species-${species.speciesId}-native-fill`}
-                    type="fill"
-                    paint={{
-                      'fill-color': colorScale.native.fillColor,
-                      'fill-opacity': 0.5
-                    }}
-                  />
-                  <Layer
-                    id={`species-${species.speciesId}-native-line`}
-                    type="line"
-                    paint={{
-                      'line-color': colorScale.native.lineColor,
-                      'line-width': 1
-                    }}
-                  />
-                </Source>
-              )}
-              
-              {/* Introduced range */}
-              {activeLayers.introduced && (
-                <Source
-                  id={`source-${species.speciesId}-introduced`}
-                  type="geojson"
-                  data={{
-                    type: 'FeatureCollection',
-                    features: filterFeaturesByType(species.geojson.features, 'introduced', 'introduced')
+                />
+              </Source>
+              <Source 
+                id={`species-${species.speciesId}-introduced-fill`} 
+                type="geojson" 
+                data={transformCoordinates(species.geojson)}
+              >
+                <Layer
+                  id={`species-${species.speciesId}-introduced-fill`}
+                  type="fill"
+                  paint={{
+                    'fill-color': colorScale.introduced.fillColor,
+                    'fill-opacity': 0.5,
+                    'fill-outline-color': colorScale.introduced.lineColor
                   }}
-                >
-                  <Layer
-                    id={`species-${species.speciesId}-introduced-fill`}
-                    type="fill"
-                    paint={{
-                      'fill-color': colorScale.introduced.fillColor,
-                      'fill-opacity': 0.5
-                    }}
-                  />
-                  <Layer
-                    id={`species-${species.speciesId}-introduced-line`}
-                    type="line"
-                    paint={{
-                      'line-color': colorScale.introduced.lineColor,
-                      'line-width': 1,
-                      'line-dasharray': [3, 1]
-                    }}
-                  />
-                </Source>
-              )}
-              
-              {/* Extinct range */}
-              {activeLayers.extinct && (
-                <Source
-                  id={`source-${species.speciesId}-extinct`}
-                  type="geojson"
-                  data={{
-                    type: 'FeatureCollection',
-                    features: filterFeaturesByType(species.geojson.features, 'extinct')
+                />
+              </Source>
+              <Source 
+                id={`species-${species.speciesId}-extinct-fill`} 
+                type="geojson" 
+                data={transformCoordinates(species.geojson)}
+              >
+                <Layer
+                  id={`species-${species.speciesId}-extinct-fill`}
+                  type="fill"
+                  paint={{
+                    'fill-color': colorScale.extinct.fillColor,
+                    'fill-opacity': 0.5,
+                    'fill-outline-color': colorScale.extinct.lineColor
                   }}
-                >
-                  <Layer
-                    id={`species-${species.speciesId}-extinct-fill`}
-                    type="fill"
-                    paint={{
-                      'fill-color': colorScale.extinct.fillColor,
-                      'fill-opacity': 0.4
-                    }}
-                  />
-                  <Layer
-                    id={`species-${species.speciesId}-extinct-line`}
-                    type="line"
-                    paint={{
-                      'line-color': colorScale.extinct.lineColor,
-                      'line-width': 1,
-                      'line-dasharray': [2, 2]
-                    }}
-                  />
-                </Source>
-              )}
+                />
+              </Source>
             </React.Fragment>
           );
         })}
         
-        {/* Popup for hovering */}
-        {hoveredFeature && hoveredFeature.properties && (
+        {/* Update the Popup component */}
+        {hoveredFeature && hoveredFeature.properties && 
+         !isNaN(hoveredFeature.geometry.coordinates[0][0][0][0]) && 
+         !isNaN(hoveredFeature.geometry.coordinates[0][0][0][1]) && (
           <Popup
-            longitude={hoveredFeature.geometry.coordinates[0][0][0]}
-            latitude={hoveredFeature.geometry.coordinates[0][0][1]}
+            longitude={Number(hoveredFeature.geometry.coordinates[0][0][0][0])}
+            latitude={Number(hoveredFeature.geometry.coordinates[0][0][0][1])}
             anchor="bottom"
             onClose={() => setHoveredFeature(null)}
             closeButton={false}
@@ -288,72 +362,15 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             <div className="p-2">
               <h3 className="font-bold text-sm">{hoveredFeature.properties.region_name || 'Region'}</h3>
               <p className="text-xs">
-                {hoveredFeature.properties.presence_status === 'extant' ? 'Current' : 'Extinct'} range
-                {hoveredFeature.properties.origin && ` (${hoveredFeature.properties.origin})`}
+                {hoveredFeature.properties.presence_status === 'Native' ? 'Native' : 
+                 hoveredFeature.properties.presence_status === 'Introduced' ? 'Introduced' : 
+                 'Extinct'} Range
               </p>
               <p className="text-xs italic">{hoveredFeature.properties.species_name}</p>
             </div>
           </Popup>
         )}
       </Map>
-      
-      {/* Layer Controls */}
-      <div className="absolute top-4 left-4 bg-white p-3 rounded-md shadow-md">
-        <h4 className="font-bold text-sm mb-2">Range Types</h4>
-        <div className="space-y-1">
-          <label className="flex items-center text-sm">
-            <input
-              type="checkbox"
-              checked={activeLayers.native}
-              onChange={() => toggleLayer('native')}
-              className="mr-2"
-            />
-            Native
-          </label>
-          <label className="flex items-center text-sm">
-            <input
-              type="checkbox"
-              checked={activeLayers.introduced}
-              onChange={() => toggleLayer('introduced')}
-              className="mr-2"
-            />
-            Introduced
-          </label>
-          <label className="flex items-center text-sm">
-            <input
-              type="checkbox"
-              checked={activeLayers.extinct}
-              onChange={() => toggleLayer('extinct')}
-              className="mr-2"
-            />
-            Extinct
-          </label>
-        </div>
-      </div>
-      
-      {/* Legend */}
-      <div className="absolute bottom-4 right-4 bg-white p-3 rounded-md shadow-md">
-        <h4 className="font-bold text-sm mb-2">Species Legend</h4>
-        {speciesData.map((species, index) => {
-          const colorScale = getColorScale(index);
-          
-          return (
-            <div key={`legend-${species.speciesId}`} className="mb-3 flex items-center">
-              {species.avatarUrl && (
-                <img 
-                  src={species.avatarUrl} 
-                  alt={species.speciesName}
-                  className="w-8 h-8 rounded-full mr-2 object-cover"
-                />
-              )}
-              <div>
-                <div className="text-sm font-medium">{species.speciesName}</div>
-                <div className="text-xs italic">{species.scientificName}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
 };
