@@ -3,16 +3,23 @@ import Map, { Source, Layer, NavigationControl, Popup, MapMouseEvent, ViewState,
 import 'mapbox-gl/dist/mapbox-gl.css';
 import mapboxgl from 'mapbox-gl';
 import { supabase } from '@/lib/db/supabaseClient';
-import type { FeatureCollection, Feature, Geometry, GeoJsonProperties } from 'geojson';
+import type { FeatureCollection, Feature, Geometry } from 'geojson';
 
+// Constants
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
-
-// Zoom thresholds for layer switching
 const ZOOM_THRESHOLDS = {
-  COUNTRY_TO_STATE: 4, // Switch from country to state at zoom level 4
+  COUNTRY_TO_STATE: 4,
 };
 
-// Define types for our component
+const COLOR_SCALES = [
+  { native: '#2563eb', introduced: '#3b82f6', extinct: '#60a5fa' },
+  { native: '#7c3aed', introduced: '#8b5cf6', extinct: '#a78bfa' },
+  { native: '#16a34a', introduced: '#22c55e', extinct: '#4ade80' },
+  { native: '#dc2626', introduced: '#ef4444', extinct: '#f87171' },
+  { native: '#ea580c', introduced: '#f97316', extinct: '#fb923c' }
+];
+
+// Types
 interface SpeciesData {
   speciesId: string | number;
   speciesName: string;
@@ -20,17 +27,13 @@ interface SpeciesData {
   avatarUrl: string;
   countryGeojson: FeatureCollection<Geometry> | null;
   stateGeojson: FeatureCollection<Geometry> | null;
-  bbox?: [number, number, number, number]; // minLng, minLat, maxLng, maxLat
+  bbox?: [number, number, number, number];
 }
 
 interface LayerState {
   native: boolean;
   introduced: boolean;
   extinct: boolean;
-}
-
-interface TurtleDistributionMapProps {
-  selectedSpeciesIds?: (string | number)[];
 }
 
 interface HoveredFeature {
@@ -40,12 +43,318 @@ interface HoveredFeature {
     species_name: string;
     region_type: 'country' | 'state';
   };
-  lngLat: {
-    lng: number;
-    lat: number;
-  };
+  lngLat: { lng: number; lat: number };
 }
 
+interface TurtleDistributionMapProps {
+  selectedSpeciesIds?: (string | number)[];
+}
+
+// Utility functions
+const calculateBoundsFromFeatures = (geojson: FeatureCollection<Geometry>): [number, number, number, number] | null => {
+  if (!geojson.features?.length) return null;
+
+  let minLng = Infinity, minLat = Infinity;
+  let maxLng = -Infinity, maxLat = -Infinity;
+
+  const extractCoordinates = (coords: any): void => {
+    if (Array.isArray(coords)) {
+      if (coords.length === 2 && typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+        const [lng, lat] = coords;
+        minLng = Math.min(minLng, lng);
+        maxLng = Math.max(maxLng, lng);
+        minLat = Math.min(minLat, lat);
+        maxLat = Math.max(maxLat, lat);
+      } else {
+        coords.forEach(extractCoordinates);
+      }
+    }
+  };
+
+  geojson.features.forEach(feature => {
+    if (feature.geometry && 'coordinates' in feature.geometry) {
+      extractCoordinates(feature.geometry.coordinates);
+    }
+  });
+
+  if (!isFinite(minLng) || !isFinite(minLat) || !isFinite(maxLng) || !isFinite(maxLat)) {
+    return null;
+  }
+
+  return [minLng, minLat, maxLng, maxLat];
+};
+
+const cleanCoordinates = (geojson: FeatureCollection<any>): FeatureCollection<any> => {
+  const cleanCoord = (coord: number[]): number[] => [
+    Math.round(coord[0] * 1000000) / 1000000,
+    Math.round(coord[1] * 1000000) / 1000000
+  ];
+
+  const cleanCoordinatesRecursive = (coords: any): any => {
+    if (!Array.isArray(coords)) return coords;
+    
+    if (coords.length === 2 && typeof coords[0] === 'number' && typeof coords[1] === 'number') {
+      return cleanCoord(coords);
+    }
+    
+    return coords.map(cleanCoordinatesRecursive);
+  };
+
+  return {
+    ...geojson,
+    features: geojson.features
+      .map(feature => {
+        if (!feature?.geometry?.coordinates) return null;
+        
+        try {
+          return {
+            ...feature,
+            geometry: {
+              ...feature.geometry,
+              coordinates: cleanCoordinatesRecursive(feature.geometry.coordinates)
+            }
+          };
+        } catch (error) {
+          return null;
+        }
+      })
+      .filter((feature): feature is Feature<any> => feature !== null)
+  };
+};
+
+// Custom hooks
+const useSpeciesData = (selectedSpeciesIds: (string | number)[]) => {
+  const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchDistributions = async () => {
+      if (selectedSpeciesIds.length === 0) {
+        setSpeciesData([]);
+        return;
+      }
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const promises = selectedSpeciesIds.map(async (speciesId) => {
+          // Fetch species info
+          const { data: speciesInfo, error: speciesError } = await supabase
+            .from('turtle_species')
+            .select('id, species_common_name, species_scientific_name, avatar_image_circle_url')
+            .eq('id', speciesId)
+            .single();
+            
+          if (speciesError) throw new Error(`Failed to fetch species info for ID ${speciesId}`);
+
+          // Fetch GeoJSON data
+          const { data: geojsonData, error: geojsonError } = await supabase
+            .rpc('get_species_geojson', { p_species_id: speciesId });
+            
+          if (geojsonError) throw new Error(`Failed to fetch GeoJSON for species ${speciesId}`);
+
+          // Validate and process GeoJSON
+          if (!geojsonData || geojsonData.type !== 'FeatureCollection' || !Array.isArray(geojsonData.features)) {
+            return {
+              speciesId: speciesInfo.id,
+              speciesName: speciesInfo.species_common_name,
+              scientificName: speciesInfo.species_scientific_name,
+              avatarUrl: speciesInfo.avatar_image_circle_url,
+              countryGeojson: null,
+              stateGeojson: null
+            };
+          }
+
+          // Separate country and state features
+          const countryFeatures: Feature<Geometry>[] = [];
+          const stateFeatures: Feature<Geometry>[] = [];
+
+          geojsonData.features.forEach((feature: Feature<Geometry>) => {
+            if (!feature?.geometry) return;
+
+            const regionLevel = feature.properties?.region_level || 'country';
+            const processedFeature = {
+              ...feature,
+              properties: {
+                ...feature.properties,
+                species_name: speciesInfo.species_common_name
+              }
+            };
+
+            if (regionLevel === 'state') {
+              stateFeatures.push(processedFeature);
+            } else {
+              countryFeatures.push(processedFeature);
+            }
+          });
+
+          // Handle bounding box
+          let bbox: [number, number, number, number] | undefined;
+          
+          if (geojsonData.bbox && Array.isArray(geojsonData.bbox) && geojsonData.bbox.length === 4) {
+            const [minLng, minLat, maxLng, maxLat] = geojsonData.bbox;
+            if (typeof minLng === 'number' && typeof minLat === 'number' && 
+                typeof maxLng === 'number' && typeof maxLat === 'number' &&
+                !isNaN(minLng) && !isNaN(minLat) && !isNaN(maxLng) && !isNaN(maxLat)) {
+              bbox = [minLng, minLat, maxLng, maxLat];
+            }
+          }
+          
+          if (!bbox) {
+            bbox = calculateBoundsFromFeatures(geojsonData) || undefined;
+          }
+
+          return {
+            speciesId: speciesInfo.id,
+            speciesName: speciesInfo.species_common_name,
+            scientificName: speciesInfo.species_scientific_name,
+            avatarUrl: speciesInfo.avatar_image_circle_url,
+            countryGeojson: countryFeatures.length > 0 ? { type: 'FeatureCollection', features: countryFeatures } : null,
+            stateGeojson: stateFeatures.length > 0 ? { type: 'FeatureCollection', features: stateFeatures } : null,
+            bbox
+          };
+        });
+        
+        const results = await Promise.all(promises);
+        setSpeciesData(results.filter((item): item is SpeciesData => item !== null));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch distribution data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchDistributions();
+  }, [selectedSpeciesIds]);
+
+  return { speciesData, loading, error };
+};
+
+const useMapFitBounds = (mapRef: React.RefObject<MapRef>, speciesData: SpeciesData[]) => {
+  useEffect(() => {
+    if (speciesData.length === 0 || !mapRef.current) return;
+
+    const performZoomToFit = () => {
+      const map = mapRef.current?.getMap();
+      if (!map) return false;
+
+      const bounds = new mapboxgl.LngLatBounds();
+      let hasValidBounds = false;
+
+      speciesData.forEach(species => {
+        if (species.bbox) {
+          const [minLng, minLat, maxLng, maxLat] = species.bbox;
+          bounds.extend([minLng, minLat]);
+          bounds.extend([maxLng, maxLat]);
+          hasValidBounds = true;
+        } else if (species.countryGeojson) {
+          const speciesBounds = calculateBoundsFromFeatures(species.countryGeojson);
+          if (speciesBounds) {
+            const [minLng, minLat, maxLng, maxLat] = speciesBounds;
+            bounds.extend([minLng, minLat]);
+            bounds.extend([maxLng, maxLat]);
+            hasValidBounds = true;
+          }
+        }
+      });
+
+      if (!hasValidBounds || bounds.isEmpty()) return false;
+
+      const fitToBounds = () => {
+        try {
+          map.fitBounds(bounds, { 
+            padding: 50, 
+            duration: 1000,
+            maxZoom: 10
+          });
+        } catch (error) {
+          console.error('Error fitting bounds:', error);
+        }
+      };
+
+      if (map.isStyleLoaded()) {
+        fitToBounds();
+      } else {
+        map.once('load', fitToBounds);
+      }
+
+      return true;
+    };
+
+    // Try immediately, then retry if needed
+    if (!performZoomToFit()) {
+      const retryInterval = setInterval(() => {
+        if (performZoomToFit()) {
+          clearInterval(retryInterval);
+        }
+      }, 100);
+
+      // Stop trying after 3 seconds
+      setTimeout(() => clearInterval(retryInterval), 3000);
+
+      return () => clearInterval(retryInterval);
+    }
+  }, [speciesData]);
+};
+
+// Components
+const LoadingState = () => (
+  <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full w-8 h-8 border-b-2 border-blue-600 mx-auto mb-2" />
+      <p className="text-gray-600">Loading distribution data...</p>
+    </div>
+  </div>
+);
+
+const ErrorState = ({ error }: { error: string }) => (
+  <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden bg-red-50 flex items-center justify-center">
+    <div className="text-center p-4">
+      <p className="text-red-600 font-semibold">Error loading map data</p>
+      <p className="text-red-500 text-sm mt-1">{error}</p>
+    </div>
+  </div>
+);
+
+const LayerControls = ({ activeLayers, onChange }: { activeLayers: LayerState; onChange: (layers: LayerState) => void }) => (
+  <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg">
+    <h4 className="font-semibold text-sm mb-2">Show Ranges</h4>
+    <div className="space-y-2">
+      {Object.entries(activeLayers).map(([key, value]) => (
+        <label key={key} className="flex items-center text-xs">
+          <input
+            type="checkbox"
+            checked={value}
+            onChange={(e) => onChange({ ...activeLayers, [key]: e.target.checked })}
+            className="mr-2"
+          />
+          {key.charAt(0).toUpperCase() + key.slice(1)}
+        </label>
+      ))}
+    </div>
+  </div>
+);
+
+const SpeciesLegend = ({ speciesData }: { speciesData: SpeciesData[] }) => (
+  <div className="absolute top-4 right-16 bg-white p-3 rounded-lg shadow-lg max-w-xs">
+    <h4 className="font-semibold text-sm mb-2">Species</h4>
+    <div className="space-y-1 max-h-32 overflow-y-auto">
+      {speciesData.map((species, index) => (
+        <div key={species.speciesId} className="flex items-center text-xs">
+          <div 
+            className="w-3 h-3 rounded mr-2 flex-shrink-0"
+            style={{ backgroundColor: COLOR_SCALES[index % COLOR_SCALES.length].native }}
+          />
+          <span className="truncate">{species.speciesName}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Main component
 const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedSpeciesIds = [] }) => {
   const [viewState, setViewState] = useState<ViewState>({
     longitude: 0,
@@ -56,419 +365,29 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     padding: { top: 0, bottom: 0, left: 0, right: 0 },
   });
   
-  const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
   const [hoveredFeature, setHoveredFeature] = useState<HoveredFeature | null>(null);
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
     extinct: true
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   
   const mapRef = useRef<MapRef>(null);
+  const { speciesData, loading, error } = useSpeciesData(selectedSpeciesIds);
   
-  // Determine which detail level to show based on zoom
+  useMapFitBounds(mapRef, speciesData);
+  
   const currentDetailLevel = useMemo(() => {
     return viewState.zoom >= ZOOM_THRESHOLDS.COUNTRY_TO_STATE ? 'state' : 'country';
   }, [viewState.zoom]);
   
-  // Calculate bounds from GeoJSON features (fallback method)
-  const calculateBoundsFromFeatures = useCallback((geojson: FeatureCollection<Geometry>): [number, number, number, number] | null => {
-    if (!geojson.features || geojson.features.length === 0) {
-      return null;
+  const getGeojsonForDetailLevel = useCallback((species: SpeciesData, detailLevel: 'country' | 'state') => {
+    if (detailLevel === 'state') {
+      return species.stateGeojson || species.countryGeojson;
     }
-
-    let minLng = Infinity;
-    let minLat = Infinity;
-    let maxLng = -Infinity;
-    let maxLat = -Infinity;
-
-    const extractCoordinates = (coords: any): void => {
-      if (Array.isArray(coords)) {
-        if (coords.length === 2 && typeof coords[0] === 'number' && typeof coords[1] === 'number') {
-          // This is a coordinate pair [lng, lat]
-          const [lng, lat] = coords;
-          minLng = Math.min(minLng, lng);
-          maxLng = Math.max(maxLng, lng);
-          minLat = Math.min(minLat, lat);
-          maxLat = Math.max(maxLat, lat);
-        } else {
-          // This is a nested array, recurse
-          coords.forEach(extractCoordinates);
-        }
-      }
-    };
-
-    geojson.features.forEach(feature => {
-      if (feature.geometry && 'coordinates' in feature.geometry) {
-        extractCoordinates(feature.geometry.coordinates);
-      }
-    });
-
-    if (minLng === Infinity || minLat === Infinity || maxLng === -Infinity || maxLat === -Infinity) {
-      return null;
-    }
-
-    return [minLng, minLat, maxLng, maxLat];
+    return species.countryGeojson;
   }, []);
   
-  // Fetch distribution GeoJSON for selected species
-  useEffect(() => {
-    const fetchDistributions = async () => {
-      if (selectedSpeciesIds.length === 0) {
-        setSpeciesData([]);
-        return;
-      }
-      
-      setLoading(true);
-      setError(null);
-      console.log('Fetching distributions for species IDs:', selectedSpeciesIds);
-      
-      try {
-        const promises = selectedSpeciesIds.map(async (speciesId) => {
-          // First, get species info
-          const { data: speciesInfo, error: speciesError } = await supabase
-            .from('turtle_species')
-            .select('id, species_common_name, species_scientific_name, avatar_image_circle_url')
-            .eq('id', speciesId)
-            .single();
-            
-          if (speciesError) {
-            console.error('Error fetching species info:', speciesError);
-            throw new Error(`Failed to fetch species info for ID ${speciesId}`);
-          }
-
-          // Use the PostGIS function to get properly formatted GeoJSON
-          const { data: geojsonData, error: geojsonError } = await supabase
-            .rpc('get_species_geojson', { p_species_id: speciesId });
-            
-          if (geojsonError) {
-            console.error('Error fetching species GeoJSON:', geojsonError);
-            throw new Error(`Failed to fetch GeoJSON for species ${speciesId}`);
-          }
-
-          console.log('Raw GeoJSON data for species', speciesId, ':', geojsonData);
-
-          // Let's also log the features to see what region_level values we're getting
-          if (geojsonData && geojsonData.features) {
-            console.log('Features breakdown for species', speciesId, ':');
-            geojsonData.features.forEach((feature: Feature<Geometry>, index: number) => {
-              console.log(`Feature ${index}:`, {
-                region_name: feature.properties?.region_name,
-                region_level: feature.properties?.region_level,
-                presence_status: feature.properties?.presence_status,
-                hasGeometry: !!feature.geometry
-              });
-            });            
-          }
-
-          // Validate the GeoJSON data structure
-          if (!geojsonData || typeof geojsonData !== 'object') {
-            console.warn(`No distribution data found for species ${speciesId}`);
-            return {
-              speciesId: speciesInfo.id,
-              speciesName: speciesInfo.species_common_name,
-              scientificName: speciesInfo.species_scientific_name,
-              avatarUrl: speciesInfo.avatar_image_circle_url,
-              countryGeojson: null,
-              stateGeojson: null
-            };
-          }
-
-          // Validate that it's a proper FeatureCollection
-          if (geojsonData.type !== 'FeatureCollection' || !Array.isArray(geojsonData.features)) {
-            console.warn(`Invalid FeatureCollection for species ${speciesId}:`, geojsonData);
-            return {
-              speciesId: speciesInfo.id,
-              speciesName: speciesInfo.species_common_name,
-              scientificName: speciesInfo.species_scientific_name,
-              avatarUrl: speciesInfo.avatar_image_circle_url,
-              countryGeojson: null,
-              stateGeojson: null
-            };
-          }
-
-          // Process and separate country/state level data from the FeatureCollection
-          const processGeojsonData = (featureCollection: FeatureCollection<Geometry>): { country: FeatureCollection<Geometry>, state: FeatureCollection<Geometry> } => {
-            const countryFeatures: Feature<Geometry>[] = [];
-            const stateFeatures: Feature<Geometry>[] = [];
-
-            featureCollection.features.forEach(feature => {
-              if (!feature || !feature.geometry) {
-                console.warn('Invalid feature in GeoJSON data:', feature);
-                return;
-              }
-
-              // Get region level from feature properties
-              const regionLevel = feature.properties?.region_level || 'country';
-
-              // Create a proper Feature
-              const processedFeature: Feature<Geometry> = {
-                ...feature,
-                properties: {
-                  ...feature.properties,
-                  species_name: speciesInfo.species_common_name
-                }
-              };
-
-              // Separate by region level
-              if (regionLevel === 'state') {
-                stateFeatures.push(processedFeature);
-              } else {
-                countryFeatures.push(processedFeature);
-              }
-            });
-
-            return {
-              country: {
-                type: 'FeatureCollection',
-                features: countryFeatures
-              },
-              state: {
-                type: 'FeatureCollection',
-                features: stateFeatures
-              }
-            };
-          };
-
-          const processedData = processGeojsonData(geojsonData);
-          
-          console.log('Processed data for species', speciesId, ':', {
-            countryFeatures: processedData.country.features.length,
-            stateFeatures: processedData.state.features.length
-          });
-
-          // Handle bounding box - first try to use the one from SQL, then calculate our own
-          let bbox: [number, number, number, number] | undefined;
-          
-          if (geojsonData.bbox && Array.isArray(geojsonData.bbox) && geojsonData.bbox.length === 4) {
-            // Validate bbox values are numbers
-            const [minLng, minLat, maxLng, maxLat] = geojsonData.bbox;
-            if (typeof minLng === 'number' && typeof minLat === 'number' && 
-                typeof maxLng === 'number' && typeof maxLat === 'number' &&
-                !isNaN(minLng) && !isNaN(minLat) && !isNaN(maxLng) && !isNaN(maxLat)) {
-              bbox = [minLng, minLat, maxLng, maxLat];
-              console.log('Using SQL-provided bbox for species', speciesId, ':', bbox);
-            }
-          }
-          
-          // If no valid bbox from SQL, calculate from features
-          if (!bbox) {
-            console.log('No valid bbox from SQL, calculating from features for species', speciesId);
-            bbox = calculateBoundsFromFeatures(geojsonData) || undefined;
-            if (bbox) {
-              console.log('Calculated bbox for species', speciesId, ':', bbox);
-            }
-          }
-
-          return {
-            speciesId: speciesInfo.id,
-            speciesName: speciesInfo.species_common_name,
-            scientificName: speciesInfo.species_scientific_name,
-            avatarUrl: speciesInfo.avatar_image_circle_url,
-            countryGeojson: processedData.country.features.length > 0 ? processedData.country : null,
-            stateGeojson: processedData.state.features.length > 0 ? processedData.state : null,
-            bbox
-          };
-        });
-        
-        const results = await Promise.all(promises);
-        const validResults = results.filter((item): item is SpeciesData => {
-          return item !== null && 
-                 typeof item === 'object' && 
-                 'speciesId' in item &&
-                 'speciesName' in item;
-        });
-        
-        console.log('Final processed species data:', validResults);
-        setSpeciesData(validResults);
-        
-      } catch (err) {
-        console.error('Error fetching distributions:', err);
-        setError(err instanceof Error ? err.message : 'Failed to fetch distribution data');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchDistributions();
-  }, [selectedSpeciesIds, calculateBoundsFromFeatures]);
-  
-  // Handle zoom-to-fit when species data changes (country-level only)
-  useEffect(() => {
-    console.log('Zoom-to-fit useEffect triggered. SpeciesData length:', speciesData.length);
-    
-    if (speciesData.length === 0) {
-      console.log('No species data available');
-      return;
-    }
-
-    // Function to perform the zoom-to-fit
-    const performZoomToFit = () => {
-      if (!mapRef.current) {
-        console.log('Map ref still not available');
-        return false;
-      }
-      
-      const map = mapRef.current.getMap();
-      if (!map) {
-        console.log('Map not available from ref');
-        return false;
-      }
-
-      console.log('Starting zoom-to-fit for species data...');
-
-      // Use the SQL-provided bbox first, then fall back to calculating from features
-      const bounds = new mapboxgl.LngLatBounds();
-      let hasValidBounds = false;
-
-      speciesData.forEach(species => {
-        console.log(`Processing bounds for species: ${species.speciesName}`);
-        
-        // First try to use the SQL-provided bbox
-        if (species.bbox && Array.isArray(species.bbox) && species.bbox.length === 4) {
-          const [minLng, minLat, maxLng, maxLat] = species.bbox;
-          if (typeof minLng === 'number' && typeof minLat === 'number' && 
-              typeof maxLng === 'number' && typeof maxLat === 'number' &&
-              !isNaN(minLng) && !isNaN(minLat) && !isNaN(maxLng) && !isNaN(maxLat)) {
-            console.log(`Using SQL bbox for ${species.speciesName}:`, species.bbox);
-            bounds.extend([minLng, minLat]);
-            bounds.extend([maxLng, maxLat]);
-            hasValidBounds = true;
-          } else {
-            console.warn(`Invalid bbox values for ${species.speciesName}:`, species.bbox);
-          }
-        }
-        // If no valid bbox, try calculating from country features
-        else if (species.countryGeojson && species.countryGeojson.features.length > 0) {
-          console.log(`No valid bbox, calculating from ${species.countryGeojson.features.length} country features for ${species.speciesName}`);
-          
-          const speciesBounds = calculateBoundsFromFeatures(species.countryGeojson);
-          if (speciesBounds) {
-            const [minLng, minLat, maxLng, maxLat] = speciesBounds;
-            console.log(`Calculated bounds for ${species.speciesName}:`, speciesBounds);
-            
-            bounds.extend([minLng, minLat]);
-            bounds.extend([maxLng, maxLat]);
-            hasValidBounds = true;
-          } else {
-            console.warn(`Could not calculate bounds for ${species.speciesName}`);
-          }
-        } else {
-          console.warn(`No bbox or country-level GeoJSON data for ${species.speciesName}`);
-        }
-      });
-
-      console.log('Final combined bounds:', bounds);
-      console.log('Has valid bounds:', hasValidBounds);
-
-      if (!hasValidBounds || bounds.isEmpty()) {
-        console.warn('No valid bounds found for any species data');
-        return false;
-      }
-
-      const fitToBounds = () => {
-        try {
-          console.log('Fitting map to bounds...');
-          map.fitBounds(bounds, { 
-            padding: 50, 
-            duration: 1000,
-            maxZoom: 10 // Prevent zooming in too much, good for country-level view
-          });
-          
-          // Update view state after fitting
-          setTimeout(() => {
-            const center = map.getCenter();
-            const zoom = map.getZoom();
-            console.log('Map fitted to bounds. New center:', center, 'New zoom:', zoom);
-            
-            setViewState(prevState => ({
-              ...prevState,
-              longitude: center.lng,
-              latitude: center.lat,
-              zoom: zoom,
-            }));
-          }, 1100); // Wait for animation to complete
-          
-        } catch (error) {
-          console.error('Error fitting bounds:', error);
-        }
-      };
-
-      // Ensure map is loaded before fitting bounds
-      if (map.isStyleLoaded()) {
-        fitToBounds();
-      } else {
-        console.log('Map style not loaded, waiting for load event...');
-        map.once('load', fitToBounds);
-      }
-
-      return true;
-    };
-
-    // Try to perform zoom-to-fit immediately
-    if (!performZoomToFit()) {
-      console.log('Map not ready, will retry...');
-      
-      // If map isn't ready, keep trying every 100ms for up to 3 seconds
-      let attempts = 0;
-      const maxAttempts = 30;
-      
-      const retryInterval = setInterval(() => {
-        attempts++;
-        console.log(`Retry attempt ${attempts}/${maxAttempts} for zoom-to-fit`);
-        
-        if (performZoomToFit() || attempts >= maxAttempts) {
-          clearInterval(retryInterval);
-          if (attempts >= maxAttempts) {
-            console.warn('Max attempts reached, could not perform zoom-to-fit');
-          }
-        }
-      }, 100);
-
-      // Cleanup function to clear interval if component unmounts
-      return () => {
-        clearInterval(retryInterval);
-      };
-    }
-
-  }, [speciesData]);
-
-  // Define color for each species
-  const getColorScale = useCallback((index: number) => {
-    const colorScales = [
-      {
-        native: { fillColor: '#2563eb', fillOpacity: 0.6 },
-        introduced: { fillColor: '#3b82f6', fillOpacity: 0.5 }, 
-        extinct: { fillColor: '#60a5fa', fillOpacity: 0.4 }
-      },
-      {
-        native: { fillColor: '#7c3aed', fillOpacity: 0.6 },
-        introduced: { fillColor: '#8b5cf6', fillOpacity: 0.5 },
-        extinct: { fillColor: '#a78bfa', fillOpacity: 0.4 }
-      },
-      {
-        native: { fillColor: '#16a34a', fillOpacity: 0.6 },
-        introduced: { fillColor: '#22c55e', fillOpacity: 0.5 },
-        extinct: { fillColor: '#4ade80', fillOpacity: 0.4 }
-      },
-      {
-        native: { fillColor: '#dc2626', fillOpacity: 0.6 },
-        introduced: { fillColor: '#ef4444', fillOpacity: 0.5 },
-        extinct: { fillColor: '#f87171', fillOpacity: 0.4 }
-      },
-      {
-        native: { fillColor: '#ea580c', fillOpacity: 0.6 },
-        introduced: { fillColor: '#f97316', fillOpacity: 0.5 },
-        extinct: { fillColor: '#fb923c', fillOpacity: 0.4 }
-      }
-    ];
-    
-    return colorScales[index % colorScales.length];
-  }, []);
-  
-  // Filter features by presence status
   const filterFeaturesByStatus = useCallback((
     geojson: FeatureCollection<Geometry>, 
     status: 'Native' | 'Introduced' | 'Extinct'
@@ -481,97 +400,6 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     };
   }, []);
   
-  // Clean coordinate precision to avoid rendering issues
-  const cleanCoordinates = useCallback((geojson: FeatureCollection<any>) => {
-    return {
-      ...geojson,
-      features: geojson.features.map(feature => {
-        if (!feature.geometry || !feature.geometry.coordinates) {
-          console.warn('Feature missing geometry or coordinates:', feature);
-          return null;
-        }
-
-        const cleanCoord = (coord: number[]): number[] => [
-          Math.round(coord[0] * 1000000) / 1000000,
-          Math.round(coord[1] * 1000000) / 1000000
-        ];
-
-        const cleanCoordinatesRecursive = (coords: any): any => {
-          if (!Array.isArray(coords)) {
-            return coords;
-          }
-          
-          // Check if this is a coordinate pair [lng, lat]
-          if (coords.length === 2 && typeof coords[0] === 'number' && typeof coords[1] === 'number') {
-            return cleanCoord(coords);
-          }
-          
-          // Otherwise, recursively clean nested arrays
-          return coords.map(cleanCoordinatesRecursive);
-        };
-
-        try {
-          return {
-            ...feature,
-            geometry: {
-              ...feature.geometry,
-              coordinates: cleanCoordinatesRecursive(feature.geometry.coordinates)
-            }
-          };
-        } catch (error) {
-          console.error('Error cleaning coordinates for feature:', feature, error);
-          return null;
-        }
-      }).filter(feature => feature !== null)
-    };
-  }, []);
-  
-  // Clean up removed species layers
-  useEffect(() => {
-    const currentSpeciesIds = new Set(speciesData.map(s => s.speciesId));
-    const map = mapRef.current?.getMap();
-    if (!map) return;
-
-    const style = map.getStyle();
-    if (!style?.sources) return;
-    
-    const existingSources = Object.keys(style.sources);
-    
-    existingSources.forEach(sourceId => {
-      if (sourceId.startsWith('species-')) {
-        const parts = sourceId.split('-');
-        if (parts.length >= 3) {
-          const speciesId = parts[1];
-          if (!currentSpeciesIds.has(Number(speciesId))) {
-            // Remove layers first
-            const layerTypes = ['native', 'introduced', 'extinct'];
-            const detailTypes = ['country', 'state'];
-            
-            detailTypes.forEach(detailType => {
-              layerTypes.forEach(type => {
-                const layerId = `${sourceId}-${detailType}-${type}`;
-                const outlineId = `${sourceId}-${detailType}-${type}-outline`;
-                
-                if (map.getLayer(layerId)) {
-                  map.removeLayer(layerId);
-                }
-                if (map.getLayer(outlineId)) {
-                  map.removeLayer(outlineId);
-                }
-              });
-            });
-            
-            // Remove source
-            if (map.getSource(sourceId)) {
-              map.removeSource(sourceId);
-            }
-          }
-        }
-      }
-    });
-  }, [speciesData]);
-
-  // Generate interactive layer IDs for hover/click events
   const interactiveLayerIds = useMemo(() => {
     return speciesData.flatMap((species) => 
       (Object.keys(activeLayers) as Array<keyof LayerState>)
@@ -580,53 +408,28 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     );
   }, [speciesData, activeLayers, currentDetailLevel]);
 
-  // Get the appropriate geojson data based on current detail level
-  const getGeojsonForDetailLevel = useCallback((species: SpeciesData, detailLevel: 'country' | 'state') => {
-    console.log(`Getting ${detailLevel} data for ${species.speciesName}:`, {
-      hasCountryData: !!(species.countryGeojson && species.countryGeojson.features.length > 0),
-      hasStateData: !!(species.stateGeojson && species.stateGeojson.features.length > 0),
-      countryFeatures: species.countryGeojson?.features.length || 0,
-      stateFeatures: species.stateGeojson?.features.length || 0
-    });
-
-    if (detailLevel === 'state') {
-      // For state level, prefer state data if available, otherwise fall back to country
-      if (species.stateGeojson && species.stateGeojson.features.length > 0) {
-        console.log(`Using state data for ${species.speciesName}`);
-        return species.stateGeojson;
-      } else {
-        console.log(`No state data available for ${species.speciesName}, falling back to country data`);
-        return species.countryGeojson;
+  const handleMouseMove = useCallback((e: MapMouseEvent) => {
+    if (e.features && e.features.length > 0) {
+      const feature = e.features[0];
+      if (feature.properties?.region_name && feature.properties?.presence_status && feature.properties?.species_name) {
+        setHoveredFeature({
+          properties: {
+            region_name: feature.properties.region_name as string,
+            presence_status: feature.properties.presence_status as 'Native' | 'Introduced' | 'Extinct',
+            species_name: feature.properties.species_name as string,
+            region_type: currentDetailLevel
+          },
+          lngLat: {
+            lng: e.lngLat.lng,
+            lat: e.lngLat.lat
+          }
+        });
       }
-    } else {
-      // For country level, use country data
-      console.log(`Using country data for ${species.speciesName}`);
-      return species.countryGeojson;
     }
-  }, []);
+  }, [currentDetailLevel]);
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full w-8 h-8 border-b-2 border-blue-600 mx-auto mb-2" />
-          <p className="text-gray-600">Loading distribution data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden bg-red-50 flex items-center justify-center">
-        <div className="text-center p-4">
-          <p className="text-red-600 font-semibold">Error loading map data</p>
-          <p className="text-red-500 text-sm mt-1">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingState />;
+  if (error) return <ErrorState error={error} />;
 
   return (
     <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden">
@@ -638,144 +441,63 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL || 'mapbox://styles/mapbox/light-v11'}
         mapboxAccessToken={MAPBOX_TOKEN}
         reuseMaps
-        initialViewState={{
-          longitude: 0,
-          latitude: 20,
-          zoom: 1.5
-        }}
         interactiveLayerIds={interactiveLayerIds}
-        onMouseMove={(e: MapMouseEvent) => {
-          if (e.features && e.features.length > 0) {
-            const feature = e.features[0];
-            if (feature.properties && 
-                'region_name' in feature.properties && 
-                'presence_status' in feature.properties && 
-                'species_name' in feature.properties) {
-              setHoveredFeature({
-                properties: {
-                  region_name: feature.properties.region_name as string,
-                  presence_status: feature.properties.presence_status as 'Native' | 'Introduced' | 'Extinct',
-                  species_name: feature.properties.species_name as string,
-                  region_type: currentDetailLevel
-                },
-                lngLat: {
-                  lng: e.lngLat.lng,
-                  lat: e.lngLat.lat
-                }
-              });
-            }
-          }
-        }}
+        onMouseMove={handleMouseMove}
         onMouseLeave={() => setHoveredFeature(null)}
       >
         <NavigationControl position="top-right" />
         
-        {/* Render each species distribution with zoom-aware detail level */}
+        {/* Render species distributions */}
         {speciesData.map((species, index) => {
-          const colorScale = getColorScale(index);
+          const colorScale = COLOR_SCALES[index % COLOR_SCALES.length];
           const currentGeojson = getGeojsonForDetailLevel(species, currentDetailLevel);
           
-          if (!currentGeojson || !currentGeojson.features || currentGeojson.features.length === 0) {
-            console.log(`No ${currentDetailLevel} GeoJSON data for species:`, species.speciesName);
-            return null;
-          }
+          if (!currentGeojson?.features?.length) return null;
           
-          console.log(`Rendering ${currentDetailLevel} level data for ${species.speciesName}, features:`, currentGeojson.features.length);
+          const presenceTypes: Array<keyof LayerState> = ['native', 'introduced', 'extinct'];
           
-          // Filter features for each presence status
-          const nativeFeatures = filterFeaturesByStatus(currentGeojson, 'Native');
-          const introducedFeatures = filterFeaturesByStatus(currentGeojson, 'Introduced');
-          const extinctFeatures = filterFeaturesByStatus(currentGeojson, 'Extinct');
-          
-          return (
-            <React.Fragment key={`species-${species.speciesId}-${currentDetailLevel}`}>
-              {/* Native Range */}
-              {activeLayers.native && nativeFeatures.features.length > 0 && (
-                <Source 
-                  id={`species-${species.speciesId}-${currentDetailLevel}-native-source`} 
-                  type="geojson" 
-                  data={cleanCoordinates(nativeFeatures)}
-                >
-                  <Layer
-                    id={`species-${species.speciesId}-${currentDetailLevel}-native-layer`}
-                    type="fill"
-                    paint={{
-                      'fill-color': colorScale.native.fillColor,
-                      'fill-opacity': colorScale.native.fillOpacity
-                    }}
-                  />
-                  <Layer
-                    id={`species-${species.speciesId}-${currentDetailLevel}-native-outline`}
-                    type="line"
-                    paint={{
-                      'line-color': colorScale.native.fillColor,
-                      'line-width': currentDetailLevel === 'state' ? 0.5 : 1,
-                      'line-opacity': 0.8
-                    }}
-                  />
-                </Source>
-              )}
-              
-              {/* Introduced Range */}
-              {activeLayers.introduced && introducedFeatures.features.length > 0 && (
-                <Source 
-                  id={`species-${species.speciesId}-${currentDetailLevel}-introduced-source`} 
-                  type="geojson" 
-                  data={cleanCoordinates(introducedFeatures)}
-                >
-                  <Layer
-                    id={`species-${species.speciesId}-${currentDetailLevel}-introduced-layer`}
-                    type="fill"
-                    paint={{
-                      'fill-color': colorScale.introduced.fillColor,
-                      'fill-opacity': colorScale.introduced.fillOpacity
-                    }}
-                  />
-                  <Layer
-                    id={`species-${species.speciesId}-${currentDetailLevel}-introduced-outline`}
-                    type="line"
-                    paint={{
-                      'line-color': colorScale.introduced.fillColor,
-                      'line-width': currentDetailLevel === 'state' ? 0.5 : 1,
-                      'line-opacity': 0.8
-                    }}
-                  />
-                </Source>
-              )}
-              
-              {/* Extinct Range */}
-              {activeLayers.extinct && extinctFeatures.features.length > 0 && (
-                <Source 
-                  id={`species-${species.speciesId}-${currentDetailLevel}-extinct-source`} 
-                  type="geojson" 
-                  data={cleanCoordinates(extinctFeatures)}
-                >
-                  <Layer
-                    id={`species-${species.speciesId}-${currentDetailLevel}-extinct-layer`}
-                    type="fill"
-                    paint={{
-                      'fill-color': colorScale.extinct.fillColor,
-                      'fill-opacity': colorScale.extinct.fillOpacity
-                    }}
-                  />
-                  <Layer
-                    id={`species-${species.speciesId}-${currentDetailLevel}-extinct-outline`}
-                    type="line"
-                    paint={{
-                      'line-color': colorScale.extinct.fillColor,
-                      'line-width': currentDetailLevel === 'state' ? 0.5 : 1,
-                      'line-opacity': 0.8,
-                      'line-dasharray': [2, 2]
-                    }}
-                  />
-                </Source>
-              )}
-            </React.Fragment>
-          );
+          return presenceTypes.map(presenceType => {
+            if (!activeLayers[presenceType]) return null;
+            
+            const features = filterFeaturesByStatus(currentGeojson, presenceType.charAt(0).toUpperCase() + presenceType.slice(1) as any);
+            if (!features.features.length) return null;
+            
+            const sourceId = `species-${species.speciesId}-${currentDetailLevel}-${presenceType}-source`;
+            const layerId = `species-${species.speciesId}-${currentDetailLevel}-${presenceType}-layer`;
+            const outlineId = `species-${species.speciesId}-${currentDetailLevel}-${presenceType}-outline`;
+            
+            return (
+              <Source 
+                key={sourceId}
+                id={sourceId}
+                type="geojson" 
+                data={cleanCoordinates(features)}
+              >
+                <Layer
+                  id={layerId}
+                  type="fill"
+                  paint={{
+                    'fill-color': colorScale[presenceType],
+                    'fill-opacity': 0.6 - (presenceTypes.indexOf(presenceType) * 0.1)
+                  }}
+                />
+                <Layer
+                  id={outlineId}
+                  type="line"
+                  paint={{
+                    'line-color': colorScale[presenceType],
+                    'line-width': currentDetailLevel === 'state' ? 0.5 : 1,
+                    'line-opacity': 0.8,
+                    ...(presenceType === 'extinct' ? { 'line-dasharray': [2, 2] } : {})
+                  }}
+                />
+              </Source>
+            );
+          });
         })}
         
         {/* Hover Popup */}
-        {hoveredFeature && hoveredFeature.properties && (
+        {hoveredFeature && (
           <Popup
             longitude={hoveredFeature.lngLat.lng}
             latitude={hoveredFeature.lngLat.lat}
@@ -785,7 +507,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             closeOnClick={false}
           >
             <div className="p-2">
-              <h3 className="font-bold text-sm">{hoveredFeature.properties.region_name || 'Region'}</h3>
+              <h3 className="font-bold text-sm">{hoveredFeature.properties.region_name}</h3>
               <p className="text-xs text-gray-500 capitalize">
                 {hoveredFeature.properties.region_type} Level
               </p>
@@ -798,77 +520,19 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         )}
       </Map>
       
-      {/* Layer Toggle Controls */}
-      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg">
-        <h4 className="font-semibold text-sm mb-2">Show Ranges</h4>
-        <div className="space-y-2">
-        <label className="flex items-center text-xs">
-        <input
-              type="checkbox"
-              checked={activeLayers.native}
-              onChange={(e) => setActiveLayers(prev => ({ ...prev, native: e.target.checked }))}
-              className="mr-2"
-            />
-            Native
-          </label>
-          <label className="flex items-center text-xs">
-            <input
-              type="checkbox"
-              checked={activeLayers.introduced}
-              onChange={(e) => setActiveLayers(prev => ({ ...prev, introduced: e.target.checked }))}
-              className="mr-2"
-            />
-            Introduced
-          </label>
-          <label className="flex items-center text-xs">
-            <input
-              type="checkbox"
-              checked={activeLayers.extinct}
-              onChange={(e) => setActiveLayers(prev => ({ ...prev, extinct: e.target.checked }))}
-              className="mr-2"
-            />
-            Extinct
-          </label>
-        </div>
-      </div>
+      <LayerControls activeLayers={activeLayers} onChange={setActiveLayers} />
       
-      {/* Species Legend */}
-      {speciesData.length > 0 && (
-        <div className="absolute top-4 right-16 bg-white p-3 rounded-lg shadow-lg max-w-xs">
-          <h4 className="font-semibold text-sm mb-2">Species</h4>
-          <div className="space-y-1 max-h-32 overflow-y-auto">
-            {speciesData.map((species, index) => {
-              const colorScale = getColorScale(index);
-              return (
-                <div key={species.speciesId} className="flex items-center text-xs">
-                  <div 
-                    className="w-3 h-3 rounded mr-2 flex-shrink-0"
-                    style={{ backgroundColor: colorScale.native.fillColor }}
-                  ></div>
-                  <span className="truncate">{species.speciesName}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {speciesData.length > 0 && <SpeciesLegend speciesData={speciesData} />}
       
-      {/* Zoom Level Indicator */}
+      {/* Info Panel */}
       <div className="absolute bottom-4 left-4 bg-white p-2 rounded-lg shadow-lg">
         <p className="text-xs text-gray-600">
           Detail Level: <span className="font-semibold capitalize">{currentDetailLevel}</span>
-          {currentDetailLevel === 'state' && speciesData.some(s => !s.stateGeojson || s.stateGeojson.features.length === 0) && (
+          {currentDetailLevel === 'state' && speciesData.some(s => !s.stateGeojson) && (
             <span className="text-orange-500 ml-1">(using country data)</span>
           )}
         </p>
-        <p className="text-xs text-gray-500">
-          Zoom: {viewState.zoom.toFixed(1)}
-        </p>
-        {speciesData.length > 0 && (
-          <p className="text-xs text-gray-500">
-            Species: {speciesData.length}
-          </p>
-        )}
+        <p className="text-xs text-gray-500">Zoom: {viewState.zoom.toFixed(1)}</p>
       </div>
     </div>
   );
