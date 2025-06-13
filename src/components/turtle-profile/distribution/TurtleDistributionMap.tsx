@@ -138,6 +138,8 @@ const useSpeciesData = (selectedSpeciesIds: (string | number)[]) => {
       setLoading(true);
       setError(null);
       
+      console.log('Fetching data for species IDs:', selectedSpeciesIds);
+      
       try {
         const promises = selectedSpeciesIds.map(async (speciesId) => {
           // Fetch species info
@@ -211,14 +213,17 @@ const useSpeciesData = (selectedSpeciesIds: (string | number)[]) => {
             speciesName: speciesInfo.species_common_name,
             scientificName: speciesInfo.species_scientific_name,
             avatarUrl: speciesInfo.avatar_image_circle_url,
-            countryGeojson: countryFeatures.length > 0 ? { type: 'FeatureCollection', features: countryFeatures } : null,
-            stateGeojson: stateFeatures.length > 0 ? { type: 'FeatureCollection', features: stateFeatures } : null,
+            countryGeojson: countryFeatures.length > 0 ? { type: 'FeatureCollection' as const, features: countryFeatures } : null,
+            stateGeojson: stateFeatures.length > 0 ? { type: 'FeatureCollection' as const, features: stateFeatures } : null,
             bbox
           };
         });
         
         const results = await Promise.all(promises);
-        setSpeciesData(results.filter((item): item is SpeciesData => item !== null));
+        const filteredResults = results.filter(item => item !== null);
+        console.log('Setting species data:', filteredResults.map(r => ({ id: r.speciesId, name: r.speciesName })));
+        setSpeciesData(filteredResults);
+        
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch distribution data');
       } finally {
@@ -232,25 +237,124 @@ const useSpeciesData = (selectedSpeciesIds: (string | number)[]) => {
   return { speciesData, loading, error };
 };
 
-const useMapFitBounds = (mapRef: React.RefObject<MapRef>, speciesData: SpeciesData[]) => {
+const useMapFitBounds = (
+  mapRef: React.RefObject<MapRef>, 
+  selectedSpeciesIds: (string | number)[], 
+  speciesData: SpeciesData[], 
+  setViewState: React.Dispatch<React.SetStateAction<ViewState>>
+) => {
+  // Track the previous selection to detect what was actually added
+  const prevSelectedIdsRef = useRef<(string | number)[]>([]);
+  // Track if we've done the initial zoom
+  const hasInitializedRef = useRef(false);
+  
   useEffect(() => {
-    if (speciesData.length === 0 || !mapRef.current) return;
+    console.log('useMapFitBounds triggered:', {
+      hasMap: !!mapRef.current,
+      selectedSpeciesIds,
+      speciesDataCount: speciesData.length,
+      speciesDataIds: speciesData.map(s => s.speciesId),
+      prevIds: prevSelectedIdsRef.current
+    });
+    
+    if (selectedSpeciesIds.length === 0) {
+      console.log('Early return: no selected species');
+      return;
+    }
+    
+    // Check if we have species data for all selected species
+    const missingSpeciesData = selectedSpeciesIds.filter(id => 
+      !speciesData.some(data => data.speciesId === id)
+    );
+    
+    if (missingSpeciesData.length > 0) {
+      console.log('Missing species data for:', missingSpeciesData, 'waiting for data to load...');
+      return;
+    }
+    
+    const prevIds = prevSelectedIdsRef.current;
+    const currentIds = selectedSpeciesIds;
+    
+    // Determine which species to zoom to
+    let speciesIdToZoom: string | number | null = null;
+    
+    if (!hasInitializedRef.current) {
+      // Initial load - zoom to the first species
+      speciesIdToZoom = currentIds[0];
+      hasInitializedRef.current = true;
+      console.log('Initial zoom to species:', speciesIdToZoom);
+    } else {
+      // Find newly added species (in current but not in previous)
+      const newlyAdded = currentIds.filter(id => !prevIds.includes(id));
+      
+      if (newlyAdded.length > 0) {
+        // Zoom to the most recently added species
+        speciesIdToZoom = newlyAdded[newlyAdded.length - 1];
+        console.log('Zooming to newly added species:', speciesIdToZoom, 'from newly added:', newlyAdded);
+      } else {
+        console.log('No newly added species found. Current:', currentIds, 'Previous:', prevIds);
+      }
+    }
+    
+    // Update the previous IDs for next comparison
+    prevSelectedIdsRef.current = [...currentIds];
+    
+    // If no species to zoom to, exit early
+    if (!speciesIdToZoom) {
+      console.log('No species to zoom to');
+      return;
+    }
+    
+    // Find the species data for the one we want to zoom to
+    const speciesForZoom = speciesData.find(s => s.speciesId === speciesIdToZoom);
+    if (!speciesForZoom) {
+      console.log('Species data not found for ID:', speciesIdToZoom);
+      return;
+    }
 
-    const performZoomToFit = () => {
-      const map = mapRef.current?.getMap();
-      if (!map) return false;
+    console.log('Proceeding with zoom to species:', speciesForZoom.speciesName);
+    
+    // Function to perform the zoom with retries for map availability
+    const performZoomWithRetries = () => {
+      let attempts = 0;
+      const maxAttempts = 50; // Increased attempts
+      
+      const attemptZoom = () => {
+        attempts++;
+        console.log(`Zoom attempt ${attempts}/${maxAttempts} for species:`, speciesForZoom.speciesName);
+        
+        if (!mapRef.current) {
+          console.log('Map not available, retrying...');
+          if (attempts < maxAttempts) {
+            setTimeout(attemptZoom, 100);
+          } else {
+            console.log('Max attempts reached, map never became available');
+          }
+          return;
+        }
+        
+        // Map is available, proceed with zoom
+        console.log('Map is available, proceeding with zoom');
+        const map = mapRef.current.getMap();
+        if (!map) {
+          console.log('Map instance not available, retrying...');
+          if (attempts < maxAttempts) {
+            setTimeout(attemptZoom, 100);
+          }
+          return;
+        }
 
-      const bounds = new mapboxgl.LngLatBounds();
-      let hasValidBounds = false;
+        const bounds = new mapboxgl.LngLatBounds();
+        let hasValidBounds = false;
 
-      speciesData.forEach(species => {
-        if (species.bbox) {
-          const [minLng, minLat, maxLng, maxLat] = species.bbox;
+        // Add bounds for the species we're zooming to
+        if (speciesForZoom.bbox) {
+          const [minLng, minLat, maxLng, maxLat] = speciesForZoom.bbox;
           bounds.extend([minLng, minLat]);
           bounds.extend([maxLng, maxLat]);
           hasValidBounds = true;
-        } else if (species.countryGeojson) {
-          const speciesBounds = calculateBoundsFromFeatures(species.countryGeojson);
+        } else if (speciesForZoom.countryGeojson) {
+          const speciesBounds = calculateBoundsFromFeatures(speciesForZoom.countryGeojson);
           if (speciesBounds) {
             const [minLng, minLat, maxLng, maxLat] = speciesBounds;
             bounds.extend([minLng, minLat]);
@@ -258,45 +362,62 @@ const useMapFitBounds = (mapRef: React.RefObject<MapRef>, speciesData: SpeciesDa
             hasValidBounds = true;
           }
         }
-      });
 
-      if (!hasValidBounds || bounds.isEmpty()) return false;
+        if (!hasValidBounds || bounds.isEmpty()) {
+          console.log('No valid bounds found for species:', speciesForZoom.speciesName);
+          return;
+        }
 
-      const fitToBounds = () => {
-        try {
-          map.fitBounds(bounds, { 
-            padding: 50, 
-            duration: 1000,
-            maxZoom: 10
-          });
-        } catch (error) {
-          console.error('Error fitting bounds:', error);
+        const fitToBounds = () => {
+          try {
+            console.log('Executing fitBounds for species:', speciesForZoom.speciesName);
+            map.fitBounds(bounds, { 
+              padding: 50, 
+              duration: 1000,
+              maxZoom: 10
+            });
+            
+            // Update view state after fitting
+            setTimeout(() => {
+              const center = map.getCenter();
+              const zoom = map.getZoom();
+              console.log('Updated view state after zoom:', { lng: center.lng, lat: center.lat, zoom });
+              setViewState((prevState: ViewState) => ({
+                ...prevState,
+                longitude: center.lng,
+                latitude: center.lat,
+                zoom: zoom,
+              }));
+            }, 1100);
+          } catch (error) {
+            console.error('Error fitting bounds:', error);
+          }
+        };
+
+        if (map.isStyleLoaded()) {
+          console.log('Map style loaded, fitting bounds immediately');
+          fitToBounds();
+        } else {
+          console.log('Map style not loaded, waiting for load event');
+          map.once('load', fitToBounds);
         }
       };
-
-      if (map.isStyleLoaded()) {
-        fitToBounds();
-      } else {
-        map.once('load', fitToBounds);
-      }
-
-      return true;
+      
+      // Start the first attempt
+      attemptZoom();
     };
-
-    // Try immediately, then retry if needed
-    if (!performZoomToFit()) {
-      const retryInterval = setInterval(() => {
-        if (performZoomToFit()) {
-          clearInterval(retryInterval);
-        }
-      }, 100);
-
-      // Stop trying after 3 seconds
-      setTimeout(() => clearInterval(retryInterval), 3000);
-
-      return () => clearInterval(retryInterval);
+    
+    // Start zoom attempts
+    performZoomWithRetries();
+  }, [selectedSpeciesIds, speciesData, setViewState]);
+  
+  // Reset when all species are removed
+  useEffect(() => {
+    if (selectedSpeciesIds.length === 0) {
+      prevSelectedIdsRef.current = [];
+      hasInitializedRef.current = false;
     }
-  }, [speciesData]);
+  }, [selectedSpeciesIds.length]);
 };
 
 // Components
@@ -375,7 +496,17 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   const mapRef = useRef<MapRef>(null);
   const { speciesData, loading, error } = useSpeciesData(selectedSpeciesIds);
   
-  useMapFitBounds(mapRef, speciesData);
+  useMapFitBounds(mapRef, selectedSpeciesIds, speciesData, setViewState);
+  
+  // Debug logging for selectedSpeciesIds changes
+  useEffect(() => {
+    console.log('selectedSpeciesIds changed in main component:', selectedSpeciesIds);
+  }, [selectedSpeciesIds]);
+  
+  // Debug logging for speciesData changes
+  useEffect(() => {
+    console.log('speciesData changed in main component:', speciesData.map(s => ({ id: s.speciesId, name: s.speciesName })));
+  }, [speciesData]);
   
   const currentDetailLevel = useMemo(() => {
     return viewState.zoom >= ZOOM_THRESHOLDS.COUNTRY_TO_STATE ? 'state' : 'country';

@@ -1,4 +1,3 @@
-// components/SpeciesSelector.js
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/db/supabaseClient';
 import Image from 'next/image';
@@ -13,13 +12,19 @@ interface Species {
 interface SpeciesSelectorProps {
   onChange: (selectedIds: (string | number)[]) => void;
   maxSpecies?: number;
+  initialSelectedIds?: (string | number)[]; // Add this prop
 }
 
-const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({ onChange, maxSpecies = 3 }) => {
+const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({ 
+  onChange, 
+  maxSpecies = 3, 
+  initialSelectedIds = [] // Add default value
+}) => {
   const [allSpecies, setAllSpecies] = useState<Species[]>([]);
   const [selectedSpecies, setSelectedSpecies] = useState<Species[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Fetch all species with distribution data
   useEffect(() => {
@@ -58,6 +63,23 @@ const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({ onChange, maxSpecies 
     fetchSpecies();
   }, []);
 
+  // Initialize selected species based on initialSelectedIds
+  useEffect(() => {
+    if (allSpecies.length > 0 && initialSelectedIds.length > 0 && !isInitialized) {
+      console.log('Initializing selector with species IDs:', initialSelectedIds);
+      
+      // Find the species objects that match the initial IDs
+      const initialSpecies = initialSelectedIds
+        .map(id => allSpecies.find(species => species.id === id))
+        .filter(Boolean) as Species[];
+      
+      console.log('Found initial species:', initialSpecies.map(s => s.species_common_name));
+      
+      setSelectedSpecies(initialSpecies);
+      setIsInitialized(true);
+    }
+  }, [allSpecies, initialSelectedIds, isInitialized]);
+
   // Filter species based on search query
   const filteredSpecies = allSpecies.filter(species => 
     species.species_common_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -81,6 +103,7 @@ const SpeciesSelector: React.FC<SpeciesSelectorProps> = ({ onChange, maxSpecies 
       newSelected.push(species);
     }
     
+    console.log('Species selection changed:', newSelected.map(s => s.species_common_name));
     setSelectedSpecies(newSelected);
     
     // Call the onChange prop with only the IDs

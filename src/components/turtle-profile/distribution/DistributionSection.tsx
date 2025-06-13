@@ -28,6 +28,7 @@ const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => 
   // Set initial species when currentSpeciesId changes
   useEffect(() => {
     if (currentSpeciesId) {
+      console.log('Setting initial species ID in DistributionSection:', currentSpeciesId);
       setSelectedSpeciesIds([currentSpeciesId]);
     }
   }, [currentSpeciesId]);
@@ -59,7 +60,10 @@ const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => 
       {isVisible ? (
         <>
           <TurtleDistributionMap selectedSpeciesIds={selectedSpeciesIds} />
-          <SpeciesSelector onChange={setSelectedSpeciesIds} />
+          <SpeciesSelector 
+            onChange={setSelectedSpeciesIds} 
+            initialSelectedIds={selectedSpeciesIds}
+          />
         </>
       ) : (
         <div className="h-96 md:h-[600px] bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">

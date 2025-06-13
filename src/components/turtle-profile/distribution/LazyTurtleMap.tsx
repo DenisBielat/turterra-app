@@ -17,6 +17,7 @@ export const LazyTurtleMap = ({ currentSpeciesId }: { currentSpeciesId?: string 
 
   useEffect(() => {
     if (currentSpeciesId) {
+      console.log('LazyTurtleMap: Setting initial species ID:', currentSpeciesId);
       setSelectedSpeciesIds([currentSpeciesId]);
     }
   }, [currentSpeciesId]);
@@ -25,6 +26,7 @@ export const LazyTurtleMap = ({ currentSpeciesId }: { currentSpeciesId?: string 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
+          console.log('LazyTurtleMap: Map is now visible, loading components');
           setIsVisible(true);
           observer.disconnect();
         }
@@ -44,7 +46,10 @@ export const LazyTurtleMap = ({ currentSpeciesId }: { currentSpeciesId?: string 
       {isVisible ? (
         <>
           <TurtleDistributionMap selectedSpeciesIds={selectedSpeciesIds} />
-          <SpeciesSelector onChange={setSelectedSpeciesIds} />
+          <SpeciesSelector 
+            onChange={setSelectedSpeciesIds} 
+            initialSelectedIds={selectedSpeciesIds}
+          />
         </>
       ) : (
         <div className="h-96 md:h-[600px] bg-gray-100 rounded-lg animate-pulse" />
