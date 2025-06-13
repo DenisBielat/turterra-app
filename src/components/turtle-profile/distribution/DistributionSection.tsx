@@ -56,7 +56,10 @@ const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => 
   }, []);
   
   return (
-    <div ref={containerRef}>
+    <section className="pb-12" ref={containerRef}>
+      <h2 id="distribution" className="scroll-m-20 text-5xl mb-6 text-white">
+        Distribution
+      </h2>
       {isVisible ? (
         <>
           <TurtleDistributionMap selectedSpeciesIds={selectedSpeciesIds} />
@@ -70,7 +73,7 @@ const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => 
           <div className="text-gray-400">Map will load when scrolled into view</div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 
