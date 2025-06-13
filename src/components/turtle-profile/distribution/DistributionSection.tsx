@@ -1,10 +1,21 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SpeciesSelector from './SpeciesSelector';
 import TurtleDistributionMap from './TurtleDistributionMap';
 
-const DistributionSection = () => {
+interface DistributionSectionProps {
+  currentSpeciesId?: string | number;
+}
+
+const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => {
   const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<(string | number)[]>([]);
+  
+  // Set initial species when currentSpeciesId changes
+  useEffect(() => {
+    if (currentSpeciesId) {
+      setSelectedSpeciesIds([currentSpeciesId]);
+    }
+  }, [currentSpeciesId]);
   
   return (
     <>

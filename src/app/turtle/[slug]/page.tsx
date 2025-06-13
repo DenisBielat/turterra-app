@@ -5,6 +5,7 @@ import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGla
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
 import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
+import { supabase } from '@/lib/db/supabaseClient';
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -13,6 +14,13 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
   if (!data) {
     return <div>No turtle data found</div>
   }
+
+  // Get the species ID from the database
+  const { data: speciesData } = await supabase
+    .from('turtle_species')
+    .select('id')
+    .eq('slug', params.slug)
+    .single();
 
   return (
     <main>
@@ -58,7 +66,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 />
 
                 <div className="w-full mt-12 mb-20">
-                  <DistributionSection />
+                  <DistributionSection currentSpeciesId={speciesData?.id} />
                 </div>
               </div>
             </div>
