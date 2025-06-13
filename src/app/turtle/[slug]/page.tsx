@@ -5,6 +5,7 @@ import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGla
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
 import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
+import ExtendedWrapper from "@/components/ui/extended-wrapper";
 import { supabase } from '@/lib/db/supabaseClient';
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
@@ -33,6 +34,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
       <div className="bg-warm">
         <div className="px-10 py-12">
           <div className="max-w-[90rem] mx-auto">
+            {/* Regular grid layout for first sections */}
             <div className="grid grid-cols-12 gap-4 relative">
               {/* Left sidebar */}
               <div className="flex flex-col col-span-3 justify-start w-full overflow-visible">
@@ -57,17 +59,36 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
                 
-                <Identification
-                  description={data.identification.description}
-                  measurements={data.identification.measurements}
-                  featureCategories={data.identification.featureCategories}
-                  speciesCard={data.identification.speciesCard}
-                  relatedSpecies={data.identification.relatedSpecies}
-                />
-
-                <div className="w-full mt-12 mb-20">
-                  <DistributionSection currentSpeciesId={speciesData?.id} />
+                <div className="pb-12">
+                  <Identification
+                    description={data.identification.description}
+                    measurements={data.identification.measurements}
+                    featureCategories={data.identification.featureCategories}
+                    speciesCard={data.identification.speciesCard}
+                    relatedSpecies={data.identification.relatedSpecies}
+                  />
                 </div>
+
+                {/* Extended background section using dynamic calculation */}
+                <div>
+                  <ExtendedWrapper backgroundColor="bg-green-950">
+                    {/* Max content width restriction */}
+                    <div className="w-full max-w-[90rem] mx-auto overflow-hidden">
+                      {/* Recreated grid within extended area - matches your original container */}
+                      <div className="grid grid-cols-12 gap-4 py-12">
+                        {/* Empty placeholder for left nav area */}
+                        <div className="col-span-3"></div>
+                        
+                        {/* Distribution content area - same size and position as normal grid */}
+                        <div className="col-span-9">
+                          <DistributionSection currentSpeciesId={speciesData?.id} />
+                        </div>
+                      </div>
+                    </div>
+                  </ExtendedWrapper>
+                </div>
+
+                {/* Continue with more content sections if needed */}
               </div>
             </div>
           </div>
