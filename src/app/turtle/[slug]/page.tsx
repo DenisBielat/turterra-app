@@ -4,10 +4,9 @@ import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
-import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
 import ExtendedWrapper from "@/components/ui/extended-wrapper";
 import { supabase } from '@/lib/db/supabaseClient';
-
+import DistributionWrapper from '@/components/turtle-profile/distribution/DistributionWrapper';
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   const data = await getTurtleData(params.slug);
@@ -71,21 +70,13 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
 
                 {/* Extended background section using dynamic calculation */}
                 <div>
-                  <ExtendedWrapper backgroundColor="bg-green-950">
-                    {/* Max content width restriction */}
-                    <div className="w-full max-w-[90rem] mx-auto overflow-hidden">
-                      {/* Recreated grid within extended area - matches your original container */}
-                      <div className="grid grid-cols-12 gap-4 py-12">
-                        {/* Empty placeholder for left nav area */}
-                        <div className="col-span-3"></div>
-                        
-                        {/* Distribution content area - same size and position as normal grid */}
-                        <div className="col-span-9">
-                          <DistributionSection currentSpeciesId={speciesData?.id} />
-                        </div>
-                      </div>
+                <ExtendedWrapper backgroundColor="bg-green-950">
+                  <div className="w-full max-w-[90rem] mx-auto overflow-hidden">
+                    <div className="grid grid-cols-12 gap-4 py-12">
+                      <DistributionWrapper currentSpeciesId={speciesData?.id} />
                     </div>
-                  </ExtendedWrapper>
+                  </div>
+                </ExtendedWrapper>
                 </div>
 
                 {/* Continue with more content sections if needed */}

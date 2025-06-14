@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import SpeciesSelector from './SpeciesSelector';
 
 // Dynamically import the map component with no SSR
 const TurtleDistributionMap = dynamic(
@@ -18,10 +17,11 @@ const TurtleDistributionMap = dynamic(
 
 interface DistributionSectionProps {
   currentSpeciesId?: string | number;
+  selectedSpeciesIds?: (string | number)[]; // Add this prop
 }
 
-const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => {
-  const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<(string | number)[]>([]);
+const DistributionSection = ({ currentSpeciesId, selectedSpeciesIds }: DistributionSectionProps) => {
+  const [mapSpeciesIds, setMapSpeciesIds] = useState<(string | number)[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -29,9 +29,16 @@ const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => 
   useEffect(() => {
     if (currentSpeciesId) {
       console.log('Setting initial species ID in DistributionSection:', currentSpeciesId);
-      setSelectedSpeciesIds([currentSpeciesId]);
+      setMapSpeciesIds([currentSpeciesId]);
     }
   }, [currentSpeciesId]);
+
+  // Update map when selectedSpeciesIds changes
+  useEffect(() => {
+    if (selectedSpeciesIds && selectedSpeciesIds.length > 0) {
+      setMapSpeciesIds(selectedSpeciesIds);
+    }
+  }, [selectedSpeciesIds]);
   
   // Intersection Observer for lazy loading
   useEffect(() => {
@@ -61,13 +68,7 @@ const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => 
         Distribution
       </h2>
       {isVisible ? (
-        <>
-          <TurtleDistributionMap selectedSpeciesIds={selectedSpeciesIds} />
-          <SpeciesSelector 
-            onChange={setSelectedSpeciesIds} 
-            initialSelectedIds={selectedSpeciesIds}
-          />
-        </>
+        <TurtleDistributionMap selectedSpeciesIds={mapSpeciesIds} />
       ) : (
         <div className="h-96 md:h-[600px] bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
           <div className="text-gray-400">Map will load when scrolled into view</div>
