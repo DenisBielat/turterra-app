@@ -30,7 +30,7 @@ const DistributionWrapper = ({ currentSpeciesId }: DistributionWrapperProps) => 
       </div>
       
       {/* Distribution content area */}
-      <div className="col-span-9 px-10">
+      <div className="col-span-9">
         <DistributionSection 
           currentSpeciesId={currentSpeciesId} 
           selectedSpeciesIds={selectedSpeciesIds}

@@ -7,6 +7,7 @@ import Identification from "@/components/turtle-profile/content-sections/Identif
 import ExtendedWrapper from "@/components/ui/extended-wrapper";
 import { supabase } from '@/lib/db/supabaseClient';
 import DistributionWrapper from '@/components/turtle-profile/distribution/DistributionWrapper';
+
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   const data = await getTurtleData(params.slug);
