@@ -342,8 +342,22 @@ const useMapFitBounds = (
 
         const fitToBounds = () => {
           try {
+            // Calculate the offset to account for the Species Selector
+            // Species Selector width: 320px (w-80) + 24px left padding + 24px right padding = 368px
+            const speciesSelectorWidth = 368;
+            const mapWidth = map.getContainer().offsetWidth;
+            const offsetRatio = speciesSelectorWidth / mapWidth;
+            
+            // Adjust padding to shift the center rightward
+            const adjustedPadding = {
+              top: 50,
+              bottom: 50,
+              left: 50 + (speciesSelectorWidth / 2), // Add half the selector width to left padding
+              right: 50
+            };
+            
             map.fitBounds(bounds, { 
-              padding: 50, 
+              padding: adjustedPadding, 
               duration: 1000,
               maxZoom: 10
             });
