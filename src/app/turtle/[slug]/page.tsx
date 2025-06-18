@@ -74,7 +74,13 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 <ExtendedWrapper backgroundColor="bg-green-950">
                   <div className="w-full max-w-[90rem] mx-auto overflow-hidden">
                     <div className="py-12">
-                      <DistributionWrapper currentSpeciesId={speciesData?.id} />
+                      <DistributionWrapper 
+                        currentSpeciesId={speciesData?.id}
+                        speciesName={data.commonName}
+                        scientificName={data.scientificName}
+                        profileImageUrl={data.profileImage || "/images/image-placeholder.png"}
+                        slug={params.slug}
+                      />
                     </div>
                   </div>
                 </ExtendedWrapper>

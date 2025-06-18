@@ -8,7 +8,7 @@ import type { FeatureCollection, Feature, Geometry } from 'geojson';
 // Constants
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const ZOOM_THRESHOLDS = {
-  COUNTRY_TO_STATE: 4,
+  COUNTRY_TO_STATE: 3,
 };
 
 const COLOR_SCALE = {
