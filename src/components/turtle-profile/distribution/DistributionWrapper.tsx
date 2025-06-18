@@ -8,21 +8,16 @@ interface DistributionWrapperProps {
 }
 
 const DistributionWrapper = ({ currentSpeciesId }: DistributionWrapperProps) => {
-  const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<(string | number)[]>([]);
-
-  // Initialize with current species
-  useEffect(() => {
-    if (currentSpeciesId) {
-      setSelectedSpeciesIds([currentSpeciesId]);
-    }
-  }, [currentSpeciesId]);
-
   return (
     <div>
-      {/* Heading outside the map container */}
-      <h2 id="distribution" className="scroll-m-20 text-5xl mb-6 text-white">
-        Distribution
-      </h2>
+      <div className="mb-6">
+        <h2 id="distribution" className="scroll-m-20 text-5xl text-white">
+          Distribution
+        </h2>
+        <div className="mt-2">
+          <p className="text-white">Explore turtle species distribution across regions.</p>
+        </div>
+      </div>
       
       {/* Map and Species Selector container */}
       <div className="relative">
@@ -30,17 +25,13 @@ const DistributionWrapper = ({ currentSpeciesId }: DistributionWrapperProps) => 
         <div className="col-span-12">
           <DistributionSection 
             currentSpeciesId={currentSpeciesId} 
-            selectedSpeciesIds={selectedSpeciesIds}
           />
         </div>
         
         {/* Species Selector positioned absolutely to align with map */}
         <div className="absolute top-6 left-6 w-80 z-10">
           <div className="bg-white rounded-lg p-6 shadow-lg">
-            <SpeciesSelector 
-              onChange={setSelectedSpeciesIds} 
-              initialSelectedIds={selectedSpeciesIds}
-            />
+            <SpeciesSelector />
           </div>
         </div>
       </div>

@@ -17,28 +17,11 @@ const TurtleDistributionMap = dynamic(
 
 interface DistributionSectionProps {
   currentSpeciesId?: string | number;
-  selectedSpeciesIds?: (string | number)[]; // Add this prop
 }
 
-const DistributionSection = ({ currentSpeciesId, selectedSpeciesIds }: DistributionSectionProps) => {
-  const [mapSpeciesIds, setMapSpeciesIds] = useState<(string | number)[]>([]);
+const DistributionSection = ({ currentSpeciesId }: DistributionSectionProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Set initial species when currentSpeciesId changes
-  useEffect(() => {
-    if (currentSpeciesId) {
-      console.log('Setting initial species ID in DistributionSection:', currentSpeciesId);
-      setMapSpeciesIds([currentSpeciesId]);
-    }
-  }, [currentSpeciesId]);
-
-  // Update map when selectedSpeciesIds changes
-  useEffect(() => {
-    if (selectedSpeciesIds && selectedSpeciesIds.length > 0) {
-      setMapSpeciesIds(selectedSpeciesIds);
-    }
-  }, [selectedSpeciesIds]);
   
   // Intersection Observer for lazy loading
   useEffect(() => {
@@ -65,7 +48,7 @@ const DistributionSection = ({ currentSpeciesId, selectedSpeciesIds }: Distribut
   return (
     <div ref={containerRef}>
       {isVisible ? (
-        <TurtleDistributionMap selectedSpeciesIds={mapSpeciesIds} />
+        <TurtleDistributionMap currentSpeciesId={currentSpeciesId} />
       ) : (
         <div className="h-96 md:h-[600px] bg-gray-100 rounded-lg animate-pulse flex items-center justify-center">
           <div className="text-gray-400">Map will load when scrolled into view</div>
