@@ -18,9 +18,17 @@ const DistributionWrapper = ({ currentSpeciesId }: DistributionWrapperProps) => 
   }, [currentSpeciesId]);
 
   return (
-    <>
-      {/* Left sidebar for SpeciesSelector */}
-      <div className="col-span-3 flex flex-col justify-start w-full">
+    <div className="relative">
+      {/* Distribution content area - full width */}
+      <div className="col-span-12">
+        <DistributionSection 
+          currentSpeciesId={currentSpeciesId} 
+          selectedSpeciesIds={selectedSpeciesIds}
+        />
+      </div>
+      
+      {/* Species Selector positioned absolutely to align with map */}
+      <div className="absolute top-24 left-6 w-80 z-10">
         <div className="bg-white rounded-lg p-6 shadow-lg">
           <SpeciesSelector 
             onChange={setSelectedSpeciesIds} 
@@ -28,15 +36,7 @@ const DistributionWrapper = ({ currentSpeciesId }: DistributionWrapperProps) => 
           />
         </div>
       </div>
-      
-      {/* Distribution content area */}
-      <div className="col-span-9">
-        <DistributionSection 
-          currentSpeciesId={currentSpeciesId} 
-          selectedSpeciesIds={selectedSpeciesIds}
-        />
-      </div>
-    </>
+    </div>
   );
 };
 

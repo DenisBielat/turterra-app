@@ -63,7 +63,7 @@ const DistributionSection = ({ currentSpeciesId, selectedSpeciesIds }: Distribut
   }, []);
   
   return (
-    <section className="pb-12" ref={containerRef}>
+    <div ref={containerRef}>
       <h2 id="distribution" className="scroll-m-20 text-5xl mb-6 text-white">
         Distribution
       </h2>
@@ -74,7 +74,7 @@ const DistributionSection = ({ currentSpeciesId, selectedSpeciesIds }: Distribut
           <div className="text-gray-400">Map will load when scrolled into view</div>
         </div>
       )}
-    </section>
+    </div>
   );
 };
 

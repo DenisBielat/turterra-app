@@ -62,7 +62,7 @@ const ExtendedWrapper: React.FC<ExtendedWrapperProps> = ({
   return (
     <div 
       ref={wrapperRef}
-      className={`relative ${backgroundColor} ${className}`}
+      className={`relative z-30 ${backgroundColor} ${className}`}
       style={styles}
     >
       {children}

@@ -12,6 +12,7 @@ interface ProfileNavigationProps {
 
 export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigationProps) => {
   const [activeSection, setActiveSection] = useState('intro')
+  const [isVisible, setIsVisible] = useState(true)
   
   // Add throttle utility
   const throttle = (func: (...args: unknown[]) => void, limit: number) => {
@@ -90,6 +91,26 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
     return () => window.removeEventListener('scroll', handleScroll)
   }, [navItems]) // Add navItems to dependency array
 
+  // Add intersection observer for distribution section
+  useEffect(() => {
+    const distributionSection = document.getElementById('distribution')
+    if (!distributionSection) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When distribution section is intersecting, hide the navigation
+        setIsVisible(!entry.isIntersecting)
+      },
+      {
+        threshold: 0.1, // Trigger when 10% of the distribution section is visible
+        rootMargin: '-50px 0px' // Add some margin to start the fade before full intersection
+      }
+    )
+
+    observer.observe(distributionSection)
+    return () => observer.disconnect()
+  }, [])
+
   // Navigation click handler
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
@@ -111,7 +132,10 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
   }
 
   return (
-      <div className="sticky top-40 z-[2] bg-warm rounded-2xl w-full max-w-72 mb-8 p-4">
+      <div 
+        className={`sticky top-40 z-[2] bg-warm rounded-2xl w-full max-w-72 mb-8 p-4 transition-opacity duration-300
+          ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+      >
         <div className="flex flex-col gap-4 items-center justify-center relative -mt-20 mb-4 text-center">
           <Image
             src={imageUrl}
