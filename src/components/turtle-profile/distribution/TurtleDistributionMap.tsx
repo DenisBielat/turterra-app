@@ -298,8 +298,8 @@ const useMapFitBounds = (
         const fitToBounds = () => {
           try {
             // Calculate the offset to account for the Species Selector
-            // Species Selector width: 320px (w-80) + 24px left padding + 24px right padding = 368px
-            const speciesSelectorWidth = 368;
+            // Species Selector width: 384px (w-96) + 24px left padding + 24px right padding = 432px
+            const speciesSelectorWidth = 432;
             const mapWidth = map.getContainer().offsetWidth;
             const offsetRatio = speciesSelectorWidth / mapWidth;
             
@@ -358,7 +358,7 @@ const useMapFitBounds = (
 
 // Components
 const LoadingState = () => (
-  <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+  <div className="relative w-full h-[500px] md:h-[700px] rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
     <div className="text-center">
       <div className="animate-spin rounded-full w-8 h-8 border-b-2 border-blue-600 mx-auto mb-2" />
       <p className="text-gray-600">Loading distribution data...</p>
@@ -367,7 +367,7 @@ const LoadingState = () => (
 );
 
 const ErrorState = ({ error }: { error: string }) => (
-  <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden bg-red-50 flex items-center justify-center">
+  <div className="relative w-full h-[500px] md:h-[700px] rounded-lg overflow-hidden bg-red-50 flex items-center justify-center">
     <div className="text-center p-4">
       <p className="text-red-600 font-semibold">Error loading map data</p>
       <p className="text-red-500 text-sm mt-1">{error}</p>
@@ -376,7 +376,7 @@ const ErrorState = ({ error }: { error: string }) => (
 );
 
 const LayerControls = ({ activeLayers, onChange }: { activeLayers: LayerState; onChange: (layers: LayerState) => void }) => (
-  <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg">
+  <div className="absolute top-4 right-16 bg-white p-3 rounded-lg shadow-lg">
     <h4 className="font-semibold text-sm mb-2">Show Ranges</h4>
     <div className="space-y-2">
       {Object.entries(activeLayers).map(([key, value]) => (
@@ -473,7 +473,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ currentSp
   if (!speciesData) return <LoadingState />;
 
   return (
-    <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden">
+    <div className="relative w-full h-[500px] md:h-[700px] rounded-lg overflow-hidden">
       <Map
         ref={mapRef}
         {...viewState}

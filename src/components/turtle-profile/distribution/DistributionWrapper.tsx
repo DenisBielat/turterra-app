@@ -39,8 +39,8 @@ const DistributionWrapper = ({
         </div>
         
         {/* Distribution Details Panel positioned absolutely to align with map */}
-        <div className="absolute top-6 left-6 w-80 z-10">
-          <div className="bg-white rounded-lg p-6 shadow-lg">
+        <div className="absolute top-6 left-6 bottom-6 w-96 z-10">
+          <div className="bg-white rounded-lg p-6 shadow-lg h-full">
             <DistributionDetailsPanel 
               currentSpeciesId={currentSpeciesId}
               speciesName={speciesName}

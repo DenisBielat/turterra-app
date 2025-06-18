@@ -57,9 +57,9 @@ const DistributionDetailsPanel: React.FC<DistributionDetailsPanelProps> = ({
   }, [slug, profileImageUrl]);
 
   return (
-    <div className="mb-6">
+    <div className="h-full flex flex-col">
       {/* Main heading with species name */}
-      <h3 className="text-xl font-semibold mb-2 text-gray-900">
+      <h3 className="text-xl font-semibold mb-2">
         {speciesName}
       </h3>
       
@@ -73,7 +73,7 @@ const DistributionDetailsPanel: React.FC<DistributionDetailsPanelProps> = ({
       
       {/* Profile image */}
       <div className="flex justify-center mb-4">
-        <div className="relative w-full h-32 rounded-lg overflow-hidden">
+        <div className="relative w-full aspect-video rounded-lg overflow-hidden">
           {loading ? (
             <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
               <span className="text-gray-500 text-sm">Loading...</span>
@@ -89,8 +89,8 @@ const DistributionDetailsPanel: React.FC<DistributionDetailsPanelProps> = ({
         </div>
       </div>
       
-      {/* Placeholder for future content */}
-      <div className="bg-gray-50 p-4 rounded-md">
+      {/* Placeholder for future content - takes remaining space */}
+      <div className="bg-gray-50 p-4 rounded-md flex-1">
         <p className="text-sm text-gray-500 text-center">
           Additional distribution details coming soon...
         </p>
