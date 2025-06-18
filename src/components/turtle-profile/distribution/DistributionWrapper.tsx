@@ -18,22 +18,30 @@ const DistributionWrapper = ({ currentSpeciesId }: DistributionWrapperProps) => 
   }, [currentSpeciesId]);
 
   return (
-    <div className="relative">
-      {/* Distribution content area - full width */}
-      <div className="col-span-12">
-        <DistributionSection 
-          currentSpeciesId={currentSpeciesId} 
-          selectedSpeciesIds={selectedSpeciesIds}
-        />
-      </div>
+    <div>
+      {/* Heading outside the map container */}
+      <h2 id="distribution" className="scroll-m-20 text-5xl mb-6 text-white">
+        Distribution
+      </h2>
       
-      {/* Species Selector positioned absolutely to align with map */}
-      <div className="absolute top-24 left-6 w-80 z-10">
-        <div className="bg-white rounded-lg p-6 shadow-lg">
-          <SpeciesSelector 
-            onChange={setSelectedSpeciesIds} 
-            initialSelectedIds={selectedSpeciesIds}
+      {/* Map and Species Selector container */}
+      <div className="relative">
+        {/* Distribution content area - full width */}
+        <div className="col-span-12">
+          <DistributionSection 
+            currentSpeciesId={currentSpeciesId} 
+            selectedSpeciesIds={selectedSpeciesIds}
           />
+        </div>
+        
+        {/* Species Selector positioned absolutely to align with map */}
+        <div className="absolute top-6 left-6 w-80 z-10">
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <SpeciesSelector 
+              onChange={setSelectedSpeciesIds} 
+              initialSelectedIds={selectedSpeciesIds}
+            />
+          </div>
         </div>
       </div>
     </div>

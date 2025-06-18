@@ -64,9 +64,6 @@ const DistributionSection = ({ currentSpeciesId, selectedSpeciesIds }: Distribut
   
   return (
     <div ref={containerRef}>
-      <h2 id="distribution" className="scroll-m-20 text-5xl mb-6 text-white">
-        Distribution
-      </h2>
       {isVisible ? (
         <TurtleDistributionMap selectedSpeciesIds={mapSpeciesIds} />
       ) : (

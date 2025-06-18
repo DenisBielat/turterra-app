@@ -407,6 +407,23 @@ const ErrorState = ({ error }: { error: string }) => (
   </div>
 );
 
+const SpeciesLegend = ({ speciesData }: { speciesData: SpeciesData[] }) => (
+  <div className="absolute top-4 right-16 bg-white p-3 rounded-lg shadow-lg max-w-xs">
+    <h4 className="font-semibold text-sm mb-2">Species</h4>
+    <div className="space-y-1 max-h-32 overflow-y-auto">
+      {speciesData.map((species, index) => (
+        <div key={species.speciesId} className="flex items-center text-xs">
+          <div 
+            className="w-3 h-3 rounded mr-2 flex-shrink-0"
+            style={{ backgroundColor: COLOR_SCALES[index % COLOR_SCALES.length].native }}
+          />
+          <span className="truncate">{species.speciesName}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const LayerControls = ({ activeLayers, onChange }: { activeLayers: LayerState; onChange: (layers: LayerState) => void }) => (
   <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg">
     <h4 className="font-semibold text-sm mb-2">Show Ranges</h4>
@@ -421,23 +438,6 @@ const LayerControls = ({ activeLayers, onChange }: { activeLayers: LayerState; o
           />
           {key.charAt(0).toUpperCase() + key.slice(1)}
         </label>
-      ))}
-    </div>
-  </div>
-);
-
-const SpeciesLegend = ({ speciesData }: { speciesData: SpeciesData[] }) => (
-  <div className="absolute top-4 right-16 bg-white p-3 rounded-lg shadow-lg max-w-xs">
-    <h4 className="font-semibold text-sm mb-2">Species</h4>
-    <div className="space-y-1 max-h-32 overflow-y-auto">
-      {speciesData.map((species, index) => (
-        <div key={species.speciesId} className="flex items-center text-xs">
-          <div 
-            className="w-3 h-3 rounded mr-2 flex-shrink-0"
-            style={{ backgroundColor: COLOR_SCALES[index % COLOR_SCALES.length].native }}
-          />
-          <span className="truncate">{species.speciesName}</span>
-        </div>
       ))}
     </div>
   </div>
@@ -594,35 +594,24 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             onClose={() => setHoveredFeature(null)}
             closeButton={false}
             closeOnClick={false}
+            className="mapbox-popup"
           >
-            <div className="p-2">
-              <h3 className="font-bold text-sm">{hoveredFeature.properties.region_name}</h3>
-              <p className="text-xs text-gray-500 capitalize">
+            <div className="p-2 text-black">
+              <h3 className="font-bold text-sm leading-tight">{hoveredFeature.properties.region_name}</h3>
+              <p className="text-xs text-gray-500 capitalize leading-tight">
                 {hoveredFeature.properties.region_type} Level
               </p>
-              <p className="text-xs">
+              <p className="text-xs leading-tight">
                 {hoveredFeature.properties.presence_status} Range
               </p>
-              <p className="text-xs italic">{hoveredFeature.properties.species_name}</p>
+              <p className="text-xs italic leading-tight">{hoveredFeature.properties.species_name}</p>
             </div>
           </Popup>
         )}
       </Map>
       
-      <LayerControls activeLayers={activeLayers} onChange={setActiveLayers} />
-      
       {speciesData.length > 0 && <SpeciesLegend speciesData={speciesData} />}
-      
-      {/* Info Panel */}
-      <div className="absolute bottom-4 left-4 bg-white p-2 rounded-lg shadow-lg">
-        <p className="text-xs text-gray-600">
-          Detail Level: <span className="font-semibold capitalize">{currentDetailLevel}</span>
-          {currentDetailLevel === 'state' && speciesData.some(s => !s.stateGeojson) && (
-            <span className="text-orange-500 ml-1">(using country data)</span>
-          )}
-        </p>
-        <p className="text-xs text-gray-500">Zoom: {viewState.zoom.toFixed(1)}</p>
-      </div>
+      <LayerControls activeLayers={activeLayers} onChange={setActiveLayers} />
     </div>
   );
 };
