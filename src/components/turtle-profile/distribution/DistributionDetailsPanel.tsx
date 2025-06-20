@@ -7,6 +7,7 @@ interface DistributionDetailsPanelProps {
   scientificName?: string;
   profileImageUrl?: string;
   slug?: string;
+  distributionDescription?: string;
 }
 
 interface ImageData {
@@ -24,7 +25,8 @@ const DistributionDetailsPanel: React.FC<DistributionDetailsPanelProps> = ({
   speciesName = "Loading...",
   scientificName,
   profileImageUrl = "/images/image-placeholder.png",
-  slug
+  slug,
+  distributionDescription
 }) => {
   const [primaryImageUrl, setPrimaryImageUrl] = useState<string>(profileImageUrl);
   const [loading, setLoading] = useState(false);
@@ -88,6 +90,16 @@ const DistributionDetailsPanel: React.FC<DistributionDetailsPanelProps> = ({
           )}
         </div>
       </div>
+      
+      {/* Distribution Description */}
+      {distributionDescription && (
+        <div className="mb-4">
+          <h4 className="font-semibold text-sm mb-2">Distribution Overview</h4>
+          <p className="text-sm text-gray-700 leading-relaxed">
+            {distributionDescription}
+          </p>
+        </div>
+      )}
       
       {/* Placeholder for future content - takes remaining space */}
       <div className="bg-gray-50 p-4 rounded-md flex-1">

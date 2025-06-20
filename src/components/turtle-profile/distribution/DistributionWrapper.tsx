@@ -9,6 +9,7 @@ interface DistributionWrapperProps {
   scientificName?: string;
   profileImageUrl?: string;
   slug?: string;
+  distributionDescription?: string;
 }
 
 const DistributionWrapper = ({ 
@@ -16,7 +17,8 @@ const DistributionWrapper = ({
   speciesName, 
   scientificName, 
   profileImageUrl,
-  slug
+  slug,
+  distributionDescription
 }: DistributionWrapperProps) => {
   return (
     <div>
@@ -47,6 +49,7 @@ const DistributionWrapper = ({
               scientificName={scientificName}
               profileImageUrl={profileImageUrl}
               slug={slug}
+              distributionDescription={distributionDescription}
             />
           </div>
         </div>

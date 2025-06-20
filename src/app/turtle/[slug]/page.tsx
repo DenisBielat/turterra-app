@@ -80,6 +80,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                         scientificName={data.scientificName}
                         profileImageUrl={data.profileImage || "/images/image-placeholder.png"}
                         slug={params.slug}
+                        distributionDescription={data.distributionDescription}
                       />
                     </div>
                   </div>

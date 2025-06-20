@@ -22,14 +22,14 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       id,
       species_common_name,
       species_scientific_name,
-      species_intro_description,
       other_common_names,
       avatar_image_circle_url,
       avatar_image_full_url,
       tax_parent_genus,
       turtle_species_section_descriptions (
         at_a_glance,
-        identification
+        identification,
+        distribution
       ),
       turtle_species_measurements (
         adult_weight,
@@ -255,15 +255,14 @@ function transformTurtleDataToProfile(
   const {
     species_common_name,
     species_scientific_name,
-    species_intro_description,
     other_common_names,
     avatar_image_circle_url,
     turtle_species_conservation_history,
     turtle_species_population_estimate_history,
     turtle_species_habitats,
     turtle_species_ecologies,
-    turtle_species_section_descriptions,
-    turtle_species_measurements
+    turtle_species_measurements,
+    turtle_species_section_descriptions
   } = turtle;
 
   // Conservation status
@@ -331,9 +330,6 @@ function transformTurtleDataToProfile(
         lifespan: { wild: 'Unknown', captivity: 'Unknown' }
       };
 
-  // Section descriptions
-  const sectionDescriptions = turtle_species_section_descriptions?.[0];
-
   // Physical feature categories
   const { referenceVariant, otherVariants } = pickReferenceAndOtherVariants(physicalFeatures);
   const featureCategories = buildFeatureCategories({
@@ -348,12 +344,13 @@ function transformTurtleDataToProfile(
     commonName: species_common_name,
     scientificName: species_scientific_name,
     profileImage: avatar_image_circle_url || "",
-    description: species_intro_description,
+    description: turtle_species_section_descriptions?.[0]?.at_a_glance || "",
+    distributionDescription: turtle_species_section_descriptions?.[0]?.distribution || "",
     conservationStatus, 
     stats,
     commonNames: other_common_names || [],
     identification: {
-      description: sectionDescriptions?.identification || "",
+      description: turtle_species_section_descriptions?.[0]?.identification || "Physical features description...",
       physicalFeatures: "Physical features description...",
       measurements,
       featureCategories,
