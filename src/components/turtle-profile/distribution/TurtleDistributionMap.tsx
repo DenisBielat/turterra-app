@@ -37,7 +37,7 @@ interface LayerState {
 interface HoveredFeature {
   properties: {
     region_name: string;
-    presence_status: 'Native' | 'Introduced' | 'Extinct';
+    origin: 'Native' | 'Introduced' | 'Extinct';
     species_name: string;
     region_type: 'country' | 'state';
   };
@@ -506,7 +506,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ currentSp
     return {
       ...geojson,
       features: geojson.features.filter(feature => 
-        feature.properties?.presence_status === status
+        feature.properties?.origin === status
       )
     };
   }, []);
@@ -522,11 +522,11 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ currentSp
   const handleMouseMove = useCallback((e: MapMouseEvent) => {
     if (e.features && e.features.length > 0) {
       const feature = e.features[0];
-      if (feature.properties?.region_name && feature.properties?.presence_status && feature.properties?.species_name) {
+      if (feature.properties?.region_name && feature.properties?.origin && feature.properties?.species_name) {
         setHoveredFeature({
           properties: {
             region_name: feature.properties.region_name as string,
-            presence_status: feature.properties.presence_status as 'Native' | 'Introduced' | 'Extinct',
+            origin: feature.properties.origin as 'Native' | 'Introduced' | 'Extinct',
             species_name: feature.properties.species_name as string,
             region_type: currentDetailLevel
           },
@@ -624,7 +624,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ currentSp
                 {hoveredFeature.properties.region_type} Level
               </p>
               <p className="text-xs leading-tight">
-                {hoveredFeature.properties.presence_status} Range
+                {hoveredFeature.properties.origin} Range
               </p>
               <p className="text-xs italic leading-tight">{hoveredFeature.properties.species_name}</p>
             </div>

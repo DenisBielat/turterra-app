@@ -206,3 +206,10 @@ export interface Variant {
     featureName: string;
     variants: FeatureVariants;
   }
+
+  export interface DistributionDetail {
+    country_name: string;
+    origin: string;
+    population_trend: string;
+    state_count: number;
+  }
