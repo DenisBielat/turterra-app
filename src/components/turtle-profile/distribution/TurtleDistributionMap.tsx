@@ -56,12 +56,9 @@ const fixWrappedBounds = (bbox: [number, number, number, number]): [number, numb
   const lngSpan = maxLng - minLng;
   
   if (lngSpan > 180) {
-    console.log('fixWrappedBounds: Detected wrapped bounds, span:', lngSpan);
-    
     // For the US, focus on the continental area (roughly -125 to -66 longitude)
     // This is a common approach for maps that span the date line
     const continentalUSBounds: [number, number, number, number] = [-125, 25, -66, 50];
-    console.log('fixWrappedBounds: Using continental US bounds:', continentalUSBounds);
     return continentalUSBounds;
   }
   
@@ -70,8 +67,6 @@ const fixWrappedBounds = (bbox: [number, number, number, number]): [number, numb
 
 const calculateBoundsFromFeatures = (geojson: FeatureCollection<Geometry>): [number, number, number, number] | null => {
   if (!geojson.features?.length) return null;
-
-  console.log('calculateBoundsFromFeatures: Processing', geojson.features.length, 'features');
 
   let minLng = Infinity, minLat = Infinity;
   let maxLng = -Infinity, maxLat = -Infinity;
@@ -99,28 +94,18 @@ const calculateBoundsFromFeatures = (geojson: FeatureCollection<Geometry>): [num
     }
   };
 
-  geojson.features.forEach((feature, index) => {
+  geojson.features.forEach((feature) => {
     if (feature.geometry && 'coordinates' in feature.geometry) {
-      if (index < 3) { // Log first few features for debugging
-        console.log('calculateBoundsFromFeatures: Feature', index, 'properties:', feature.properties);
-      }
       extractCoordinates(feature.geometry.coordinates);
     }
   });
 
-  console.log('calculateBoundsFromFeatures: Initial bounds:', { minLng, minLat, maxLng, maxLat });
-  console.log('calculateBoundsFromFeatures: Has negative lng:', hasNegativeLng);
-  console.log('calculateBoundsFromFeatures: Has positive lng:', hasPositiveLng);
-
   if (!isFinite(minLng) || !isFinite(minLat) || !isFinite(maxLng) || !isFinite(maxLat)) {
-    console.log('calculateBoundsFromFeatures: Invalid bounds detected');
     return null;
   }
 
   // Handle wrapping around the globe (like Alaska extending westward)
   if (hasNegativeLng && hasPositiveLng) {
-    console.log('calculateBoundsFromFeatures: Detected date line crossing, processing...');
-    
     // Sort longitudes to find the largest gap
     allLngs.sort((a, b) => a - b);
     
@@ -136,13 +121,9 @@ const calculateBoundsFromFeatures = (geojson: FeatureCollection<Geometry>): [num
       }
     }
     
-    console.log('calculateBoundsFromFeatures: Largest gap:', maxGap, 'at longitude:', gapStart);
-    
     // If the largest gap is significant (more than 180 degrees), 
     // we're dealing with a date line crossing
     if (maxGap > 180) {
-      console.log('calculateBoundsFromFeatures: Significant gap detected, splitting coordinates');
-      
       // Split the coordinates into two groups and calculate bounds for the larger group
       const group1: number[] = [];
       const group2: number[] = [];
@@ -155,21 +136,15 @@ const calculateBoundsFromFeatures = (geojson: FeatureCollection<Geometry>): [num
         }
       });
       
-      console.log('calculateBoundsFromFeatures: Group 1 size:', group1.length);
-      console.log('calculateBoundsFromFeatures: Group 2 size:', group2.length);
-      
       // Use the larger group for bounds calculation
       const useGroup = group1.length > group2.length ? group1 : group2;
       const newMinLng = Math.min(...useGroup);
       const newMaxLng = Math.max(...useGroup);
       
-      console.log('calculateBoundsFromFeatures: Using group with bounds:', [newMinLng, minLat, newMaxLng, maxLat]);
-      
       return [newMinLng, minLat, newMaxLng, maxLat];
     }
   }
 
-  console.log('calculateBoundsFromFeatures: Final bounds:', [minLng, minLat, maxLng, maxLat]);
   return [minLng, minLat, maxLng, maxLat];
 };
 
@@ -329,20 +304,13 @@ const useMapFitBounds = (
   
   useEffect(() => {
     if (!currentSpeciesId || !speciesData) {
-      console.log('useMapFitBounds: Missing data', { currentSpeciesId, hasSpeciesData: !!speciesData });
       return;
     }
     
     // Only zoom on initial load
     if (hasInitializedRef.current) {
-      console.log('useMapFitBounds: Already initialized, skipping');
       return;
     }
-    
-    console.log('useMapFitBounds: Starting zoom process for species:', speciesData.speciesName);
-    console.log('useMapFitBounds: Bbox from database:', speciesData.bbox);
-    console.log('useMapFitBounds: Has country geojson:', !!speciesData.countryGeojson);
-    console.log('useMapFitBounds: Has state geojson:', !!speciesData.stateGeojson);
     
     hasInitializedRef.current = true;
     
@@ -370,27 +338,21 @@ const useMapFitBounds = (
           return;
         }
 
-        console.log('useMapFitBounds: Map is available, calculating bounds');
-
         const bounds = new mapboxgl.LngLatBounds();
         let hasValidBounds = false;
 
         // Add bounds for the species
         if (speciesData.bbox) {
           const [minLng, minLat, maxLng, maxLat] = speciesData.bbox;
-          console.log('useMapFitBounds: Using database bbox:', [minLng, minLat, maxLng, maxLat]);
           
           // Fix wrapped bounds if necessary
           const fixedBbox = fixWrappedBounds([minLng, minLat, maxLng, maxLat]);
-          console.log('useMapFitBounds: Fixed bbox:', fixedBbox);
           
           bounds.extend([fixedBbox[0], fixedBbox[1]]);
           bounds.extend([fixedBbox[2], fixedBbox[3]]);
           hasValidBounds = true;
         } else if (speciesData.countryGeojson) {
-          console.log('useMapFitBounds: Calculating bounds from country geojson');
           const speciesBounds = calculateBoundsFromFeatures(speciesData.countryGeojson);
-          console.log('useMapFitBounds: Calculated bounds:', speciesBounds);
           if (speciesBounds) {
             const [minLng, minLat, maxLng, maxLat] = speciesBounds;
             bounds.extend([minLng, minLat]);
@@ -399,18 +361,12 @@ const useMapFitBounds = (
           }
         }
 
-        console.log('useMapFitBounds: Has valid bounds:', hasValidBounds);
-        console.log('useMapFitBounds: Bounds empty:', bounds.isEmpty());
-
         if (!hasValidBounds || bounds.isEmpty()) {
-          console.log('useMapFitBounds: No valid bounds, skipping zoom');
           return;
         }
 
         const fitToBounds = () => {
           try {
-            console.log('useMapFitBounds: Fitting to bounds:', bounds.toArray());
-            
             // Calculate the offset to account for the details panel
             // Details panel width: 384px (w-96) + 24px left padding + 24px right padding = 432px
             const detailsPanelWidth = 432;
@@ -426,23 +382,16 @@ const useMapFitBounds = (
               right: 50
             };
             
-            console.log('useMapFitBounds: Using padding:', adjustedPadding);
-            console.log('useMapFitBounds: Panel ratio:', panelRatio);
-            
             map.fitBounds(bounds, { 
               padding: adjustedPadding, 
               duration: 1000,
               maxZoom: 8 // Reduced from 10 to allow more zoomed-out view
             });
             
-            console.log('useMapFitBounds: fitBounds called successfully');
-            
             // Update view state after fitting
             setTimeout(() => {
               const center = map.getCenter();
               const zoom = map.getZoom();
-              console.log('useMapFitBounds: Map center after fit:', center);
-              console.log('useMapFitBounds: Map zoom after fit:', zoom);
               setViewState((prevState: ViewState) => ({
                 ...prevState,
                 longitude: center.lng,
@@ -458,7 +407,6 @@ const useMapFitBounds = (
         if (map.isStyleLoaded()) {
           fitToBounds();
         } else {
-          console.log('useMapFitBounds: Map style not loaded, waiting...');
           map.once('load', fitToBounds);
         }
       };

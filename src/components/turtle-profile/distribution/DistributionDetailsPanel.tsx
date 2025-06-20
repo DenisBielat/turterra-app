@@ -95,7 +95,7 @@ const DistributionDetailsPanel: React.FC<DistributionDetailsPanelProps> = ({
       {distributionDescription && (
         <div className="mb-4">
           <h4 className="font-semibold text-sm mb-2">Distribution Overview</h4>
-          <p className="text-sm text-gray-700 leading-relaxed">
+          <p className="text-sm text-gray-700">
             {distributionDescription}
           </p>
         </div>
