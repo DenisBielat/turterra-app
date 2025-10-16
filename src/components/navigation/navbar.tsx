@@ -98,11 +98,11 @@ const Navbar = () => {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <Link href="/donate" legacyBehavior passHref>
-                  <NavigationMenuLink className='hover:text-green-600 transition-all'>
+                <NavigationMenuLink asChild>
+                  <Link href="/donate" className='hover:text-green-600 transition-all'>
                     Donate
-                  </NavigationMenuLink>
-                </Link>
+                  </Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
