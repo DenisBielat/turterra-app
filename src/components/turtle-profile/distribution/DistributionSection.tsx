@@ -11,9 +11,9 @@ const DistributionSection: React.FC<DistributionSectionProps> = ({
   currentSpeciesName 
 }) => {
   return (
-    <div>
+    <div id="distribution" className="scroll-mt-20">
       <div className="mb-4">
-        <h2 className="text-2xl font-bold mb-2">Distribution</h2>
+        <h2 className="text-5xl font-bold mb-2">Distribution</h2>
         {currentSpeciesName && (
           <p className="text-gray-600">
             Geographic distribution of the {currentSpeciesName}

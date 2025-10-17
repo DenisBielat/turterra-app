@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import Map, { Source, Layer, NavigationControl, Popup, MapMouseEvent, ViewState, MapRef } from 'react-map-gl/mapbox';
+import Map, { Source, Layer, NavigationControl, ViewState, MapRef, MapMouseEvent } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/lib/db/supabaseClient';
 import type { FeatureCollection, Feature, MultiPolygon } from 'geojson';
@@ -25,17 +25,6 @@ interface TurtleDistributionMapProps {
   selectedSpeciesIds?: (string | number)[];
 }
 
-interface HoveredFeature {
-  properties: {
-    region_name: string;
-    origin: 'Native' | 'Introduced' | 'Extinct';
-    species_name: string;
-    region_level: string;
-  };
-  geometry: {
-    coordinates: number[][][][];
-  };
-}
 
 const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedSpeciesIds = [] }) => {
   const [viewState, setViewState] = useState<ViewState>({
@@ -53,7 +42,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   });
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
-  const [hoveredFeature, setHoveredFeature] = useState<HoveredFeature | null>(null);
+  const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
@@ -62,7 +51,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   
   // Track zoom level for layer visibility
   const [currentZoom, setCurrentZoom] = useState(1.5);
-  const ZOOM_BREAKPOINT = 4; // Show states when zoom >= 4, countries when zoom < 4
+  const ZOOM_BREAKPOINT = 2.5; // Show states when zoom >= 2.5, countries when zoom < 2.5
   
   // Fetch distribution GeoJSON for selected species
   useEffect(() => {
@@ -141,27 +130,36 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     fetchDistributions();
   }, [selectedSpeciesIds]);
   
+  // Helper function to darken a hex color
+  const darkenColor = useCallback((hex: string, amount: number = 0.2) => {
+    const num = parseInt(hex.replace('#', ''), 16);
+    const r = Math.max(0, Math.floor((num >> 16) * (1 - amount)));
+    const g = Math.max(0, Math.floor(((num >> 8) & 0x00FF) * (1 - amount)));
+    const b = Math.max(0, Math.floor((num & 0x0000FF) * (1 - amount)));
+    return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
+  }, []);
+
   // Define color for each species (up to 3)
   const getColorScale = useCallback((index: number) => {
     // Different base colors for each species
     const colorScales = [
       // Species 1: Blue scale
       {
-        native: { fillColor: '#60a5fa', lineColor: '#2563eb' }, // blue-400, blue-600
-        introduced: { fillColor: '#93c5fd', lineColor: '#3b82f6' }, // blue-300, blue-500 
-        extinct: { fillColor: '#bfdbfe', lineColor: '#60a5fa' }  // blue-200, blue-400
+        native: { fillColor: '#60a5fa', lineColor: '#2563eb', hoverFillColor: '#3b82f6' }, // blue-400, blue-600, blue-500
+        introduced: { fillColor: '#93c5fd', lineColor: '#3b82f6', hoverFillColor: '#60a5fa' }, // blue-300, blue-500, blue-400
+        extinct: { fillColor: '#bfdbfe', lineColor: '#60a5fa', hoverFillColor: '#93c5fd' }  // blue-200, blue-400, blue-300
       },
       // Species 2: Purple scale
       {
-        native: { fillColor: '#a78bfa', lineColor: '#7c3aed' }, // purple-400, purple-600
-        introduced: { fillColor: '#c4b5fd', lineColor: '#8b5cf6' }, // purple-300, purple-500
-        extinct: { fillColor: '#ddd6fe', lineColor: '#a78bfa' }  // purple-200, purple-400
+        native: { fillColor: '#a78bfa', lineColor: '#7c3aed', hoverFillColor: '#8b5cf6' }, // purple-400, purple-600, purple-500
+        introduced: { fillColor: '#c4b5fd', lineColor: '#8b5cf6', hoverFillColor: '#a78bfa' }, // purple-300, purple-500, purple-400
+        extinct: { fillColor: '#ddd6fe', lineColor: '#a78bfa', hoverFillColor: '#c4b5fd' }  // purple-200, purple-400, purple-300
       },
       // Species 3: Green scale
       {
-        native: { fillColor: '#4ade80', lineColor: '#16a34a' }, // green-400, green-600
-        introduced: { fillColor: '#86efac', lineColor: '#22c55e' }, // green-300, green-500
-        extinct: { fillColor: '#bbf7d0', lineColor: '#4ade80' }  // green-200, green-400
+        native: { fillColor: '#4ade80', lineColor: '#16a34a', hoverFillColor: '#22c55e' }, // green-400, green-600, green-500
+        introduced: { fillColor: '#86efac', lineColor: '#22c55e', hoverFillColor: '#4ade80' }, // green-300, green-500, green-400
+        extinct: { fillColor: '#bbf7d0', lineColor: '#4ade80', hoverFillColor: '#86efac' }  // green-200, green-400, green-300
       }
     ];
     
@@ -266,53 +264,33 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         
         console.log('🗺️ Map style loaded, calculating bounds...');
         
-        // Calculate bounding box for all species
-        let bounds: number[][] | null = null;
+        // Use the bbox from the GeoJSON if available
+        const allFeatures = speciesData.flatMap(species => species.geojson?.features || []);
         
-        speciesData.forEach(species => {
-          if (species.geojson && species.geojson.features) {
-            species.geojson.features.forEach(feature => {
-              if (feature.geometry && feature.geometry.coordinates) {
-                // For MultiPolygon, iterate through all polygons and rings
-                feature.geometry.coordinates.forEach(polygon => {
-                  polygon.forEach(ring => {
-                    ring.forEach(coord => {
-                      if (!bounds) {
-                        bounds = [[coord[0], coord[1]], [coord[0], coord[1]]];
-                      } else {
-                        bounds[0][0] = Math.min(bounds[0][0], coord[0]);
-                        bounds[0][1] = Math.min(bounds[0][1], coord[1]);
-                        bounds[1][0] = Math.max(bounds[1][0], coord[0]);
-                        bounds[1][1] = Math.max(bounds[1][1], coord[1]);
-                      }
-                    });
-                  });
-                });
-              }
+        if (allFeatures.length > 0) {
+          // Try to use the bbox from the first species GeoJSON
+          const firstSpecies = speciesData[0];
+          if (firstSpecies.geojson.bbox) {
+            console.log('🎯 Using GeoJSON bbox:', firstSpecies.geojson.bbox);
+            map.fitBounds([
+              [firstSpecies.geojson.bbox[0], firstSpecies.geojson.bbox[1]],
+              [firstSpecies.geojson.bbox[2], firstSpecies.geojson.bbox[3]]
+            ], {
+              padding: 50,
+              duration: 1500,
+              easing: (t) => t * (2 - t)
+            });
+          } else {
+            console.log('🎯 No bbox in GeoJSON, using default zoom');
+            // Just zoom to a reasonable level if no bbox
+            map.easeTo({
+              zoom: 3,
+              duration: 1500,
+              easing: (t) => t * (2 - t)
             });
           }
-        });
-        
-        // Fit map to bounds with some padding
-        if (bounds) {
-          const padding = 0.1; // 10% padding
-          const width = bounds[1][0] - bounds[0][0];
-          const height = bounds[1][1] - bounds[0][1];
-          
-          const paddedBounds: [[number, number], [number, number]] = [
-            [bounds[0][0] - width * padding, bounds[0][1] - height * padding],
-            [bounds[1][0] + width * padding, bounds[1][1] + height * padding]
-          ];
-          
-          console.log('🎯 Fitting map to bounds:', paddedBounds);
-          
-          map.fitBounds(paddedBounds, {
-            padding: 50,
-            duration: 1500,
-            easing: (t) => t * (2 - t) // ease-out
-          });
         } else {
-          console.warn('⚠️ No bounds calculated from species data');
+          console.warn('⚠️ No features found for auto-zoom');
         }
       };
       
@@ -406,23 +384,23 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         onMouseMove={(e: MapMouseEvent) => {
           if (e.features && e.features.length > 0) {
             const feature = e.features[0];
-            if (feature.properties && 
-                'region_name' in feature.properties && 
-                'origin' in feature.properties && 
-                'species_name' in feature.properties) {
-              setHoveredFeature({
-                properties: {
-                  region_name: feature.properties.region_name as string,
-                  origin: feature.properties.origin as 'Native' | 'Introduced' | 'Extinct',
-                  species_name: feature.properties.species_name as string,
-                  region_level: feature.properties.region_level as string
-                },
-                geometry: feature.geometry as { coordinates: number[][][][] }
-              });
+            setHoveredFeatureId(feature.id as string);
+            // Change cursor to pointer
+            if (e.target.getCanvas()) {
+              e.target.getCanvas().style.cursor = 'pointer';
             }
           }
         }}
-        onMouseLeave={() => setHoveredFeature(null)}
+        onMouseLeave={() => {
+          setHoveredFeatureId(null);
+          // Reset cursor
+          if (mapRef.current) {
+            const canvas = mapRef.current.getCanvas();
+            if (canvas) {
+              canvas.style.cursor = '';
+            }
+          }
+        }}
       >
         <NavigationControl position="top-right" />
         
@@ -500,9 +478,19 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
                 paint={{
                   'fill-color': [
                     'case',
-                    ['==', ['get', 'origin'], 'Native'], colorScale.native.fillColor,
-                    ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.fillColor,
-                    colorScale.extinct.fillColor
+                    ['==', ['get', 'id'], hoveredFeatureId],
+                    [
+                      'case',
+                      ['==', ['get', 'origin'], 'Native'], colorScale.native.hoverFillColor,
+                      ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.hoverFillColor,
+                      colorScale.extinct.hoverFillColor
+                    ],
+                    [
+                      'case',
+                      ['==', ['get', 'origin'], 'Native'], colorScale.native.fillColor,
+                      ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.fillColor,
+                      colorScale.extinct.fillColor
+                    ]
                   ],
                   'fill-opacity': 0.6,
                   'fill-outline-color': [
@@ -522,31 +510,6 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             </Source>
           );
         })}
-        
-        {/* Update the Popup component */}
-        {hoveredFeature && hoveredFeature.properties && 
-         !isNaN(hoveredFeature.geometry.coordinates[0][0][0][0]) && 
-         !isNaN(hoveredFeature.geometry.coordinates[0][0][0][1]) && (
-          <Popup
-            longitude={Number(hoveredFeature.geometry.coordinates[0][0][0][0])}
-            latitude={Number(hoveredFeature.geometry.coordinates[0][0][0][1])}
-            anchor="bottom"
-            onClose={() => setHoveredFeature(null)}
-            closeButton={false}
-            closeOnClick={false}
-          >
-            <div className="p-2">
-              <h3 className="font-bold text-sm">{hoveredFeature.properties.region_name || 'Region'}</h3>
-              <p className="text-xs">
-                {hoveredFeature.properties.origin === 'Native' ? 'Native' : 
-                 hoveredFeature.properties.origin === 'Introduced' ? 'Introduced' : 
-                 'Extinct'} Range
-              </p>
-              <p className="text-xs text-gray-600">{hoveredFeature.properties.region_level}</p>
-              <p className="text-xs italic">{hoveredFeature.properties.species_name}</p>
-            </div>
-          </Popup>
-        )}
       </Map>
     </div>
   );
