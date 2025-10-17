@@ -17,7 +17,7 @@ const DistributionSection: React.FC<DistributionSectionProps> = ({
       <div className="mb-8 max-w-lg">
         <h2 className="text-5xl font-bold mb-2">Distribution</h2>
         {currentSpeciesName && (
-          <p className="text-gray-600">
+          <p className="text-base">
             {description?.trim() || `Geographic distribution of the ${currentSpeciesName}`}
           </p>
         )}
