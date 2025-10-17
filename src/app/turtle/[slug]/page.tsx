@@ -1,4 +1,4 @@
-import { getTurtleData } from '@/lib/db/queries/turtle-profile'
+import { getTurtleData, debugAvailableSlugs } from '@/lib/db/queries/turtle-profile'
 import TurtleProfileHero from "@/components/turtle-profile/hero-slider/turtle-profile-hero";
 import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
@@ -8,10 +8,33 @@ import DistributionSection from "@/components/turtle-profile/distribution/Distri
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
+  
+  console.log(`🐢 Attempting to load turtle with slug: "${params.slug}"`);
+  
+  // Debug: Show available slugs if there's an issue
+  const availableSlugs = await debugAvailableSlugs();
+  
   const data = await getTurtleData(params.slug);
 
   if (!data) {
-    return <div>No turtle data found</div>
+    return (
+      <div className="p-8">
+        <h1 className="text-2xl font-bold mb-4">Turtle Not Found</h1>
+        <p className="mb-4">No turtle data found for slug: <code className="bg-gray-100 px-2 py-1 rounded">{params.slug}</code></p>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold mb-2">Available slugs:</h2>
+          <ul className="list-disc list-inside">
+            {availableSlugs.map((turtle: any) => (
+              <li key={turtle.slug}>
+                <a href={`/turtle/${turtle.slug}`} className="text-blue-600 hover:underline">
+                  {turtle.species_common_name} ({turtle.slug})
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    )
   }
 
   return (

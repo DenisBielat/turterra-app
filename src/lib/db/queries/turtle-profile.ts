@@ -37,13 +37,14 @@ function normalizeValue(value: any): string | null {
 }
 
 async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', value: string) {
+  console.log(`🔍 Fetching turtle data by ${column}:`, value);
+  
   const { data: turtle, error } = await supabase
     .from('turtle_species')
     .select(`
       id,
       species_common_name,
       species_scientific_name,
-      species_intro_description,
       other_common_names,
       avatar_image_circle_url,
       avatar_image_full_url,
@@ -84,10 +85,16 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
     .single<TurtleData>();
 
   if (error) {
-    console.error(`Error fetching turtle data by ${column}:`, error);
+    console.error(`❌ Error fetching turtle data by ${column} "${value}":`, {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     throw error;
   }
 
+  console.log(`✅ Successfully fetched turtle data:`, turtle?.species_common_name);
   return turtle ?? null;
 }
 
@@ -276,7 +283,6 @@ function transformTurtleDataToProfile(
   const {
     species_common_name,
     species_scientific_name,
-    species_intro_description,
     other_common_names,
     avatar_image_circle_url,
     turtle_species_conservation_history,
@@ -369,7 +375,7 @@ function transformTurtleDataToProfile(
     commonName: species_common_name,
     scientificName: species_scientific_name,
     profileImage: avatar_image_circle_url || "",
-    description: species_intro_description,
+    description: sectionDescriptions?.at_a_glance || `Learn about the ${species_common_name}.`,
     conservationStatus, 
     stats,
     commonNames: other_common_names || [],
@@ -405,6 +411,27 @@ export async function getTurtleData(slug: string) {
   } catch (error) {
     console.error('Error in getTurtleData:', error);
     throw error;
+  }
+}
+
+// Debug function to check available slugs
+export async function debugAvailableSlugs() {
+  try {
+    const { data, error } = await supabase
+      .from('turtle_species')
+      .select('slug, species_common_name')
+      .limit(10);
+    
+    if (error) {
+      console.error('Error fetching slugs:', error);
+      return [];
+    }
+    
+    console.log('📋 Available slugs:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in debugAvailableSlugs:', error);
+    return [];
   }
 }
 

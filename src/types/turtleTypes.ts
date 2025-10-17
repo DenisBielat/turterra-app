@@ -78,7 +78,7 @@ export interface Variant {
     id: number;
     species_common_name: string;
     species_scientific_name: string;
-    species_intro_description: string;
+    species_intro_description?: string; // Optional since it might not exist in DB
     other_common_names: string[];
     avatar_image_circle_url: string | null;
     avatar_image_full_url: string | null;
