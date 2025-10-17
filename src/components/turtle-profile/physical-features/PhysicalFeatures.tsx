@@ -6,14 +6,13 @@ import VariantModal from './VariantModal';
 
 // Import the types
 import {
-  Variant,
   FeatureVariants,
   PhysicalFeaturesProps
 } from '@/types/turtleTypes';
 
-function formatValue(value: any): React.ReactNode {
+function formatValue(value: unknown): React.ReactNode {
   // Handle null/undefined/unknown
-  if (!value || value === 'Unknown') return '-';
+  if (value === null || value === undefined || value === 'Unknown' || value === '-') return '-';
 
   // Convert to string if it's not already
   const stringValue = String(value);

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Icon } from '@/components/Icon'
 
 interface ProfileNavigationProps {
@@ -14,16 +14,44 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
   const [activeSection, setActiveSection] = useState('intro')
   
   // Add throttle utility
-  const throttle = (func: Function, limit: number) => {
-    let inThrottle: boolean
-    return (...args: any[]) => {
+  const throttle = <T extends unknown[]>(func: (...args: T) => void, limit: number) => {
+    let inThrottle = false
+    return (...args: T) => {
       if (!inThrottle) {
         func(...args)
         inThrottle = true
-        setTimeout(() => inThrottle = false, limit)
+        setTimeout(() => { inThrottle = false }, limit)
       }
     }
   }
+
+  const navItems = useMemo(() => ([
+    {
+      id: 'intro',
+      label: 'At a Glance',
+      icon: <Icon name="eyeball" style="filled" size="base" />
+    },
+    {
+      id: 'identification',
+      label: 'Identification',
+      icon: <Icon name="marine-turtle" style="filled" size="base" />
+    },
+    {
+      id: 'distribution',
+      label: 'Distribution',
+      icon: <Icon name="trip-map-markers" style="filled" size="base" />
+    },
+    {
+      id: 'habitat',
+      label: 'Habitat & Behavior',
+      icon: <Icon name="outdoors-tree-valley" style="filled" size="base" />
+    },
+    {
+      id: 'conservation',
+      label: 'Conservation',
+      icon: <Icon name="hand-shake-heart" style="filled" size="base" />
+    }
+  ]), [])
 
   // Scroll handling logic
   useEffect(() => {
@@ -59,7 +87,7 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [navItems])
 
   // Navigation click handler
   const scrollToSection = (id: string) => {
@@ -77,33 +105,7 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
 
   if (!imageUrl) return null;
 
-  const navItems = [
-    {
-      id: 'intro',
-      label: 'At a Glance',
-      icon: <Icon name="eyeball" style="filled" size="base" />
-    },
-    {
-      id: 'identification',
-      label: 'Identification',
-      icon: <Icon name="marine-turtle" style="filled" size="base" />
-    },
-    {
-      id: 'distribution',
-      label: 'Distribution',
-      icon: <Icon name="trip-map-markers" style="filled" size="base" />
-    },
-    {
-      id: 'habitat',
-      label: 'Habitat & Behavior',
-      icon: <Icon name="outdoors-tree-valley" style="filled" size="base" />
-    },
-    {
-      id: 'conservation',
-      label: 'Conservation',
-      icon: <Icon name="hand-shake-heart" style="filled" size="base" />
-    }
-  ]
+  
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })

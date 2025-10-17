@@ -23,7 +23,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
         <div className="mb-4">
           <h2 className="text-lg font-semibold mb-2">Available slugs:</h2>
           <ul className="list-disc list-inside">
-            {availableSlugs.map((turtle: any) => (
+            {(availableSlugs as { slug: string; species_common_name: string }[]).map((turtle) => (
               <li key={turtle.slug}>
                 <a href={`/turtle/${turtle.slug}`} className="text-blue-600 hover:underline">
                   {turtle.species_common_name} ({turtle.slug})

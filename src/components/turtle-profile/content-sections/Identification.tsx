@@ -1,6 +1,4 @@
 import { Icon } from '@/components/Icon';
-import PhysicalFeatures from '../physical-features/PhysicalFeatures';
-import SpeciesCard from '../physical-features/SpeciesCard';
 import SpeciesComparison from '../physical-features/SpeciesComparison';
 
 interface IdentificationProps {

@@ -1,13 +1,13 @@
 export interface Variant {
     sex: string;
     lifeStage: string;
-    value: string;
+    value: unknown;
   }
   
   export interface VariantData {
     sex: string;
     life_stage: string;
-    [key: string]: any;
+    [key: string]: unknown;
   }
   
   export interface ConservationStatus {
@@ -66,7 +66,7 @@ export interface Variant {
     species_id: number;
     sex: string;         // e.g. "Male", "Female"
     life_stage: string;  // e.g. "Adult", "Juvenile"
-    [key: string]: any;  // For dynamic columns like color, shape, etc.
+    [key: string]: unknown;  // For dynamic columns like color, shape, etc.
   }
   
   export interface RelatedSpecies {

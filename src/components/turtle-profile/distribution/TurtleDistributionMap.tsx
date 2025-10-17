@@ -2,7 +2,13 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Map, { Source, Layer, NavigationControl, ViewState, MapRef, MapMouseEvent } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/lib/db/supabaseClient';
-import type { FeatureCollection, Feature, MultiPolygon } from 'geojson';
+import type { FeatureCollection, MultiPolygon } from 'geojson';
+
+type DistributionProperties = {
+  presence_status?: string;
+  origin?: string;
+  region_level?: string;
+};
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -42,7 +48,6 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   });
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
-  const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
   const lastHoverRef = useRef<{ source: string; id: string | number } | null>(null);
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
@@ -125,7 +130,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   }, []);
 
   // Define color scale using Tailwind theme equivalents regardless of species index
-  const getColorScale = useCallback((index: number) => {
+  const getColorScale = useCallback(() => {
     // Map origins to Tailwind-based hex colors from tailwind.config.ts
     // Native -> green, Introduced -> violet, Extinct -> orange
     const colorScales = [
@@ -148,11 +153,12 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   };
 
   // Memoize filterFeaturesByType
-  const filterFeaturesByType = useMemo(() => (features: any[], type: string) => {
+  const filterFeaturesByType = useMemo(
+    () => (features: Array<{ properties?: DistributionProperties }>, type: string) => {
     if (!features || !Array.isArray(features)) return [];
     
     return features.filter(f => {
-      const status = f.properties.presence_status;
+      const status = f.properties?.presence_status;
       switch(type.toLowerCase()) {
         case 'native': return status === 'Native';
         case 'introduced': return status === 'Introduced';
@@ -357,7 +363,6 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
                 lastHoverRef.current = { source: feature.source as string, id: feature.id as string | number };
               } catch {}
             }
-            setHoveredFeatureId(String(feature.id ?? ''));
             // Change cursor to pointer
             if (e.target.getCanvas()) {
               e.target.getCanvas().style.cursor = 'pointer';
@@ -365,7 +370,6 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           }
         }}
         onMouseLeave={() => {
-          setHoveredFeatureId(null);
           // Reset cursor
           if (mapRef.current) {
             const canvas = mapRef.current.getCanvas();
@@ -388,8 +392,8 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         <NavigationControl position="top-right" />
         
         {/* Render each species distribution */}
-        {speciesData.map((species, speciesIndex) => {
-          const colorScale = getColorScale(speciesIndex);
+        {speciesData.map((species) => {
+          const colorScale = getColorScale();
           
           // rendering layers
           

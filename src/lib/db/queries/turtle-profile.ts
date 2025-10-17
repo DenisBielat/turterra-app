@@ -8,15 +8,15 @@ import {
   Variant
 } from '@/types/turtleTypes';
 
-function normalizeValue(value: any): string | null {
+function normalizeValue(value: unknown): string | null {
   if (value === false) return 'false';
-  if (!value || value === 'Unknown' || value === '-') return null;
+  if (value === null || value === undefined || value === 'Unknown' || value === '-') return null;
   if (typeof value === 'boolean' || value === 'true' || value === 'false') {
     return String(value).toLowerCase();
   }
   if (Array.isArray(value)) {
     return value
-      .map(v => v.toLowerCase().trim())
+      .map(v => String(v).toLowerCase().trim())
       .sort()
       .join(', ');
   }
@@ -25,11 +25,11 @@ function normalizeValue(value: any): string | null {
       const parsed = JSON.parse(value);
       if (Array.isArray(parsed)) {
         return parsed
-          .map((v: string) => v.toLowerCase().trim())
+          .map((v: unknown) => String(v).toLowerCase().trim())
           .sort()
           .join(', ');
       }
-    } catch (e) {
+    } catch {
       // Ignore parse errors
     }
   }
@@ -191,11 +191,12 @@ function buildFeatureCategories({
 
       // Reference & variants
       const columnName = key.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
-      const referenceValue = referenceVariant?.[columnName] || '-';
+      const referenceValueRaw = referenceVariant?.[columnName] ?? '-';
+      const referenceValue = String(referenceValueRaw);
 
       const variantDifferences = otherVariants.reduce<Variant[]>((variants, variant) => {
         const variantValue = normalizeValue(variant[columnName]);
-        const referenceNormalized = normalizeValue(referenceValue);
+        const referenceNormalized = normalizeValue(referenceValueRaw);
         if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
           variants.push({
             sex: variant.sex,
@@ -218,11 +219,12 @@ function buildFeatureCategories({
             .toLowerCase()
             .replace(/\s+/g, '_')
             .replace(/\//g, '_');
-          const subReferenceValue = referenceVariant?.[subColumnName] || '-';
+          const subReferenceValueRaw = referenceVariant?.[subColumnName] ?? '-';
+          const subReferenceValue = String(subReferenceValueRaw);
 
           const subVariantDifferences = otherVariants.reduce<Variant[]>((variants, variant) => {
             const variantValue = normalizeValue(variant[subColumnName]);
-            const referenceNormalized = normalizeValue(subReferenceValue);
+            const referenceNormalized = normalizeValue(subReferenceValueRaw);
             if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
               variants.push({
                 sex: variant.sex,
