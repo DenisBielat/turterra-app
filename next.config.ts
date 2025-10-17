@@ -4,9 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['res.cloudinary.com', 'nznxvfsdsxeflwzlrpvj.supabase.co']
   },
-  experimental: {
-    typedRoutes: false
-  }
+  typedRoutes: false
 };
 
 export default nextConfig;
