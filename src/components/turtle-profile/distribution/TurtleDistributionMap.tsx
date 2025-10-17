@@ -43,7 +43,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
-  const hoveredIdStr = hoveredFeatureId ?? '';
+  const lastHoverRef = useRef<{ source: string; id: string | number } | null>(null);
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
@@ -140,31 +140,19 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
   }, []);
 
-  // Define color for each species (up to 3)
+  // Define color scale using Tailwind theme equivalents regardless of species index
   const getColorScale = useCallback((index: number) => {
-    // Different base colors for each species
+    // Map origins to Tailwind-based hex colors from tailwind.config.ts
+    // Native -> green, Introduced -> violet, Extinct -> orange
     const colorScales = [
-      // Species 1: Blue scale
       {
-        native: { fillColor: '#60a5fa', lineColor: '#2563eb', hoverFillColor: '#3b82f6' }, // blue-400, blue-600, blue-500
-        introduced: { fillColor: '#93c5fd', lineColor: '#3b82f6', hoverFillColor: '#60a5fa' }, // blue-300, blue-500, blue-400
-        extinct: { fillColor: '#bfdbfe', lineColor: '#60a5fa', hoverFillColor: '#93c5fd' }  // blue-200, blue-400, blue-300
-      },
-      // Species 2: Purple scale
-      {
-        native: { fillColor: '#a78bfa', lineColor: '#7c3aed', hoverFillColor: '#8b5cf6' }, // purple-400, purple-600, purple-500
-        introduced: { fillColor: '#c4b5fd', lineColor: '#8b5cf6', hoverFillColor: '#a78bfa' }, // purple-300, purple-500, purple-400
-        extinct: { fillColor: '#ddd6fe', lineColor: '#a78bfa', hoverFillColor: '#c4b5fd' }  // purple-200, purple-400, purple-300
-      },
-      // Species 3: Green scale
-      {
-        native: { fillColor: '#4ade80', lineColor: '#16a34a', hoverFillColor: '#22c55e' }, // green-400, green-600, green-500
-        introduced: { fillColor: '#86efac', lineColor: '#22c55e', hoverFillColor: '#4ade80' }, // green-300, green-500, green-400
-        extinct: { fillColor: '#bbf7d0', lineColor: '#4ade80', hoverFillColor: '#86efac' }  // green-200, green-400, green-300
+        native: { fillColor: '#33f590', lineColor: '#00c35e', hoverFillColor: '#09de6f' }, // green-400, green-600, green-500
+        introduced: { fillColor: '#a173ff', lineColor: '#7d14ff', hoverFillColor: '#873bff' }, // violet-400, violet-600, violet-500
+        extinct: { fillColor: '#eeb231', lineColor: '#cc6f13', hoverFillColor: '#ffa91e' }  // orange-400, orange-600, orange-500
       }
     ];
     
-    return colorScales[index % colorScales.length];
+    return colorScales[0];
   }, []);
   
   // Toggle layer visibility
@@ -333,7 +321,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               className="rounded"
             />
             <span className="text-sm">
-              <span className="inline-block w-3 h-3 rounded mr-1" style={{backgroundColor: '#60a5fa'}}></span>
+              <span className="inline-block w-3 h-3 rounded mr-1 bg-green-500"></span>
               Native
             </span>
           </label>
@@ -345,7 +333,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               className="rounded"
             />
             <span className="text-sm">
-              <span className="inline-block w-3 h-3 rounded mr-1" style={{backgroundColor: '#a78bfa'}}></span>
+              <span className="inline-block w-3 h-3 rounded mr-1 bg-violet-500"></span>
               Introduced
             </span>
           </label>
@@ -357,7 +345,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               className="rounded"
             />
             <span className="text-sm">
-              <span className="inline-block w-3 h-3 rounded mr-1" style={{backgroundColor: '#4ade80'}}></span>
+              <span className="inline-block w-3 h-3 rounded mr-1 bg-orange-500"></span>
               Extinct
             </span>
           </label>
@@ -385,8 +373,27 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         onMouseMove={(e: MapMouseEvent) => {
           if (e.features && e.features.length > 0) {
             const feature = e.features[0];
-            const fid = feature.id == null ? '' : String(feature.id);
-            setHoveredFeatureId(fid);
+            const map = mapRef.current?.getMap();
+            if (map && feature.id != null && typeof feature.source === 'string') {
+              // Clear previous feature-state
+              if (lastHoverRef.current) {
+                try {
+                  map.setFeatureState(
+                    { source: lastHoverRef.current.source, id: lastHoverRef.current.id },
+                    { hover: false }
+                  );
+                } catch {}
+              }
+              // Set current hover state
+              try {
+                map.setFeatureState(
+                  { source: feature.source as string, id: feature.id as string | number },
+                  { hover: true }
+                );
+                lastHoverRef.current = { source: feature.source as string, id: feature.id as string | number };
+              } catch {}
+            }
+            setHoveredFeatureId(String(feature.id ?? ''));
             // Change cursor to pointer
             if (e.target.getCanvas()) {
               e.target.getCanvas().style.cursor = 'pointer';
@@ -400,6 +407,16 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             const canvas = mapRef.current.getCanvas();
             if (canvas) {
               canvas.style.cursor = '';
+            }
+            const map = mapRef.current.getMap();
+            if (lastHoverRef.current) {
+              try {
+                map.setFeatureState(
+                  { source: lastHoverRef.current.source, id: lastHoverRef.current.id },
+                  { hover: false }
+                );
+              } catch {}
+              lastHoverRef.current = null;
             }
           }
         }}
@@ -472,6 +489,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               key={`species-${species.speciesId}`}
               id={`species-${species.speciesId}`} 
               type="geojson" 
+              generateId
               data={transformCoordinates(filteredGeoJSON)}
             >
               <Layer
@@ -480,13 +498,13 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
                 paint={{
                   'fill-color': [
                     'case',
-                    ['==', ['to-string', ['id']], hoveredIdStr],
+                    ['boolean', ['feature-state', 'hover'], false],
                     [
                       'case',
-                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Native']], colorScale.native.hoverFillColor,
-                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Introduced']], colorScale.introduced.hoverFillColor,
-                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Extinct']], colorScale.extinct.hoverFillColor,
-                      colorScale.native.hoverFillColor // fallback color
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Native']], darkenColor(colorScale.native.fillColor, 0.15),
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Introduced']], darkenColor(colorScale.introduced.fillColor, 0.15),
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Extinct']], darkenColor(colorScale.extinct.fillColor, 0.15),
+                      darkenColor(colorScale.native.fillColor, 0.15) // fallback color
                     ],
                     [
                       'case',
