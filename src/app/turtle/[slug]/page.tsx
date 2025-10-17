@@ -81,7 +81,10 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 />
 
                 <div className="w-full mt-12 mb-20">
-                  <DistributionSection />
+                  <DistributionSection 
+                    currentSpeciesId={data.id}
+                    currentSpeciesName={data.commonName}
+                  />
                 </div>
               </div>
             </div>

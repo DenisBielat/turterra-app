@@ -372,6 +372,7 @@ function transformTurtleDataToProfile(
 
   // Final object
   return {
+    id: turtle.id,
     commonName: species_common_name,
     scientificName: species_scientific_name,
     profileImage: avatar_image_circle_url || "",

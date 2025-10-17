@@ -1,16 +1,29 @@
 'use client';
-import { useState } from 'react';
-import SpeciesSelector from './SpeciesSelector';
 import TurtleDistributionMap from './TurtleDistributionMap';
 
-const DistributionSection = () => {
-  const [selectedSpeciesIds, setSelectedSpeciesIds] = useState<(string | number)[]>([]);
-  
+interface DistributionSectionProps {
+  currentSpeciesId?: string | number;
+  currentSpeciesName?: string;
+}
+
+const DistributionSection: React.FC<DistributionSectionProps> = ({ 
+  currentSpeciesId, 
+  currentSpeciesName 
+}) => {
   return (
-    <>
-      <TurtleDistributionMap selectedSpeciesIds={selectedSpeciesIds} />
-      <SpeciesSelector onChange={setSelectedSpeciesIds} />
-    </>
+    <div>
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold mb-2">Distribution</h2>
+        {currentSpeciesName && (
+          <p className="text-gray-600">
+            Geographic distribution of the {currentSpeciesName}
+          </p>
+        )}
+      </div>
+      <TurtleDistributionMap 
+        selectedSpeciesIds={currentSpeciesId ? [currentSpeciesId] : []} 
+      />
+    </div>
   );
 };
 

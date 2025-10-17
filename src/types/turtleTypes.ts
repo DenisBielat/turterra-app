@@ -97,6 +97,7 @@ export interface Variant {
   
   // For the shape you ultimately return to the front-end (if different)
   export interface ProfileData {
+    id: number;
     commonName: string;
     scientificName: string;
     profileImage: string;

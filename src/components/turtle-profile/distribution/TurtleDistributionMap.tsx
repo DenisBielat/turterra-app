@@ -28,8 +28,9 @@ interface TurtleDistributionMapProps {
 interface HoveredFeature {
   properties: {
     region_name: string;
-    presence_status: 'Native' | 'Introduced' | 'Extinct';
+    origin: 'Native' | 'Introduced' | 'Extinct';
     species_name: string;
+    region_level: string;
   };
   geometry: {
     coordinates: number[][][][];
@@ -59,27 +60,41 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     extinct: true
   });
   
+  // Track zoom level for layer visibility
+  const [currentZoom, setCurrentZoom] = useState(1.5);
+  const ZOOM_BREAKPOINT = 4; // Show states when zoom >= 4, countries when zoom < 4
+  
   // Fetch distribution GeoJSON for selected species
   useEffect(() => {
     const fetchDistributions = async () => {
       if (selectedSpeciesIds.length === 0) {
+        console.log('No species IDs provided, clearing species data');
         setSpeciesData([]);
         return;
       }
       
-      // Add console log to check selected IDs
-      console.log('Fetching distributions for species IDs:', selectedSpeciesIds);
+      console.log('🔍 Fetching distributions for species IDs:', selectedSpeciesIds);
       
       const promises = selectedSpeciesIds.map(async (speciesId) => {
-        // Using the database function we created
+        console.log(`📊 Fetching data for species ID: ${speciesId}`);
+        
+        // Using the database function
         const { data: geojsonData, error: geojsonError } = await supabase
           .rpc('get_species_geojson', { p_species_id: speciesId });
           
-        // Add console log to check GeoJSON data
-        console.log('GeoJSON data for species', speciesId, ':', geojsonData);
+        console.log(`🗺️ GeoJSON response for species ${speciesId}:`, {
+          data: geojsonData,
+          error: geojsonError,
+          hasFeatures: geojsonData?.features?.length || 0
+        });
           
         if (geojsonError) {
-          console.error('Error fetching distribution:', geojsonError);
+          console.error(`❌ Error fetching distribution for species ${speciesId}:`, geojsonError);
+          return null;
+        }
+        
+        if (!geojsonData || !geojsonData.features || geojsonData.features.length === 0) {
+          console.warn(`⚠️ No distribution data found for species ${speciesId}`);
           return null;
         }
         
@@ -91,23 +106,36 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           .single();
           
         if (speciesError) {
-          console.error('Error fetching species info:', speciesError);
+          console.error(`❌ Error fetching species info for species ${speciesId}:`, speciesError);
           return null;
         }
         
-        return {
+        const result = {
           speciesId: speciesInfo.id,
           speciesName: speciesInfo.species_common_name,
           scientificName: speciesInfo.species_scientific_name,
           avatarUrl: speciesInfo.avatar_image_circle_url,
           geojson: geojsonData
         };
+        
+        console.log(`✅ Successfully processed data for ${speciesInfo.species_common_name}:`, {
+          featuresCount: geojsonData.features.length,
+          sampleFeature: geojsonData.features[0]?.properties
+        });
+        
+        return result;
       });
       
       const results = await Promise.all(promises);
-      // Add console log to check final processed data
-      console.log('Processed species data:', results.filter((item): item is SpeciesData => item !== null));
-      setSpeciesData(results.filter((item): item is SpeciesData => item !== null));
+      const validResults = results.filter((item): item is SpeciesData => item !== null);
+      
+      console.log('📋 Final processed species data:', {
+        totalRequested: selectedSpeciesIds.length,
+        totalReceived: validResults.length,
+        speciesNames: validResults.map(s => s.speciesName)
+      });
+      
+      setSpeciesData(validResults);
     };
     
     fetchDistributions();
@@ -222,6 +250,75 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
 
   // Add a map reference
   const mapRef = useRef<MapRef>(null);
+  
+  // Auto-zoom to species distribution when data loads
+  useEffect(() => {
+    if (speciesData.length > 0 && mapRef.current) {
+      const map = mapRef.current.getMap();
+      
+      // Wait for map to be fully loaded
+      const waitForMapLoad = () => {
+        if (!map.isStyleLoaded()) {
+          console.log('⏳ Waiting for map style to load...');
+          setTimeout(waitForMapLoad, 100);
+          return;
+        }
+        
+        console.log('🗺️ Map style loaded, calculating bounds...');
+        
+        // Calculate bounding box for all species
+        let bounds: number[][] | null = null;
+        
+        speciesData.forEach(species => {
+          if (species.geojson && species.geojson.features) {
+            species.geojson.features.forEach(feature => {
+              if (feature.geometry && feature.geometry.coordinates) {
+                // For MultiPolygon, iterate through all polygons and rings
+                feature.geometry.coordinates.forEach(polygon => {
+                  polygon.forEach(ring => {
+                    ring.forEach(coord => {
+                      if (!bounds) {
+                        bounds = [[coord[0], coord[1]], [coord[0], coord[1]]];
+                      } else {
+                        bounds[0][0] = Math.min(bounds[0][0], coord[0]);
+                        bounds[0][1] = Math.min(bounds[0][1], coord[1]);
+                        bounds[1][0] = Math.max(bounds[1][0], coord[0]);
+                        bounds[1][1] = Math.max(bounds[1][1], coord[1]);
+                      }
+                    });
+                  });
+                });
+              }
+            });
+          }
+        });
+        
+        // Fit map to bounds with some padding
+        if (bounds) {
+          const padding = 0.1; // 10% padding
+          const width = bounds[1][0] - bounds[0][0];
+          const height = bounds[1][1] - bounds[0][1];
+          
+          const paddedBounds: [[number, number], [number, number]] = [
+            [bounds[0][0] - width * padding, bounds[0][1] - height * padding],
+            [bounds[1][0] + width * padding, bounds[1][1] + height * padding]
+          ];
+          
+          console.log('🎯 Fitting map to bounds:', paddedBounds);
+          
+          map.fitBounds(paddedBounds, {
+            padding: 50,
+            duration: 1500,
+            easing: (t) => t * (2 - t) // ease-out
+          });
+        } else {
+          console.warn('⚠️ No bounds calculated from species data');
+        }
+      };
+      
+      waitForMapLoad();
+    }
+  }, [speciesData]);
 
   const transformCoordinates = (geojson: FeatureCollection<MultiPolygon>) => {
     return {
@@ -245,11 +342,56 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
 
   return (
     <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden">
+      {/* Layer Controls */}
+      <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg p-3">
+        <h4 className="text-sm font-medium mb-2">Distribution Types</h4>
+        <div className="space-y-2">
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={activeLayers.native}
+              onChange={() => toggleLayer('native')}
+              className="rounded"
+            />
+            <span className="text-sm">
+              <span className="inline-block w-3 h-3 rounded mr-1" style={{backgroundColor: '#60a5fa'}}></span>
+              Native
+            </span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={activeLayers.introduced}
+              onChange={() => toggleLayer('introduced')}
+              className="rounded"
+            />
+            <span className="text-sm">
+              <span className="inline-block w-3 h-3 rounded mr-1" style={{backgroundColor: '#a78bfa'}}></span>
+              Introduced
+            </span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={activeLayers.extinct}
+              onChange={() => toggleLayer('extinct')}
+              className="rounded"
+            />
+            <span className="text-sm">
+              <span className="inline-block w-3 h-3 rounded mr-1" style={{backgroundColor: '#4ade80'}}></span>
+              Extinct
+            </span>
+          </label>
+        </div>
+      </div>
       <Map
         ref={mapRef}
         {...viewState}
         projection="mercator"
-        onMove={evt => setViewState(evt.viewState)}
+        onMove={evt => {
+          setViewState(evt.viewState);
+          setCurrentZoom(evt.viewState.zoom);
+        }}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL || 'mapbox://styles/mapbox/light-v11'}
         mapboxAccessToken={MAPBOX_TOKEN}
         reuseMaps
@@ -259,24 +401,21 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           zoom: 1.5
         }}
         interactiveLayerIds={
-          speciesData.flatMap((species, speciesIndex) => 
-            (Object.keys(activeLayers) as Array<keyof LayerState>)
-              .filter(type => activeLayers[type])
-              .map(type => `species-${species.speciesId}-${type}-fill`)
-          )
+          speciesData.map(species => `species-${species.speciesId}-fill`)
         }
         onMouseMove={(e: MapMouseEvent) => {
           if (e.features && e.features.length > 0) {
             const feature = e.features[0];
             if (feature.properties && 
                 'region_name' in feature.properties && 
-                'presence_status' in feature.properties && 
+                'origin' in feature.properties && 
                 'species_name' in feature.properties) {
               setHoveredFeature({
                 properties: {
                   region_name: feature.properties.region_name as string,
-                  presence_status: feature.properties.presence_status as 'Native' | 'Introduced' | 'Extinct',
-                  species_name: feature.properties.species_name as string
+                  origin: feature.properties.origin as 'Native' | 'Introduced' | 'Extinct',
+                  species_name: feature.properties.species_name as string,
+                  region_level: feature.properties.region_level as string
                 },
                 geometry: feature.geometry as { coordinates: number[][][][] }
               });
@@ -291,59 +430,96 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         {speciesData.map((species, speciesIndex) => {
           const colorScale = getColorScale(speciesIndex);
           
+          console.log(`🎨 Rendering layers for species: ${species.speciesName}`, {
+            hasGeoJSON: !!species.geojson,
+            hasFeatures: !!species.geojson?.features,
+            featuresCount: species.geojson?.features?.length || 0,
+            sampleFeature: species.geojson?.features?.[0]?.properties
+          });
+          
           if (!species.geojson || !species.geojson.features) {
-            console.log('Invalid GeoJSON data for species:', species);
+            console.log('❌ Invalid GeoJSON data for species:', species);
             return null;
           }
           
+          // Filter features by zoom level and origin status
+          const filteredGeoJSON = {
+            ...species.geojson,
+            features: species.geojson.features.filter(feature => {
+              const origin = feature.properties?.origin;
+              const regionLevel = feature.properties?.region_level;
+              
+              // Map origin to layer types (assuming origin values match layer names)
+              const isActiveLayer = activeLayers.native && origin === 'Native' ||
+                                   activeLayers.introduced && origin === 'Introduced' ||
+                                   activeLayers.extinct && origin === 'Extinct';
+              
+              console.log(`🔍 Feature filter for ${species.speciesName}:`, {
+                origin,
+                regionLevel,
+                isActiveLayer,
+                activeLayers,
+                featureProperties: feature.properties
+              });
+              
+              if (!isActiveLayer) return false;
+              
+              // Add zoom-based filtering for country/state levels
+              const shouldShowAtCurrentZoom = 
+                (regionLevel === 'country' && currentZoom < ZOOM_BREAKPOINT) ||
+                (regionLevel === 'state' && currentZoom >= ZOOM_BREAKPOINT) ||
+                (regionLevel !== 'country' && regionLevel !== 'state'); // Show other levels always
+              
+              return shouldShowAtCurrentZoom;
+            })
+          };
+          
+          console.log(`📊 Filtered GeoJSON for ${species.speciesName}:`, {
+            originalFeatures: species.geojson.features.length,
+            filteredFeatures: filteredGeoJSON.features.length
+          });
+          
+          // Only render if there are features to show
+          if (filteredGeoJSON.features.length === 0) {
+            console.log(`⚠️ No features to render for ${species.speciesName}`);
+            return null;
+          }
+          
+          console.log(`✅ Rendering source and layer for ${species.speciesName}`);
+          
           return (
-            <React.Fragment key={`species-${species.speciesId}-native-fill`}>
-              <Source 
-                id={`species-${species.speciesId}-native-fill`} 
-                type="geojson" 
-                data={transformCoordinates(species.geojson)}
-              >
-                <Layer
-                  id={`species-${species.speciesId}-native-fill`}
-                  type="fill"
-                  paint={{
-                    'fill-color': colorScale.native.fillColor,
-                    'fill-opacity': 0.5,
-                    'fill-outline-color': colorScale.native.lineColor
-                  }}
-                />
-              </Source>
-              <Source 
-                id={`species-${species.speciesId}-introduced-fill`} 
-                type="geojson" 
-                data={transformCoordinates(species.geojson)}
-              >
-                <Layer
-                  id={`species-${species.speciesId}-introduced-fill`}
-                  type="fill"
-                  paint={{
-                    'fill-color': colorScale.introduced.fillColor,
-                    'fill-opacity': 0.5,
-                    'fill-outline-color': colorScale.introduced.lineColor
-                  }}
-                />
-              </Source>
-              <Source 
-                id={`species-${species.speciesId}-extinct-fill`} 
-                type="geojson" 
-                data={transformCoordinates(species.geojson)}
-              >
-                <Layer
-                  id={`species-${species.speciesId}-extinct-fill`}
-                  type="fill"
-                  paint={{
-                    'fill-color': colorScale.extinct.fillColor,
-                    'fill-opacity': 0.5,
-                    'fill-outline-color': colorScale.extinct.lineColor
-                  }}
-                />
-              </Source>
-            </React.Fragment>
+            <Source 
+              key={`species-${species.speciesId}`}
+              id={`species-${species.speciesId}`} 
+              type="geojson" 
+              data={transformCoordinates(filteredGeoJSON)}
+            >
+              <Layer
+                id={`species-${species.speciesId}-fill`}
+                type="fill"
+                paint={{
+                  'fill-color': [
+                    'case',
+                    ['==', ['get', 'origin'], 'Native'], colorScale.native.fillColor,
+                    ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.fillColor,
+                    colorScale.extinct.fillColor
+                  ],
+                  'fill-opacity': 0.6,
+                  'fill-outline-color': [
+                    'case',
+                    ['==', ['get', 'origin'], 'Native'], colorScale.native.lineColor,
+                    ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.lineColor,
+                    colorScale.extinct.lineColor
+                  ]
+                }}
+                filter={[
+                  'any',
+                  ...(activeLayers.native ? [['==', ['get', 'origin'], 'Native']] : []),
+                  ...(activeLayers.introduced ? [['==', ['get', 'origin'], 'Introduced']] : []),
+                  ...(activeLayers.extinct ? [['==', ['get', 'origin'], 'Extinct']] : [])
+                ]}
+              />
+            </Source>
           );
         })}
         
@@ -362,10 +538,11 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             <div className="p-2">
               <h3 className="font-bold text-sm">{hoveredFeature.properties.region_name || 'Region'}</h3>
               <p className="text-xs">
-                {hoveredFeature.properties.presence_status === 'Native' ? 'Native' : 
-                 hoveredFeature.properties.presence_status === 'Introduced' ? 'Introduced' : 
+                {hoveredFeature.properties.origin === 'Native' ? 'Native' : 
+                 hoveredFeature.properties.origin === 'Introduced' ? 'Introduced' : 
                  'Extinct'} Range
               </p>
+              <p className="text-xs text-gray-600">{hoveredFeature.properties.region_level}</p>
               <p className="text-xs italic">{hoveredFeature.properties.species_name}</p>
             </div>
           </Popup>
