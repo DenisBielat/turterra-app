@@ -43,6 +43,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
+  const hoveredIdStr = hoveredFeatureId ?? '';
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
@@ -384,7 +385,8 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         onMouseMove={(e: MapMouseEvent) => {
           if (e.features && e.features.length > 0) {
             const feature = e.features[0];
-            setHoveredFeatureId(feature.id as string);
+            const fid = feature.id == null ? '' : String(feature.id);
+            setHoveredFeatureId(fid);
             // Change cursor to pointer
             if (e.target.getCanvas()) {
               e.target.getCanvas().style.cursor = 'pointer';
@@ -424,7 +426,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           const filteredGeoJSON = {
             ...species.geojson,
             features: species.geojson.features.filter(feature => {
-              const origin = feature.properties?.origin;
+              const origin = feature.properties?.origin || feature.properties?.presence_status;
               const regionLevel = feature.properties?.region_level;
               
               // Map origin to layer types (assuming origin values match layer names)
@@ -478,33 +480,36 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
                 paint={{
                   'fill-color': [
                     'case',
-                    ['==', ['get', 'id'], hoveredFeatureId],
+                    ['==', ['to-string', ['id']], hoveredIdStr],
                     [
                       'case',
-                      ['==', ['get', 'origin'], 'Native'], colorScale.native.hoverFillColor,
-                      ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.hoverFillColor,
-                      colorScale.extinct.hoverFillColor
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Native']], colorScale.native.hoverFillColor,
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Introduced']], colorScale.introduced.hoverFillColor,
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Extinct']], colorScale.extinct.hoverFillColor,
+                      colorScale.native.hoverFillColor // fallback color
                     ],
                     [
                       'case',
-                      ['==', ['get', 'origin'], 'Native'], colorScale.native.fillColor,
-                      ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.fillColor,
-                      colorScale.extinct.fillColor
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Native']], colorScale.native.fillColor,
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Introduced']], colorScale.introduced.fillColor,
+                      ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Extinct']], colorScale.extinct.fillColor,
+                      colorScale.native.fillColor // fallback color
                     ]
                   ],
                   'fill-opacity': 0.6,
                   'fill-outline-color': [
                     'case',
-                    ['==', ['get', 'origin'], 'Native'], colorScale.native.lineColor,
-                    ['==', ['get', 'origin'], 'Introduced'], colorScale.introduced.lineColor,
-                    colorScale.extinct.lineColor
+                    ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Native']], colorScale.native.lineColor,
+                    ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Introduced']], colorScale.introduced.lineColor,
+                    ['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Extinct']], colorScale.extinct.lineColor,
+                    colorScale.native.lineColor // fallback color
                   ]
                 }}
                 filter={[
                   'any',
-                  ...(activeLayers.native ? [['==', ['get', 'origin'], 'Native']] : []),
-                  ...(activeLayers.introduced ? [['==', ['get', 'origin'], 'Introduced']] : []),
-                  ...(activeLayers.extinct ? [['==', ['get', 'origin'], 'Extinct']] : [])
+                  ...(activeLayers.native ? [['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Native']]] : []),
+                  ...(activeLayers.introduced ? [['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Introduced']]] : []),
+                  ...(activeLayers.extinct ? [['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Extinct']]] : [])
                 ]}
               />
             </Source>
