@@ -37,7 +37,7 @@ function normalizeValue(value: any): string | null {
 }
 
 async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', value: string) {
-  console.log(`🔍 Fetching turtle data by ${column}:`, value);
+  // fetching turtle data
   
   const { data: turtle, error } = await supabase
     .from('turtle_species')
@@ -51,7 +51,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       tax_parent_genus,
       turtle_species_section_descriptions (
         at_a_glance,
-        identification
+        identification,
+        distribution
       ),
       turtle_species_measurements (
         adult_weight,
@@ -85,7 +86,7 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
     .single<TurtleData>();
 
   if (error) {
-    console.error(`❌ Error fetching turtle data by ${column} "${value}":`, {
+    console.error('Error fetching turtle data', column, value, {
       message: error.message,
       details: error.details,
       hint: error.hint,
@@ -94,7 +95,7 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
     throw error;
   }
 
-  console.log(`✅ Successfully fetched turtle data:`, turtle?.species_common_name);
+  // fetched turtle data
   return turtle ?? null;
 }
 
@@ -396,7 +397,8 @@ function transformTurtleDataToProfile(
         }
       },
       relatedSpecies: formattedRelatedSpecies
-    }
+    },
+    distributionText: sectionDescriptions?.distribution
   };
 }
 

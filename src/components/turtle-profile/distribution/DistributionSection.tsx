@@ -4,19 +4,21 @@ import TurtleDistributionMap from './TurtleDistributionMap';
 interface DistributionSectionProps {
   currentSpeciesId?: string | number;
   currentSpeciesName?: string;
+  description?: string | null;
 }
 
 const DistributionSection: React.FC<DistributionSectionProps> = ({ 
   currentSpeciesId, 
-  currentSpeciesName 
+  currentSpeciesName,
+  description
 }) => {
   return (
     <div id="distribution" className="scroll-mt-20">
-      <div className="mb-4">
+      <div className="mb-8 max-w-lg">
         <h2 className="text-5xl font-bold mb-2">Distribution</h2>
         {currentSpeciesName && (
           <p className="text-gray-600">
-            Geographic distribution of the {currentSpeciesName}
+            {description?.trim() || `Geographic distribution of the ${currentSpeciesName}`}
           </p>
         )}
       </div>

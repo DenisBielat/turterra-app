@@ -58,33 +58,24 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   useEffect(() => {
     const fetchDistributions = async () => {
       if (selectedSpeciesIds.length === 0) {
-        console.log('No species IDs provided, clearing species data');
         setSpeciesData([]);
         return;
       }
       
-      console.log('🔍 Fetching distributions for species IDs:', selectedSpeciesIds);
       
       const promises = selectedSpeciesIds.map(async (speciesId) => {
-        console.log(`📊 Fetching data for species ID: ${speciesId}`);
         
         // Using the database function
         const { data: geojsonData, error: geojsonError } = await supabase
           .rpc('get_species_geojson', { p_species_id: speciesId });
           
-        console.log(`🗺️ GeoJSON response for species ${speciesId}:`, {
-          data: geojsonData,
-          error: geojsonError,
-          hasFeatures: geojsonData?.features?.length || 0
-        });
           
         if (geojsonError) {
-          console.error(`❌ Error fetching distribution for species ${speciesId}:`, geojsonError);
+          console.error('Error fetching distribution', speciesId, geojsonError);
           return null;
         }
         
         if (!geojsonData || !geojsonData.features || geojsonData.features.length === 0) {
-          console.warn(`⚠️ No distribution data found for species ${speciesId}`);
           return null;
         }
         
@@ -96,7 +87,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           .single();
           
         if (speciesError) {
-          console.error(`❌ Error fetching species info for species ${speciesId}:`, speciesError);
+          console.error('Error fetching species info', speciesId, speciesError);
           return null;
         }
         
@@ -108,10 +99,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           geojson: geojsonData
         };
         
-        console.log(`✅ Successfully processed data for ${speciesInfo.species_common_name}:`, {
-          featuresCount: geojsonData.features.length,
-          sampleFeature: geojsonData.features[0]?.properties
-        });
+        // processed
         
         return result;
       });
@@ -119,11 +107,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
       const results = await Promise.all(promises);
       const validResults = results.filter((item): item is SpeciesData => item !== null);
       
-      console.log('📋 Final processed species data:', {
-        totalRequested: selectedSpeciesIds.length,
-        totalReceived: validResults.length,
-        speciesNames: validResults.map(s => s.speciesName)
-      });
+      // set processed data
       
       setSpeciesData(validResults);
     };
@@ -178,25 +162,9 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     });
   }, []);
   
-  useEffect(() => {
-    console.log('Map configuration:', {
-      token: !!MAPBOX_TOKEN, // just log if it exists, not the actual token
-      style: process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL || 'mapbox://styles/mapbox/light-v11'
-    });
-  }, []);
+  useEffect(() => {}, []);
   
-  useEffect(() => {
-    speciesData.forEach(species => {
-      const features = species.geojson?.features || [];
-      console.log('Layer debug for species', species.speciesName, {
-        nativeFeatures: filterFeaturesByType(features, 'native').length,
-        introducedFeatures: filterFeaturesByType(features, 'introduced').length,
-        extinctFeatures: filterFeaturesByType(features, 'extinct').length,
-        allFeatures: features.length,
-        sampleFeature: features[0]?.properties
-      });
-    });
-  }, [speciesData, filterFeaturesByType]);
+  useEffect(() => {}, [speciesData, filterFeaturesByType]);
   
   // Add this effect to clean up removed species layers
   useEffect(() => {
@@ -246,12 +214,10 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
       // Wait for map to be fully loaded
       const waitForMapLoad = () => {
         if (!map.isStyleLoaded()) {
-          console.log('⏳ Waiting for map style to load...');
           setTimeout(waitForMapLoad, 100);
           return;
         }
         
-        console.log('🗺️ Map style loaded, calculating bounds...');
         
         // Use the bbox from the GeoJSON if available
         const allFeatures = speciesData.flatMap(species => species.geojson?.features || []);
@@ -260,7 +226,6 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           // Try to use the bbox from the first species GeoJSON
           const firstSpecies = speciesData[0];
           if (firstSpecies.geojson.bbox) {
-            console.log('🎯 Using GeoJSON bbox:', firstSpecies.geojson.bbox);
             map.fitBounds([
               [firstSpecies.geojson.bbox[0], firstSpecies.geojson.bbox[1]],
               [firstSpecies.geojson.bbox[2], firstSpecies.geojson.bbox[3]]
@@ -270,7 +235,6 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               easing: (t) => t * (2 - t)
             });
           } else {
-            console.log('🎯 No bbox in GeoJSON, using default zoom');
             // Just zoom to a reasonable level if no bbox
             map.easeTo({
               zoom: 3,
@@ -279,7 +243,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             });
           }
         } else {
-          console.warn('⚠️ No features found for auto-zoom');
+          // no features found
         }
       };
       
@@ -427,15 +391,9 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         {speciesData.map((species, speciesIndex) => {
           const colorScale = getColorScale(speciesIndex);
           
-          console.log(`🎨 Rendering layers for species: ${species.speciesName}`, {
-            hasGeoJSON: !!species.geojson,
-            hasFeatures: !!species.geojson?.features,
-            featuresCount: species.geojson?.features?.length || 0,
-            sampleFeature: species.geojson?.features?.[0]?.properties
-          });
+          // rendering layers
           
           if (!species.geojson || !species.geojson.features) {
-            console.log('❌ Invalid GeoJSON data for species:', species);
             return null;
           }
           
@@ -451,13 +409,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
                                    activeLayers.introduced && origin === 'Introduced' ||
                                    activeLayers.extinct && origin === 'Extinct';
               
-              console.log(`🔍 Feature filter for ${species.speciesName}:`, {
-                origin,
-                regionLevel,
-                isActiveLayer,
-                activeLayers,
-                featureProperties: feature.properties
-              });
+              // feature filter
               
               if (!isActiveLayer) return false;
               
@@ -471,18 +423,14 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             })
           };
           
-          console.log(`📊 Filtered GeoJSON for ${species.speciesName}:`, {
-            originalFeatures: species.geojson.features.length,
-            filteredFeatures: filteredGeoJSON.features.length
-          });
+          // filtered geojson
           
           // Only render if there are features to show
           if (filteredGeoJSON.features.length === 0) {
-            console.log(`⚠️ No features to render for ${species.speciesName}`);
             return null;
           }
           
-          console.log(`✅ Rendering source and layer for ${species.speciesName}`);
+          // render source and layer
           
           return (
             <Source 

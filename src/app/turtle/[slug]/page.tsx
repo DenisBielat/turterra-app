@@ -9,7 +9,6 @@ import DistributionSection from "@/components/turtle-profile/distribution/Distri
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   
-  console.log(`🐢 Attempting to load turtle with slug: "${params.slug}"`);
   
   // Debug: Show available slugs if there's an issue
   const availableSlugs = await debugAvailableSlugs();
@@ -88,6 +87,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 <DistributionSection 
                   currentSpeciesId={data.id}
                   currentSpeciesName={data.commonName}
+                  description={data.distributionText}
                 />
 
                 {/* Divider */}

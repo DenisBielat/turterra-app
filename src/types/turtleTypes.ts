@@ -51,6 +51,7 @@ export interface Variant {
   export interface SectionDescriptions {
     at_a_glance?: string;
     identification?: string;
+    distribution?: string;
   }
   
   export interface PhysicalFeature {
