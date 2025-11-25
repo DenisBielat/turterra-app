@@ -29,6 +29,7 @@ export interface Variant {
   export interface HabitatRow {
     habitats: {
       habitat: string;
+      icon: string;
     };
   }
   
@@ -52,6 +53,7 @@ export interface Variant {
     at_a_glance?: string;
     identification?: string;
     distribution?: string;
+    habitat?: string;
   }
   
   export interface PhysicalFeature {
@@ -134,6 +136,14 @@ export interface Variant {
         variant: { sex: string; lifeStage: string };
       };
       relatedSpecies: RelatedSpecies[];
+    };
+    distributionText?: string | null;
+    habitat: {
+      description: string;
+      habitats: Array<{
+        name: string;
+        icon: string;
+      }>;
     };
   }
   

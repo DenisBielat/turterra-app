@@ -52,7 +52,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       turtle_species_section_descriptions (
         at_a_glance,
         identification,
-        distribution
+        distribution,
+        habitat
       ),
       turtle_species_measurements (
         adult_weight,
@@ -76,7 +77,7 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
         year_of_estimate
       ),
       turtle_species_habitats(
-        habitats(habitat)
+        habitats(habitat, icon)
       ),
       turtle_species_ecologies(
         ecologies(ecology)
@@ -400,7 +401,14 @@ function transformTurtleDataToProfile(
       },
       relatedSpecies: formattedRelatedSpecies
     },
-    distributionText: sectionDescriptions?.distribution
+    distributionText: sectionDescriptions?.distribution,
+    habitat: {
+      description: sectionDescriptions?.habitat || "",
+      habitats: turtle_species_habitats?.map(h => ({
+        name: h.habitats.habitat,
+        icon: h.habitats.icon
+      })) || []
+    }
   };
 }
 

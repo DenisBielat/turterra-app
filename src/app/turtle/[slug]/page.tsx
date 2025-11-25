@@ -5,6 +5,7 @@ import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGla
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
 import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
+import HabitatAndBehavior from "@/components/turtle-profile/content-sections/HabitatAndBehavior";
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -88,6 +89,16 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                   currentSpeciesId={data.id}
                   currentSpeciesName={data.commonName}
                   description={data.distributionText}
+                />
+
+                {/* Divider */}
+                <div className="w-full mt-12 mb-20">
+                  <div className="w-full h-px bg-gray-200"></div>
+                </div>
+                
+                <HabitatAndBehavior
+                  description={data.habitat.description}
+                  habitats={data.habitat.habitats}
                 />
 
                 {/* Divider */}
