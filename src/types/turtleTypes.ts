@@ -39,6 +39,14 @@ export interface Variant {
     };
   }
   
+  export interface BehaviorRow {
+    behaviors_general: {
+      behavior: string;
+      behavior_icon: string;
+      behavior_description?: string | null;
+    };
+  }
+  
   export interface Measurements {
     adult_weight: number | null;
     length_female_max_scl: number | null;
@@ -93,6 +101,7 @@ export interface Variant {
     turtle_species_population_estimate_history?: PopulationHistory[];
     turtle_species_habitats?: HabitatRow[];
     turtle_species_ecologies?: EcologyRow[];
+    turtle_species_behaviors_general?: BehaviorRow[];
     turtle_species_physical_features?: PhysicalFeatureData[];
     turtle_species_physical_features_key?: PhysicalFeature[];
     related_species?: RelatedSpecies[];
@@ -145,6 +154,11 @@ export interface Variant {
         icon: string;
       }>;
     };
+    behaviors: Array<{
+      name: string;
+      icon: string;
+      description: string;
+    }>;
   }
   
   export interface FeatureCategory {

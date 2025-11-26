@@ -91,7 +91,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       message: error.message,
       details: error.details,
       hint: error.hint,
-      code: error.code
+      code: error.code,
+      error: error
     });
     throw error;
   }
@@ -142,11 +143,31 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
     throw relatedError;
   }
 
+  // Fetch behaviors - make it optional so it doesn't break if table doesn't exist
+  // Schema: turtle_species_behaviors_general has species_id and behavior_id
+  // behaviors_general has behavior, behavior_description, behavior_icon
+  const { data: behaviorsData, error: behaviorsError } = await supabase
+    .from('turtle_species_behaviors_general')
+    .select(`
+      behaviors_general(behavior, behavior_description, behavior_icon)
+    `)
+    .eq('species_id', turtle.id);
+
+  if (behaviorsError) {
+    console.warn('Error fetching behaviors (this is optional):', behaviorsError.message);
+    console.warn('Behaviors error details:', behaviorsError);
+    // Don't throw - just log and continue with empty array
+  } else {
+    console.log('Behaviors data fetched:', behaviorsData);
+    console.log('Behaviors count:', behaviorsData?.length || 0);
+  }
+
   return {
     categoryImages,
     physicalFeatures: physicalFeatures.data || [],
     featureKeys: featureKeys.data || [],
-    relatedSpecies: relatedSpecies || []
+    relatedSpecies: relatedSpecies || [],
+    behaviors: behaviorsData || []
   };
 }
 
@@ -264,7 +285,8 @@ function transformTurtleDataToProfile(
     categoryImages,
     physicalFeatures,
     featureKeys,
-    relatedSpecies
+    relatedSpecies,
+    behaviors
   }: {
     categoryImages: Awaited<ReturnType<typeof getPhysicalFeatureImages>>;
     physicalFeatures: PhysicalFeatureData[];
@@ -274,6 +296,13 @@ function transformTurtleDataToProfile(
       species_scientific_name: string; 
       avatar_image_full_url?: string; 
     }[];
+    behaviors?: Array<{
+      behaviors_general: {
+        behavior: string;
+        behavior_icon: string;
+        behavior_description?: string | null;
+      };
+    }>;
   }
 ) {
   // Format related species
@@ -408,7 +437,24 @@ function transformTurtleDataToProfile(
         name: h.habitats.habitat,
         icon: h.habitats.icon
       })) || []
-    }
+    },
+    behaviors: (() => {
+      console.log('Transforming behaviors, raw data:', behaviors);
+      if (!behaviors || behaviors.length === 0) {
+        console.log('No behaviors data to transform');
+        return [];
+      }
+      const transformed = behaviors.map(b => {
+        console.log('Mapping behavior:', b);
+        return {
+          name: b.behaviors_general?.behavior || '',
+          icon: b.behaviors_general?.behavior_icon || '',
+          description: b.behaviors_general?.behavior_description || ""
+        };
+      });
+      console.log('Transformed behaviors:', transformed);
+      return transformed;
+    })()
   };
 }
 
