@@ -72,6 +72,7 @@ export interface Variant {
     hibernation?: string;
     nesting?: string;
     unique_traits_and_qualities?: string;
+    conservation?: string;
   }
   
   export interface PhysicalFeature {
@@ -172,6 +173,21 @@ export interface Variant {
       hibernation: string | null;
       nesting: string | null;
       uniqueTraits: string | null;
+    };
+    conservation: {
+      description: string | null;
+      statuses: Array<{
+        id: string;
+        status: string;
+        abbreviation: string;
+        definition?: string | null;
+        order_of_concern?: number | null;
+      }>;
+      currentStatus: {
+        status: string;
+        code: string;
+        year: number;
+      };
     };
     behaviors: Array<{
       name: string;

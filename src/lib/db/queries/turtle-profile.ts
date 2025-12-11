@@ -57,7 +57,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
         diet,
         hibernation,
         nesting,
-        unique_traits_and_qualities
+        unique_traits_and_qualities,
+        conservation
       ),
       turtle_species_measurements (
         adult_weight,
@@ -169,12 +170,23 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
     console.log('Behaviors count:', behaviorsData?.length || 0);
   }
 
+  // Fetch all conservation statuses
+  const { data: conservationStatuses, error: conservationStatusesError } = await supabase
+    .from('conservation_statuses')
+    .select('*')
+    .order('order_of_concern', { ascending: true });
+
+  if (conservationStatusesError) {
+    console.warn('Error fetching conservation statuses:', conservationStatusesError);
+  }
+
   return {
     categoryImages,
     physicalFeatures: physicalFeatures.data || [],
     featureKeys: featureKeys.data || [],
     relatedSpecies: relatedSpecies || [],
-    behaviors: behaviorsData || []
+    behaviors: behaviorsData || [],
+    conservationStatuses: conservationStatuses || []
   };
 }
 
@@ -293,7 +305,8 @@ function transformTurtleDataToProfile(
     physicalFeatures,
     featureKeys,
     relatedSpecies,
-    behaviors
+    behaviors,
+    conservationStatuses
   }: {
     categoryImages: Awaited<ReturnType<typeof getPhysicalFeatureImages>>;
     physicalFeatures: PhysicalFeatureData[];
@@ -309,6 +322,13 @@ function transformTurtleDataToProfile(
         behavior_icon: string;
         behavior_description?: string | null;
       };
+    }>;
+    conservationStatuses?: Array<{
+      id: string;
+      status: string;
+      abbreviation: string;
+      definition?: string | null;
+      order_of_concern?: number | null;
     }>;
   }
 ) {
@@ -454,6 +474,11 @@ function transformTurtleDataToProfile(
       nesting: sectionDescriptions?.nesting || null,
       uniqueTraits: sectionDescriptions?.unique_traits_and_qualities || null
     },
+    conservation: {
+      description: sectionDescriptions?.conservation || null,
+      statuses: conservationStatuses || [],
+      currentStatus: conservationStatus
+    },
     behaviors: (() => {
       console.log('Transforming behaviors, raw data:', behaviors);
       if (!behaviors || behaviors.length === 0) {
@@ -482,7 +507,10 @@ export async function getTurtleData(slug: string) {
 
     const relatedData = await fetchRelatedTurtleData(turtle);
 
-    return transformTurtleDataToProfile(turtle, relatedData);
+    return transformTurtleDataToProfile(turtle, {
+      ...relatedData,
+      conservationStatuses: relatedData.conservationStatuses
+    });
   } catch (error) {
     console.error('Error in getTurtleData:', error);
     throw error;

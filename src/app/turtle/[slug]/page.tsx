@@ -7,6 +7,7 @@ import Identification from "@/components/turtle-profile/content-sections/Identif
 import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
 import Habitat from "@/components/turtle-profile/content-sections/Habitat";
 import Behavior from "@/components/turtle-profile/content-sections/Behavior";
+import Conservation from "@/components/turtle-profile/content-sections/Conservation";
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -119,6 +120,12 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 <div className="w-full mt-12 mb-20">
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
+
+                <Conservation
+                  description={data.conservation.description}
+                  statuses={data.conservation.statuses}
+                  currentStatus={data.conservation.currentStatus}
+                />
               </div>
             </div>
           </div>
