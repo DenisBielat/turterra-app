@@ -39,6 +39,12 @@ export interface Variant {
     };
   }
   
+  export interface HabitatTypeRow {
+    habitat_types: {
+      habitat_type: string;
+    };
+  }
+  
   export interface BehaviorRow {
     behaviors_general: {
       behavior: string;
@@ -101,6 +107,7 @@ export interface Variant {
     turtle_species_population_estimate_history?: PopulationHistory[];
     turtle_species_habitats?: HabitatRow[];
     turtle_species_ecologies?: EcologyRow[];
+    turtle_species_habitat_types?: HabitatTypeRow[];
     turtle_species_behaviors_general?: BehaviorRow[];
     turtle_species_physical_features?: PhysicalFeatureData[];
     turtle_species_physical_features_key?: PhysicalFeature[];
@@ -153,6 +160,8 @@ export interface Variant {
         name: string;
         icon: string;
       }>;
+      ecologies: string[];
+      habitatTypes: string[];
     };
     behaviors: Array<{
       name: string;

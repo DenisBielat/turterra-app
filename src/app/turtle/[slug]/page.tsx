@@ -97,9 +97,9 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 </div>
                 
                 <HabitatAndBehavior
-                  description={data.habitat.description}
-                  habitats={data.habitat.habitats}
-                  behaviors={data.behaviors}
+                  habitatDescription={data.habitat.description}
+                  habitatSystems={data.habitat.ecologies}
+                  habitatTypes={data.habitat.habitatTypes}
                 />
 
                 {/* Divider */}

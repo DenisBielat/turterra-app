@@ -81,6 +81,9 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       ),
       turtle_species_ecologies(
         ecologies(ecology)
+      ),
+      turtle_species_habitat_types(
+        habitat_types(habitat_type)
       )
     `)
     .eq(column, value)
@@ -322,6 +325,7 @@ function transformTurtleDataToProfile(
     turtle_species_population_estimate_history,
     turtle_species_habitats,
     turtle_species_ecologies,
+    turtle_species_habitat_types,
     turtle_species_section_descriptions,
     turtle_species_measurements
   } = turtle;
@@ -436,7 +440,9 @@ function transformTurtleDataToProfile(
       habitats: turtle_species_habitats?.map(h => ({
         name: h.habitats.habitat,
         icon: h.habitats.icon
-      })) || []
+      })) || [],
+      ecologies: turtle_species_ecologies?.map(e => e.ecologies.ecology) || [],
+      habitatTypes: turtle_species_habitat_types?.map(ht => ht.habitat_types?.habitat_type).filter(Boolean) || []
     },
     behaviors: (() => {
       console.log('Transforming behaviors, raw data:', behaviors);
