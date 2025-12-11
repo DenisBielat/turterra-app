@@ -68,6 +68,10 @@ export interface Variant {
     identification?: string;
     distribution?: string;
     habitat?: string;
+    diet?: string;
+    hibernation?: string;
+    nesting?: string;
+    unique_traits_and_qualities?: string;
   }
   
   export interface PhysicalFeature {
@@ -162,6 +166,12 @@ export interface Variant {
       }>;
       ecologies: string[];
       habitatTypes: string[];
+    };
+    behavior: {
+      diet: string | null;
+      hibernation: string | null;
+      nesting: string | null;
+      uniqueTraits: string | null;
     };
     behaviors: Array<{
       name: string;

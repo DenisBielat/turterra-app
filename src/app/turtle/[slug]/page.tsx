@@ -5,7 +5,8 @@ import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGla
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
 import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
-import HabitatAndBehavior from "@/components/turtle-profile/content-sections/HabitatAndBehavior";
+import Habitat from "@/components/turtle-profile/content-sections/Habitat";
+import Behavior from "@/components/turtle-profile/content-sections/Behavior";
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -96,10 +97,22 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
                 
-                <HabitatAndBehavior
+                <Habitat
                   habitatDescription={data.habitat.description}
                   habitatSystems={data.habitat.ecologies}
                   habitatTypes={data.habitat.habitatTypes}
+                />
+
+                {/* Divider */}
+                <div className="w-full mt-12 mb-20">
+                  <div className="w-full h-px bg-gray-200"></div>
+                </div>
+
+                <Behavior
+                  hibernation={data.behavior.hibernation ?? undefined}
+                  diet={data.behavior.diet ?? undefined}
+                  nesting={data.behavior.nesting ?? undefined}
+                  uniqueTraits={data.behavior.uniqueTraits ?? undefined}
                 />
 
                 {/* Divider */}

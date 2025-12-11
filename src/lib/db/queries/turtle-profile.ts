@@ -53,7 +53,11 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
         at_a_glance,
         identification,
         distribution,
-        habitat
+        habitat,
+        diet,
+        hibernation,
+        nesting,
+        unique_traits_and_qualities
       ),
       turtle_species_measurements (
         adult_weight,
@@ -443,6 +447,12 @@ function transformTurtleDataToProfile(
       })) || [],
       ecologies: turtle_species_ecologies?.map(e => e.ecologies.ecology) || [],
       habitatTypes: turtle_species_habitat_types?.map(ht => ht.habitat_types?.habitat_type).filter(Boolean) || []
+    },
+    behavior: {
+      diet: sectionDescriptions?.diet || null,
+      hibernation: sectionDescriptions?.hibernation || null,
+      nesting: sectionDescriptions?.nesting || null,
+      uniqueTraits: sectionDescriptions?.unique_traits_and_qualities || null
     },
     behaviors: (() => {
       console.log('Transforming behaviors, raw data:', behaviors);
