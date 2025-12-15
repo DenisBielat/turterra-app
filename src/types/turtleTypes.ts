@@ -73,6 +73,7 @@ export interface Variant {
     nesting?: string;
     unique_traits_and_qualities?: string;
     conservation?: string;
+    predators?: string;
   }
   
   export interface PhysicalFeature {
@@ -167,6 +168,7 @@ export interface Variant {
       }>;
       ecologies: string[];
       habitatTypes: string[];
+      predators: string | null;
     };
     behavior: {
       diet: string | null;

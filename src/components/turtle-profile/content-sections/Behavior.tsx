@@ -15,7 +15,7 @@ export default function Behavior({
   uniqueTraits,
 }: BehaviorProps) {
   return (
-    <section className="pb-12">
+    <section className="">
       <h2 className="text-5xl font-bold mb-2">Behavior</h2>
       
       <div className="mt-12">

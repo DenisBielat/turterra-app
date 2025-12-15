@@ -53,14 +53,14 @@ export default function Conservation({
           <div className="col-span-5">
             {description && (
               <>
-                <h3 className="text-3xl font-bold mb-3">Conservation Status</h3>
+                <h3 className="text-3xl font-bold mb-3">Status</h3>
                 <div className="text-base">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {description}
                   </ReactMarkdown>
                 </div>
                 <div className="mt-4 text-base">
-                  <p>IUCN Red List Status: {currentStatus.status}</p>
+                  <p><span className="font-bold">IUCN Red List Status:</span> {currentStatus.status}</p>
                 </div>
               </>
             )}

@@ -58,7 +58,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
         hibernation,
         nesting,
         unique_traits_and_qualities,
-        conservation
+        conservation,
+        predators
       ),
       turtle_species_measurements (
         adult_weight,
@@ -470,7 +471,8 @@ function transformTurtleDataToProfile(
         icon: h.habitats.icon
       })) || [],
       ecologies: turtle_species_ecologies?.map(e => e.ecologies.ecology) || [],
-      habitatTypes: turtle_species_habitat_types?.map(ht => ht.habitat_types?.habitat_type).filter(Boolean) || []
+      habitatTypes: turtle_species_habitat_types?.map(ht => ht.habitat_types?.habitat_type).filter(Boolean) || [],
+      predators: sectionDescriptions?.predators || null
     },
     behavior: {
       diet: sectionDescriptions?.diet || null,

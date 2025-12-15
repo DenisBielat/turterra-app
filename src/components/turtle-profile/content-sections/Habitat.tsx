@@ -5,25 +5,45 @@ interface HabitatProps {
   habitatDescription: string;
   habitatSystems?: string[];
   habitatTypes?: string[];
+  predators?: string;
 }
 
 export default function Habitat({
   habitatDescription,
   habitatSystems = [],
   habitatTypes = [],
+  predators,
 }: HabitatProps) {
   return (
-    <section id="habitat" className="scroll-m-20 pb-12">
+    <section id="habitat" className="scroll-m-20">
       <h2 className="text-5xl font-bold mb-2">Habitat</h2>
       
       <div className="mt-12">
         <div className="grid grid-cols-9 gap-4">
-          {/* Left content area - Description */}
-          <div className="col-span-5">
+          {/* Left content area - All subsections */}
+          <div className="col-span-5 space-y-12">
+            {/* Habitat Description */}
             {habitatDescription && (
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {habitatDescription}
-              </ReactMarkdown>
+              <div className="text-base">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {habitatDescription}
+                </ReactMarkdown>
+              </div>
+            )}
+
+            {/* Predators Subsection */}
+            {predators && (
+              <div>
+                <div className="w-full mb-8">
+                  <div className="w-full h-px bg-gray-200"></div>
+                </div>
+                <h3 className="text-3xl font-bold mb-3">Predators</h3>
+                <div className="text-base">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {predators}
+                  </ReactMarkdown>
+                </div>
+              </div>
             )}
           </div>
 
