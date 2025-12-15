@@ -59,7 +59,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
         nesting,
         unique_traits_and_qualities,
         conservation,
-        predators
+        predators,
+        threats
       ),
       turtle_species_measurements (
         adult_weight,
@@ -90,6 +91,12 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       ),
       turtle_species_habitat_types(
         habitat_types(habitat_type)
+      ),
+      turtle_species_threats(
+        threats_list(
+          threat_name,
+          icon
+        )
       )
     `)
     .eq(column, value)
@@ -356,7 +363,8 @@ function transformTurtleDataToProfile(
     turtle_species_ecologies,
     turtle_species_habitat_types,
     turtle_species_section_descriptions,
-    turtle_species_measurements
+    turtle_species_measurements,
+    turtle_species_threats
   } = turtle;
 
   // Conservation status
@@ -483,7 +491,27 @@ function transformTurtleDataToProfile(
     conservation: {
       description: sectionDescriptions?.conservation || null,
       statuses: conservationStatuses || [],
-      currentStatus: conservationStatus
+      currentStatus: conservationStatus,
+      threats: sectionDescriptions?.threats || null,
+      threatTags: (() => {
+        if (!turtle_species_threats || turtle_species_threats.length === 0) {
+          return [];
+        }
+        // Handle both array and object cases for threats_list (Supabase can return either)
+        const tags = turtle_species_threats
+          .map(t => {
+            const threatList = Array.isArray(t.threats_list) ? t.threats_list[0] : t.threats_list;
+            if (!threatList || !threatList.threat_name) {
+              return null;
+            }
+            return {
+              name: threatList.threat_name,
+              icon: threatList.icon || null
+            };
+          })
+          .filter((tag): tag is { name: string; icon: string | null } => tag !== null);
+        return tags;
+      })()
     },
     behaviors: (() => {
       console.log('Transforming behaviors, raw data:', behaviors);

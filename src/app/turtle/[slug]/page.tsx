@@ -126,6 +126,8 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                   description={data.conservation.description}
                   statuses={data.conservation.statuses}
                   currentStatus={data.conservation.currentStatus}
+                  threats={data.conservation.threats ?? undefined}
+                  threatTags={data.conservation.threatTags}
                 />
               </div>
             </div>

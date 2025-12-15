@@ -74,6 +74,14 @@ export interface Variant {
     unique_traits_and_qualities?: string;
     conservation?: string;
     predators?: string;
+    threats?: string;
+  }
+  
+  export interface ThreatRow {
+    threats_list: {
+      threat_name: string | null;
+      icon: string | null;
+    } | null;
   }
   
   export interface PhysicalFeature {
@@ -117,6 +125,7 @@ export interface Variant {
     turtle_species_behaviors_general?: BehaviorRow[];
     turtle_species_physical_features?: PhysicalFeatureData[];
     turtle_species_physical_features_key?: PhysicalFeature[];
+    turtle_species_threats?: ThreatRow[];
     related_species?: RelatedSpecies[];
   }
   
@@ -190,6 +199,11 @@ export interface Variant {
         code: string;
         year: number;
       };
+      threats: string | null;
+      threatTags: Array<{
+        name: string;
+        icon: string | null;
+      }>;
     };
     behaviors: Array<{
       name: string;

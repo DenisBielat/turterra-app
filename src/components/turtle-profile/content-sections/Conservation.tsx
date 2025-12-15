@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Badge } from '@/components/ui/badge';
 
 interface ConservationProps {
   description: string | null;
@@ -15,12 +16,19 @@ interface ConservationProps {
     code: string;
     year: number;
   };
+  threats?: string | null;
+  threatTags?: Array<{
+    name: string;
+    icon: string | null;
+  }>;
 }
 
 export default function Conservation({
   description,
   statuses,
   currentStatus,
+  threats,
+  threatTags = [],
 }: ConservationProps) {
   // Separate statuses into the two groups
   const specialStatuses = statuses.filter(s => 
@@ -43,6 +51,41 @@ export default function Conservation({
     return currentStatus.code === abbreviation;
   };
 
+  const getStatusColor = (abbreviation: string, isActive: boolean) => {
+    // Only active status gets threat-level color, inactive bubbles are black
+    if (!isActive) {
+      return 'bg-black border-black text-white';
+    }
+
+    // Color coding based on threat level (only for active status)
+    switch (abbreviation) {
+      // Extinct categories - red
+      case 'EX':
+      case 'EW':
+        return 'bg-red-500 border-red-500 text-white';
+      
+      // Threatened categories - orange
+      case 'CR':
+      case 'EN':
+      case 'VU':
+        return 'bg-orange-500 border-orange-500 text-white';
+      
+      // Near Threatened and Least Concern - green
+      case 'NT':
+      case 'LC':
+        return 'bg-green-800 border-green-800 text-white';
+      
+      // Lacks Data - gray
+      case 'DD':
+      case 'NE':
+        return 'bg-gray-500 border-gray-500 text-white';
+      
+      // Default fallback
+      default:
+        return 'bg-black border-black text-white';
+    }
+  };
+
   return (
     <section id="conservation" className="scroll-m-20 pb-12">
       <h2 className="text-5xl font-bold mb-2">Conservation</h2>
@@ -50,17 +93,19 @@ export default function Conservation({
       <div className="mt-12">
         <div className="grid grid-cols-9 gap-4">
           {/* Left content area - Description */}
-          <div className="col-span-5">
+          <div className="col-span-5 space-y-12">
             {description && (
               <>
-                <h3 className="text-3xl font-bold mb-3">Status</h3>
-                <div className="text-base">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {description}
-                  </ReactMarkdown>
-                </div>
-                <div className="mt-4 text-base">
-                  <p><span className="font-bold">IUCN Red List Status:</span> {currentStatus.status}</p>
+                <div>
+                  <h3 className="text-3xl font-bold mb-3">Status</h3>
+                  <div className="text-base">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {description}
+                    </ReactMarkdown>
+                  </div>
+                  <div className="mt-4 text-base">
+                    <p><span className="font-bold">IUCN Red List Status:</span> {currentStatus.status}</p>
+                  </div>
                 </div>
               </>
             )}
@@ -88,11 +133,7 @@ export default function Conservation({
                   return (
                     <div key={status.id} className="flex items-center">
                       <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${
-                          isActive
-                            ? 'bg-blue-500 border-blue-500 text-white'
-                            : 'bg-black border-black text-white'
-                        }`}
+                        className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${getStatusColor(status.abbreviation, isActive)}`}
                       >
                         <span className="font-bold text-sm">{status.abbreviation}</span>
                       </div>
@@ -119,11 +160,7 @@ export default function Conservation({
                 return (
                   <div key={status.id} className="flex items-center">
                     <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${
-                        isActive
-                          ? 'bg-blue-500 border-blue-500 text-white'
-                          : 'bg-black border-black text-white'
-                      }`}
+                      className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${getStatusColor(status.abbreviation, isActive)}`}
                     >
                       <span className="font-bold text-sm">{status.abbreviation}</span>
                     </div>
@@ -139,11 +176,11 @@ export default function Conservation({
         
         {/* Labels row */}
         <div className="flex items-start mt-2">
-          {/* Lacks Data label - left aligned under DD and NE section */}
+          {/* Lacks Data label - centered under DD and NE section */}
           {specialStatuses.length > 0 && (
             <>
               <div
-                className="text-sm text-gray-600 text-left"
+                className="text-sm text-gray-600 text-center"
                 style={{
                   width: `${specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}px`
                 }}
@@ -161,7 +198,7 @@ export default function Conservation({
           {/* IUCN Status labels - positioned across the IUCN bubbles section */}
           {iucnStatuses.length > 0 && (
             <div
-              className="flex text-sm text-gray-600"
+              className="flex text-sm text-gray-600 relative"
               style={{
                 width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
               }}
@@ -169,15 +206,65 @@ export default function Conservation({
               {/* Extinct - left aligned */}
               <span className="text-left">Extinct</span>
 
-              {/* Threatened - centered */}
-              <span className="flex-1 text-center">Threatened</span>
+              {/* Threatened - aligned with EN bubble (4th bubble, index 3) */}
+              <span 
+                className="absolute"
+                style={{
+                  left: `${3 * 48 + 3 * 32 + 24}px`,
+                  transform: 'translateX(-50%)'
+                }}
+              >
+                Threatened
+              </span>
 
               {/* Least Concern - right aligned */}
-              <span className="text-right">Least Concern</span>
+              <span className="text-right ml-auto">Least Concern</span>
             </div>
           )}
         </div>
       </div>
+
+      {/* Environmental & Manmade Threats Subsection - After bubbles */}
+      {threats && (
+        <div className="mt-12">
+          <div className="grid grid-cols-9 gap-4">
+            <div className="col-span-5">
+              <div className="w-full mb-8">
+                <div className="w-full h-px bg-gray-200"></div>
+              </div>
+              <h3 className="text-3xl font-bold mb-3">Environmental & Manmade Threats</h3>
+              <div className="text-base">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {threats}
+                </ReactMarkdown>
+              </div>
+              {threatTags.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {threatTags.map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="flex items-center gap-2 px-4 py-2 text-sm border-gray-300 rounded-md bg-green-500/10"
+                    >
+                      {tag.icon && (
+                        <span
+                          className="w-5 h-5 flex-shrink-0"
+                          dangerouslySetInnerHTML={{ __html: tag.icon }}
+                        />
+                      )}
+                      <span>{tag.name}</span>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="col-span-1" />
+            <div className="col-span-3">
+              {/* Future content */}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
