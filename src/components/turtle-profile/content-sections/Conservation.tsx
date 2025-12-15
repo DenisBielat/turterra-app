@@ -2,6 +2,66 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Badge } from '@/components/ui/badge';
 
+// Bracket component for grouping status bubbles with their labels
+interface BracketProps {
+  width: number;
+  className?: string;
+}
+
+function Bracket({ width, className = '' }: BracketProps) {
+  const height = 20;
+  const strokeWidth = 1.5;
+  const cornerRadius = 6;
+  const centerX = width / 2;
+
+  return (
+    <svg
+      width={width}
+      height={height}
+      className={className}
+      viewBox={`0 0 ${width} ${height}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Left horizontal line */}
+      <path
+        d={`M 0 ${strokeWidth / 2} H ${centerX - cornerRadius}`}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+      />
+      {/* Left corner curve */}
+      <path
+        d={`M ${centerX - cornerRadius} ${strokeWidth / 2} Q ${centerX} ${strokeWidth / 2} ${centerX} ${strokeWidth / 2 + cornerRadius}`}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        fill="none"
+      />
+      {/* Center vertical line */}
+      <path
+        d={`M ${centerX} ${strokeWidth / 2 + cornerRadius} V ${height}`}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+      />
+      {/* Right corner curve */}
+      <path
+        d={`M ${centerX} ${strokeWidth / 2 + cornerRadius} Q ${centerX} ${strokeWidth / 2} ${centerX + cornerRadius} ${strokeWidth / 2}`}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        fill="none"
+      />
+      {/* Right horizontal line */}
+      <path
+        d={`M ${centerX + cornerRadius} ${strokeWidth / 2} H ${width}`}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 interface ConservationProps {
   description: string | null;
   statuses: Array<{
@@ -174,18 +234,22 @@ export default function Conservation({
           )}
         </div>
         
-        {/* Labels row */}
-        <div className="flex items-start mt-2">
-          {/* Lacks Data label - centered under DD and NE section */}
+        {/* Labels row with brackets */}
+        <div className="flex items-start mt-4">
+          {/* Lacks Data label with bracket - centered under DD and NE section */}
           {specialStatuses.length > 0 && (
             <>
               <div
-                className="text-sm text-gray-600 text-center"
+                className="flex flex-col items-center"
                 style={{
                   width: `${specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}px`
                 }}
               >
-                Lacks Data
+                <Bracket
+                  width={specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}
+                  className="text-gray-400"
+                />
+                <span className="text-sm text-gray-600 mt-1">Lacks Data</span>
               </div>
 
               {/* Spacer matching the vertical divider */}
@@ -195,30 +259,52 @@ export default function Conservation({
             </>
           )}
 
-          {/* IUCN Status labels - positioned across the IUCN bubbles section */}
+          {/* IUCN Status labels with brackets - positioned across the IUCN bubbles section */}
           {iucnStatuses.length > 0 && (
             <div
-              className="flex text-sm text-gray-600 relative"
+              className="relative"
               style={{
                 width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
               }}
             >
-              {/* Extinct - left aligned */}
-              <span className="text-left">Extinct</span>
-
-              {/* Threatened - aligned with EN bubble (4th bubble, index 3) */}
-              <span 
-                className="absolute"
+              {/* Extinct label - left aligned under EX, EW */}
+              <div
+                className="absolute flex flex-col items-center"
                 style={{
-                  left: `${3 * 48 + 3 * 32 + 24}px`,
-                  transform: 'translateX(-50%)'
+                  left: 0,
+                  width: `${2 * 48 + 1 * 32}px`
                 }}
               >
-                Threatened
-              </span>
+                <Bracket width={2 * 48 + 1 * 32} className="text-gray-400" />
+                <span className="text-sm text-gray-600 mt-1">Extinct</span>
+              </div>
 
-              {/* Least Concern - right aligned */}
-              <span className="text-right ml-auto">Least Concern</span>
+              {/* Threatened label with bracket - spanning CR, EN, VU */}
+              <div
+                className="absolute flex flex-col items-center"
+                style={{
+                  left: `${2 * 48 + 2 * 32}px`,
+                  width: `${3 * 48 + 2 * 32}px`
+                }}
+              >
+                <Bracket width={3 * 48 + 2 * 32} className="text-gray-400" />
+                <span className="text-sm text-gray-600 mt-1">Threatened</span>
+              </div>
+
+              {/* Least Concern label - right aligned under NT, LC */}
+              <div
+                className="absolute flex flex-col items-center"
+                style={{
+                  right: 0,
+                  width: `${2 * 48 + 1 * 32}px`
+                }}
+              >
+                <Bracket width={2 * 48 + 1 * 32} className="text-gray-400" />
+                <span className="text-sm text-gray-600 mt-1">Least Concern</span>
+              </div>
+
+              {/* Spacer to maintain height for absolute positioned elements */}
+              <div style={{ height: '44px' }}></div>
             </div>
           )}
         </div>
