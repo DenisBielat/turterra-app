@@ -321,7 +321,11 @@ function transformTurtleDataToProfile(
         behavior: string;
         behavior_icon: string;
         behavior_description?: string | null;
-      };
+      } | Array<{
+        behavior: string;
+        behavior_icon: string;
+        behavior_description?: string | null;
+      }>;
     }>;
     conservationStatuses?: Array<{
       id: string;
@@ -487,10 +491,14 @@ function transformTurtleDataToProfile(
       }
       const transformed = behaviors.map(b => {
         console.log('Mapping behavior:', b);
+        // Handle both array and object cases for behaviors_general
+        const bg = Array.isArray(b.behaviors_general)
+          ? b.behaviors_general[0]
+          : b.behaviors_general;
         return {
-          name: b.behaviors_general?.behavior || '',
-          icon: b.behaviors_general?.behavior_icon || '',
-          description: b.behaviors_general?.behavior_description || ""
+          name: bg?.behavior || '',
+          icon: bg?.behavior_icon || '',
+          description: bg?.behavior_description || ""
         };
       });
       console.log('Transformed behaviors:', transformed);

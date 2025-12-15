@@ -39,9 +39,6 @@ export default function Conservation({
     return order.indexOf(a.abbreviation) - order.indexOf(b.abbreviation);
   });
 
-  // Combine all statuses in order: DD, NE, [divider], EX, EW, CR, EN, VU, NT, LC
-  const allStatuses = [...specialStatuses, ...iucnStatuses];
-
   const isStatusActive = (abbreviation: string) => {
     return currentStatus.code === abbreviation;
   };
