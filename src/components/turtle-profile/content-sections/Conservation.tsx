@@ -9,10 +9,22 @@ interface BracketProps {
 }
 
 function Bracket({ width, className = '' }: BracketProps) {
-  const height = 20;
+  const height = 16;
   const strokeWidth = 1.5;
-  const cornerRadius = 6;
+  const radius = 8;
   const centerX = width / 2;
+  const y = strokeWidth / 2;
+
+  // Path: left line -> arc curving down -> short vertical stem -> arc curving down <- right line
+  const path = `
+    M 0 ${y}
+    H ${centerX - radius}
+    A ${radius} ${radius} 0 0 1 ${centerX} ${y + radius}
+    V ${height}
+    M ${centerX} ${y + radius}
+    A ${radius} ${radius} 0 0 1 ${centerX + radius} ${y}
+    H ${width}
+  `;
 
   return (
     <svg
@@ -23,40 +35,12 @@ function Bracket({ width, className = '' }: BracketProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Left horizontal line */}
       <path
-        d={`M 0 ${strokeWidth / 2} H ${centerX - cornerRadius}`}
+        d={path}
         stroke="currentColor"
         strokeWidth={strokeWidth}
         strokeLinecap="round"
-      />
-      {/* Left corner curve */}
-      <path
-        d={`M ${centerX - cornerRadius} ${strokeWidth / 2} Q ${centerX} ${strokeWidth / 2} ${centerX} ${strokeWidth / 2 + cornerRadius}`}
-        stroke="currentColor"
-        strokeWidth={strokeWidth}
         fill="none"
-      />
-      {/* Center vertical line */}
-      <path
-        d={`M ${centerX} ${strokeWidth / 2 + cornerRadius} V ${height}`}
-        stroke="currentColor"
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-      />
-      {/* Right corner curve */}
-      <path
-        d={`M ${centerX} ${strokeWidth / 2 + cornerRadius} Q ${centerX} ${strokeWidth / 2} ${centerX + cornerRadius} ${strokeWidth / 2}`}
-        stroke="currentColor"
-        strokeWidth={strokeWidth}
-        fill="none"
-      />
-      {/* Right horizontal line */}
-      <path
-        d={`M ${centerX + cornerRadius} ${strokeWidth / 2} H ${width}`}
-        stroke="currentColor"
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
       />
     </svg>
   );
@@ -267,8 +251,8 @@ export default function Conservation({
                 width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
               }}
             >
-              {/* Extinct label - left aligned */}
-              <span className="absolute left-0 text-sm text-gray-600" style={{ top: '12px' }}>
+              {/* Extinct label - left aligned, positioned to align with text below brackets */}
+              <span className="absolute left-0 text-sm text-gray-600" style={{ top: '20px' }}>
                 Extinct
               </span>
 
@@ -284,13 +268,13 @@ export default function Conservation({
                 <span className="text-sm text-gray-600 mt-1">Threatened</span>
               </div>
 
-              {/* Least Concern label - right aligned */}
-              <span className="absolute right-0 text-sm text-gray-600" style={{ top: '12px' }}>
+              {/* Least Concern label - right aligned, positioned to align with text below brackets */}
+              <span className="absolute right-0 text-sm text-gray-600" style={{ top: '20px' }}>
                 Least Concern
               </span>
 
               {/* Spacer to maintain height for absolute positioned elements */}
-              <div style={{ height: '44px' }}></div>
+              <div style={{ height: '40px' }}></div>
             </div>
           )}
         </div>
