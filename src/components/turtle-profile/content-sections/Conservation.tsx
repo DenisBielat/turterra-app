@@ -259,7 +259,7 @@ export default function Conservation({
             </>
           )}
 
-          {/* IUCN Status labels with brackets - positioned across the IUCN bubbles section */}
+          {/* IUCN Status labels - positioned across the IUCN bubbles section */}
           {iucnStatuses.length > 0 && (
             <div
               className="relative"
@@ -267,17 +267,10 @@ export default function Conservation({
                 width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
               }}
             >
-              {/* Extinct label - left aligned under EX, EW */}
-              <div
-                className="absolute flex flex-col items-center"
-                style={{
-                  left: 0,
-                  width: `${2 * 48 + 1 * 32}px`
-                }}
-              >
-                <Bracket width={2 * 48 + 1 * 32} className="text-gray-400" />
-                <span className="text-sm text-gray-600 mt-1">Extinct</span>
-              </div>
+              {/* Extinct label - left aligned */}
+              <span className="absolute left-0 text-sm text-gray-600" style={{ top: '12px' }}>
+                Extinct
+              </span>
 
               {/* Threatened label with bracket - spanning CR, EN, VU */}
               <div
@@ -291,17 +284,10 @@ export default function Conservation({
                 <span className="text-sm text-gray-600 mt-1">Threatened</span>
               </div>
 
-              {/* Least Concern label - right aligned under NT, LC */}
-              <div
-                className="absolute flex flex-col items-center"
-                style={{
-                  right: 0,
-                  width: `${2 * 48 + 1 * 32}px`
-                }}
-              >
-                <Bracket width={2 * 48 + 1 * 32} className="text-gray-400" />
-                <span className="text-sm text-gray-600 mt-1">Least Concern</span>
-              </div>
+              {/* Least Concern label - right aligned */}
+              <span className="absolute right-0 text-sm text-gray-600" style={{ top: '12px' }}>
+                Least Concern
+              </span>
 
               {/* Spacer to maintain height for absolute positioned elements */}
               <div style={{ height: '44px' }}></div>
