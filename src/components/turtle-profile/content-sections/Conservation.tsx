@@ -51,9 +51,6 @@ export default function Conservation({
       <h2 className="text-5xl font-bold mb-2">Conservation</h2>
       
       <div className="mt-12">
-        <div className="w-full mb-8">
-          <div className="w-full h-px bg-gray-200"></div>
-        </div>
         <div className="grid grid-cols-9 gap-4">
           {/* Left content area - Description */}
           <div className="col-span-5">
@@ -144,77 +141,43 @@ export default function Conservation({
         </div>
         
         {/* Labels row */}
-        <div className="flex items-start mt-2 relative">
-          {/* Lacks Data label - centered under DD and NE */}
+        <div className="flex items-start mt-2">
+          {/* Lacks Data label - left aligned under DD and NE section */}
           {specialStatuses.length > 0 && (
-            <div 
-              className="text-sm text-gray-600 absolute"
-              style={{ 
-                left: `${(specialStatuses.length - 1) * 80 + 24}px`, 
-                transform: 'translateX(-50%)' 
+            <>
+              <div
+                className="text-sm text-gray-600 text-left"
+                style={{
+                  width: `${specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}px`
+                }}
+              >
+                Lacks Data
+              </div>
+
+              {/* Spacer matching the vertical divider */}
+              {iucnStatuses.length > 0 && (
+                <div className="mx-4" style={{ width: '1px' }}></div>
+              )}
+            </>
+          )}
+
+          {/* IUCN Status labels - positioned across the IUCN bubbles section */}
+          {iucnStatuses.length > 0 && (
+            <div
+              className="flex text-sm text-gray-600"
+              style={{
+                width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
               }}
             >
-              Lacks Data
+              {/* Extinct - left aligned */}
+              <span className="text-left">Extinct</span>
+
+              {/* Threatened - centered */}
+              <span className="flex-1 text-center">Threatened</span>
+
+              {/* Least Concern - right aligned */}
+              <span className="text-right">Least Concern</span>
             </div>
-          )}
-          
-          {/* IUCN Status labels */}
-          {iucnStatuses.length > 0 && (
-            <>
-              {/* Calculate starting position of IUCN statuses */}
-              {(() => {
-                // Each bubble is 48px (w-12), each connector is 32px (w-8)
-                // Vertical divider is 1px (w-px) + 32px margins (mx-4 = 1rem each side)
-                const bubbleWidth = 48;
-                const connectorWidth = 32;
-                const dividerWidth = 1 + 32; // w-px (1px) + mx-4 (1rem = 16px each side = 32px total)
-                
-                const specialStatusesWidth = specialStatuses.length > 0 
-                  ? specialStatuses.length * bubbleWidth + (specialStatuses.length - 1) * connectorWidth + dividerWidth
-                  : 0;
-                
-                const iucnStart = specialStatusesWidth;
-                // Each IUCN bubble+connector pair is 80px (48 + 32)
-                const bubbleConnectorPair = bubbleWidth + connectorWidth;
-                
-                return (
-                  <>
-                    {/* Extinct - under EX (index 0) */}
-                    <div 
-                      className="text-sm text-gray-600 absolute"
-                      style={{ 
-                        left: `${iucnStart + bubbleWidth / 2}px`, 
-                        transform: 'translateX(-50%)' 
-                      }}
-                    >
-                      Extinct
-                    </div>
-                    
-                    {/* Threatened - centered under CR, EN, VU (indices 2, 3, 4) - center at EN (index 3) */}
-                    <div 
-                      className="text-sm text-gray-600 absolute"
-                      style={{ 
-                        left: `${iucnStart + 3 * bubbleConnectorPair + bubbleWidth / 2}px`, 
-                        transform: 'translateX(-50%)' 
-                      }}
-                    >
-                      Threatened
-                    </div>
-                    
-                    {/* Least Concern - under LC (index 6) */}
-                    <div 
-                      className="text-sm text-gray-600 absolute"
-                      style={{ 
-                        left: `${iucnStart + 6 * bubbleConnectorPair + bubbleWidth / 2}px`, 
-                        transform: 'translateX(-50%)' 
-                      }}
-                    >
-                      Least Concern
-                    </div>
-                  </>
-                );
-              })()}
-            </>
           )}
         </div>
       </div>
