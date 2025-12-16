@@ -2,6 +2,50 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Badge } from '@/components/ui/badge';
 
+// Bracket component for grouping status bubbles with their labels
+interface BracketProps {
+  width: number;
+  className?: string;
+}
+
+function Bracket({ width, className = '' }: BracketProps) {
+  const height = 16;
+  const strokeWidth = 1.5;
+  const radius = 8;
+  const centerX = width / 2;
+  const y = strokeWidth / 2;
+
+  // Path: left line -> arc curving down -> short vertical stem -> arc curving down <- right line
+  const path = `
+    M 0 ${y}
+    H ${centerX - radius}
+    A ${radius} ${radius} 0 0 1 ${centerX} ${y + radius}
+    V ${height}
+    M ${centerX} ${y + radius}
+    A ${radius} ${radius} 0 0 1 ${centerX + radius} ${y}
+    H ${width}
+  `;
+
+  return (
+    <svg
+      width={width}
+      height={height}
+      className={className}
+      viewBox={`0 0 ${width} ${height}`}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d={path}
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
 interface ConservationProps {
   description: string | null;
   statuses: Array<{
@@ -174,18 +218,22 @@ export default function Conservation({
           )}
         </div>
         
-        {/* Labels row */}
-        <div className="flex items-start mt-2">
-          {/* Lacks Data label - centered under DD and NE section */}
+        {/* Labels row with brackets */}
+        <div className="flex items-start mt-4">
+          {/* Lacks Data label with bracket - centered under DD and NE section */}
           {specialStatuses.length > 0 && (
             <>
               <div
-                className="text-sm text-gray-600 text-center"
+                className="flex flex-col items-center"
                 style={{
                   width: `${specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}px`
                 }}
               >
-                Lacks Data
+                <Bracket
+                  width={specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}
+                  className="text-gray-400"
+                />
+                <span className="text-sm text-gray-600 mt-1">Lacks Data</span>
               </div>
 
               {/* Spacer matching the vertical divider */}
@@ -198,27 +246,35 @@ export default function Conservation({
           {/* IUCN Status labels - positioned across the IUCN bubbles section */}
           {iucnStatuses.length > 0 && (
             <div
-              className="flex text-sm text-gray-600 relative"
+              className="relative"
               style={{
                 width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
               }}
             >
-              {/* Extinct - left aligned */}
-              <span className="text-left">Extinct</span>
-
-              {/* Threatened - aligned with EN bubble (4th bubble, index 3) */}
-              <span 
-                className="absolute"
-                style={{
-                  left: `${3 * 48 + 3 * 32 + 24}px`,
-                  transform: 'translateX(-50%)'
-                }}
-              >
-                Threatened
+              {/* Extinct label - left aligned, positioned to align with text below brackets */}
+              <span className="absolute left-0 text-sm text-gray-600" style={{ top: '20px' }}>
+                Extinct
               </span>
 
-              {/* Least Concern - right aligned */}
-              <span className="text-right ml-auto">Least Concern</span>
+              {/* Threatened label with bracket - spanning CR, EN, VU */}
+              <div
+                className="absolute flex flex-col items-center"
+                style={{
+                  left: `${2 * 48 + 2 * 32}px`,
+                  width: `${3 * 48 + 2 * 32}px`
+                }}
+              >
+                <Bracket width={3 * 48 + 2 * 32} className="text-gray-400" />
+                <span className="text-sm text-gray-600 mt-1">Threatened</span>
+              </div>
+
+              {/* Least Concern label - right aligned, positioned to align with text below brackets */}
+              <span className="absolute right-0 text-sm text-gray-600" style={{ top: '20px' }}>
+                Least Concern
+              </span>
+
+              {/* Spacer to maintain height for absolute positioned elements */}
+              <div style={{ height: '40px' }}></div>
             </div>
           )}
         </div>
