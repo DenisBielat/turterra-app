@@ -104,12 +104,11 @@ export default function Identification({
                 <h3 className="font-bold text-base mb-3">Length (Max SCL)</h3>
 
                 {/* Labels Row */}
-                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 mb-1">
-                  <div className="text-sm flex items-center gap-1 justify-end">
+                <div className="grid grid-cols-2 gap-4 mb-1">
+                  <div className="text-sm flex items-center gap-1">
                     <Icon name="female" style="line" size="sm" />
                     <span>Female</span>
                   </div>
-                  <div className="w-8" /> {/* Spacer to match symbol width */}
                   <div className="text-sm flex items-center gap-1">
                     <Icon name="male" style="line" size="sm" />
                     <span>Male</span>
@@ -117,9 +116,9 @@ export default function Identification({
                 </div>
 
                 {/* Values Row with Centered Symbol */}
-                <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 mb-2">
-                  {/* Female Value - Right aligned */}
-                  <div className="flex items-baseline gap-1 justify-end">
+                <div className="relative grid grid-cols-2 gap-4 mb-2">
+                  {/* Female Value */}
+                  <div className="flex items-baseline gap-1">
                     <span className="text-5xl font-bold leading-none">
                       {measurements.length.female === 'Unknown'
                         ? 'Unknown'
@@ -132,16 +131,7 @@ export default function Identification({
                     )}
                   </div>
 
-                  {/* Comparison Symbol - Center column */}
-                  <div className="flex items-center justify-center">
-                    <span className="text-3xl font-bold leading-none">
-                      {measurements.length.generallyLarger === 'female' ? '>' :
-                       measurements.length.generallyLarger === 'male' ? '<' :
-                       measurements.length.generallyLarger === 'equal' ? '=' : '>'}
-                    </span>
-                  </div>
-
-                  {/* Male Value - Left aligned */}
+                  {/* Male Value */}
                   <div className="flex items-baseline gap-1">
                     <span className="text-5xl font-bold leading-none">
                       {measurements.length.male === 'Unknown'
@@ -153,6 +143,15 @@ export default function Identification({
                         {measurements.length.male.split(' ').slice(1).join(' ')}
                       </span>
                     )}
+                  </div>
+
+                  {/* Comparison Symbol - Absolutely positioned in center */}
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <span className="text-3xl font-bold leading-none">
+                      {measurements.length.generallyLarger === 'female' ? '>' :
+                       measurements.length.generallyLarger === 'male' ? '<' :
+                       measurements.length.generallyLarger === 'equal' ? '=' : '>'}
+                    </span>
                   </div>
                 </div>
                 <p className="text-sm text-gray-700">
