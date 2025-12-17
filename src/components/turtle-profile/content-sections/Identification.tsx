@@ -1,7 +1,7 @@
-import { Icon } from '@/components/Icon';
 import SpeciesComparison from '../physical-features/SpeciesComparison';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Icon } from '@/components/Icon';
 
 interface IdentificationProps {
   description: string;
@@ -10,6 +10,7 @@ interface IdentificationProps {
     length: {
       female: string;
       male: string;
+      generallyLarger: 'female' | 'male' | 'equal' | null;
     };
     lifespan: {
       wild: string;
@@ -74,75 +75,135 @@ export default function Identification({
 
           {/* Right content area - Measurements */}
           <div className="col-span-3">
-            <div className="text-sm text-gray-600">Measurements</div>
-            <div className="mt-2 space-y-3">
+            <div className="space-y-0">
               {/* Adult Weight */}
-              <div className="flex items-center gap-4 rounded-lg bg-black/5 p-4">
-                <Icon name="kettlebell" size="xlg" style="line" />
-                <div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm">Adult Weight</span>
-                    <Icon 
-                      name="information-circle" 
-                      size="sm" 
-                      style="line" 
-                      className="text-gray-400 cursor-pointer hover:text-gray-600" 
-                    />
-                  </div>
-                  <div className="mt-1 text-lg font-bold">{measurements.adultWeight}</div>
+              <div className="pb-6">
+                <h3 className="font-bold text-base mb-3">Adult Weight</h3>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-5xl font-bold leading-none">
+                    {measurements.adultWeight === 'Unknown' 
+                      ? 'Unknown' 
+                      : measurements.adultWeight.split(' ')[0]}
+                  </span>
+                  {measurements.adultWeight !== 'Unknown' && (
+                    <span className="text-base font-normal">
+                      {measurements.adultWeight.split(' ').slice(1).join(' ')}
+                    </span>
+                  )}
                 </div>
+                <p className="text-sm text-gray-700">
+                  Best estimate of natural adult weight based on turtles caught in the wild.
+                </p>
               </div>
+
+              {/* Divider */}
+              <div className="w-full h-px bg-gray-300 mb-6" />
 
               {/* Length */}
-              <div className="flex items-center gap-4 rounded-lg bg-black/5 p-4">
-                <Icon name="ruler" size="xlg" style="line" />
-                <div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm">Length (Max SCL)</span>
-                    <Icon 
-                      name="information-circle" 
-                      size="sm" 
-                      style="line" 
-                      className="text-gray-400 cursor-pointer hover:text-gray-600" 
-                    />
+              <div className="pt-6 pb-6">
+                <h3 className="font-bold text-base mb-3">Length (Max SCL)</h3>
+                <div className="relative flex gap-4 mb-2">
+                  {/* Female Column */}
+                  <div className="flex-1">
+                    <div className="text-sm mb-1 flex items-center gap-1">
+                      <Icon name="female" style="line" size="sm" />
+                      <span>Female</span>
+                    </div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl font-bold leading-none">
+                        {measurements.length.female === 'Unknown' 
+                          ? 'Unknown' 
+                          : measurements.length.female.split(' ')[0]}
+                      </span>
+                      {measurements.length.female !== 'Unknown' && (
+                        <span className="text-base font-normal">
+                          {measurements.length.female.split(' ').slice(1).join(' ')}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-1 flex gap-8">
-                    <div>
-                      <div className="text-lg font-bold">{measurements.length.female}</div>
-                      <div className="text-xs">Female</div>
+                  
+                  {/* Male Column */}
+                  <div className="flex-1">
+                    <div className="text-sm mb-1 flex items-center gap-1">
+                      <Icon name="male" style="line" size="sm" />
+                      <span>Male</span>
                     </div>
-                    <div>
-                      <div className="text-lg font-bold">{measurements.length.male}</div>
-                      <div className="text-xs">Male</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl font-bold leading-none">
+                        {measurements.length.male === 'Unknown' 
+                          ? 'Unknown' 
+                          : measurements.length.male.split(' ')[0]}
+                      </span>
+                      {measurements.length.male !== 'Unknown' && (
+                        <span className="text-base font-normal">
+                          {measurements.length.male.split(' ').slice(1).join(' ')}
+                        </span>
+                      )}
                     </div>
+                  </div>
+                  
+                  {/* Comparison Symbol - Absolutely positioned in center */}
+                  <div className="absolute left-1/2 top-0 bottom-0 flex items-baseline justify-center -translate-x-1/2 pointer-events-none" style={{ paddingTop: '1.5rem' }}>
+                    <span className="text-3xl font-bold leading-none">
+                      {measurements.length.generallyLarger === 'female' ? '>' : 
+                       measurements.length.generallyLarger === 'male' ? '<' : 
+                       measurements.length.generallyLarger === 'equal' ? '=' : '>'}
+                    </span>
                   </div>
                 </div>
+                <p className="text-sm text-gray-700">
+                  {measurements.length.generallyLarger === 'female' 
+                    ? 'The female is generally larger than the male.'
+                    : measurements.length.generallyLarger === 'male'
+                    ? 'The male is generally larger than the female.'
+                    : measurements.length.generallyLarger === 'equal'
+                    ? 'Males and females are generally similar in size.'
+                    : 'The female is generally larger than the male.'}
+                </p>
               </div>
 
+              {/* Divider */}
+              <div className="w-full h-px bg-gray-300 mb-6" />
+
               {/* Lifespan */}
-              <div className="flex items-center gap-4 rounded-lg bg-black/5 p-4">
-                <Icon name="clock" size="xlg" style="line" />
-                <div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-sm">Lifespan</span>
-                    <Icon 
-                      name="information-circle" 
-                      size="sm" 
-                      style="line" 
-                      className="text-gray-400 cursor-pointer hover:text-gray-600" 
-                    />
-                  </div>
-                  <div className="mt-1 flex gap-8">
-                    <div>
-                      <div className="text-lg font-bold">{measurements.lifespan.wild}</div>
-                      <div className="text-xs">In the Wild</div>
+              <div className="pt-6">
+                <h3 className="font-bold text-base mb-3">Lifespan</h3>
+                <div className="flex items-start gap-8 mb-2">
+                  <div className="flex-1">
+                    <div className="text-sm mb-1">In the Wild</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl font-bold leading-none">
+                        {measurements.lifespan.wild === 'Unknown' 
+                          ? 'Unknown' 
+                          : measurements.lifespan.wild.split(' ')[0]}
+                      </span>
+                      {measurements.lifespan.wild !== 'Unknown' && (
+                        <span className="text-base font-normal">
+                          {measurements.lifespan.wild.split(' ').slice(1).join(' ')}
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <div className="text-lg font-bold">{measurements.lifespan.captivity}</div>
-                      <div className="text-xs">In Captivity</div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm mb-1">In Captivity</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl font-bold leading-none">
+                        {measurements.lifespan.captivity === 'Unknown' 
+                          ? 'Unknown' 
+                          : measurements.lifespan.captivity.split(' ')[0]}
+                      </span>
+                      {measurements.lifespan.captivity !== 'Unknown' && (
+                        <span className="text-base font-normal">
+                          {measurements.lifespan.captivity.split(' ').slice(1).join(' ')}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
+                <p className="text-sm text-gray-700">
+                  These are best estimates based on what has been observed and recorded.
+                </p>
               </div>
             </div>
           </div>

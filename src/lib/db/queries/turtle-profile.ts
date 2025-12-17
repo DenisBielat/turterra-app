@@ -66,6 +66,7 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
         adult_weight,
         length_female_max_scl,
         length_male_max_scl,
+        generally_larger,
         lifespan_wild_min,
         lifespan_wild_max,
         lifespan_captivity_min,
@@ -415,7 +416,8 @@ function transformTurtleDataToProfile(
             : 'Unknown',
           male: measurementData.length_male_max_scl
             ? `${measurementData.length_male_max_scl} cm`
-            : 'Unknown'
+            : 'Unknown',
+          generallyLarger: measurementData.generally_larger || null
         },
         lifespan: {
           wild: measurementData.lifespan_wild_max
@@ -428,7 +430,7 @@ function transformTurtleDataToProfile(
       }
     : {
         adultWeight: 'Unknown',
-        length: { female: 'Unknown', male: 'Unknown' },
+        length: { female: 'Unknown', male: 'Unknown', generallyLarger: null },
         lifespan: { wild: 'Unknown', captivity: 'Unknown' }
       };
 
