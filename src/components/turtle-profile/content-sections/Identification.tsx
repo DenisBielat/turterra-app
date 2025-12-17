@@ -1,5 +1,7 @@
 import { Icon } from '@/components/Icon';
 import SpeciesComparison from '../physical-features/SpeciesComparison';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface IdentificationProps {
   description: string;
@@ -60,8 +62,10 @@ export default function Identification({
           {/* Left content area - Description */}
           <div className="col-span-5">
             <div className="font-heading text-xl font-semibold">Description</div>
-            <div className="mt-4">
-              <p className="text-base">{description}</p>
+            <div className="mt-4 text-lg whitespace-pre-line">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {description}
+              </ReactMarkdown>
             </div>
           </div>
 
