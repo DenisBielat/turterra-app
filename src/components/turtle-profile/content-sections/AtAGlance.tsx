@@ -1,3 +1,5 @@
+"use client";
+
 import { Icon } from '@/components/Icon';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -36,12 +38,56 @@ const getPopulationTrendIcon = (trend: string) => {
   return 'dotted-line-horizontal';
 };
 
+// Helper function to get conservation status color classes
+const getConservationStatusColor = (code: string) => {
+  switch (code) {
+    // Extinct categories - red
+    case 'EX':
+    case 'EW':
+      return 'bg-red-500 outline-red-500';
+    
+    // Threatened categories - orange
+    case 'CR':
+    case 'EN':
+    case 'VU':
+      return 'bg-orange-500 outline-orange-500';
+    
+    // Near Threatened and Least Concern - green
+    case 'NT':
+    case 'LC':
+      return 'bg-green-800 outline-green-800';
+    
+    // Lacks Data - gray
+    case 'DD':
+    case 'NE':
+      return 'bg-gray-500 outline-gray-500';
+    
+    // Default fallback - black
+    default:
+      return 'bg-black outline-black';
+  }
+};
+
 export default function TurtleAtAGlance({
   description,
   conservationStatus,
   stats,
   commonNames,
 }: TurtleAtAGlanceProps) {
+  // Smooth scroll handler matching the side menu behavior
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (!element) return;
+
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - 100;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <section>
       <h2 id="intro" className="scroll-m-20 text-5xl">
@@ -63,15 +109,18 @@ export default function TurtleAtAGlance({
           {/* Stats area - spans 4 columns */}
           <div className="col-span-4 space-y-6">
             {/* Conservation Status */}
-            <div className="flex gap-4">
-              <div className="relative flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 outline-2 outline-offset-[3px] outline-dotted outline-orange-500">
+            <button
+              onClick={() => scrollToSection('conservation')}
+              className="flex gap-4 cursor-pointer hover:opacity-80 transition-opacity text-left"
+            >
+              <div className={`relative flex h-12 w-12 items-center justify-center rounded-full ${getConservationStatusColor(conservationStatus.code)} outline-2 outline-offset-[3px] outline-dotted`}>
                 <span className="font-bold text-white">{conservationStatus.code}</span>
               </div>
               <div className="flex flex-col justify-center">
                 <div className="font-heading font-bold text-lg">{conservationStatus.status}</div>
                 <p className="text-sm">IUCN RedList | {conservationStatus.year}</p>
               </div>
-            </div>
+            </button>
 
             {/* Stats Grid */}
             <div className="flex flex-wrap gap-x-5">

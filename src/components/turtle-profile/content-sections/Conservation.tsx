@@ -102,31 +102,32 @@ export default function Conservation({
     }
 
     // Color coding based on threat level (only for active status)
+    // For active statuses, use outline classes to match At a Glance styling
     switch (abbreviation) {
       // Extinct categories - red
       case 'EX':
       case 'EW':
-        return 'bg-red-500 border-red-500 text-white';
+        return 'bg-red-500 outline-red-500 text-white';
       
       // Threatened categories - orange
       case 'CR':
       case 'EN':
       case 'VU':
-        return 'bg-orange-500 border-orange-500 text-white';
+        return 'bg-orange-500 outline-orange-500 text-white';
       
       // Near Threatened and Least Concern - green
       case 'NT':
       case 'LC':
-        return 'bg-green-800 border-green-800 text-white';
+        return 'bg-green-800 outline-green-800 text-white';
       
       // Lacks Data - gray
       case 'DD':
       case 'NE':
-        return 'bg-gray-500 border-gray-500 text-white';
+        return 'bg-gray-500 outline-gray-500 text-white';
       
       // Default fallback
       default:
-        return 'bg-black border-black text-white';
+        return 'bg-black outline-black text-white';
     }
   };
 
@@ -177,7 +178,7 @@ export default function Conservation({
                   return (
                     <div key={status.id} className="flex items-center">
                       <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${getStatusColor(status.abbreviation, isActive)}`}
+                        className={`flex h-12 w-12 items-center justify-center rounded-full ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
                       >
                         <span className="font-bold text-sm">{status.abbreviation}</span>
                       </div>
@@ -204,7 +205,7 @@ export default function Conservation({
                 return (
                   <div key={status.id} className="flex items-center">
                     <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-full border-2 ${getStatusColor(status.abbreviation, isActive)}`}
+                      className={`flex h-12 w-12 items-center justify-center rounded-full ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
                     >
                       <span className="font-bold text-sm">{status.abbreviation}</span>
                     </div>
