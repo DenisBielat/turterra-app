@@ -102,17 +102,17 @@ export default function Identification({
               {/* Length */}
               <div className="pt-6 pb-6">
                 <h3 className="font-bold text-base mb-3">Length (Max SCL)</h3>
-                <div className="relative flex gap-4 mb-2">
+                <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-4 mb-2">
                   {/* Female Column */}
-                  <div className="flex-1">
+                  <div>
                     <div className="text-sm mb-1 flex items-center gap-1">
                       <Icon name="female" style="line" size="sm" />
                       <span>Female</span>
                     </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-5xl font-bold leading-none">
-                        {measurements.length.female === 'Unknown' 
-                          ? 'Unknown' 
+                        {measurements.length.female === 'Unknown'
+                          ? 'Unknown'
                           : measurements.length.female.split(' ')[0]}
                       </span>
                       {measurements.length.female !== 'Unknown' && (
@@ -122,17 +122,26 @@ export default function Identification({
                       )}
                     </div>
                   </div>
-                  
+
+                  {/* Comparison Symbol - Center column */}
+                  <div className="flex items-center justify-center pb-1">
+                    <span className="text-3xl font-bold leading-none">
+                      {measurements.length.generallyLarger === 'female' ? '>' :
+                       measurements.length.generallyLarger === 'male' ? '<' :
+                       measurements.length.generallyLarger === 'equal' ? '=' : '>'}
+                    </span>
+                  </div>
+
                   {/* Male Column */}
-                  <div className="flex-1">
+                  <div>
                     <div className="text-sm mb-1 flex items-center gap-1">
                       <Icon name="male" style="line" size="sm" />
                       <span>Male</span>
                     </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-5xl font-bold leading-none">
-                        {measurements.length.male === 'Unknown' 
-                          ? 'Unknown' 
+                        {measurements.length.male === 'Unknown'
+                          ? 'Unknown'
                           : measurements.length.male.split(' ')[0]}
                       </span>
                       {measurements.length.male !== 'Unknown' && (
@@ -141,15 +150,6 @@ export default function Identification({
                         </span>
                       )}
                     </div>
-                  </div>
-                  
-                  {/* Comparison Symbol - Absolutely positioned in center */}
-                  <div className="absolute left-1/2 top-0 bottom-0 flex items-baseline justify-center -translate-x-1/2 pointer-events-none" style={{ paddingTop: '1.5rem' }}>
-                    <span className="text-3xl font-bold leading-none">
-                      {measurements.length.generallyLarger === 'female' ? '>' : 
-                       measurements.length.generallyLarger === 'male' ? '<' : 
-                       measurements.length.generallyLarger === 'equal' ? '=' : '>'}
-                    </span>
                   </div>
                 </div>
                 <p className="text-sm text-gray-700">
