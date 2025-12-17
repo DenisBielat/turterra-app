@@ -78,9 +78,9 @@ export default function Identification({
             <div className="space-y-0">
               {/* Adult Weight */}
               <div className="pb-6">
-                <h3 className="font-bold text-base mb-3">Adult Weight</h3>
+                <div className="text-sm uppercase mb-3 text-green-900 ">Adult Weight</div>
                 <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-5xl font-bold leading-none">
+                  <span className="text-3xl font-bold leading-none">
                     {measurements.adultWeight === 'Unknown' 
                       ? 'Unknown' 
                       : measurements.adultWeight.split(' ')[0]}
@@ -101,8 +101,8 @@ export default function Identification({
 
               {/* Length */}
               <div className="pt-6 pb-6">
-                <h3 className="font-bold text-base mb-3">Length (Max SCL)</h3>
-                <div className="relative flex gap-4 mb-2">
+                <div className="text-sm uppercase mb-3 text-green-900 ">Length (Max SCL)</div>
+                <div className="flex gap-8 mb-2">
                   {/* Female Column */}
                   <div className="flex-1">
                     <div className="text-sm mb-1 flex items-center gap-1">
@@ -110,7 +110,7 @@ export default function Identification({
                       <span>Female</span>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold leading-none">
+                      <span className="text-3xl font-bold leading-none">
                         {measurements.length.female === 'Unknown' 
                           ? 'Unknown' 
                           : measurements.length.female.split(' ')[0]}
@@ -130,7 +130,7 @@ export default function Identification({
                       <span>Male</span>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold leading-none">
+                      <span className="text-3xl font-bold leading-none">
                         {measurements.length.male === 'Unknown' 
                           ? 'Unknown' 
                           : measurements.length.male.split(' ')[0]}
@@ -142,15 +142,6 @@ export default function Identification({
                       )}
                     </div>
                   </div>
-                  
-                  {/* Comparison Symbol - Absolutely positioned in center */}
-                  <div className="absolute left-1/2 top-0 bottom-0 flex items-baseline justify-center -translate-x-1/2 pointer-events-none" style={{ paddingTop: '1.5rem' }}>
-                    <span className="text-3xl font-bold leading-none">
-                      {measurements.length.generallyLarger === 'female' ? '>' : 
-                       measurements.length.generallyLarger === 'male' ? '<' : 
-                       measurements.length.generallyLarger === 'equal' ? '=' : '>'}
-                    </span>
-                  </div>
                 </div>
                 <p className="text-sm text-gray-700">
                   {measurements.length.generallyLarger === 'female' 
@@ -158,7 +149,7 @@ export default function Identification({
                     : measurements.length.generallyLarger === 'male'
                     ? 'The male is generally larger than the female.'
                     : measurements.length.generallyLarger === 'equal'
-                    ? 'Males and females are generally similar in size.'
+                    ? 'Both sexes are about the same in length.'
                     : 'The female is generally larger than the male.'}
                 </p>
               </div>
@@ -168,12 +159,12 @@ export default function Identification({
 
               {/* Lifespan */}
               <div className="pt-6">
-                <h3 className="font-bold text-base mb-3">Lifespan</h3>
+                <div className="text-sm uppercase mb-3 text-green-900 ">Lifespan</div>
                 <div className="flex items-start gap-8 mb-2">
                   <div className="flex-1">
                     <div className="text-sm mb-1">In the Wild</div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold leading-none">
+                      <span className="text-3xl font-bold leading-none">
                         {measurements.lifespan.wild === 'Unknown' 
                           ? 'Unknown' 
                           : measurements.lifespan.wild.split(' ')[0]}
@@ -188,7 +179,7 @@ export default function Identification({
                   <div className="flex-1">
                     <div className="text-sm mb-1">In Captivity</div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold leading-none">
+                      <span className="text-3xl font-bold leading-none">
                         {measurements.lifespan.captivity === 'Unknown' 
                           ? 'Unknown' 
                           : measurements.lifespan.captivity.split(' ')[0]}
