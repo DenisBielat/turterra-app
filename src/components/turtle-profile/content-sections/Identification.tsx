@@ -102,29 +102,38 @@ export default function Identification({
               {/* Length */}
               <div className="pt-6 pb-6">
                 <h3 className="font-bold text-base mb-3">Length (Max SCL)</h3>
-                <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-4 mb-2">
-                  {/* Female Column */}
-                  <div>
-                    <div className="text-sm mb-1 flex items-center gap-1">
-                      <Icon name="female" style="line" size="sm" />
-                      <span>Female</span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold leading-none">
-                        {measurements.length.female === 'Unknown'
-                          ? 'Unknown'
-                          : measurements.length.female.split(' ')[0]}
+
+                {/* Labels Row */}
+                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 mb-1">
+                  <div className="text-sm flex items-center gap-1 justify-end">
+                    <Icon name="female" style="line" size="sm" />
+                    <span>Female</span>
+                  </div>
+                  <div className="w-8" /> {/* Spacer to match symbol width */}
+                  <div className="text-sm flex items-center gap-1">
+                    <Icon name="male" style="line" size="sm" />
+                    <span>Male</span>
+                  </div>
+                </div>
+
+                {/* Values Row with Centered Symbol */}
+                <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 mb-2">
+                  {/* Female Value - Right aligned */}
+                  <div className="flex items-baseline gap-1 justify-end">
+                    <span className="text-5xl font-bold leading-none">
+                      {measurements.length.female === 'Unknown'
+                        ? 'Unknown'
+                        : measurements.length.female.split(' ')[0]}
+                    </span>
+                    {measurements.length.female !== 'Unknown' && (
+                      <span className="text-base font-normal">
+                        {measurements.length.female.split(' ').slice(1).join(' ')}
                       </span>
-                      {measurements.length.female !== 'Unknown' && (
-                        <span className="text-base font-normal">
-                          {measurements.length.female.split(' ').slice(1).join(' ')}
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
 
                   {/* Comparison Symbol - Center column */}
-                  <div className="flex items-center justify-center pb-1">
+                  <div className="flex items-center justify-center">
                     <span className="text-3xl font-bold leading-none">
                       {measurements.length.generallyLarger === 'female' ? '>' :
                        measurements.length.generallyLarger === 'male' ? '<' :
@@ -132,24 +141,18 @@ export default function Identification({
                     </span>
                   </div>
 
-                  {/* Male Column */}
-                  <div>
-                    <div className="text-sm mb-1 flex items-center gap-1">
-                      <Icon name="male" style="line" size="sm" />
-                      <span>Male</span>
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold leading-none">
-                        {measurements.length.male === 'Unknown'
-                          ? 'Unknown'
-                          : measurements.length.male.split(' ')[0]}
+                  {/* Male Value - Left aligned */}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-5xl font-bold leading-none">
+                      {measurements.length.male === 'Unknown'
+                        ? 'Unknown'
+                        : measurements.length.male.split(' ')[0]}
+                    </span>
+                    {measurements.length.male !== 'Unknown' && (
+                      <span className="text-base font-normal">
+                        {measurements.length.male.split(' ').slice(1).join(' ')}
                       </span>
-                      {measurements.length.male !== 'Unknown' && (
-                        <span className="text-base font-normal">
-                          {measurements.length.male.split(' ').slice(1).join(' ')}
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
                 <p className="text-sm text-gray-700">
