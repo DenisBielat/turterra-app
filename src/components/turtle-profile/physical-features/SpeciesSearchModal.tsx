@@ -211,7 +211,7 @@ export default function SpeciesSearchModal({
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            <Icon name="image" size="sm" style="line" />
+                            <Icon name="turtle" size="sm" style="line" />
                           </div>
                         )}
                       </div>
