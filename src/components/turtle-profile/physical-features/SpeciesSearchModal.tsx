@@ -8,6 +8,13 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { RelatedSpecies } from '@/types/turtleTypes';
 
 interface SpeciesSearchResult {
@@ -35,7 +42,7 @@ export default function SpeciesSearchModal({
 }: SpeciesSearchModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [habitatFilter, setHabitatFilter] = useState('');
+  const [habitatFilter, setHabitatFilter] = useState('all');
   const [sortBy, setSortBy] = useState('alphabetical');
   const [species, setSpecies] = useState<SpeciesSearchResult[]>([]);
   const [habitatTypes, setHabitatTypes] = useState<string[]>([]);
@@ -58,7 +65,7 @@ export default function SpeciesSearchModal({
     try {
       const params = new URLSearchParams();
       if (query) params.set('query', query);
-      if (habitatFilter) params.set('habitatType', habitatFilter);
+      if (habitatFilter && habitatFilter !== 'all') params.set('habitatType', habitatFilter);
       if (sortBy) params.set('sort', sortBy);
       if (primarySpeciesId) params.set('excludeId', String(primarySpeciesId));
 
@@ -116,9 +123,9 @@ export default function SpeciesSearchModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl h-[85vh] flex flex-col p-0 gap-0">
+      <DialogContent className="max-w-3xl h-[75vh] flex flex-col p-0 gap-0 bg-warm">
         {/* Search Bar - Fixed at top */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-300 bg-white rounded-t-lg">
           <div className="relative">
             <Icon
               name="search"
@@ -131,7 +138,7 @@ export default function SpeciesSearchModal({
               placeholder="Search Turtles"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-12 text-base"
+              className="pl-10 h-12 text-base border-gray-300 bg-white"
             />
           </div>
         </div>
@@ -139,68 +146,68 @@ export default function SpeciesSearchModal({
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {/* All Species Section */}
-          <div className="flex-1 flex flex-col min-h-0 p-4 border-b border-gray-200">
+          <div className="flex-[2] flex flex-col min-h-0 p-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm text-gray-600">
+              <h4 className="text-sm font-medium text-gray-700">
                 All Species
               </h4>
               <div className="flex gap-2">
                 {/* Habitat Filter */}
-                <select
-                  value={habitatFilter}
-                  onChange={(e) => setHabitatFilter(e.target.value)}
-                  className="text-sm border border-gray-200 rounded-md px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  aria-label="Filter by habitat"
-                >
-                  <option value="">All Habitats</option>
-                  {habitatTypes.map((habitat) => (
-                    <option key={habitat} value={habitat}>
-                      {habitat}
-                    </option>
-                  ))}
-                </select>
+                <Select value={habitatFilter} onValueChange={setHabitatFilter}>
+                  <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
+                    <SelectValue placeholder="All Habitats" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Habitats</SelectItem>
+                    {habitatTypes.map((habitat) => (
+                      <SelectItem key={habitat} value={habitat}>
+                        {habitat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
                 {/* Sort */}
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="text-sm border border-gray-200 rounded-md px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  aria-label="Sort by"
-                >
-                  <option value="alphabetical">Alphabetical</option>
-                  <option value="scientific">Scientific Name</option>
-                </select>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
+                    <SelectValue placeholder="Alphabetical" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="alphabetical">Alphabetical</SelectItem>
+                    <SelectItem value="scientific">Scientific Name</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             {/* Scrollable Results List */}
-            <div className="flex-1 overflow-y-auto min-h-0 rounded-lg border border-gray-200 bg-[#f5f5f0]">
+            <div className="flex-1 overflow-y-auto min-h-0 rounded-lg border border-gray-300 bg-[#e8e8e0]">
               {isLoading ? (
-                <div className="p-4 space-y-2">
+                <div className="p-3 space-y-2">
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
-                      className="h-16 bg-gray-200 rounded-lg animate-pulse"
+                      className="h-[72px] bg-gray-200 rounded-lg animate-pulse"
                     />
                   ))}
                 </div>
               ) : filteredSpecies.length > 0 ? (
-                <div className="p-2 space-y-2">
+                <div className="p-3 space-y-2">
                   {filteredSpecies.map((result) => (
                     <button
                       key={result.id}
                       onClick={() => handleSelectSpecies(result)}
-                      className="w-full flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-200 hover:border-green-500 hover:bg-green-50 transition-colors text-left"
+                      className="w-full flex items-center gap-4 p-3 rounded-lg bg-white border border-gray-200 hover:border-green-600 hover:shadow-md cursor-pointer transition-all text-left group"
                     >
                       {/* Avatar */}
-                      <div className="relative w-12 h-12 flex-shrink-0 rounded-full overflow-hidden bg-gray-100">
+                      <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200 group-hover:ring-green-600 transition-all">
                         {result.avatarUrl ? (
                           <Image
                             src={result.avatarUrl}
                             alt={result.commonName}
                             fill
                             className="object-cover"
-                            sizes="48px"
+                            sizes="56px"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -211,7 +218,7 @@ export default function SpeciesSearchModal({
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900">
+                        <p className="font-heading font-bold text-gray-900">
                           {result.commonName}
                         </p>
                         <p className="text-sm text-gray-500 italic">
@@ -230,9 +237,9 @@ export default function SpeciesSearchModal({
                 </div>
               ) : hasSearched ? (
                 <div className="flex flex-col items-center justify-center h-full py-12 text-gray-500">
-                  <Icon name="search" size="base" style="line" className="mb-2 text-gray-300" />
-                  <p>No species found</p>
-                  {(searchQuery || habitatFilter) && (
+                  <Icon name="search" size="base" style="line" className="mb-2 text-gray-400" />
+                  <p className="font-medium">No species found</p>
+                  {(searchQuery || (habitatFilter && habitatFilter !== 'all')) && (
                     <p className="text-sm mt-1">
                       Try adjusting your search or filters
                     </p>
@@ -242,33 +249,33 @@ export default function SpeciesSearchModal({
             </div>
           </div>
 
-          {/* Related Species Section - Fixed at bottom */}
+          {/* Related Species Section */}
           {relatedSpecies.length > 0 && (
-            <div className="p-4">
-              <h4 className="text-sm text-gray-600 mb-3">
+            <div className="flex-[1] flex flex-col min-h-0 p-4 pt-0">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
                 Related Species
               </h4>
-              <div className="max-h-[200px] overflow-y-auto space-y-2">
+              <div className="flex-1 overflow-y-auto min-h-0 space-y-2">
                 {relatedSpecies.map((species) => (
                   <button
                     key={species.scientificName}
                     onClick={() => handleSelectRelated(species)}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg bg-[#c5c5b8] hover:bg-[#b5b5a8] transition-colors text-left"
+                    className="w-full flex items-center gap-4 p-3 rounded-lg bg-[#c9c9bc] hover:bg-[#bdbdb0] cursor-pointer transition-colors text-left group"
                   >
                     {/* Avatar */}
-                    <div className="relative w-12 h-12 flex-shrink-0 rounded-full overflow-hidden bg-gray-200">
+                    <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden ring-2 ring-[#a8a89c] group-hover:ring-green-700 transition-all">
                       <Image
                         src={species.avatarUrl}
                         alt={species.commonName}
                         fill
                         className="object-cover"
-                        sizes="48px"
+                        sizes="56px"
                       />
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-gray-900">
+                      <p className="font-heading font-bold text-gray-900">
                         {species.commonName}
                       </p>
                       <p className="text-sm text-gray-600 italic">
@@ -277,7 +284,7 @@ export default function SpeciesSearchModal({
                     </div>
 
                     {/* Add Button */}
-                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-500 text-white">
+                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-500 group-hover:bg-green-700 text-white transition-colors">
                       <Icon name="add" size="sm" style="line" />
                     </div>
                   </button>
