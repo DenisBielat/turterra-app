@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import { Icon } from '@/components/Icon';
 
 interface IdentificationProps {
+  speciesId?: number;
   description: string;
   measurements: {
     adultWeight: string;
@@ -46,6 +47,7 @@ interface IdentificationProps {
 }
 
 export default function Identification({
+  speciesId,
   description,
   measurements,
   featureCategories,
@@ -210,11 +212,12 @@ export default function Identification({
 
         {/* Physical Features Accordions/Tables Row */}
         <div className="mt-8">
-          <SpeciesComparison 
+          <SpeciesComparison
             primarySpecies={{
               speciesCard,
               featureCategories
             }}
+            primarySpeciesId={speciesId}
             relatedSpecies={relatedSpecies}
           />
         </div>

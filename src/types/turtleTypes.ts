@@ -253,6 +253,7 @@ export interface Variant {
   
   export interface SpeciesComparisonProps {
     primarySpecies: ComparisonSpecies;
+    primarySpeciesId?: number;
     comparisonSpecies?: ComparisonSpecies;
     relatedSpecies: RelatedSpecies[];
   }

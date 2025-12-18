@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import SpeciesCard from './SpeciesCard';
 import PhysicalFeatures from './PhysicalFeatures';
+import SpeciesSearchModal from './SpeciesSearchModal';
 import { Icon } from '@/components/Icon';
 import Image from 'next/image';
 
@@ -15,6 +16,7 @@ import {
 
 export default function SpeciesComparison({
   primarySpecies,
+  primarySpeciesId,
   comparisonSpecies: initialComparisonSpecies,
   relatedSpecies
 }: SpeciesComparisonProps) {
@@ -199,34 +201,13 @@ export default function SpeciesComparison({
       </div>
 
       {/* Search Modal */}
-      {isSearchOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="search-modal-title"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsSearchOpen(false);
-          }}
-        >
-          <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl m-4 p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 id="search-modal-title" className="text-xl">Find a Species</h3>
-              <button
-                onClick={() => setIsSearchOpen(false)}
-                className="flex items-center justify-center text-gray-500 hover:text-black"
-                aria-label="Close search modal"
-              >
-                <Icon name="close" size="sm" style="line" />
-              </button>
-            </div>
-
-            <div className="text-center py-8 text-gray-500">
-              Search functionality coming soon...
-            </div>
-          </div>
-        </div>
-      )}
+      <SpeciesSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onSelectSpecies={handleAddRelatedSpecies}
+        relatedSpecies={relatedSpecies}
+        primarySpeciesId={primarySpeciesId}
+      />
     </div>
   );
 }
