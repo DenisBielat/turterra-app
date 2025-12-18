@@ -24,7 +24,7 @@ export default function Habitat({
           <div className="col-span-5 space-y-12">
             {/* Habitat Description */}
             {habitatDescription && (
-              <div className="text-base">
+              <div className="text-lg">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {habitatDescription}
                 </ReactMarkdown>
@@ -38,7 +38,7 @@ export default function Habitat({
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
                 <h3 className="text-3xl font-bold mb-3">Predators</h3>
-                <div className="text-base">
+                <div className="text-lg">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {predators}
                   </ReactMarkdown>

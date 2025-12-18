@@ -143,12 +143,12 @@ export default function Conservation({
               <>
                 <div>
                   <h3 className="text-3xl font-bold mb-3">Status</h3>
-                  <div className="text-base">
+                  <div className="text-lg">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {description}
                     </ReactMarkdown>
                   </div>
-                  <div className="mt-4 text-base">
+                  <div className="mt-4 text-lg">
                     <p><span className="font-bold">IUCN Red List Status:</span> {currentStatus.status}</p>
                   </div>
                 </div>
@@ -290,7 +290,7 @@ export default function Conservation({
                 <div className="w-full h-px bg-gray-200"></div>
               </div>
               <h3 className="text-3xl font-bold mb-3">Environmental & Manmade Threats</h3>
-              <div className="text-base">
+              <div className="text-lg">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {threats}
                 </ReactMarkdown>
