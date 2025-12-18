@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -15,6 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { RelatedSpecies } from '@/types/turtleTypes';
 
 interface SpeciesSearchResult {
@@ -49,6 +52,10 @@ export default function SpeciesSearchModal({
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const initialFetchDone = useRef(false);
+
+  // Controlled state for dropdowns - when one opens, close the other
+  const [habitatOpen, setHabitatOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
 
   // Debounce search query with longer delay (500ms)
   useEffect(() => {
@@ -107,7 +114,8 @@ export default function SpeciesSearchModal({
     onSelectSpecies({
       commonName: result.commonName,
       scientificName: result.scientificName,
-      avatarUrl: result.avatarUrl || ''
+      avatarUrl: result.avatarUrl || '',
+      conservationStatus: result.conservationStatus || undefined
     });
     onClose();
   };
@@ -121,9 +129,24 @@ export default function SpeciesSearchModal({
   const relatedScientificNames = new Set(relatedSpecies.map(s => s.scientificName));
   const filteredSpecies = species.filter(s => !relatedScientificNames.has(s.scientificName));
 
+  // Handlers to close other dropdown when one opens
+  const handleHabitatOpenChange = (open: boolean) => {
+    setHabitatOpen(open);
+    if (open) setSortOpen(false);
+  };
+
+  const handleSortOpenChange = (open: boolean) => {
+    setSortOpen(open);
+    if (open) setHabitatOpen(false);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl h-[75vh] flex flex-col p-0 gap-0 bg-warm">
+        <VisuallyHidden>
+          <DialogTitle>Search Species to Compare</DialogTitle>
+        </VisuallyHidden>
+
         {/* Search Bar - Fixed at top */}
         <div className="p-4 border-b border-gray-300 bg-white rounded-t-lg">
           <div className="relative">
@@ -153,7 +176,12 @@ export default function SpeciesSearchModal({
               </h4>
               <div className="flex gap-2">
                 {/* Habitat Filter */}
-                <Select value={habitatFilter} onValueChange={setHabitatFilter}>
+                <Select
+                  value={habitatFilter}
+                  onValueChange={setHabitatFilter}
+                  open={habitatOpen}
+                  onOpenChange={handleHabitatOpenChange}
+                >
                   <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
                     <SelectValue placeholder="All Habitats" />
                   </SelectTrigger>
@@ -168,7 +196,12 @@ export default function SpeciesSearchModal({
                 </Select>
 
                 {/* Sort */}
-                <Select value={sortBy} onValueChange={setSortBy}>
+                <Select
+                  value={sortBy}
+                  onValueChange={setSortBy}
+                  open={sortOpen}
+                  onOpenChange={handleSortOpenChange}
+                >
                   <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
                     <SelectValue placeholder="Alphabetical" />
                   </SelectTrigger>
@@ -181,7 +214,7 @@ export default function SpeciesSearchModal({
             </div>
 
             {/* Scrollable Results List */}
-            <div className="flex-1 overflow-y-auto min-h-0 rounded-lg border border-gray-300 bg-[#e8e8e0]">
+            <ScrollArea className="flex-1 min-h-0 rounded-lg border border-gray-300 bg-[#e8e8e0]">
               {isLoading ? (
                 <div className="p-3 space-y-2">
                   {[1, 2, 3, 4].map((i) => (
@@ -197,10 +230,10 @@ export default function SpeciesSearchModal({
                     <button
                       key={result.id}
                       onClick={() => handleSelectSpecies(result)}
-                      className="w-full flex items-center gap-4 p-3 rounded-lg bg-white border border-gray-200 hover:border-green-600 hover:shadow-md cursor-pointer transition-all text-left group"
+                      className="w-full flex items-center gap-4 p-3 rounded-lg bg-white border border-gray-200 hover:bg-[#D1EAE0] hover:border-[#D1EAE0] cursor-pointer transition-all text-left group"
                     >
                       {/* Avatar */}
-                      <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200 group-hover:ring-green-600 transition-all">
+                      <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200 group-hover:ring-[#9DD4BE] transition-all">
                         {result.avatarUrl ? (
                           <Image
                             src={result.avatarUrl}
@@ -221,17 +254,16 @@ export default function SpeciesSearchModal({
                         <p className="font-heading font-bold text-gray-900">
                           {result.commonName}
                         </p>
-                        <p className="text-sm text-gray-500 italic">
-                          {result.scientificName}
+                        <p className="text-sm text-gray-500">
+                          <span className="italic">{result.scientificName}</span>
+                          {result.conservationStatus && (
+                            <>
+                              <span className="mx-2">|</span>
+                              <span>{result.conservationStatus}</span>
+                            </>
+                          )}
                         </p>
                       </div>
-
-                      {/* Conservation Status Badge */}
-                      {result.conservationStatus && (
-                        <span className="flex-shrink-0 px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-700">
-                          {result.conservationStatus}
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>
@@ -246,50 +278,53 @@ export default function SpeciesSearchModal({
                   )}
                 </div>
               ) : null}
-            </div>
+            </ScrollArea>
           </div>
 
           {/* Related Species Section */}
           {relatedSpecies.length > 0 && (
-            <div className="flex-[1] flex flex-col min-h-0 p-4 pt-0">
-              <h4 className="text-sm font-medium text-gray-700 mb-3">
+            <div className="flex-[1] flex flex-col min-h-0 p-4 pt-0 border-t border-gray-300">
+              <h4 className="text-sm font-medium text-gray-700 mb-3 pt-4">
                 Related Species
               </h4>
-              <div className="flex-1 overflow-y-auto min-h-0 space-y-2">
-                {relatedSpecies.map((species) => (
-                  <button
-                    key={species.scientificName}
-                    onClick={() => handleSelectRelated(species)}
-                    className="w-full flex items-center gap-4 p-3 rounded-lg bg-[#c9c9bc] hover:bg-[#bdbdb0] cursor-pointer transition-colors text-left group"
-                  >
-                    {/* Avatar */}
-                    <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden ring-2 ring-[#a8a89c] group-hover:ring-green-700 transition-all">
-                      <Image
-                        src={species.avatarUrl}
-                        alt={species.commonName}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                      />
-                    </div>
+              <ScrollArea className="flex-1 min-h-0">
+                <div className="space-y-2 pr-2">
+                  {relatedSpecies.map((species) => (
+                    <button
+                      key={species.scientificName}
+                      onClick={() => handleSelectRelated(species)}
+                      className="w-full flex items-center gap-4 p-3 rounded-lg bg-white border border-gray-200 hover:bg-[#D1EAE0] hover:border-[#D1EAE0] cursor-pointer transition-all text-left group"
+                    >
+                      {/* Avatar */}
+                      <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden ring-2 ring-gray-200 group-hover:ring-[#9DD4BE] transition-all">
+                        <Image
+                          src={species.avatarUrl}
+                          alt={species.commonName}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      </div>
 
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-heading font-bold text-gray-900">
-                        {species.commonName}
-                      </p>
-                      <p className="text-sm text-gray-600 italic">
-                        {species.scientificName}
-                      </p>
-                    </div>
-
-                    {/* Add Button */}
-                    <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-500 group-hover:bg-green-700 text-white transition-colors">
-                      <Icon name="add" size="sm" style="line" />
-                    </div>
-                  </button>
-                ))}
-              </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-heading font-bold text-gray-900">
+                          {species.commonName}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          <span className="italic">{species.scientificName}</span>
+                          {species.conservationStatus && (
+                            <>
+                              <span className="mx-2">|</span>
+                              <span>{species.conservationStatus}</span>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
           )}
         </div>
