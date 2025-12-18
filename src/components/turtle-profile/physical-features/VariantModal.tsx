@@ -20,28 +20,9 @@ import {
   TableRow
 } from '@/components/ui/table';
 // Local imports
-import { Icon } from '@/components/Icon';
+import { formatModalValue } from '@/lib/formatters';
 // Import types from turtleTypes.ts
 import { VariantModalProps, Variant } from '@/types/turtleTypes';
-
-function formatModalValue(value: unknown): React.ReactNode {
-  // Handle null, undefined, or empty
-  if (!value && value !== false) return '-';
-
-  const stringValue = String(value);
-
-  // Boolean true
-  if (stringValue.toLowerCase() === 'true' || value === true) {
-    return <Icon name="checkmark-2" size="sm" style="filled" className="text-green-600" />;
-  }
-  // Boolean false
-  if (stringValue.toLowerCase() === 'false' || value === false) {
-    return <Icon name="close" size="sm" style="filled" className="text-red-500" />;
-  }
-
-  // Otherwise, just capitalize
-  return stringValue.charAt(0).toUpperCase() + stringValue.slice(1).toLowerCase();
-}
 
 export default function VariantModal({
   isOpen,
@@ -49,7 +30,6 @@ export default function VariantModal({
   featureName,
   variants
 }: VariantModalProps) {
-  // Optional: useCallback for close if you want
   const handleChange = useCallback(
     (open: boolean) => {
       if (!open) {
@@ -59,15 +39,12 @@ export default function VariantModal({
     [onClose]
   );
 
-  // If you want to skip rendering entirely when closed:
-  if (!isOpen) return null;
-
   return (
     <Dialog open={isOpen} onOpenChange={handleChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl" aria-describedby="variant-modal-description">
         <DialogHeader>
           <DialogTitle className="font-heading font-bold">{featureName} | Differences</DialogTitle>
-          <DialogDescription className="text-gray-500">
+          <DialogDescription id="variant-modal-description" className="text-gray-500">
             Comparing Male Adult (reference) to other variants
           </DialogDescription>
         </DialogHeader>

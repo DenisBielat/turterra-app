@@ -3,40 +3,13 @@
 import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import VariantModal from './VariantModal';
+import { formatFeatureValue } from '@/lib/formatters';
 
 // Import the types
 import {
   FeatureVariants,
   PhysicalFeaturesProps
 } from '@/types/turtleTypes';
-
-function formatValue(value: unknown): React.ReactNode {
-  // Handle null/undefined/unknown
-  if (value === null || value === undefined || value === 'Unknown' || value === '-') return '-';
-
-  // Convert to string if it's not already
-  const stringValue = String(value);
-
-  // Handle boolean values
-  if (stringValue.toLowerCase() === 'true' || value === true) {
-    return <Icon name="checkmark-2" size="sm" style="filled" className="text-green-600" />;
-  }
-  if (stringValue.toLowerCase() === 'false' || value === false) {
-    return <Icon name="close" size="sm" style="filled" className="text-gray-400" />;
-  }
-
-  // Handle comma-separated values
-  if (stringValue.includes(',')) {
-    return stringValue
-      .split(',')
-      .map(item => item.trim())
-      .map(item => item.charAt(0).toUpperCase() + item.slice(1).toLowerCase())
-      .join(', ');
-  }
-
-  // Handle single value
-  return stringValue.charAt(0).toUpperCase() + stringValue.slice(1).toLowerCase();
-}
 
 export default function PhysicalFeatures({ 
   categories,
@@ -57,23 +30,22 @@ export default function PhysicalFeatures({
 
   const scrollToSection = (element: HTMLElement) => {
     const yOffset = -100;
-    const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
     window.scrollTo({ top: y, behavior: 'smooth' });
   };
 
   const handleCategoryClick = (e: React.MouseEvent, categoryName: string, isOpen: boolean) => {
     e.preventDefault();
     onCategoryClick(categoryName, isOpen);
-    
-    const header = e.currentTarget;
-    const content = header.nextElementSibling;
-    
-    if (!isOpen && content instanceof HTMLElement) {
-      content.addEventListener('transitionend', function onTransitionEnd(event: TransitionEvent) {
-        if (event.propertyName === 'max-height') {
-          content.removeEventListener('transitionend', onTransitionEnd);
-          scrollToSection(header as HTMLElement);
-        }
+
+    // Only scroll when opening a category
+    if (!isOpen) {
+      const header = e.currentTarget as HTMLElement;
+      // Use requestAnimationFrame to wait for the DOM update, then scroll after animation
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          scrollToSection(header);
+        }, 550); // Slightly longer than the 500ms animation duration
       });
     }
   };
@@ -108,13 +80,17 @@ export default function PhysicalFeatures({
                 />
               </button>
 
-              {/* Animated content wrapper */}
-              <div className="relative">
-                <div className="accordion-animated-content">
+              {/* Animated content wrapper using CSS Grid for smooth height animation */}
+              <div
+                className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+                  isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                }`}
+              >
+                <div className="overflow-hidden">
                   {/* Category Image Container */}
                   <div
-                    className={`transition-all duration-500 ease-in-out ${
-                      isOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+                    className={`transition-opacity duration-500 ease-in-out ${
+                      isOpen ? 'opacity-100' : 'opacity-0'
                     }`}
                   >
                     {category.image && (
@@ -131,8 +107,8 @@ export default function PhysicalFeatures({
                   {/* Content Container */}
                   <div
                     id={`content-${categoryTag}`}
-                    className={`transition-all duration-500 ease-in-out ${
-                      isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
+                    className={`transition-opacity duration-500 ease-in-out ${
+                      isOpen ? 'opacity-100' : 'opacity-0'
                     }`}
                   >
                     {/* Header Row */}
@@ -157,7 +133,7 @@ export default function PhysicalFeatures({
                           <div className="font-semibold">{feature.name}</div>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center h-5">
-                              {formatValue(feature.value)}
+                              {formatFeatureValue(feature.value)}
                             </div>
                             {feature.variants && (
                               <button
@@ -168,7 +144,7 @@ export default function PhysicalFeatures({
                                   })
                                 }
                                 className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm"
-                                title="View variant differences"
+                                aria-label={`View variant differences for ${feature.name}`}
                               >
                                 <Icon
                                   name="split-3"
@@ -198,7 +174,7 @@ export default function PhysicalFeatures({
                             </div>
                             <div className="flex items-center justify-between">
                               <div className="flex items-center h-5">
-                                {formatValue(sub.value)}
+                                {formatFeatureValue(sub.value)}
                               </div>
                               {sub.variants && (
                                 <button
@@ -209,7 +185,7 @@ export default function PhysicalFeatures({
                                     })
                                   }
                                   className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm"
-                                  title="View variant differences"
+                                  aria-label={`View variant differences for ${sub.name}`}
                                 >
                                   <Icon
                                     name="split-3"

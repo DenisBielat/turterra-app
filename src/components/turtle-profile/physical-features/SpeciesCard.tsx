@@ -75,9 +75,9 @@ export default function SpeciesCard({
               size="icon"
               onClick={onRemove}
               className="hover:bg-orange-700 hover:text-white text-white p-2 w-auto h-auto rounded-full"
-              title="Remove comparison"
+              aria-label="Remove comparison species"
             >
-              <Icon name="add" size="sm" style="line" className="rotate-45" />
+              <Icon name="close" size="sm" style="line" />
             </Button>
           )}
         </div>

@@ -13,32 +13,42 @@ import {
   ComparisonSpecies
 } from '@/types/turtleTypes';
 
-export default function SpeciesComparison({ 
-  primarySpecies, 
+export default function SpeciesComparison({
+  primarySpecies,
   comparisonSpecies: initialComparisonSpecies,
-  relatedSpecies 
+  relatedSpecies
 }: SpeciesComparisonProps) {
   const [comparisonSpecies, setComparisonSpecies] = useState<ComparisonSpecies | undefined>(
     initialComparisonSpecies
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<{ message: string; species: RelatedSpecies } | null>(null);
   const [openCategory, setOpenCategory] = useState<string>('Head/Neck');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const handleAddRelatedSpecies = async (species: RelatedSpecies) => {
     setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch(`/api/species/${encodeURIComponent(species.scientificName)}`);
       if (!response.ok) throw new Error('Failed to fetch species data');
-      
+
       const speciesData = await response.json();
       setComparisonSpecies(speciesData);
       setOpenCategory('Head/Neck');
-    } catch (error) {
-      console.error('Error adding comparison species:', error);
+    } catch (err) {
+      console.error('Error adding comparison species:', err);
+      setError({
+        message: 'Failed to load species data. Please try again.',
+        species
+      });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDismissError = () => {
+    setError(null);
   };
 
   const handleCategoryClick = (categoryName: string, isOpen: boolean) => {
@@ -52,17 +62,17 @@ export default function SpeciesComparison({
   return (
     <div className="space-y-6">
       {/* Top Grid - Species Cards */}
-      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_minmax(16px,24px)_1fr_1fr_1fr_1fr_1fr] gap-4">
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-4">
         {/* Primary Species Card */}
-        <div className="col-span-5">
+        <div>
           <SpeciesCard {...primarySpecies.speciesCard} />
         </div>
 
-        {/* Empty column for spacing */}
-        <div className="col-span-1" />
+        {/* Spacer column */}
+        <div className="w-4 md:w-6" />
 
         {/* Comparison Species Card or Compare UI */}
-        <div className="col-span-5">
+        <div>
           {isLoading ? (
             <div className="w-full h-full flex flex-col items-center justify-center border border-gray-300 rounded-lg bg-gray-50 animate-pulse">
               <div className="flex flex-col items-center gap-4">
@@ -70,15 +80,36 @@ export default function SpeciesComparison({
                 <span className="text-sm text-gray-500">Loading species data...</span>
               </div>
             </div>
+          ) : error ? (
+            <div className="w-full h-full flex flex-col items-center justify-center border border-red-300 rounded-lg bg-red-50 p-4">
+              <div className="flex flex-col items-center gap-3 text-center">
+                <Icon name="close" size="sm" style="filled" className="text-red-500" />
+                <span className="text-sm text-red-700">{error.message}</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddRelatedSpecies(error.species)}
+                    className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                  >
+                    Retry
+                  </button>
+                  <button
+                    onClick={handleDismissError}
+                    className="px-3 py-1 text-sm border border-red-300 text-red-700 rounded hover:bg-red-100 transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </div>
           ) : comparisonSpecies ? (
-            <SpeciesCard 
+            <SpeciesCard
               {...comparisonSpecies.speciesCard}
               isComparison={true}
               onRemove={handleRemoveComparison}
             />
           ) : (
-            <button 
-              onClick={() => setIsSearchOpen(true)} 
+            <button
+              onClick={() => setIsSearchOpen(true)}
               className="w-full h-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-lg hover:bg-green-900/20 transition-all"
             >
               <Icon name="add" size="sm" style="line" className="mb-2" />
@@ -91,9 +122,9 @@ export default function SpeciesComparison({
       </div>
 
       {/* Bottom Grid - Physical Features */}
-      <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_minmax(16px,24px)_1fr_1fr_1fr_1fr_1fr] gap-4">
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-4">
         {/* Primary Species Features */}
-        <div className="col-span-5">
+        <div>
           <PhysicalFeatures 
             categories={primarySpecies.featureCategories}
             openCategory={openCategory}
@@ -101,11 +132,11 @@ export default function SpeciesComparison({
           />
         </div>
 
-        {/* Empty column for spacing */}
-        <div className="col-span-1" />
+        {/* Spacer column */}
+        <div className="w-4 md:w-6" />
 
         {/* Comparison Species Features or Related Species */}
-        <div className="col-span-5">
+        <div>
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
@@ -113,14 +144,16 @@ export default function SpeciesComparison({
               ))}
             </div>
           ) : comparisonSpecies ? (
-            <PhysicalFeatures 
+            <PhysicalFeatures
               categories={comparisonSpecies.featureCategories}
               openCategory={openCategory}
               onCategoryClick={handleCategoryClick}
             />
           ) : (
             <div>
-              <p className="text-xs mb-4 text-gray-700">Related Species | Quick Add</p>
+              <p className="text-xs mb-4 text-gray-700">
+                {error ? 'Try a different species:' : 'Related Species | Quick Add'}
+              </p>
               <div className="space-y-3">
                 {relatedSpecies.map((species) => (
                   <button
@@ -165,20 +198,29 @@ export default function SpeciesComparison({
         </div>
       </div>
 
-      {/* Add Search Modal */}
+      {/* Search Modal */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="search-modal-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsSearchOpen(false);
+          }}
+        >
           <div className="relative w-full max-w-2xl bg-white rounded-lg shadow-xl m-4 p-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl">Find a Species</h3>
-              <button 
+              <h3 id="search-modal-title" className="text-xl">Find a Species</h3>
+              <button
                 onClick={() => setIsSearchOpen(false)}
                 className="flex items-center justify-center text-gray-500 hover:text-black"
+                aria-label="Close search modal"
               >
                 <Icon name="close" size="sm" style="line" />
               </button>
             </div>
-            
+
             <div className="text-center py-8 text-gray-500">
               Search functionality coming soon...
             </div>
