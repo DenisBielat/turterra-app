@@ -142,81 +142,93 @@ export default function SpeciesSearchModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl h-[75vh] flex flex-col p-0 gap-0 bg-warm">
+      <DialogContent className="max-w-3xl h-[75vh] flex flex-col p-0 gap-0 bg-warm rounded-xl [&>button]:hidden">
         <VisuallyHidden>
           <DialogTitle>Search Species to Compare</DialogTitle>
         </VisuallyHidden>
 
-        {/* Search Bar - Fixed at top */}
-        <div className="p-4 border-b border-gray-300 bg-white rounded-t-lg">
-          <div className="relative">
-            <Icon
-              name="search"
-              size="sm"
-              style="line"
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-            <Input
-              type="text"
-              placeholder="Search Turtles"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-12 text-base border-gray-300 bg-white"
-            />
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          {/* All Species Section */}
-          <div className="flex-[2] flex flex-col min-h-0 p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium text-gray-700">
-                All Species
-              </h4>
-              <div className="flex gap-2">
-                {/* Habitat Filter */}
-                <Select
-                  value={habitatFilter}
-                  onValueChange={setHabitatFilter}
-                  open={habitatOpen}
-                  onOpenChange={handleHabitatOpenChange}
-                >
-                  <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
-                    <SelectValue placeholder="All Habitats" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Habitats</SelectItem>
-                    {habitatTypes.map((habitat) => (
-                      <SelectItem key={habitat} value={habitat}>
-                        {habitat}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                {/* Sort */}
-                <Select
-                  value={sortBy}
-                  onValueChange={setSortBy}
-                  open={sortOpen}
-                  onOpenChange={handleSortOpenChange}
-                >
-                  <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
-                    <SelectValue placeholder="Alphabetical" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="alphabetical">Alphabetical</SelectItem>
-                    <SelectItem value="scientific">Scientific Name</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* Modal Container with Padding */}
+        <div className="flex flex-col h-full p-6">
+          {/* Search Bar Row - Inline with Close Button */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="relative flex-1">
+              <Icon
+                name="search"
+                size="sm"
+                style="line"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <Input
+                type="text"
+                placeholder="Search Turtles"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 h-12 text-base border-gray-300 bg-white rounded-lg"
+              />
             </div>
+            <button
+              onClick={onClose}
+              className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition-colors"
+              aria-label="Close modal"
+            >
+              <Icon name="close" size="sm" style="line" className="text-gray-600" />
+            </button>
+          </div>
 
-            {/* Scrollable Results List */}
-            <ScrollArea className="flex-1 min-h-0 rounded-lg border border-gray-300 bg-[#e8e8e0]">
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* All Species Section */}
+            <div className="flex-[2] flex flex-col min-h-0 overflow-visible">
+              <div className="flex items-center justify-between mb-3 relative z-10">
+                <h4 className="text-sm font-normal text-gray-700">
+                  All Species
+                </h4>
+                <div className="flex gap-2">
+                  {/* Habitat Filter */}
+                  <Select
+                    value={habitatFilter}
+                    onValueChange={setHabitatFilter}
+                    open={habitatOpen}
+                    onOpenChange={handleHabitatOpenChange}
+                  >
+                    <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
+                      <SelectValue placeholder="All Habitats" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Habitats</SelectItem>
+                      {habitatTypes.map((habitat) => (
+                        <SelectItem key={habitat} value={habitat}>
+                          {habitat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {/* Sort */}
+                  <Select
+                    value={sortBy}
+                    onValueChange={setSortBy}
+                    open={sortOpen}
+                    onOpenChange={handleSortOpenChange}
+                  >
+                    <SelectTrigger className="w-[140px] h-9 text-sm bg-white border-gray-300">
+                      <SelectValue placeholder="Alphabetical" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="alphabetical">Alphabetical</SelectItem>
+                      <SelectItem value="scientific">Scientific Name</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-300 mb-3" />
+
+              {/* Scrollable Results List */}
+              <ScrollArea className="flex-1 min-h-0" thumbClassName="bg-black/20">
               {isLoading ? (
-                <div className="p-3 space-y-2">
+                <div className="space-y-2 pr-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
@@ -225,15 +237,15 @@ export default function SpeciesSearchModal({
                   ))}
                 </div>
               ) : filteredSpecies.length > 0 ? (
-                <div className="p-3 space-y-2">
+                <div className="space-y-2 pr-3">
                   {filteredSpecies.map((result) => (
                     <button
                       key={result.id}
                       onClick={() => handleSelectSpecies(result)}
-                      className="w-full flex items-center gap-4 p-3 rounded-lg bg-white border border-gray-200 hover:bg-[#D1EAE0] hover:border-[#D1EAE0] cursor-pointer transition-all text-left group"
+                      className="w-full flex items-center gap-4 p-3 rounded-lg bg-warm hover:bg-green-900 cursor-pointer transition-all text-left group"
                     >
                       {/* Avatar */}
-                      <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200 group-hover:ring-[#9DD4BE] transition-all">
+                      <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden bg-gray-100 ring-2 ring-gray-200 group-hover:ring-white transition-all">
                         {result.avatarUrl ? (
                           <Image
                             src={result.avatarUrl}
@@ -251,10 +263,10 @@ export default function SpeciesSearchModal({
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="font-heading font-bold text-gray-900">
+                        <p className="font-heading font-bold text-gray-900 group-hover:text-white transition-colors">
                           {result.commonName}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 group-hover:text-white/80 transition-colors">
                           <span className="italic">{result.scientificName}</span>
                           {result.conservationStatus && (
                             <>
@@ -281,52 +293,50 @@ export default function SpeciesSearchModal({
             </ScrollArea>
           </div>
 
-          {/* Related Species Section */}
-          {relatedSpecies.length > 0 && (
-            <div className="flex-[1] flex flex-col min-h-0 p-4 pt-0 border-t border-gray-300">
-              <h4 className="text-sm font-medium text-gray-700 mb-3 pt-4">
-                Related Species
-              </h4>
-              <ScrollArea className="flex-1 min-h-0">
-                <div className="space-y-2 pr-2">
-                  {relatedSpecies.map((species) => (
-                    <button
-                      key={species.scientificName}
-                      onClick={() => handleSelectRelated(species)}
-                      className="w-full flex items-center gap-4 p-3 rounded-lg bg-white border border-gray-200 hover:bg-[#D1EAE0] hover:border-[#D1EAE0] cursor-pointer transition-all text-left group"
-                    >
-                      {/* Avatar */}
-                      <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden ring-2 ring-gray-200 group-hover:ring-[#9DD4BE] transition-all">
-                        <Image
-                          src={species.avatarUrl}
-                          alt={species.commonName}
-                          fill
-                          className="object-cover"
-                          sizes="56px"
-                        />
-                      </div>
+            {/* Related Species Section */}
+            {relatedSpecies.length > 0 && (
+              <div className="flex-[1] flex flex-col min-h-0 mt-4">
+                {/* Divider */}
+                <div className="border-t border-gray-300 mb-3" />
 
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-heading font-bold text-gray-900">
-                          {species.commonName}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          <span className="italic">{species.scientificName}</span>
-                          {species.conservationStatus && (
-                            <>
-                              <span className="mx-2">|</span>
-                              <span>{species.conservationStatus}</span>
-                            </>
-                          )}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          )}
+                <h4 className="text-sm font-normal text-gray-700 mb-3">
+                  Related Species
+                </h4>
+                <ScrollArea className="flex-1 min-h-0" thumbClassName="bg-black/20">
+                  <div className="space-y-2 pr-3">
+                    {relatedSpecies.map((species) => (
+                      <button
+                        key={species.scientificName}
+                        onClick={() => handleSelectRelated(species)}
+                        className="w-full flex items-center gap-4 p-3 rounded-lg bg-warm hover:bg-green-900 cursor-pointer transition-all text-left group"
+                      >
+                        {/* Avatar */}
+                        <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden ring-2 ring-gray-200 group-hover:ring-white transition-all">
+                          <Image
+                            src={species.avatarUrl}
+                            alt={species.commonName}
+                            fill
+                            className="object-cover"
+                            sizes="56px"
+                          />
+                        </div>
+
+                        {/* Info */}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-heading font-bold text-gray-900 group-hover:text-white transition-colors">
+                            {species.commonName}
+                          </p>
+                          <p className="text-sm text-gray-500 group-hover:text-white/80 transition-colors">
+                            <span className="italic">{species.scientificName}</span>
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </ScrollArea>
+              </div>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
