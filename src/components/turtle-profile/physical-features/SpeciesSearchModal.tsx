@@ -180,7 +180,7 @@ export default function SpeciesSearchModal({
             {/* All Species Section */}
             <div className="flex-[2] flex flex-col min-h-0">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-medium text-gray-700">
+                <h4 className="text-sm font-normal text-gray-700">
                   All Species
                 </h4>
                 <div className="flex gap-2">
@@ -299,7 +299,7 @@ export default function SpeciesSearchModal({
                 {/* Divider */}
                 <div className="border-t border-gray-300 mb-3" />
 
-                <h4 className="text-sm font-medium text-gray-700 mb-3">
+                <h4 className="text-sm font-normal text-gray-700 mb-3">
                   Related Species
                 </h4>
                 <ScrollArea className="flex-1 min-h-0">
