@@ -66,13 +66,20 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     // Transform and filter results
-    let results: SpeciesSearchResult[] = (species || []).map((s) => {
+    type ResultWithHabitatTypes = SpeciesSearchResult & { _habitatTypes: string[] };
+    let results: ResultWithHabitatTypes[] = (species || []).map((s) => {
       // Get the most recent conservation status
       const conservationHistory = s.turtle_species_conservation_history || [];
       const sortedHistory = [...conservationHistory].sort(
         (a, b) => parseInt(b.year_status_assigned) - parseInt(a.year_status_assigned)
       );
-      const currentStatus = sortedHistory[0]?.conservation_statuses?.abbreviation || null;
+      const latestHistory = sortedHistory[0];
+      // Handle conservation_statuses - TypeScript infers it as array but it's actually an object
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const conservationStatuses = latestHistory?.conservation_statuses as any;
+      const currentStatus = Array.isArray(conservationStatuses) 
+        ? conservationStatuses[0]?.abbreviation || null
+        : conservationStatuses?.abbreviation || null;
 
       return {
         id: s.id,
@@ -82,8 +89,9 @@ export async function GET(request: Request) {
         conservationStatus: currentStatus,
         // Keep habitat types for filtering (will be removed from final response)
         _habitatTypes: (s.turtle_species_habitat_types || []).map(
-          (ht: { habitat_types: HabitatType | null }) => ht.habitat_types?.habitat_type
-        ).filter(Boolean)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (ht: any) => ht.habitat_types?.habitat_type
+        ).filter(Boolean) as string[]
       };
     });
 
@@ -91,7 +99,7 @@ export async function GET(request: Request) {
     // doesn't easily support filtering by nested many-to-many relationships)
     if (habitatType) {
       results = results.filter((r) =>
-        (r as SpeciesSearchResult & { _habitatTypes: string[] })._habitatTypes.includes(habitatType)
+        r._habitatTypes.includes(habitatType)
       );
     }
 
