@@ -72,7 +72,7 @@ export async function GET(request: Request) {
       const sortedHistory = [...conservationHistory].sort(
         (a, b) => parseInt(b.year_status_assigned) - parseInt(a.year_status_assigned)
       );
-      const currentStatus = sortedHistory[0]?.conservation_statuses?.abbreviation || null;
+      const currentStatus = sortedHistory[0]?.conservation_statuses?.[0]?.abbreviation || null;
 
       return {
         id: s.id,
@@ -82,7 +82,7 @@ export async function GET(request: Request) {
         conservationStatus: currentStatus,
         // Keep habitat types for filtering (will be removed from final response)
         _habitatTypes: (s.turtle_species_habitat_types || []).map(
-          (ht: { habitat_types: HabitatType | null }) => ht.habitat_types?.habitat_type
+          (ht: { habitat_types: { habitat_type: string }[] }) => ht.habitat_types?.[0]?.habitat_type
         ).filter(Boolean)
       };
     });
