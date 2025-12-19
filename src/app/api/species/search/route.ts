@@ -96,8 +96,11 @@ export async function GET(request: Request) {
     }
 
     // Remove the temporary _habitatTypes field
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const cleanResults = results.map(({ _habitatTypes, ...rest }) => rest) as SpeciesSearchResult[];
+    const cleanResults: SpeciesSearchResult[] = results.map((result) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { _habitatTypes, ...rest } = result;
+      return rest as SpeciesSearchResult;
+    });
 
     // Also fetch available habitat types for the filter dropdown
     const { data: habitatTypes, error: habitatError } = await supabase
