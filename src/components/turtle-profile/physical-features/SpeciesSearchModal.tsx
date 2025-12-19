@@ -226,7 +226,7 @@ export default function SpeciesSearchModal({
               <div className="border-t border-gray-300 mb-3" />
 
               {/* Scrollable Results List */}
-              <ScrollArea className="flex-1 min-h-0 [&_[data-radix-scroll-area-thumb]]:bg-black/20">
+              <ScrollArea className="flex-1 min-h-0" thumbClassName="bg-black/20">
               {isLoading ? (
                 <div className="space-y-2 pr-3">
                   {[1, 2, 3, 4].map((i) => (
@@ -302,7 +302,7 @@ export default function SpeciesSearchModal({
                 <h4 className="text-sm font-normal text-gray-700 mb-3">
                   Related Species
                 </h4>
-                <ScrollArea className="flex-1 min-h-0 [&_[data-radix-scroll-area-thumb]]:bg-black/20">
+                <ScrollArea className="flex-1 min-h-0" thumbClassName="bg-black/20">
                   <div className="space-y-2 pr-3">
                     {relatedSpecies.map((species) => (
                       <button
