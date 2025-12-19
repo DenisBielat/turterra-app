@@ -142,7 +142,7 @@ export default function SpeciesSearchModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl h-[75vh] flex flex-col p-0 gap-0 bg-warm [&>button]:hidden">
+      <DialogContent className="max-w-3xl h-[75vh] flex flex-col p-0 gap-0 bg-warm rounded-xl [&>button]:hidden">
         <VisuallyHidden>
           <DialogTitle>Search Species to Compare</DialogTitle>
         </VisuallyHidden>
@@ -163,7 +163,7 @@ export default function SpeciesSearchModal({
                 placeholder="Search Turtles"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 text-base border-gray-300 bg-white rounded-full"
+                className="pl-10 h-12 text-base border-gray-300 bg-white rounded-lg"
               />
             </div>
             <button
@@ -176,10 +176,10 @@ export default function SpeciesSearchModal({
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-0">
             {/* All Species Section */}
-            <div className="flex-[2] flex flex-col min-h-0">
-              <div className="flex items-center justify-between mb-3">
+            <div className="flex-[2] flex flex-col min-h-0 overflow-visible">
+              <div className="flex items-center justify-between mb-3 relative z-10">
                 <h4 className="text-sm font-normal text-gray-700">
                   All Species
                 </h4>
@@ -228,7 +228,7 @@ export default function SpeciesSearchModal({
               {/* Scrollable Results List */}
               <ScrollArea className="flex-1 min-h-0">
               {isLoading ? (
-                <div className="space-y-2">
+                <div className="space-y-2 pr-3">
                   {[1, 2, 3, 4].map((i) => (
                     <div
                       key={i}
@@ -237,7 +237,7 @@ export default function SpeciesSearchModal({
                   ))}
                 </div>
               ) : filteredSpecies.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-2 pr-3">
                   {filteredSpecies.map((result) => (
                     <button
                       key={result.id}
@@ -303,7 +303,7 @@ export default function SpeciesSearchModal({
                   Related Species
                 </h4>
                 <ScrollArea className="flex-1 min-h-0">
-                  <div className="space-y-2">
+                  <div className="space-y-2 pr-3">
                     {relatedSpecies.map((species) => (
                       <button
                         key={species.scientificName}
