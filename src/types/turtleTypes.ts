@@ -103,6 +103,7 @@ export interface Variant {
     commonName: string;
     scientificName: string;
     avatarUrl: string;
+    conservationStatus?: string;
   }
   
   export interface TurtleData {
@@ -253,6 +254,7 @@ export interface Variant {
   
   export interface SpeciesComparisonProps {
     primarySpecies: ComparisonSpecies;
+    primarySpeciesId?: number;
     comparisonSpecies?: ComparisonSpecies;
     relatedSpecies: RelatedSpecies[];
   }

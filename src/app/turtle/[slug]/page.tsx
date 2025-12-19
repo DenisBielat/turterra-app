@@ -75,6 +75,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 </div>
                 
                 <Identification
+                  speciesId={data.id}
                   description={data.identification.description}
                   measurements={data.identification.measurements}
                   featureCategories={data.identification.featureCategories}

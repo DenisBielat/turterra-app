@@ -143,13 +143,20 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
     throw physicalFeatures.error || featureKeys.error;
   }
 
-  // Fetch related species in the same family
+  // Fetch related species in the same family (with conservation status)
   const { data: relatedSpecies, error: relatedError } = await supabase
     .from('turtle_species')
     .select(`
       species_common_name,
       species_scientific_name,
-      avatar_image_full_url
+      avatar_image_full_url,
+      turtle_species_conservation_history(
+        year_status_assigned,
+        conservation_statuses(
+          status,
+          abbreviation
+        )
+      )
     `)
     .eq('tax_parent_genus', turtle.tax_parent_genus)
     .neq('id', turtle.id)
@@ -320,10 +327,17 @@ function transformTurtleDataToProfile(
     categoryImages: Awaited<ReturnType<typeof getPhysicalFeatureImages>>;
     physicalFeatures: PhysicalFeatureData[];
     featureKeys: PhysicalFeature[];
-    relatedSpecies: { 
-      species_common_name: string; 
-      species_scientific_name: string; 
-      avatar_image_full_url?: string; 
+    relatedSpecies: {
+      species_common_name: string;
+      species_scientific_name: string;
+      avatar_image_full_url?: string;
+      turtle_species_conservation_history?: Array<{
+        year_status_assigned: string;
+        conservation_statuses: {
+          status: string;
+          abbreviation: string;
+        };
+      }>;
     }[];
     behaviors?: Array<{
       behaviors_general: {
@@ -346,11 +360,18 @@ function transformTurtleDataToProfile(
   }
 ) {
   // Format related species
-  const formattedRelatedSpecies = relatedSpecies.map(species => ({
-    commonName: species.species_common_name,
-    scientificName: species.species_scientific_name,
-    avatarUrl: species.avatar_image_full_url || '/images/image-placeholder.png'
-  }));
+  const formattedRelatedSpecies = relatedSpecies.map(species => {
+    // Get the latest conservation status
+    const latestHistory = species.turtle_species_conservation_history
+      ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0];
+
+    return {
+      commonName: species.species_common_name,
+      scientificName: species.species_scientific_name,
+      avatarUrl: species.avatar_image_full_url || '/images/image-placeholder.png',
+      conservationStatus: latestHistory?.conservation_statuses?.status
+    };
+  });
 
   // Extract needed fields
   const {
