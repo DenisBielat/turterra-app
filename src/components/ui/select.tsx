@@ -11,14 +11,11 @@ interface SelectProps extends React.ComponentPropsWithoutRef<typeof SelectPrimit
   onOpenChange?: (open: boolean) => void;
 }
 
-const Select = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Root>,
-  SelectProps
->(({ children, ...props }, ref) => (
+const Select = ({ children, ...props }: SelectProps) => (
   <SelectPrimitive.Root {...props}>
     {children}
   </SelectPrimitive.Root>
-))
+)
 Select.displayName = "Select"
 
 const SelectGroup = SelectPrimitive.Group
