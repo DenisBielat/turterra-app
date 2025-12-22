@@ -103,6 +103,7 @@ export interface Variant {
     commonName: string;
     scientificName: string;
     avatarUrl: string;
+    avatarCircleUrl?: string;
     conservationStatus?: string;
   }
   

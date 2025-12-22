@@ -313,7 +313,7 @@ export default function SpeciesSearchModal({
                         {/* Avatar */}
                         <div className="relative w-14 h-14 flex-shrink-0 rounded-full overflow-hidden ring-2 ring-gray-200 group-hover:ring-white transition-all">
                           <Image
-                            src={species.avatarUrl}
+                            src={species.avatarCircleUrl || species.avatarUrl}
                             alt={species.commonName}
                             fill
                             className="object-cover"

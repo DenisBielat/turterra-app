@@ -150,6 +150,7 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
       species_common_name,
       species_scientific_name,
       avatar_image_full_url,
+      avatar_image_circle_url,
       turtle_species_conservation_history(
         year_status_assigned,
         conservation_statuses(
@@ -331,6 +332,7 @@ function transformTurtleDataToProfile(
       species_common_name: string;
       species_scientific_name: string;
       avatar_image_full_url?: string;
+      avatar_image_circle_url?: string;
       turtle_species_conservation_history?: Array<{
         year_status_assigned: string;
         conservation_statuses: {
@@ -369,6 +371,7 @@ function transformTurtleDataToProfile(
       commonName: species.species_common_name,
       scientificName: species.species_scientific_name,
       avatarUrl: species.avatar_image_full_url || '/images/image-placeholder.png',
+      avatarCircleUrl: species.avatar_image_circle_url || undefined,
       conservationStatus: latestHistory?.conservation_statuses?.status
     };
   });
