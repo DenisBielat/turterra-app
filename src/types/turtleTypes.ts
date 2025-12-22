@@ -57,6 +57,7 @@ export interface Variant {
     adult_weight: number | null;
     length_female_max_scl: number | null;
     length_male_max_scl: number | null;
+    generally_larger: 'female' | 'male' | 'equal' | null;
     lifespan_wild_min: number | null;
     lifespan_wild_max: number | null;
     lifespan_captivity_min: number | null;

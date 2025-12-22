@@ -335,10 +335,10 @@ function transformTurtleDataToProfile(
       avatar_image_circle_url?: string;
       turtle_species_conservation_history?: Array<{
         year_status_assigned: string;
-        conservation_statuses: {
+        conservation_statuses: Array<{
           status: string;
           abbreviation: string;
-        };
+        }>;
       }>;
     }[];
     behaviors?: Array<{
@@ -372,7 +372,7 @@ function transformTurtleDataToProfile(
       scientificName: species.species_scientific_name,
       avatarUrl: species.avatar_image_full_url || '/images/image-placeholder.png',
       avatarCircleUrl: species.avatar_image_circle_url || undefined,
-      conservationStatus: latestHistory?.conservation_statuses?.status
+      conservationStatus: latestHistory?.conservation_statuses?.[0]?.status
     };
   });
 

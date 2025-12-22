@@ -13,6 +13,28 @@ export interface HabitatType {
   habitat_type: string;
 }
 
+interface ConservationStatus {
+  abbreviation: string;
+}
+
+interface ConservationHistory {
+  year_status_assigned: string;
+  conservation_statuses: ConservationStatus[];
+}
+
+interface HabitatTypeRelation {
+  habitat_types: HabitatType[];
+}
+
+interface SpeciesRow {
+  id: number;
+  species_common_name: string;
+  species_scientific_name: string;
+  avatar_image_circle_url: string | null;
+  turtle_species_conservation_history: ConservationHistory[];
+  turtle_species_habitat_types: HabitatTypeRelation[];
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get('query') || '';
@@ -66,13 +88,13 @@ export async function GET(request: Request) {
     if (error) throw error;
 
     // Transform and filter results
-    let results: SpeciesSearchResult[] = (species || []).map((s) => {
+    let results = ((species || []) as SpeciesRow[]).map((s) => {
       // Get the most recent conservation status
       const conservationHistory = s.turtle_species_conservation_history || [];
       const sortedHistory = [...conservationHistory].sort(
         (a, b) => parseInt(b.year_status_assigned) - parseInt(a.year_status_assigned)
       );
-      const currentStatus = sortedHistory[0]?.conservation_statuses?.abbreviation || null;
+      const currentStatus = sortedHistory[0]?.conservation_statuses?.[0]?.abbreviation || null;
 
       return {
         id: s.id,
@@ -82,17 +104,15 @@ export async function GET(request: Request) {
         conservationStatus: currentStatus,
         // Keep habitat types for filtering (will be removed from final response)
         _habitatTypes: (s.turtle_species_habitat_types || []).map(
-          (ht: { habitat_types: HabitatType | null }) => ht.habitat_types?.habitat_type
-        ).filter(Boolean)
+          (ht) => ht.habitat_types?.[0]?.habitat_type
+        ).filter(Boolean) as string[]
       };
     });
 
     // Apply habitat type filter if provided (client-side filtering since Supabase
     // doesn't easily support filtering by nested many-to-many relationships)
     if (habitatType) {
-      results = results.filter((r) =>
-        (r as SpeciesSearchResult & { _habitatTypes: string[] })._habitatTypes.includes(habitatType)
-      );
+      results = results.filter((r) => r._habitatTypes.includes(habitatType));
     }
 
     // Remove the temporary _habitatTypes field
