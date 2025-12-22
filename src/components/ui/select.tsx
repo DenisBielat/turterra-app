@@ -14,11 +14,15 @@ interface SelectProps extends React.ComponentPropsWithoutRef<typeof SelectPrimit
 const Select = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Root>,
   SelectProps
->(({ children, ...props }, _ref) => (
-  <SelectPrimitive.Root {...props}>
-    {children}
-  </SelectPrimitive.Root>
-))
+>(({ children, ...props }, _ref) => {
+  // _ref is required by forwardRef signature but not used
+  void _ref;
+  return (
+    <SelectPrimitive.Root {...props}>
+      {children}
+    </SelectPrimitive.Root>
+  );
+})
 Select.displayName = "Select"
 
 const SelectGroup = SelectPrimitive.Group

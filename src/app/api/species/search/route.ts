@@ -96,6 +96,7 @@ export async function GET(request: Request) {
     }
 
     // Remove the temporary _habitatTypes field
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const cleanResults = results.map(({ _habitatTypes: _, ...rest }) => rest) as SpeciesSearchResult[];
 
     // Also fetch available habitat types for the filter dropdown
