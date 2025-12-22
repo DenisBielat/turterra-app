@@ -96,7 +96,7 @@ export async function GET(request: Request) {
     }
 
     // Remove the temporary _habitatTypes field
-    const cleanResults = results.map(({ _habitatTypes, ...rest }) => rest) as SpeciesSearchResult[];
+    const cleanResults = results.map(({ _habitatTypes: _, ...rest }) => rest) as SpeciesSearchResult[];
 
     // Also fetch available habitat types for the filter dropdown
     const { data: habitatTypes, error: habitatError } = await supabase

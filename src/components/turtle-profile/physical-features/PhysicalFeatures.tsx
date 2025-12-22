@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Icon } from '@/components/Icon';
 import VariantModal from './VariantModal';
 import { formatFeatureValue } from '@/lib/formatters';
@@ -95,11 +96,15 @@ export default function PhysicalFeatures({
                   >
                     {category.image && (
                       <div className="p-4 bg-white">
-                        <img
-                          src={category.image.url}
-                          alt={`${category.name} features`}
-                          className="w-full h-auto rounded-lg"
-                        />
+                        <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                          <Image
+                            src={category.image.url}
+                            alt={`${category.name} features`}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
