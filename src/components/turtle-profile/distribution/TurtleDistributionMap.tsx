@@ -176,10 +176,13 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   useEffect(() => {
     // Get all current species IDs
     const currentSpeciesIds = new Set(speciesData.map(s => s.speciesId));
-    
+
     // Get all previously rendered species IDs by checking existing source IDs
     const map = mapRef.current?.getMap();
     if (!map) return;
+
+    // Wait for style to be loaded before accessing it
+    if (!map.isStyleLoaded()) return;
 
     const style = map.getStyle();
     if (!style?.sources) return;
