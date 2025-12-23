@@ -1,11 +1,11 @@
 export interface Variant {
-    sex: string;
+    sex: string | null;
     lifeStage: string;
     value: unknown;
   }
   
   export interface VariantData {
-    sex: string;
+    sex: string | null;
     life_stage: string;
     [key: string]: unknown;
   }
@@ -95,8 +95,8 @@ export interface Variant {
   export interface PhysicalFeatureData {
     id: number;
     species_id: number;
-    sex: string;         // e.g. "Male", "Female"
-    life_stage: string;  // e.g. "Adult", "Juvenile"
+    sex: string | null;  // e.g. "Male", "Female", or null for generic records
+    life_stage: string;  // e.g. "Adult", "Juvenile", "Hatchling"
     [key: string]: unknown;  // For dynamic columns like color, shape, etc.
   }
   
@@ -223,7 +223,8 @@ export interface Variant {
   
   export interface FeatureVariants {
     reference: string;
-    variants: Variant[];
+    variants: Variant[];        // All existing variants (Adult Female, Juvenile, Hatchling)
+    hasDifferences: boolean;    // True if at least one variant differs from reference
   }
   
   export interface Feature {

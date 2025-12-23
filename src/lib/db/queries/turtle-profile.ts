@@ -122,16 +122,16 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
   // Fetch images
   const categoryImages = await getPhysicalFeatureImages(turtle.species_common_name);
 
-  // Fetch physical features and keys
+  // Fetch physical features and keys from the new tables
   const [physicalFeatures, featureKeys] = await Promise.all([
     supabase
-      .from('turtle_species_physical_features')
+      .from('turtle_species_physical_features_new')
       .select('*')
       .eq('species_id', turtle.id)
-      .order('sex')
-      .order('life_stage'),
+      .order('life_stage')
+      .order('sex'),
     supabase
-      .from('turtle_species_physical_features_key')
+      .from('turtle_species_physical_features_key_new')
       .select('*')
   ]);
 
@@ -208,13 +208,48 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
 }
 
 function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) {
+  // Helper for case-insensitive string comparison
+  const equalsIgnoreCase = (a: string | null | undefined, b: string | null | undefined): boolean => {
+    if (a === null || a === undefined || a === '') {
+      return b === null || b === undefined || b === '';
+    }
+    if (b === null || b === undefined || b === '') {
+      return false;
+    }
+    return a.toLowerCase() === b.toLowerCase();
+  };
+
+  // Reference is Adult Male (case-insensitive)
   const referenceVariant = physicalFeatures.find(
-    (variant) => variant.sex === 'Male' && variant.life_stage === 'Adult'
+    (variant) => equalsIgnoreCase(variant.sex, 'Male') && equalsIgnoreCase(variant.life_stage, 'Adult')
   ) || physicalFeatures[0];
 
-  const otherVariants = physicalFeatures.filter(
-    (variant) => !(variant.sex === 'Male' && variant.life_stage === 'Adult')
-  );
+  // Helper to check if sex matches (handles null, undefined, empty string)
+  const sexMatches = (variantSex: string | null | undefined, targetSex: string | null) => {
+    if (targetSex === null) {
+      // For generic records, sex should be null, undefined, or empty
+      return variantSex === null || variantSex === undefined || variantSex === '';
+    }
+    return equalsIgnoreCase(variantSex, targetSex);
+  };
+
+  // Define the order of variants we want to compare against
+  // Adult Female, Juvenile (generic), Hatchling (generic)
+  // Skip the generic adult record (sex=null, life_stage='Adult') as it's for record keeping only
+  const variantOrder: { sex: string | null; life_stage: string }[] = [
+    { sex: 'Female', life_stage: 'Adult' },
+    { sex: null, life_stage: 'Juvenile' },
+    { sex: null, life_stage: 'Hatchling' }
+  ];
+
+  // Build the ordered list of variants, only including those that exist
+  const otherVariants = variantOrder
+    .map(({ sex, life_stage }) =>
+      physicalFeatures.find(
+        (variant) => sexMatches(variant.sex, sex) && equalsIgnoreCase(variant.life_stage, life_stage)
+      )
+    )
+    .filter((variant): variant is PhysicalFeatureData => variant !== undefined);
 
   return { referenceVariant, otherVariants };
 }
@@ -230,6 +265,35 @@ function buildFeatureCategories({
   otherVariants: PhysicalFeatureData[];
   categoryImages: { url: string; tags: string[] }[];
 }): FeatureCategory[] {
+  // Helper for case-insensitive comparison
+  const equalsIgnoreCase = (a: string | null | undefined, b: string | null | undefined): boolean => {
+    if (a === null || a === undefined || a === '') {
+      return b === null || b === undefined || b === '';
+    }
+    if (b === null || b === undefined || b === '') {
+      return false;
+    }
+    return a.toLowerCase() === b.toLowerCase();
+  };
+
+  // Define all expected variants with their display labels
+  // These will always be shown in the modal
+  const expectedVariants: { sex: string | null; lifeStage: string; label: string }[] = [
+    { sex: 'Female', lifeStage: 'Adult', label: 'Adult Female' },
+    { sex: null, lifeStage: 'Juvenile', label: 'Juvenile' },
+    { sex: null, lifeStage: 'Hatchling', label: 'Hatchling' }
+  ];
+
+  // Helper to find a variant record by sex and life stage
+  const findVariantRecord = (sex: string | null, lifeStage: string): PhysicalFeatureData | undefined => {
+    return otherVariants.find(v => {
+      const sexMatches = sex === null
+        ? (v.sex === null || v.sex === undefined || v.sex === '')
+        : equalsIgnoreCase(v.sex, sex);
+      return sexMatches && equalsIgnoreCase(v.life_stage, lifeStage);
+    });
+  };
+
   return featureKeys
     .filter(key => !key.parent_feature)
     .reduce<FeatureCategory[]>((acc, key) => {
@@ -249,24 +313,35 @@ function buildFeatureCategories({
 
       // Reference & variants
       const columnName = key.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
-      const referenceValueRaw = referenceVariant?.[columnName] ?? '-';
-      const referenceValue = String(referenceValueRaw);
+      const referenceValueRaw = referenceVariant?.[columnName] ?? null;
+      const referenceValue = referenceValueRaw !== null ? String(referenceValueRaw) : '-';
+      const referenceNormalized = normalizeValue(referenceValueRaw);
 
-      const variantDifferences = otherVariants.reduce<Variant[]>((variants, variant) => {
-        const variantValue = normalizeValue(variant[columnName]);
-        const referenceNormalized = normalizeValue(referenceValueRaw);
-        if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
-          variants.push({
-            sex: variant.sex,
-            lifeStage: variant.life_stage,
-            value: variant[columnName]
-          });
+      // Build all variants - always include all expected life stages
+      const allVariants: Variant[] = [];
+      let hasDifferences = false;
+
+      for (const expected of expectedVariants) {
+        const variantRecord = findVariantRecord(expected.sex, expected.lifeStage);
+        const variantValueRaw = variantRecord?.[columnName] ?? null;
+        const variantNormalized = normalizeValue(variantValueRaw);
+
+        // Always add this variant (with "-" if no data)
+        allVariants.push({
+          sex: expected.sex,
+          lifeStage: expected.label, // Use the formatted label
+          value: variantValueRaw !== null ? variantValueRaw : '-'
+        });
+
+        // Check if this variant differs from reference (only if both have actual values)
+        if (referenceNormalized && variantNormalized && variantNormalized !== referenceNormalized) {
+          hasDifferences = true;
         }
-        return variants;
-      }, []);
+      }
 
-      const featureVariants = variantDifferences.length
-        ? { reference: referenceValue, variants: variantDifferences }
+      // Only create featureVariants if there are differences to show
+      const featureVariants = hasDifferences
+        ? { reference: referenceValue, variants: allVariants, hasDifferences }
         : undefined;
 
       // Sub-features
@@ -277,24 +352,34 @@ function buildFeatureCategories({
             .toLowerCase()
             .replace(/\s+/g, '_')
             .replace(/\//g, '_');
-          const subReferenceValueRaw = referenceVariant?.[subColumnName] ?? '-';
-          const subReferenceValue = String(subReferenceValueRaw);
+          const subReferenceValueRaw = referenceVariant?.[subColumnName] ?? null;
+          const subReferenceValue = subReferenceValueRaw !== null ? String(subReferenceValueRaw) : '-';
+          const subReferenceNormalized = normalizeValue(subReferenceValueRaw);
 
-          const subVariantDifferences = otherVariants.reduce<Variant[]>((variants, variant) => {
-            const variantValue = normalizeValue(variant[subColumnName]);
-            const referenceNormalized = normalizeValue(subReferenceValueRaw);
-            if (variantValue && referenceNormalized && variantValue !== referenceNormalized) {
-              variants.push({
-                sex: variant.sex,
-                lifeStage: variant.life_stage,
-                value: variant[subColumnName]
-              });
+          // Build all variants for sub-features
+          const subAllVariants: Variant[] = [];
+          let subHasDifferences = false;
+
+          for (const expected of expectedVariants) {
+            const variantRecord = findVariantRecord(expected.sex, expected.lifeStage);
+            const variantValueRaw = variantRecord?.[subColumnName] ?? null;
+            const variantNormalized = normalizeValue(variantValueRaw);
+
+            // Always add this variant (with "-" if no data)
+            subAllVariants.push({
+              sex: expected.sex,
+              lifeStage: expected.label,
+              value: variantValueRaw !== null ? variantValueRaw : '-'
+            });
+
+            // Check if this variant differs from reference
+            if (subReferenceNormalized && variantNormalized && variantNormalized !== subReferenceNormalized) {
+              subHasDifferences = true;
             }
-            return variants;
-          }, []);
+          }
 
-          const subFeatureVariants = subVariantDifferences.length
-            ? { reference: subReferenceValue, variants: subVariantDifferences }
+          const subFeatureVariants = subHasDifferences
+            ? { reference: subReferenceValue, variants: subAllVariants, hasDifferences: subHasDifferences }
             : undefined;
 
           return {
