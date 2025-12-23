@@ -115,7 +115,10 @@ export default function VariantModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleChange}>
-      <DialogContent className="max-w-lg" aria-describedby="variant-modal-description">
+      <DialogContent
+        className="max-w-xl duration-300 [&>button]:hidden"
+        aria-describedby="variant-modal-description"
+      >
         <DialogHeader className="pb-2">
           <DialogTitle className="font-heading font-bold text-xl">{featureName}</DialogTitle>
           <DialogDescription id="variant-modal-description" className="text-gray-500 text-sm">
@@ -126,14 +129,14 @@ export default function VariantModal({
         {/* Life stage rows */}
         <div className="flex flex-col gap-3 py-2">
           {/* Reference Row (Adult Male) */}
-          <div className="flex items-start justify-between gap-4 p-4 rounded-lg border border-gray-200 bg-white">
-            <div className="flex items-center gap-3 whitespace-nowrap flex-shrink-0">
+          <div className="grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border border-gray-200 bg-white">
+            <div className="flex items-center gap-3 whitespace-nowrap">
               <span className="font-medium">Adult Male</span>
               <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-white font-medium">
                 Reference
               </span>
             </div>
-            <div className="text-right">
+            <div>
               {formatDisplayValue(variants.reference)}
             </div>
           </div>
@@ -147,14 +150,14 @@ export default function VariantModal({
             return (
               <div
                 key={`${variant.sex}-${variant.lifeStage}`}
-                className={`flex items-start justify-between gap-4 p-4 rounded-lg border ${
+                className={`grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border ${
                   isDifferent
                     ? 'border-amber-200 bg-amber-50'
                     : 'border-gray-200 bg-white'
                 }`}
               >
-                <span className="font-medium whitespace-nowrap flex-shrink-0">{label}</span>
-                <div className="text-right">
+                <span className="font-medium whitespace-nowrap">{label}</span>
+                <div>
                   {formatDisplayValue(variant.value)}
                 </div>
               </div>
