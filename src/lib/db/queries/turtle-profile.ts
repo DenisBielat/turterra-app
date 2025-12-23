@@ -208,13 +208,6 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
 }
 
 function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) {
-  // Debug: log what we received
-  console.log('Physical features received:', physicalFeatures.map(pf => ({
-    sex: pf.sex,
-    life_stage: pf.life_stage,
-    sexType: typeof pf.sex
-  })));
-
   // Helper for case-insensitive string comparison
   const equalsIgnoreCase = (a: string | null | undefined, b: string | null | undefined): boolean => {
     if (a === null || a === undefined || a === '') {
@@ -258,9 +251,6 @@ function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) 
     )
     .filter((variant): variant is PhysicalFeatureData => variant !== undefined);
 
-  console.log('Reference variant:', referenceVariant?.sex, referenceVariant?.life_stage);
-  console.log('Other variants found:', otherVariants.map(v => `${v.sex ?? 'null'} ${v.life_stage}`));
-
   return { referenceVariant, otherVariants };
 }
 
@@ -275,6 +265,35 @@ function buildFeatureCategories({
   otherVariants: PhysicalFeatureData[];
   categoryImages: { url: string; tags: string[] }[];
 }): FeatureCategory[] {
+  // Helper for case-insensitive comparison
+  const equalsIgnoreCase = (a: string | null | undefined, b: string | null | undefined): boolean => {
+    if (a === null || a === undefined || a === '') {
+      return b === null || b === undefined || b === '';
+    }
+    if (b === null || b === undefined || b === '') {
+      return false;
+    }
+    return a.toLowerCase() === b.toLowerCase();
+  };
+
+  // Define all expected variants with their display labels
+  // These will always be shown in the modal
+  const expectedVariants: { sex: string | null; lifeStage: string; label: string }[] = [
+    { sex: 'Female', lifeStage: 'Adult', label: 'Adult Female' },
+    { sex: null, lifeStage: 'Juvenile', label: 'Juvenile' },
+    { sex: null, lifeStage: 'Hatchling', label: 'Hatchling' }
+  ];
+
+  // Helper to find a variant record by sex and life stage
+  const findVariantRecord = (sex: string | null, lifeStage: string): PhysicalFeatureData | undefined => {
+    return otherVariants.find(v => {
+      const sexMatches = sex === null
+        ? (v.sex === null || v.sex === undefined || v.sex === '')
+        : equalsIgnoreCase(v.sex, sex);
+      return sexMatches && equalsIgnoreCase(v.life_stage, lifeStage);
+    });
+  };
+
   return featureKeys
     .filter(key => !key.parent_feature)
     .reduce<FeatureCategory[]>((acc, key) => {
@@ -294,43 +313,29 @@ function buildFeatureCategories({
 
       // Reference & variants
       const columnName = key.physical_feature.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_');
-      const referenceValueRaw = referenceVariant?.[columnName] ?? '-';
-      const referenceValue = String(referenceValueRaw);
+      const referenceValueRaw = referenceVariant?.[columnName] ?? null;
+      const referenceValue = referenceValueRaw !== null ? String(referenceValueRaw) : '-';
       const referenceNormalized = normalizeValue(referenceValueRaw);
 
-      // Debug: log column mapping for first few features
-      if (key.physical_feature === 'Head Colors' || key.physical_feature === 'Carapace Colors') {
-        console.log(`Feature "${key.physical_feature}" -> column "${columnName}"`);
-        console.log(`  Reference value:`, referenceValueRaw, `-> normalized:`, referenceNormalized);
-        console.log(`  Reference variant keys:`, referenceVariant ? Object.keys(referenceVariant).slice(0, 10) : 'none');
-      }
-
-      // Collect all existing variants with their values
+      // Build all variants - always include all expected life stages
       const allVariants: Variant[] = [];
       let hasDifferences = false;
 
-      for (const variant of otherVariants) {
-        const variantValueRaw = variant[columnName];
+      for (const expected of expectedVariants) {
+        const variantRecord = findVariantRecord(expected.sex, expected.lifeStage);
+        const variantValueRaw = variantRecord?.[columnName] ?? null;
         const variantNormalized = normalizeValue(variantValueRaw);
 
-        // Debug logging
-        if (key.physical_feature === 'Head Colors' || key.physical_feature === 'Carapace Colors') {
-          console.log(`  Variant ${variant.sex ?? 'null'} ${variant.life_stage}: raw="${variantValueRaw}" normalized="${variantNormalized}"`);
-        }
+        // Always add this variant (with "-" if no data)
+        allVariants.push({
+          sex: expected.sex,
+          lifeStage: expected.label, // Use the formatted label
+          value: variantValueRaw !== null ? variantValueRaw : '-'
+        });
 
-        // Only include this variant if it has actual data (not null/empty)
-        if (variantNormalized !== null) {
-          allVariants.push({
-            sex: variant.sex,
-            lifeStage: variant.life_stage,
-            value: variantValueRaw
-          });
-
-          // Check if this variant differs from reference
-          if (referenceNormalized && variantNormalized !== referenceNormalized) {
-            hasDifferences = true;
-            console.log(`  DIFFERENCE DETECTED for ${key.physical_feature}: ref="${referenceNormalized}" vs variant="${variantNormalized}"`);
-          }
+        // Check if this variant differs from reference (only if both have actual values)
+        if (referenceNormalized && variantNormalized && variantNormalized !== referenceNormalized) {
+          hasDifferences = true;
         }
       }
 
@@ -347,30 +352,29 @@ function buildFeatureCategories({
             .toLowerCase()
             .replace(/\s+/g, '_')
             .replace(/\//g, '_');
-          const subReferenceValueRaw = referenceVariant?.[subColumnName] ?? '-';
-          const subReferenceValue = String(subReferenceValueRaw);
+          const subReferenceValueRaw = referenceVariant?.[subColumnName] ?? null;
+          const subReferenceValue = subReferenceValueRaw !== null ? String(subReferenceValueRaw) : '-';
           const subReferenceNormalized = normalizeValue(subReferenceValueRaw);
 
-          // Collect all existing variants with their values for sub-features
+          // Build all variants for sub-features
           const subAllVariants: Variant[] = [];
           let subHasDifferences = false;
 
-          for (const variant of otherVariants) {
-            const variantValueRaw = variant[subColumnName];
+          for (const expected of expectedVariants) {
+            const variantRecord = findVariantRecord(expected.sex, expected.lifeStage);
+            const variantValueRaw = variantRecord?.[subColumnName] ?? null;
             const variantNormalized = normalizeValue(variantValueRaw);
 
-            // Only include this variant if it has actual data (not null/empty)
-            if (variantNormalized !== null) {
-              subAllVariants.push({
-                sex: variant.sex,
-                lifeStage: variant.life_stage,
-                value: variantValueRaw
-              });
+            // Always add this variant (with "-" if no data)
+            subAllVariants.push({
+              sex: expected.sex,
+              lifeStage: expected.label,
+              value: variantValueRaw !== null ? variantValueRaw : '-'
+            });
 
-              // Check if this variant differs from reference
-              if (subReferenceNormalized && variantNormalized !== subReferenceNormalized) {
-                subHasDifferences = true;
-              }
+            // Check if this variant differs from reference
+            if (subReferenceNormalized && variantNormalized && variantNormalized !== subReferenceNormalized) {
+              subHasDifferences = true;
             }
           }
 

@@ -38,7 +38,7 @@ function formatBooleanValue(value: unknown): React.ReactNode {
   if (isTrue) {
     return (
       <span className="flex items-center gap-2 text-green-600 font-medium">
-        <Icon name="checkmark-2" size="sm" style="filled" className="text-green-600" />
+        <Icon name="checkmark-2" size="sm" style="filled" className="text-green-600 flex-shrink-0" />
         Present
       </span>
     );
@@ -46,7 +46,7 @@ function formatBooleanValue(value: unknown): React.ReactNode {
   if (isFalse) {
     return (
       <span className="flex items-center gap-2 text-red-500 font-medium">
-        <Icon name="close" size="sm" style="filled" className="text-red-500" />
+        <Icon name="close" size="sm" style="filled" className="text-red-500 flex-shrink-0" />
         Absent
       </span>
     );
@@ -81,14 +81,6 @@ function formatDisplayValue(value: unknown): React.ReactNode {
   return stringValue.charAt(0).toUpperCase() + stringValue.slice(1).toLowerCase();
 }
 
-// Helper to get display label for a variant
-function getVariantLabel(variant: Variant): string {
-  if (variant.lifeStage === 'Juvenile' || variant.lifeStage === 'Hatchling') {
-    return variant.lifeStage;
-  }
-  return `${variant.sex} ${variant.lifeStage}`;
-}
-
 export default function VariantModal({
   isOpen,
   onClose,
@@ -113,6 +105,10 @@ export default function VariantModal({
   const variantsDifferFromReference = useMemo(() => {
     return variants.variants.map((variant) => {
       const variantNormalized = normalizeValue(variant.value);
+      // Only consider it different if both have actual values and they differ
+      if (referenceNormalized === null || variantNormalized === null) {
+        return false;
+      }
       return variantNormalized !== referenceNormalized;
     });
   }, [variants.variants, referenceNormalized]);
@@ -130,8 +126,8 @@ export default function VariantModal({
         {/* Life stage rows */}
         <div className="flex flex-col gap-3 py-2">
           {/* Reference Row (Adult Male) */}
-          <div className="flex items-center justify-between p-4 rounded-lg border border-gray-200 bg-white">
-            <div className="flex items-center gap-3">
+          <div className="flex items-start justify-between gap-4 p-4 rounded-lg border border-gray-200 bg-white">
+            <div className="flex items-center gap-3 whitespace-nowrap flex-shrink-0">
               <span className="font-medium">Adult Male</span>
               <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-white font-medium">
                 Reference
@@ -145,18 +141,19 @@ export default function VariantModal({
           {/* Other Variant Rows */}
           {variants.variants.map((variant: Variant, index: number) => {
             const isDifferent = variantsDifferFromReference[index];
-            const label = getVariantLabel(variant);
+            // lifeStage is now pre-formatted (e.g., "Adult Female", "Juvenile", "Hatchling")
+            const label = variant.lifeStage;
 
             return (
               <div
                 key={`${variant.sex}-${variant.lifeStage}`}
-                className={`flex items-center justify-between p-4 rounded-lg border ${
+                className={`flex items-start justify-between gap-4 p-4 rounded-lg border ${
                   isDifferent
                     ? 'border-amber-200 bg-amber-50'
                     : 'border-gray-200 bg-white'
                 }`}
               >
-                <span className="font-medium">{label}</span>
+                <span className="font-medium whitespace-nowrap flex-shrink-0">{label}</span>
                 <div className="text-right">
                   {formatDisplayValue(variant.value)}
                 </div>
