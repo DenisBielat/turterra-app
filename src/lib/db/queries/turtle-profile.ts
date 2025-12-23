@@ -208,15 +208,31 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
 }
 
 function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) {
+  // Debug: log what we received
+  console.log('Physical features received:', physicalFeatures.map(pf => ({
+    sex: pf.sex,
+    life_stage: pf.life_stage,
+    sexType: typeof pf.sex
+  })));
+
   // Reference is Adult Male
   const referenceVariant = physicalFeatures.find(
     (variant) => variant.sex === 'Male' && variant.life_stage === 'Adult'
   ) || physicalFeatures[0];
 
+  // Helper to check if sex matches (handles null, undefined, empty string)
+  const sexMatches = (variantSex: string | null | undefined, targetSex: string | null) => {
+    if (targetSex === null) {
+      // For generic records, sex should be null, undefined, or empty
+      return variantSex === null || variantSex === undefined || variantSex === '';
+    }
+    return variantSex === targetSex;
+  };
+
   // Define the order of variants we want to compare against
   // Adult Female, Juvenile (generic), Hatchling (generic)
   // Skip the generic adult record (sex=null, life_stage='Adult') as it's for record keeping only
-  const variantOrder = [
+  const variantOrder: { sex: string | null; life_stage: string }[] = [
     { sex: 'Female', life_stage: 'Adult' },
     { sex: null, life_stage: 'Juvenile' },
     { sex: null, life_stage: 'Hatchling' }
@@ -226,10 +242,13 @@ function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) 
   const otherVariants = variantOrder
     .map(({ sex, life_stage }) =>
       physicalFeatures.find(
-        (variant) => variant.sex === sex && variant.life_stage === life_stage
+        (variant) => sexMatches(variant.sex, sex) && variant.life_stage === life_stage
       )
     )
     .filter((variant): variant is PhysicalFeatureData => variant !== undefined);
+
+  console.log('Reference variant:', referenceVariant?.sex, referenceVariant?.life_stage);
+  console.log('Other variants found:', otherVariants.map(v => `${v.sex ?? 'null'} ${v.life_stage}`));
 
   return { referenceVariant, otherVariants };
 }
@@ -268,6 +287,13 @@ function buildFeatureCategories({
       const referenceValue = String(referenceValueRaw);
       const referenceNormalized = normalizeValue(referenceValueRaw);
 
+      // Debug: log column mapping for first few features
+      if (key.physical_feature === 'Head Colors' || key.physical_feature === 'Carapace Colors') {
+        console.log(`Feature "${key.physical_feature}" -> column "${columnName}"`);
+        console.log(`  Reference value:`, referenceValueRaw, `-> normalized:`, referenceNormalized);
+        console.log(`  Reference variant keys:`, referenceVariant ? Object.keys(referenceVariant).slice(0, 10) : 'none');
+      }
+
       // Collect all existing variants with their values
       const allVariants: Variant[] = [];
       let hasDifferences = false;
@@ -275,6 +301,11 @@ function buildFeatureCategories({
       for (const variant of otherVariants) {
         const variantValueRaw = variant[columnName];
         const variantNormalized = normalizeValue(variantValueRaw);
+
+        // Debug logging
+        if (key.physical_feature === 'Head Colors' || key.physical_feature === 'Carapace Colors') {
+          console.log(`  Variant ${variant.sex ?? 'null'} ${variant.life_stage}: raw="${variantValueRaw}" normalized="${variantNormalized}"`);
+        }
 
         // Only include this variant if it has actual data (not null/empty)
         if (variantNormalized !== null) {
@@ -287,6 +318,7 @@ function buildFeatureCategories({
           // Check if this variant differs from reference
           if (referenceNormalized && variantNormalized !== referenceNormalized) {
             hasDifferences = true;
+            console.log(`  DIFFERENCE DETECTED for ${key.physical_feature}: ref="${referenceNormalized}" vs variant="${variantNormalized}"`);
           }
         }
       }

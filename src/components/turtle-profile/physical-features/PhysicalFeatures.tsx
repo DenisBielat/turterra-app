@@ -131,13 +131,13 @@ export default function PhysicalFeatures({
                         } ${index === category.features.length - 1 ? 'pb-2' : ''}`}
                       >
                         <div
-                          className={`grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 py-2 ${
+                          className={`grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 py-3 ${
                             index > 0 ? 'border-t border-gray-200' : ''
                           }`}
                         >
-                          <div className="font-semibold">{feature.name}</div>
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center h-5">
+                          <div className="font-semibold self-start pt-0.5">{feature.name}</div>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
                               {formatFeatureValue(feature.value)}
                             </div>
                             {feature.variants && (
@@ -148,7 +148,7 @@ export default function PhysicalFeatures({
                                     variants: feature.variants!
                                   })
                                 }
-                                className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm"
+                                className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm flex-shrink-0"
                                 aria-label={`View variant differences for ${feature.name}`}
                               >
                                 <Icon
@@ -166,19 +166,19 @@ export default function PhysicalFeatures({
                         {feature.subFeatures.map((sub) => (
                           <div
                             key={sub.name}
-                            className="grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 pb-2"
+                            className="grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 py-2"
                           >
-                            <div className="pl-10 relative flex items-center">
+                            <div className="pl-10 relative flex items-start pt-0.5">
                               <Icon
                                 name="flow-arrow-1"
                                 size="base"
                                 style="filled"
-                                className="absolute left-2 text-black"
+                                className="absolute left-2 top-1 text-black"
                               />
                               <span className="font-semibold">{sub.name}</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center h-5">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
                                 {formatFeatureValue(sub.value)}
                               </div>
                               {sub.variants && (
@@ -189,7 +189,7 @@ export default function PhysicalFeatures({
                                       variants: sub.variants!
                                     })
                                   }
-                                  className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm"
+                                  className="p-1 flex items-center justify-center hover:bg-gray-100 rounded-sm flex-shrink-0"
                                   aria-label={`View variant differences for ${sub.name}`}
                                 >
                                   <Icon
