@@ -215,9 +215,20 @@ function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) 
     sexType: typeof pf.sex
   })));
 
-  // Reference is Adult Male
+  // Helper for case-insensitive string comparison
+  const equalsIgnoreCase = (a: string | null | undefined, b: string | null | undefined): boolean => {
+    if (a === null || a === undefined || a === '') {
+      return b === null || b === undefined || b === '';
+    }
+    if (b === null || b === undefined || b === '') {
+      return false;
+    }
+    return a.toLowerCase() === b.toLowerCase();
+  };
+
+  // Reference is Adult Male (case-insensitive)
   const referenceVariant = physicalFeatures.find(
-    (variant) => variant.sex === 'Male' && variant.life_stage === 'Adult'
+    (variant) => equalsIgnoreCase(variant.sex, 'Male') && equalsIgnoreCase(variant.life_stage, 'Adult')
   ) || physicalFeatures[0];
 
   // Helper to check if sex matches (handles null, undefined, empty string)
@@ -226,7 +237,7 @@ function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) 
       // For generic records, sex should be null, undefined, or empty
       return variantSex === null || variantSex === undefined || variantSex === '';
     }
-    return variantSex === targetSex;
+    return equalsIgnoreCase(variantSex, targetSex);
   };
 
   // Define the order of variants we want to compare against
@@ -242,7 +253,7 @@ function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) 
   const otherVariants = variantOrder
     .map(({ sex, life_stage }) =>
       physicalFeatures.find(
-        (variant) => sexMatches(variant.sex, sex) && variant.life_stage === life_stage
+        (variant) => sexMatches(variant.sex, sex) && equalsIgnoreCase(variant.life_stage, life_stage)
       )
     )
     .filter((variant): variant is PhysicalFeatureData => variant !== undefined);
