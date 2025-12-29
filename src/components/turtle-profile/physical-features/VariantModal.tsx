@@ -17,11 +17,15 @@ import { VariantModalProps, Variant } from '@/types/turtleTypes';
 function normalizeValue(value: unknown): string | null {
   if (value === false) return 'false';
   if (value === null || value === undefined || value === 'Unknown' || value === '-') return null;
+  // Handle empty strings and whitespace-only strings as "no data"
+  if (typeof value === 'string' && value.trim() === '') return null;
   if (typeof value === 'boolean' || value === 'true' || value === 'false') {
     return String(value).toLowerCase();
   }
   if (Array.isArray(value)) {
-    return value
+    const filtered = value.filter(v => v !== null && v !== undefined && String(v).trim() !== '');
+    if (filtered.length === 0) return null;
+    return filtered
       .map(v => String(v).toLowerCase().trim())
       .sort()
       .join(', ');
@@ -57,6 +61,10 @@ function formatBooleanValue(value: unknown): React.ReactNode {
 // Helper to format display values
 function formatDisplayValue(value: unknown): React.ReactNode {
   if (value === null || value === undefined || value === '-') {
+    return '-';
+  }
+  // Handle empty strings and whitespace-only strings as "no data"
+  if (typeof value === 'string' && value.trim() === '') {
     return '-';
   }
 
