@@ -133,7 +133,7 @@ export default function VariantModal({
           className="absolute right-4 top-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Close"
         >
-          <Icon name="close" size="md" style="line" />
+          <Icon name="close" size="base" style="line" />
         </button>
 
         <DialogHeader className="pb-2">
