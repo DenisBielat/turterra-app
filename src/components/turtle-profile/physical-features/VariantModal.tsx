@@ -124,7 +124,7 @@ export default function VariantModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleChange}>
       <DialogContent
-        className="max-w-xl duration-300 [&>button]:hidden"
+        className="max-w-xl duration-300"
         aria-describedby="variant-modal-description"
       >
         {/* Close button in top-right */}
@@ -133,7 +133,7 @@ export default function VariantModal({
           className="absolute right-4 top-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Close"
         >
-          <Icon name="close" size="md" style="outline" />
+          <Icon name="close" size="md" style="line" />
         </button>
 
         <DialogHeader className="pb-2">
@@ -146,7 +146,7 @@ export default function VariantModal({
         {/* Life stage rows */}
         <div className="flex flex-col gap-3 py-2">
           {/* Reference Row (Adult Male) - warm background */}
-          <div className="grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border border-gray-300 bg-stone-100">
+          <div className="grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border border-gray-300 bg-warm">
             <div className="flex items-center gap-3 whitespace-nowrap">
               <span className="font-medium">Adult Male</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-gray-500 text-white font-medium">
