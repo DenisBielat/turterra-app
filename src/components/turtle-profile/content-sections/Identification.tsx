@@ -206,7 +206,16 @@ export default function Identification({
         <div className="mt-12 max-w-lg">
           <h3 className="text-3xl font-bold">Physical Features</h3>
           <p className="mt-2 text-base">
-          This section highlights each physical feature of the turtle as observed in the “reference” variant (Adult Male). If you see a variant icon next to a feature, it means there are known differences in that feature for other sexes or life stages (e.g., juvenile, hatchling). Clicking the icon will display a quick comparison, so you can see exactly how that feature varies across the same turtle species. 
+          Features shown are for Adult Males (reference). Look for the variant icon{' '}
+          <span className="inline-flex items-center justify-center rounded bg-gray-200/60 px-1.5 py-0.5 align-baseline">
+            <Icon
+              name="split-3"
+              size="sm"
+              style="line"
+              className="text-violet-800"
+            />
+          </span>{' '}
+          to see how a feature differs by sex or life stage.
           </p>
         </div>
 

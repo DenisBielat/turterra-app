@@ -127,15 +127,6 @@ export default function VariantModal({
         className="max-w-xl duration-300"
         aria-describedby="variant-modal-description"
       >
-        {/* Close button in top-right */}
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
-          aria-label="Close"
-        >
-          <Icon name="close" size="base" style="line" />
-        </button>
-
         <DialogHeader className="pb-2">
           <DialogTitle className="font-heading font-bold text-xl">{featureName}</DialogTitle>
           <DialogDescription id="variant-modal-description" className="text-gray-500 text-sm">
