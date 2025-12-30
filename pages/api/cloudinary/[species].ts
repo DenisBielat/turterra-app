@@ -11,7 +11,7 @@ type CloudinaryResource = {
     custom?: {
       [key: string]: string;
     };
-    [key: string]: any;
+    [key: string]: unknown;
   };
 };
 
