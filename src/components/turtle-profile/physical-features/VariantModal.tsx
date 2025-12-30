@@ -17,11 +17,15 @@ import { VariantModalProps, Variant } from '@/types/turtleTypes';
 function normalizeValue(value: unknown): string | null {
   if (value === false) return 'false';
   if (value === null || value === undefined || value === 'Unknown' || value === '-') return null;
+  // Handle empty strings and whitespace-only strings as "no data"
+  if (typeof value === 'string' && value.trim() === '') return null;
   if (typeof value === 'boolean' || value === 'true' || value === 'false') {
     return String(value).toLowerCase();
   }
   if (Array.isArray(value)) {
-    return value
+    const filtered = value.filter(v => v !== null && v !== undefined && String(v).trim() !== '');
+    if (filtered.length === 0) return null;
+    return filtered
       .map(v => String(v).toLowerCase().trim())
       .sort()
       .join(', ');
@@ -57,6 +61,10 @@ function formatBooleanValue(value: unknown): React.ReactNode {
 // Helper to format display values
 function formatDisplayValue(value: unknown): React.ReactNode {
   if (value === null || value === undefined || value === '-') {
+    return '-';
+  }
+  // Handle empty strings and whitespace-only strings as "no data"
+  if (typeof value === 'string' && value.trim() === '') {
     return '-';
   }
 
@@ -116,23 +124,32 @@ export default function VariantModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleChange}>
       <DialogContent
-        className="max-w-xl duration-300 [&>button]:hidden"
+        className="max-w-xl duration-300"
         aria-describedby="variant-modal-description"
       >
+        {/* Close button in top-right */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+          aria-label="Close"
+        >
+          <Icon name="close" size="base" style="line" />
+        </button>
+
         <DialogHeader className="pb-2">
           <DialogTitle className="font-heading font-bold text-xl">{featureName}</DialogTitle>
           <DialogDescription id="variant-modal-description" className="text-gray-500 text-sm">
-            How this feature varies across life stages
+            How this feature compares across life stages
           </DialogDescription>
         </DialogHeader>
 
         {/* Life stage rows */}
         <div className="flex flex-col gap-3 py-2">
-          {/* Reference Row (Adult Male) */}
-          <div className="grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border border-gray-200 bg-white">
+          {/* Reference Row (Adult Male) - warm background */}
+          <div className="grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border border-gray-300 bg-warm">
             <div className="flex items-center gap-3 whitespace-nowrap">
               <span className="font-medium">Adult Male</span>
-              <span className="text-xs px-2 py-0.5 rounded bg-gray-800 text-white font-medium">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-gray-500 text-white font-medium">
                 Reference
               </span>
             </div>
@@ -152,8 +169,8 @@ export default function VariantModal({
                 key={`${variant.sex}-${variant.lifeStage}`}
                 className={`grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border ${
                   isDifferent
-                    ? 'border-amber-200 bg-amber-50'
-                    : 'border-gray-200 bg-white'
+                    ? 'border-orange-500 bg-orange-500/20'
+                    : 'border-gray-300 bg-white'
                 }`}
               >
                 <span className="font-medium whitespace-nowrap">{label}</span>
