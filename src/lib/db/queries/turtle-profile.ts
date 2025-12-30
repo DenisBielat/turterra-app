@@ -263,7 +263,7 @@ function buildFeatureCategories({
   featureKeys: PhysicalFeature[];
   referenceVariant?: PhysicalFeatureData;
   otherVariants: PhysicalFeatureData[];
-  categoryImages: { url: string; tags: string[] }[];
+  categoryImages: { url: string; tags: string[]; metadata?: { pictured_life_stages?: string; life_stages_descriptor?: string; asset_type?: string; credits_basic?: string } }[];
 }): FeatureCategory[] {
   // Helper for case-insensitive comparison
   const equalsIgnoreCase = (a: string | null | undefined, b: string | null | undefined): boolean => {
@@ -306,9 +306,26 @@ function buildFeatureCategories({
 
       // Assign category image if missing
       if (!category.image) {
-        const featureTag = key.category.toLowerCase().replace(/\//g, '-and-').replace(/\s+/g, '-');
-        const categoryImage = categoryImages.find(img => img.tags.includes(featureTag));
-        category.image = { url: categoryImage?.url || '/images/image-placeholder.png' };
+        const categoryName = key.category.toLowerCase();
+        // Map old tag names to new tag names
+        const tagMapping: Record<string, string> = {
+          'shell-top': 'carapace',
+          'shell-bottom': 'plastron'
+        };
+        
+        // Try to find image with new tag name first, then fall back to old tag name
+        const normalizedCategory = categoryName.replace(/\//g, '-and-').replace(/\s+/g, '-');
+        const newTag = tagMapping[normalizedCategory] || normalizedCategory;
+        const oldTag = normalizedCategory;
+        
+        const categoryImage = categoryImages.find(img => 
+          img.tags.includes(newTag) || img.tags.includes(oldTag)
+        );
+        
+        category.image = { 
+          url: categoryImage?.url || '/images/image-placeholder.png',
+          metadata: categoryImage?.metadata
+        };
       }
 
       // Reference & variants

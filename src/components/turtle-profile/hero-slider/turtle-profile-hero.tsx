@@ -10,16 +10,18 @@ import styles from "./TurtleProfileHero.module.css";
 import Icon from "@/components/Icon";
 
 type AssetType = "Image" | "Video" | "Diagram" | "Illustration" | "Artwork";
-type LifeStage = "Adult" | "Juvenile" | "Hatchling" | "Unknown";
 
 interface ImageData {
   public_id: string;
   secure_url: string;
   metadata: {
     primary_photo: boolean;
-    life_stage: LifeStage | "";
+    pictured_life_stages: string;
+    life_stages_descriptor: string;
     asset_type: AssetType | "";
-    credits_basic: string | "";
+    credits_basic: string;
+    credits_full: string;
+    author: string;
     width?: number;
     height?: number;
   };
@@ -126,7 +128,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                   <img
                     src={image.secure_url}
                     alt={`${turtleName} image`}
-                    title={image.metadata.life_stage || ""}
+                    title={image.metadata.pictured_life_stages || ""}
                     loading="lazy"
                     className={styles.image}
                   />
@@ -138,16 +140,48 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                     index === activeIndex ? styles.visible : ""
                   }`}
                 >
-                  <div className="flex justify-end items-center gap-2 text-sm text-gray-300">
-                    {image.metadata.life_stage && (
-                      <span>{image.metadata.life_stage}</span>
-                    )}
-                    {image.metadata.asset_type && (
-                      <span>{image.metadata.asset_type}</span>
-                    )}
-                    {image.metadata.credits_basic && (
-                      <span>{image.metadata.credits_basic}</span>
-                    )}
+                  <div className="flex justify-end items-center text-sm text-gray-300">
+                    {(() => {
+                      // Helper function to capitalize first letter
+                      const capitalize = (str: string) => {
+                        if (!str) return "";
+                        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+                      };
+
+                      const parts: string[] = [];
+                      
+                      // Format life stages with proper capitalization
+                      if (image.metadata.life_stages_descriptor && image.metadata.pictured_life_stages) {
+                        // If descriptor exists: capitalize descriptor, lowercase life stage
+                        const descriptor = capitalize(image.metadata.life_stages_descriptor);
+                        const lifeStage = image.metadata.pictured_life_stages.toLowerCase();
+                        parts.push(`${descriptor} ${lifeStage}`);
+                      } else if (image.metadata.pictured_life_stages) {
+                        // If no descriptor: capitalize life stage
+                        parts.push(capitalize(image.metadata.pictured_life_stages));
+                      } else if (image.metadata.life_stages_descriptor) {
+                        // Only descriptor, no life stage
+                        parts.push(capitalize(image.metadata.life_stages_descriptor));
+                      }
+                      
+                      // Join life stage parts and add period if we have any
+                      let attributionText = "";
+                      if (parts.length > 0) {
+                        attributionText = parts.join(" ") + ". ";
+                      }
+                      
+                      // Add asset type (capitalized) and credits basic
+                      if (image.metadata.asset_type && image.metadata.credits_basic) {
+                        const assetType = capitalize(image.metadata.asset_type);
+                        attributionText += `${assetType}: ${image.metadata.credits_basic}`;
+                      } else if (image.metadata.asset_type) {
+                        attributionText += capitalize(image.metadata.asset_type);
+                      } else if (image.metadata.credits_basic) {
+                        attributionText += image.metadata.credits_basic;
+                      }
+                      
+                      return attributionText ? <span>{attributionText}</span> : null;
+                    })()}
                   </div>
                 </div>
               </SwiperSlide>

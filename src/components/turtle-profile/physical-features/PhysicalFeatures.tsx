@@ -29,6 +29,52 @@ export default function PhysicalFeatures({
       .replace(/\s+/g, '-');
   };
 
+  // Format category name with new format: "Carapace | Shell Top"
+  const formatCategoryName = (categoryName: string) => {
+    const nameMapping: Record<string, { primary: string; secondary: string }> = {
+      'Shell Top': { primary: 'Carapace', secondary: 'Shell Top' },
+      'Shell Bottom': { primary: 'Plastron', secondary: 'Shell Bottom' }
+    };
+    
+    const mapped = nameMapping[categoryName];
+    if (mapped) {
+      return (
+        <>
+          <span>{mapped.primary}</span>
+          <span className="text-sm text-gray-500 font-normal"> | {mapped.secondary}</span>
+        </>
+      );
+    }
+    return categoryName;
+  };
+
+  // Format attribution text (asset type and credits only)
+  const formatAttribution = (metadata?: {
+    asset_type?: string;
+    credits_basic?: string;
+  }) => {
+    if (!metadata) return null;
+
+    // Helper function to capitalize first letter
+    const capitalize = (str: string) => {
+      if (!str) return "";
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+    };
+    
+    // Add asset type (capitalized) and credits basic
+    let attributionText = "";
+    if (metadata.asset_type && metadata.credits_basic) {
+      const assetType = capitalize(metadata.asset_type);
+      attributionText = `${assetType}: ${metadata.credits_basic}`;
+    } else if (metadata.asset_type) {
+      attributionText = capitalize(metadata.asset_type);
+    } else if (metadata.credits_basic) {
+      attributionText = metadata.credits_basic;
+    }
+    
+    return attributionText || null;
+  };
+
   const scrollToSection = (element: HTMLElement) => {
     const yOffset = -100;
     const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
@@ -70,7 +116,7 @@ export default function PhysicalFeatures({
                 aria-expanded={isOpen}
                 aria-controls={`content-${categoryTag}`}
               >
-                <span className="text-lg font-bold">{category.name}</span>
+                <span className="text-lg font-bold">{formatCategoryName(category.name)}</span>
                 <Icon
                   name="chevron-down"
                   size="sm"
@@ -105,6 +151,11 @@ export default function PhysicalFeatures({
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
                         </div>
+                        {category.image.metadata && formatAttribution(category.image.metadata) && (
+                          <div className="mt-2 text-xs text-gray-500 text-right">
+                            {formatAttribution(category.image.metadata)}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

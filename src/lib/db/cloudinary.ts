@@ -26,13 +26,34 @@ export async function getPhysicalFeatureImages(species: string) {
   try {
     const result = await cloudinary.api.resources_by_asset_folder(assetFolder, {
       max_results: 500,
-      tags: true
+      tags: true,
+      context: true,
+      metadata: true
     });
 
-    const images = result.resources.map(image => ({
-      url: image.secure_url,
-      tags: image.tags || []
-    }));
+    const images = result.resources.map(image => {
+      // Cloudinary custom metadata can be in:
+      // 1. context.custom (most common for custom fields)
+      // 2. context (directly)
+      // 3. metadata (for EXIF/IPTC data, but sometimes custom fields too)
+      const contextCustom = image.context?.custom || {};
+      const contextDirect = image.context || {};
+      const metadata = image.metadata || {};
+      
+      // Merge all sources, with priority: context.custom > context > metadata
+      const customData = { ...metadata, ...contextDirect, ...contextCustom };
+      
+      return {
+        url: image.secure_url,
+        tags: image.tags || [],
+        metadata: {
+          pictured_life_stages: customData.pictured_life_stages || customData.life_stage || "",
+          life_stages_descriptor: customData.life_stages_descriptor || "",
+          asset_type: customData.asset_type || "",
+          credits_basic: customData.credits_basic || "",
+        }
+      };
+    });
     return images;
   } catch (error) {
     console.error('Cloudinary fetch error:', error);
