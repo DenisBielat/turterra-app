@@ -29,6 +29,7 @@ export type LineIconName =
   | 'male'
   | 'map-marks'
   | 'move-back'
+  | 'origin'
   | 'outdoors-tree-valley'
   | 'pattern'
   | 'ruler'

@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Map, { Source, Layer, NavigationControl, ViewState, MapRef, MapMouseEvent } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/lib/db/supabaseClient';
+import { Icon } from '@/components/Icon';
 import type { FeatureCollection, MultiPolygon, Geometry } from 'geojson';
+import type { LngLatBoundsLike } from 'mapbox-gl';
 
 type DistributionProperties = {
   presence_status?: string;
@@ -66,6 +68,11 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   // Track zoom level for layer visibility
   const [currentZoom, setCurrentZoom] = useState(1.5);
   const ZOOM_BREAKPOINT = 2.5; // Show states when zoom >= 2.5, countries when zoom < 2.5
+
+  // Track origin bounds for "Back to Origin" functionality
+  const [originBounds, setOriginBounds] = useState<LngLatBoundsLike | null>(null);
+  const [hasMovedFromOrigin, setHasMovedFromOrigin] = useState(false);
+  const isInitialZoomRef = useRef(true);
   
   // Fetch distribution GeoJSON for selected species
   useEffect(() => {
@@ -289,14 +296,25 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         }
 
         if (bbox && bbox.length >= 4) {
-          map.fitBounds([
+          const bounds: LngLatBoundsLike = [
             [bbox[0], bbox[1]],
             [bbox[2], bbox[3]]
-          ], {
+          ];
+          // Store the origin bounds for "Back to Origin" functionality
+          setOriginBounds(bounds);
+          isInitialZoomRef.current = true;
+          setHasMovedFromOrigin(false);
+
+          map.fitBounds(bounds, {
             padding: 50,
             duration: 1500,
             easing: (t) => t * (2 - t)
           });
+
+          // Mark initial zoom complete after animation
+          setTimeout(() => {
+            isInitialZoomRef.current = false;
+          }, 1600);
         } else if (distributionFeatures.length > 0 || rangeFeatures.length > 0) {
           // Just zoom to a reasonable level if no bbox
           map.easeTo({
@@ -304,12 +322,34 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             duration: 1500,
             easing: (t) => t * (2 - t)
           });
+
+          // Mark initial zoom complete after animation
+          setTimeout(() => {
+            isInitialZoomRef.current = false;
+          }, 1600);
         }
       };
 
       waitForMapLoad();
     }
   }, [speciesData, rangeMapData]);
+
+  // Handle returning to origin
+  const handleBackToOrigin = useCallback(() => {
+    if (originBounds && mapRef.current) {
+      const map = mapRef.current.getMap();
+      isInitialZoomRef.current = true;
+      map.fitBounds(originBounds, {
+        padding: 50,
+        duration: 1000,
+        easing: (t) => t * (2 - t)
+      });
+      setTimeout(() => {
+        isInitialZoomRef.current = false;
+        setHasMovedFromOrigin(false);
+      }, 1100);
+    }
+  }, [originBounds]);
 
   const transformCoordinates = (geojson: FeatureCollection<MultiPolygon>) => {
     return {
@@ -389,6 +429,19 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           )}
         </div>
       </div>
+
+      {/* Back to Origin Button - positioned below the layer controls */}
+      {hasMovedFromOrigin && originBounds && (
+        <button
+          onClick={handleBackToOrigin}
+          className="absolute left-4 z-10 bg-white rounded-lg shadow-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+          style={{ top: 'calc(1rem + 180px)' }}
+        >
+          <Icon name="origin" style="line" size="sm" className="text-gray-600" />
+          <span className="text-sm font-medium text-gray-700">Back to Origin</span>
+        </button>
+      )}
+
       <Map
         ref={mapRef}
         {...viewState}
@@ -396,6 +449,10 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         onMove={evt => {
           setViewState(evt.viewState);
           setCurrentZoom(evt.viewState.zoom);
+          // Detect user movement after initial zoom
+          if (!isInitialZoomRef.current && originBounds) {
+            setHasMovedFromOrigin(true);
+          }
         }}
         mapStyle={process.env.NEXT_PUBLIC_MAPBOX_STYLE_URL || 'mapbox://styles/mapbox/light-v11'}
         mapboxAccessToken={MAPBOX_TOKEN}
