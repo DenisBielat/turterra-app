@@ -14,9 +14,9 @@ import {
 
 const Navbar = () => {
   return (
-    <header className="top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2 px-10">
+    <header className="top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2 px-4 lg:px-10">
       <div className="container mx-auto max-w-8xl flex h-16 items-center justify-between">
-        <div className="flex items-center gap-16">
+        <div className="flex items-center gap-8 lg:gap-16">
           <Link href="/" className="flex-shrink-0">
             <Image
               src="/images/turterra-logo-white-text.png"
@@ -27,7 +27,8 @@ const Navbar = () => {
             />
           </Link>
 
-          <NavigationMenu>
+          {/* Desktop Navigation - Hidden on mobile/tablet */}
+          <NavigationMenu className="hidden lg:flex">
             <NavigationMenuList className="gap-8">
               <NavigationMenuItem>
                 <NavigationMenuTrigger>
@@ -108,7 +109,8 @@ const Navbar = () => {
           </NavigationMenu>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Desktop Action Buttons - Hidden on mobile/tablet */}
+        <div className="hidden lg:flex items-center gap-4">
           <Link
             href="/login"
             className="font-semibold text-white border-2 border-warm rounded-full px-6 py-3 hover:text-green-950 hover:bg-warm transition-all"
