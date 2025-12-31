@@ -20,7 +20,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       metadata: true,
     });
 
-    if (result.resources.length === 0) {
+    const resourceCount: number = result.resources.length;
+    if (resourceCount === 0) {
       console.log("No images found in:", assetFolder); // Log for empty folder
       return res.status(404).json({ error: "No images found for this species" });
     }
