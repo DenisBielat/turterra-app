@@ -8,7 +8,6 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Icon } from '@/components/Icon';
 import { TaxonomyData } from '@/types/turtleTypes';
 
 interface TaxonomyPopupProps {
@@ -53,8 +52,7 @@ export default function TaxonomyPopup({
     <Dialog open={isOpen} onOpenChange={handleChange}>
       <DialogContent className="max-w-lg bg-warm rounded-xl p-0 gap-0">
         <DialogHeader className="p-6 pb-4">
-          <DialogTitle className="flex items-center gap-3 font-heading font-bold text-xl">
-            <Icon name="clipboard" size="base" style="line" />
+          <DialogTitle className="font-heading font-bold text-xl">
             Taxonomy at a Glance
           </DialogTitle>
           <VisuallyHidden>
