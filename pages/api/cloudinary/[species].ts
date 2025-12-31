@@ -1,24 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import cloudinary from "@/lib/db/cloudinary";
 
-type CloudinaryResource = {
-  public_id: string;
-  secure_url: string;
-  metadata?: {
-    [key: string]: string;
-  };
-  context?: {
-    custom?: {
-      [key: string]: string;
-    };
-    [key: string]: unknown;
-  };
-};
-
-type CloudinaryResponse = {
-  resources: CloudinaryResource[];
-};
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { species } = req.query;
 
@@ -32,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   console.log("Asset folder being queried:", assetFolder); // Debugging log
 
   try {
-    const result: CloudinaryResponse = await cloudinary.api.resources_by_asset_folder(assetFolder, {
+    const result = await cloudinary.api.resources_by_asset_folder(assetFolder, {
       max_results: 500,
       context: true,
       metadata: true,
@@ -54,13 +36,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // 1. context.custom (most common for custom fields)
       // 2. context (directly)
       // 3. metadata (for EXIF/IPTC data, but sometimes custom fields too)
-      const contextCustom = image.context?.custom || {};
-      const contextDirect = image.context || {};
-      const metadata = image.metadata || {};
-      
+      const context = image.context as Record<string, unknown> | undefined;
+      const contextCustom = (context?.custom as Record<string, unknown>) || {};
+      const contextDirect = context || {};
+      const metadata = (image.metadata as Record<string, unknown>) || {};
+
       // Merge all sources, with priority: context.custom > context > metadata
-      const customData = { ...metadata, ...contextDirect, ...contextCustom };
-      
+      const customData: Record<string, unknown> = { ...metadata, ...contextDirect, ...contextCustom };
+
       return {
         public_id: image.public_id,
         secure_url: image.secure_url,
