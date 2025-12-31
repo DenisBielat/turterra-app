@@ -1,6 +1,14 @@
+"use client"
+
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 // Bracket component for grouping status bubbles with their labels
 interface BracketProps {
@@ -167,59 +175,88 @@ export default function Conservation({
       </div>
 
       {/* Status Bubbles - Full width, outside grid */}
-      <div className="mt-12 w-full">
-        <div className="flex items-center">
-          {/* DD and NE bubbles - disconnected group */}
-          {specialStatuses.length > 0 && (
-            <>
+      <TooltipProvider>
+        <div className="mt-12 w-full">
+          <div className="flex items-center">
+            {/* DD and NE bubbles - disconnected group */}
+            {specialStatuses.length > 0 && (
+              <>
+                <div className="flex items-center">
+                  {specialStatuses.map((status, index) => {
+                    const isActive = isStatusActive(status.abbreviation);
+                    return (
+                      <div key={status.id} className="flex items-center">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={`flex h-12 w-12 items-center justify-center rounded-full cursor-pointer ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                            >
+                              <span className="font-bold text-sm">{status.abbreviation}</span>
+                            </div>
+                          </TooltipTrigger>
+                          {status.definition && (
+                            <TooltipContent className="max-w-xs">
+                              <div className="flex flex-col gap-1.5">
+                                <div className="font-bold text-base leading-tight">{status.status}</div>
+                                <div className="text-sm text-gray-600 font-normal leading-relaxed">
+                                  {status.definition}
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                        {index < specialStatuses.length - 1 && (
+                          <div className="h-px w-8 bg-gray-300"></div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                {/* Vertical divider between DD/NE and IUCN statuses */}
+                {iucnStatuses.length > 0 && (
+                  <div className="w-px h-12 bg-gray-400 mx-4"></div>
+                )}
+              </>
+            )}
+            
+            {/* IUCN Status bubbles - connected group */}
+            {iucnStatuses.length > 0 && (
               <div className="flex items-center">
-                {specialStatuses.map((status, index) => {
+                {iucnStatuses.map((status, index) => {
                   const isActive = isStatusActive(status.abbreviation);
                   return (
                     <div key={status.id} className="flex items-center">
-                      <div
-                        className={`flex h-12 w-12 items-center justify-center rounded-full ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
-                      >
-                        <span className="font-bold text-sm">{status.abbreviation}</span>
-                      </div>
-                      {index < specialStatuses.length - 1 && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={`flex h-12 w-12 items-center justify-center rounded-full cursor-pointer ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                          >
+                            <span className="font-bold text-sm">{status.abbreviation}</span>
+                          </div>
+                        </TooltipTrigger>
+                        {status.definition && (
+                          <TooltipContent className="max-w-xs">
+                            <div className="flex flex-col gap-1.5">
+                              <div className="font-bold text-base leading-tight">{status.status}</div>
+                              <div className="text-sm text-gray-600 font-normal">
+                                {status.definition}
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                      {index < iucnStatuses.length - 1 && (
                         <div className="h-px w-8 bg-gray-300"></div>
                       )}
                     </div>
                   );
                 })}
-              </div>
-              
-              {/* Vertical divider between DD/NE and IUCN statuses */}
-              {iucnStatuses.length > 0 && (
-                <div className="w-px h-12 bg-gray-400 mx-4"></div>
-              )}
-            </>
-          )}
-          
-          {/* IUCN Status bubbles - connected group */}
-          {iucnStatuses.length > 0 && (
-            <div className="flex items-center">
-              {iucnStatuses.map((status, index) => {
-                const isActive = isStatusActive(status.abbreviation);
-                return (
-                  <div key={status.id} className="flex items-center">
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-full ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
-                    >
-                      <span className="font-bold text-sm">{status.abbreviation}</span>
-                    </div>
-                    {index < iucnStatuses.length - 1 && (
-                      <div className="h-px w-8 bg-gray-300"></div>
-                    )}
-                  </div>
-                );
-              })}
             </div>
           )}
-        </div>
+          </div>
         
-        {/* Labels row with brackets */}
+          {/* Labels row with brackets */}
         <div className="flex items-start mt-4">
           {/* Lacks Data label with bracket - centered under DD and NE section */}
           {specialStatuses.length > 0 && (
@@ -279,7 +316,8 @@ export default function Conservation({
             </div>
           )}
         </div>
-      </div>
+        </div>
+      </TooltipProvider>
 
       {/* Environmental & Manmade Threats Subsection - After bubbles */}
       {threats && (
