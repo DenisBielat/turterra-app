@@ -612,11 +612,13 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           );
         })}
 
-        {/* Render IUCN Range Maps */}
-        {activeLayers.range && rangeMapData.map((rangeData) => {
+        {/* Render IUCN Range Maps - always render but control visibility via layout */}
+        {rangeMapData.map((rangeData) => {
           if (!rangeData.geojson || !rangeData.geojson.features) {
             return null;
           }
+
+          const visibility = activeLayers.range ? 'visible' : 'none';
 
           return (
             <Source
@@ -630,6 +632,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               <Layer
                 id={`range-${rangeData.speciesId}-fill`}
                 type="fill"
+                layout={{ visibility }}
                 paint={{
                   'fill-color': '#3b82f6', // blue-500
                   'fill-opacity': [
@@ -648,6 +651,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               <Layer
                 id={`range-${rangeData.speciesId}-line`}
                 type="line"
+                layout={{ visibility }}
                 paint={{
                   'line-color': '#1d4ed8', // blue-700
                   'line-width': 2,
@@ -662,6 +666,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               <Layer
                 id={`range-${rangeData.speciesId}-linestring`}
                 type="line"
+                layout={{ visibility }}
                 paint={{
                   'line-color': '#3b82f6', // blue-500
                   'line-width': 2
