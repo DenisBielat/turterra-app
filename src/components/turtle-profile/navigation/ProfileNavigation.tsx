@@ -3,15 +3,19 @@
 import Image from 'next/image'
 import { useState, useEffect, useMemo } from 'react'
 import { Icon } from '@/components/Icon'
+import { TaxonomyData } from '@/types/turtleTypes'
+import TaxonomyPopup from './TaxonomyPopup'
 
 interface ProfileNavigationProps {
   name: string
   species: string
   imageUrl: string
+  taxonomy?: TaxonomyData | null
 }
 
-export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigationProps) => {
+export const ProfileNavigation = ({ name, species, imageUrl, taxonomy }: ProfileNavigationProps) => {
   const [activeSection, setActiveSection] = useState('intro')
+  const [isTaxonomyOpen, setIsTaxonomyOpen] = useState(false)
   
   // Add throttle utility
   const throttle = <T extends unknown[]>(func: (...args: T) => void, limit: number) => {
@@ -123,7 +127,16 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
             sizes="(max-width: 768px) 100vw, 32vw"
           />
           <h5 className="font-heading font-bold text-2xl">{name}</h5>
-          <div className="italic">{species}</div>
+          {taxonomy ? (
+            <button
+              onClick={() => setIsTaxonomyOpen(true)}
+              className="italic text-gray-700 hover:text-green-800 hover:underline transition-colors cursor-pointer"
+            >
+              {species}
+            </button>
+          ) : (
+            <div className="italic">{species}</div>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -152,6 +165,14 @@ export const ProfileNavigation = ({ name, species, imageUrl }: ProfileNavigation
             Back to Top
           </button>
         </div>
+
+        {taxonomy && (
+          <TaxonomyPopup
+            isOpen={isTaxonomyOpen}
+            onClose={() => setIsTaxonomyOpen(false)}
+            taxonomy={taxonomy}
+          />
+        )}
       </div>
   )
 } 

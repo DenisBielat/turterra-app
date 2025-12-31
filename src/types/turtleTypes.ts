@@ -302,3 +302,54 @@ export interface Variant {
     featureName: string;
     variants: FeatureVariants;
   }
+
+  // Taxonomy types
+  export interface TaxonomyOrder {
+    id: number;
+    order_scientific: string | null;
+    order_common_name: string | null;
+  }
+
+  export interface TaxonomySuborder {
+    id: number;
+    suborder_scientific: string | null;
+    suborder_common_name: string | null;
+    tax_parent_order: number | null;
+  }
+
+  export interface TaxonomyFamily {
+    id: number;
+    family_scientific_name: string | null;
+    family_common_name: string | null;
+    tax_parent_suborder: number | null;
+  }
+
+  export interface TaxonomyGenus {
+    id: number;
+    genus_scientific_name: string | null;
+    genus_common_name: string | null;
+    tax_parent_family: number | null;
+  }
+
+  export interface TaxonomyData {
+    order: {
+      scientific: string;
+      common: string;
+    };
+    suborder: {
+      scientific: string;
+      common: string;
+    };
+    family: {
+      scientific: string;
+      common: string;
+    };
+    genus: {
+      scientific: string;
+      common: string;
+    };
+    species: {
+      scientific: string;
+      common: string;
+    };
+  }
