@@ -36,21 +36,29 @@ export async function getPhysicalFeatureImages(species: string) {
       // 1. context.custom (most common for custom fields)
       // 2. context (directly)
       // 3. metadata (for EXIF/IPTC data, but sometimes custom fields too)
-      const contextCustom = image.context?.custom || {};
-      const contextDirect = image.context || {};
-      const metadata = image.metadata || {};
+      const context = image.context as Record<string, unknown> | undefined;
+      const contextCustom = (context?.custom as Record<string, unknown>) || {};
+      const contextDirect = context || {};
+      const metadata = (image.metadata as Record<string, unknown>) || {};
       
       // Merge all sources, with priority: context.custom > context > metadata
-      const customData = { ...metadata, ...contextDirect, ...contextCustom };
+      const customData: Record<string, unknown> = { ...metadata, ...contextDirect, ...contextCustom };
+      
+      // Helper to safely convert unknown values to string
+      const toString = (value: unknown): string => {
+        if (value === null || value === undefined) return "";
+        if (typeof value === "string") return value;
+        return String(value);
+      };
       
       return {
         url: image.secure_url,
         tags: image.tags || [],
         metadata: {
-          pictured_life_stages: customData.pictured_life_stages || customData.life_stage || "",
-          life_stages_descriptor: customData.life_stages_descriptor || "",
-          asset_type: customData.asset_type || "",
-          credits_basic: customData.credits_basic || "",
+          pictured_life_stages: toString(customData.pictured_life_stages || customData.life_stage),
+          life_stages_descriptor: toString(customData.life_stages_descriptor),
+          asset_type: toString(customData.asset_type),
+          credits_basic: toString(customData.credits_basic),
         }
       };
     });

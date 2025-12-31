@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   try {
     const { data, error } = await supabase
       .from('turtle_species')
-      .select('species_common_name, species_scientific_name, slug, avatar_image_url')
+      .select('species_common_name, species_scientific_name, slug, avatar_image_circle_url')
       .or(`species_common_name.ilike.%${query}%,species_scientific_name.ilike.%${query}%`)
       .limit(5);
 

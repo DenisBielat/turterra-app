@@ -11,7 +11,7 @@ interface SearchResult {
   species_common_name: string;
   species_scientific_name: string;
   slug: string;
-  avatar_image_url: string;
+  avatar_image_circle_url: string;
 }
 
 export default function TurtleSearchNav() {
@@ -120,7 +120,7 @@ export default function TurtleSearchNav() {
                       onClick={clearSearch}
                     >
                       <Image
-                        src={result.avatar_image_url}
+                        src={result.avatar_image_circle_url}
                         alt={result.species_common_name}
                         className="w-12 h-12 rounded-full object-cover flex-shrink-0 self-start mt-1"
                         width={500}
