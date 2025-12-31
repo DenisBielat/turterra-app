@@ -45,6 +45,12 @@ export interface Variant {
     };
   }
   
+  export interface RegionRow {
+    regions_general: {
+      region_name: string | null;
+    };
+  }
+  
   export interface BehaviorRow {
     behaviors_general: {
       behavior: string;
@@ -125,6 +131,7 @@ export interface Variant {
     turtle_species_habitats?: HabitatRow[];
     turtle_species_ecologies?: EcologyRow[];
     turtle_species_habitat_types?: HabitatTypeRow[];
+    turtle_species_regions_general?: RegionRow[];
     turtle_species_behaviors_general?: BehaviorRow[];
     turtle_species_physical_features?: PhysicalFeatureData[];
     turtle_species_physical_features_key?: PhysicalFeature[];

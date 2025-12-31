@@ -93,6 +93,9 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       turtle_species_habitat_types(
         habitat_types(habitat_type)
       ),
+      turtle_species_regions_general(
+        regions_general(region_name)
+      ),
       turtle_species_threats(
         threats_list(
           threat_name,
@@ -489,6 +492,7 @@ function transformTurtleDataToProfile(
     turtle_species_habitats,
     turtle_species_ecologies,
     turtle_species_habitat_types,
+    turtle_species_regions_general,
     turtle_species_section_descriptions,
     turtle_species_measurements,
     turtle_species_threats
@@ -513,18 +517,22 @@ function transformTurtleDataToProfile(
     : "Unknown";
   const populationTrend = latestPopulation?.population_trend || "Unknown";
 
-  // Habitats / ecologies
+  // Habitats / ecologies / regions
   const habitatString = turtle_species_habitats
     ?.map(h => h.habitats.habitat).join(", ") || "Unknown";
   const ecologyString = turtle_species_ecologies
     ?.map(e => e.ecologies.ecology).join(", ") || "Unknown";
+  const regionString = turtle_species_regions_general
+    ?.map(r => r.regions_general.region_name)
+    .filter((name): name is string => name != null)
+    .join(", ") || "Unknown";
 
   // Stats
   const stats = {
     population,
     populationTrend,
     habitat: habitatString,
-    region: "Unknown",
+    region: regionString,
     ecology: ecologyString,
     category: "Unknown"
   };
