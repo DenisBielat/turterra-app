@@ -5,7 +5,8 @@ import {
   FeatureCategory,
   PhysicalFeatureData,
   PhysicalFeature,
-  Variant
+  Variant,
+  TaxonomyData
 } from '@/types/turtleTypes';
 
 function normalizeValue(value: unknown): string | null {
@@ -207,6 +208,83 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
     relatedSpecies: relatedSpecies || [],
     behaviors: behaviorsData || [],
     conservationStatuses: conservationStatuses || []
+  };
+}
+
+async function fetchTaxonomyData(
+  genusId: number,
+  speciesCommonName: string,
+  speciesScientificName: string
+): Promise<TaxonomyData | null> {
+  // Fetch genus data
+  const { data: genus, error: genusError } = await supabase
+    .from('turtle_taxonomy_genuses')
+    .select('*')
+    .eq('id', genusId)
+    .single();
+
+  if (genusError || !genus) {
+    console.warn('Error fetching genus:', genusError?.message);
+    return null;
+  }
+
+  // Fetch family data
+  const { data: family, error: familyError } = await supabase
+    .from('turtle_taxonomy_families')
+    .select('*')
+    .eq('id', genus.tax_parent_family)
+    .single();
+
+  if (familyError || !family) {
+    console.warn('Error fetching family:', familyError?.message);
+    return null;
+  }
+
+  // Fetch suborder data
+  const { data: suborder, error: suborderError } = await supabase
+    .from('turtle_taxonomy_suborders')
+    .select('*')
+    .eq('id', family.tax_parent_suborder)
+    .single();
+
+  if (suborderError || !suborder) {
+    console.warn('Error fetching suborder:', suborderError?.message);
+    return null;
+  }
+
+  // Fetch order data
+  const { data: order, error: orderError } = await supabase
+    .from('turtle_taxonomy_orders')
+    .select('*')
+    .eq('id', suborder.tax_parent_order)
+    .single();
+
+  if (orderError || !order) {
+    console.warn('Error fetching order:', orderError?.message);
+    return null;
+  }
+
+  return {
+    order: {
+      scientific: order.order_scientific || 'Unknown',
+      common: order.order_common_name || 'Unknown'
+    },
+    suborder: {
+      scientific: suborder.suborder_scientific || 'Unknown',
+      common: suborder.suborder_common_name || 'Unknown'
+    },
+    family: {
+      scientific: family.family_scientific_name || 'Unknown',
+      common: family.family_common_name || 'Unknown'
+    },
+    genus: {
+      scientific: genus.genus_scientific_name || 'Unknown',
+      common: genus.genus_common_name || 'Unknown'
+    },
+    species: {
+      scientific: speciesScientificName,
+      common: speciesCommonName
+    }
   };
 }
 
@@ -679,12 +757,24 @@ export async function getTurtleData(slug: string) {
     const turtle = await fetchRawTurtleRow('slug', slug);
     if (!turtle) return null;
 
-    const relatedData = await fetchRelatedTurtleData(turtle);
+    const [relatedData, taxonomyData] = await Promise.all([
+      fetchRelatedTurtleData(turtle),
+      fetchTaxonomyData(
+        turtle.tax_parent_genus,
+        turtle.species_common_name,
+        turtle.species_scientific_name
+      )
+    ]);
 
-    return transformTurtleDataToProfile(turtle, {
+    const profileData = transformTurtleDataToProfile(turtle, {
       ...relatedData,
       conservationStatuses: relatedData.conservationStatuses
     });
+
+    return {
+      ...profileData,
+      taxonomy: taxonomyData
+    };
   } catch (error) {
     console.error('Error in getTurtleData:', error);
     throw error;
@@ -717,9 +807,21 @@ export async function getTurtleDataByScientificName(scientificName: string) {
     const turtle = await fetchRawTurtleRow('species_scientific_name', scientificName);
     if (!turtle) return null;
 
-    const relatedData = await fetchRelatedTurtleData(turtle);
+    const [relatedData, taxonomyData] = await Promise.all([
+      fetchRelatedTurtleData(turtle),
+      fetchTaxonomyData(
+        turtle.tax_parent_genus,
+        turtle.species_common_name,
+        turtle.species_scientific_name
+      )
+    ]);
 
-    return transformTurtleDataToProfile(turtle, relatedData);
+    const profileData = transformTurtleDataToProfile(turtle, relatedData);
+
+    return {
+      ...profileData,
+      taxonomy: taxonomyData
+    };
   } catch (error) {
     console.error('Error in getTurtleDataByScientificName:', error);
     throw error;

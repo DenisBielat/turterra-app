@@ -53,10 +53,11 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
             <div className="grid grid-cols-12 gap-4 relative">
               {/* Left sidebar */}
               <div className="flex flex-col col-span-3 justify-start w-full overflow-visible">
-                <ProfileNavigation 
+                <ProfileNavigation
                   name={data.commonName}
                   species={data.scientificName}
                   imageUrl={data.profileImage || "/images/image-placeholder.png"}
+                  taxonomy={data.taxonomy}
                 />
               </div>
 
