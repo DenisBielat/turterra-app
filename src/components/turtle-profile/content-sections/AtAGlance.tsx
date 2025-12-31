@@ -90,24 +90,24 @@ export default function TurtleAtAGlance({
 
   return (
     <section>
-      <h2 id="intro" className="scroll-m-20 text-5xl">
+      <h2 id="intro" className="scroll-m-20 text-3xl md:text-4xl lg:text-5xl">
         At a Glance
       </h2>
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
-          {/* Description area - spans 4 columns */}
-          <div className="col-span-4 text-lg leading-relaxed">
+      <div className="mt-8 lg:mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-9 gap-8 lg:gap-4">
+          {/* Description area - full width on mobile, 4 columns on large screens */}
+          <div className="col-span-1 lg:col-span-4 text-base lg:text-lg leading-relaxed">
             {/* Render the markdown description */}
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {description}
             </ReactMarkdown>
           </div>
-          
-          {/* Empty column */}
-          <div className="col-span-1" />
-          
-          {/* Stats area - spans 4 columns */}
-          <div className="col-span-4 space-y-6">
+
+          {/* Empty column - hidden on mobile */}
+          <div className="hidden lg:block lg:col-span-1" />
+
+          {/* Stats area - full width on mobile, 4 columns on large screens */}
+          <div className="col-span-1 lg:col-span-4 space-y-6">
             {/* Conservation Status */}
             <button
               onClick={() => scrollToSection('conservation')}

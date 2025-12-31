@@ -56,27 +56,27 @@ export default function Identification({
 }: IdentificationProps) {
   return (
     <section className="pb-12">
-      <h2 id="identification" className="scroll-m-20 text-5xl">
+      <h2 id="identification" className="scroll-m-20 text-3xl md:text-4xl lg:text-5xl">
         Identification
       </h2>
-      
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
+
+      <div className="mt-8 lg:mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-9 gap-8 lg:gap-4">
           {/* Left content area - Description */}
-          <div className="col-span-5">
-            <div className="font-heading text-xl font-semibold">Description</div>
-            <div className="mt-4 text-lg whitespace-pre-line">
+          <div className="col-span-1 lg:col-span-5">
+            <div className="font-heading text-lg lg:text-xl font-semibold">Description</div>
+            <div className="mt-4 text-base lg:text-lg whitespace-pre-line">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {description}
               </ReactMarkdown>
             </div>
           </div>
 
-          {/* Empty column for spacing */}
-          <div className="col-span-1" />
+          {/* Empty column for spacing - hidden on mobile */}
+          <div className="hidden lg:block lg:col-span-1" />
 
           {/* Right content area - Measurements */}
-          <div className="col-span-3">
+          <div className="col-span-1 lg:col-span-3">
             <div className="space-y-0">
               {/* Adult Weight */}
               <div className="pb-6">

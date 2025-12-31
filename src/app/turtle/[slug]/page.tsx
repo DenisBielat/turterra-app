@@ -3,6 +3,7 @@ import TurtleProfileHero from "@/components/turtle-profile/hero-slider/turtle-pr
 import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
 import { ProfileNavigation } from "@/components/turtle-profile/navigation/ProfileNavigation";
+import MobileProfileMenuWrapper from "@/components/turtle-profile/navigation/MobileProfileMenuWrapper";
 import Identification from "@/components/turtle-profile/content-sections/Identification";
 import DistributionSection from "@/components/turtle-profile/distribution/DistributionSection";
 import Habitat from "@/components/turtle-profile/content-sections/Habitat";
@@ -46,13 +47,21 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
       <div className="w-full h-16 bg-green-900"></div>
       <div className="w-full h-12 bg-green-800"></div>
       <div className="w-full h-8 bg-orange-500"></div>
-      
+
+      {/* Mobile Profile Menu */}
+      <MobileProfileMenuWrapper
+        name={data.commonName}
+        species={data.scientificName}
+        imageUrl={data.profileImage || "/images/image-placeholder.png"}
+        taxonomy={data.taxonomy}
+      />
+
       <div className="bg-warm">
-        <div className="px-10 py-12">
+        <div className="px-4 py-8 lg:px-10 lg:py-12">
           <div className="max-w-[90rem] mx-auto">
             <div className="grid grid-cols-12 gap-4 relative">
-              {/* Left sidebar */}
-              <div className="flex flex-col col-span-3 justify-start w-full overflow-visible">
+              {/* Left sidebar - Hidden on mobile, visible on large screens */}
+              <div className="hidden lg:flex flex-col col-span-3 justify-start w-full overflow-visible">
                 <ProfileNavigation
                   name={data.commonName}
                   species={data.scientificName}
@@ -61,8 +70,8 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 />
               </div>
 
-              {/* Right content area */}
-              <div className="col-span-9 flex flex-col">
+              {/* Right content area - Full width on mobile, 9 columns on large screens */}
+              <div className="col-span-12 lg:col-span-9 flex flex-col">
                 <TurtleAtAGlance 
                   description={data.description}
                   conservationStatus={data.conservationStatus}

@@ -82,3 +82,30 @@ h1, h2, h3, h4, h5, h6 {
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile Profile Menu Slide Animation */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.mobile-menu-content[data-state="open"] {
+  animation: slideInFromLeft 0.3s ease-out;
+}
+
+.mobile-menu-content[data-state="closed"] {
+  animation: slideOutToLeft 0.3s ease-in;
+}

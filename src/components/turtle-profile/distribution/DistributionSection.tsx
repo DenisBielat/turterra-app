@@ -16,10 +16,10 @@ const DistributionSection: React.FC<DistributionSectionProps> = ({
 }) => {
   return (
     <div id="distribution" className="scroll-mt-20">
-      <div className="mb-8 max-w-2xl">
-        <h2 className="text-5xl font-bold mb-8">Distribution</h2>
+      <div className="mb-6 lg:mb-8 max-w-2xl">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8">Distribution</h2>
         {currentSpeciesName && (
-          <div className="text-lg whitespace-pre-line">
+          <div className="text-base lg:text-lg whitespace-pre-line">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {description?.trim() || `Geographic distribution of the ${currentSpeciesName}`}
             </ReactMarkdown>

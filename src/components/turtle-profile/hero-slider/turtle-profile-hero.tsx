@@ -85,8 +85,8 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
   return (
     <section className="bg-green-950 text-white">
       {/* Header */}
-      <div className="text-center mx-auto w-full max-w-3xl pb-12">
-        <h1 className="text-6xl font-bold text-white leading-[1.1em]">{turtleName}</h1>
+      <div className="text-center mx-auto w-full max-w-3xl pb-8 lg:pb-12 px-4">
+        <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold text-white leading-[1.1em]">{turtleName}</h1>
       </div>
 
       {/* Slider */}

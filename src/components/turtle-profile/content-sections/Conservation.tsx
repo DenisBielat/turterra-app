@@ -141,22 +141,22 @@ export default function Conservation({
 
   return (
     <section id="conservation" className="scroll-m-20 pb-12">
-      <h2 className="text-5xl font-bold mb-2">Conservation</h2>
-      
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2">Conservation</h2>
+
+      <div className="mt-8 lg:mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-9 gap-8 lg:gap-4">
           {/* Left content area - Description */}
-          <div className="col-span-5 space-y-12">
+          <div className="col-span-1 lg:col-span-5 space-y-8 lg:space-y-12">
             {description && (
               <>
                 <div>
-                  <h3 className="text-3xl font-bold mb-3">Status</h3>
-                  <div className="text-lg">
+                  <h3 className="text-2xl lg:text-3xl font-bold mb-3">Status</h3>
+                  <div className="text-base lg:text-lg">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {description}
                     </ReactMarkdown>
                   </div>
-                  <div className="mt-4 text-lg">
+                  <div className="mt-4 text-base lg:text-lg">
                     <p><span className="font-bold">IUCN Red List Status:</span> {currentStatus.status}</p>
                   </div>
                 </div>
@@ -164,11 +164,11 @@ export default function Conservation({
             )}
           </div>
 
-          {/* Empty column for spacing */}
-          <div className="col-span-1" />
+          {/* Empty column for spacing - hidden on mobile */}
+          <div className="hidden lg:block lg:col-span-1" />
 
           {/* Right content area - reserved for future use */}
-          <div className="col-span-3">
+          <div className="hidden lg:block lg:col-span-3">
             {/* Future content */}
           </div>
         </div>
@@ -176,8 +176,8 @@ export default function Conservation({
 
       {/* Status Bubbles - Full width, outside grid */}
       <TooltipProvider>
-        <div className="mt-12 w-full">
-          <div className="flex items-center">
+        <div className="mt-8 lg:mt-12 w-full overflow-x-auto">
+          <div className="flex items-center min-w-max lg:min-w-0">
             {/* DD and NE bubbles - disconnected group */}
             {specialStatuses.length > 0 && (
               <>
@@ -321,14 +321,14 @@ export default function Conservation({
 
       {/* Environmental & Manmade Threats Subsection - After bubbles */}
       {threats && (
-        <div className="mt-12">
-          <div className="grid grid-cols-9 gap-4">
-            <div className="col-span-5">
-              <div className="w-full mb-8">
+        <div className="mt-8 lg:mt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-9 gap-8 lg:gap-4">
+            <div className="col-span-1 lg:col-span-5">
+              <div className="w-full mb-6 lg:mb-8">
                 <div className="w-full h-px bg-gray-200"></div>
               </div>
-              <h3 className="text-3xl font-bold mb-3">Environmental & Manmade Threats</h3>
-              <div className="text-lg">
+              <h3 className="text-2xl lg:text-3xl font-bold mb-3">Environmental & Manmade Threats</h3>
+              <div className="text-base lg:text-lg">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {threats}
                 </ReactMarkdown>
@@ -339,7 +339,7 @@ export default function Conservation({
                     <Badge
                       key={index}
                       variant="outline"
-                      className="flex items-center gap-2 px-4 py-2 text-sm border-gray-300 rounded-md bg-green-500/10"
+                      className="flex items-center gap-2 px-3 lg:px-4 py-2 text-sm border-gray-300 rounded-md bg-green-500/10"
                     >
                       {tag.icon && (
                         <span
@@ -353,8 +353,8 @@ export default function Conservation({
                 </div>
               )}
             </div>
-            <div className="col-span-1" />
-            <div className="col-span-3">
+            <div className="hidden lg:block lg:col-span-1" />
+            <div className="hidden lg:block lg:col-span-3">
               {/* Future content */}
             </div>
           </div>
