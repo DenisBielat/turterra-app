@@ -55,7 +55,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" type="image/png" sizes="256x256" href="/images/turterra-favicon-256.png" />
       </head>
-      <body className={`${outfit.variable} ${averta.variable} antialiased`}>
+      <body className={`${outfit.variable} ${averta.variable} antialiased`} suppressHydrationWarning>
         <Navbar />
         <main>
           {children}
