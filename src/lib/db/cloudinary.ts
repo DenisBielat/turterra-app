@@ -36,12 +36,13 @@ export async function getPhysicalFeatureImages(species: string) {
       // 1. context.custom (most common for custom fields)
       // 2. context (directly)
       // 3. metadata (for EXIF/IPTC data, but sometimes custom fields too)
-      const contextCustom = image.context?.custom || {};
-      const contextDirect = image.context || {};
-      const metadata = image.metadata || {};
+      const context = image.context as Record<string, unknown> | undefined;
+      const contextCustom = (context?.custom as Record<string, unknown>) || {};
+      const contextDirect = context || {};
+      const metadata = (image.metadata as Record<string, unknown>) || {};
       
       // Merge all sources, with priority: context.custom > context > metadata
-      const customData = { ...metadata, ...contextDirect, ...contextCustom };
+      const customData: Record<string, unknown> = { ...metadata, ...contextDirect, ...contextCustom };
       
       return {
         url: image.secure_url,
