@@ -28,11 +28,18 @@ interface RangeMapData {
   geojson: FeatureCollection<Geometry>;
 }
 
+interface INaturalistObservation {
+  id: number;
+  latitude: number;
+  longitude: number;
+}
+
 interface LayerState {
   native: boolean;
   introduced: boolean;
   extinct: boolean;
   range: boolean;
+  sightings: boolean;
 }
 
 interface TurtleDistributionMapProps {
@@ -57,12 +64,14 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
   const [rangeMapData, setRangeMapData] = useState<RangeMapData[]>([]);
+  const [iNatObservations, setINatObservations] = useState<INaturalistObservation[]>([]);
   const lastHoverRef = useRef<{ source: string; id: string | number } | null>(null);
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
     extinct: true,
-    range: true
+    range: true,
+    sightings: true
   });
   
   // Track zoom level for layer visibility
@@ -172,6 +181,58 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     fetchRangeMaps();
   }, [selectedSpeciesIds]);
 
+  // Fetch iNaturalist observations for selected species
+  useEffect(() => {
+    const fetchINatObservations = async () => {
+      if (speciesData.length === 0) {
+        setINatObservations([]);
+        return;
+      }
+
+      try {
+        // Get scientific name from the first species
+        const scientificName = speciesData[0]?.scientificName;
+        if (!scientificName) {
+          setINatObservations([]);
+          return;
+        }
+
+        // Query iNaturalist API for research-grade observations with coordinates
+        const response = await fetch(
+          `https://api.inaturalist.org/v1/observations?taxon_name=${encodeURIComponent(scientificName)}&quality_grade=research&geo=true&per_page=200&order=desc&order_by=created_at`
+        );
+
+        if (!response.ok) {
+          console.error('Failed to fetch iNaturalist observations');
+          setINatObservations([]);
+          return;
+        }
+
+        const data = await response.json();
+
+        // Extract observations with valid coordinates
+        const observations: INaturalistObservation[] = data.results
+          ?.filter((obs: { location?: string }) => obs.location)
+          .map((obs: { id: number; location: string }) => {
+            const [lat, lng] = obs.location.split(',').map(Number);
+            return {
+              id: obs.id,
+              latitude: lat,
+              longitude: lng
+            };
+          })
+          .filter((obs: INaturalistObservation) => !isNaN(obs.latitude) && !isNaN(obs.longitude)) || [];
+
+        setINatObservations(observations);
+      } catch (error) {
+        console.error('Error fetching iNaturalist observations:', error);
+        setINatObservations([]);
+      }
+    };
+
+    fetchINatObservations();
+  }, [speciesData]);
+
   // Helper function to darken a hex color
   const darkenColor = useCallback((hex: string, amount: number = 0.2) => {
     const num = parseInt(hex.replace('#', ''), 16);
@@ -263,6 +324,49 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
       }
     });
   }, [speciesData]);
+
+  // Ensure range and sightings layers are always on top
+  useEffect(() => {
+    const map = mapRef.current?.getMap();
+    if (!map || !map.isStyleLoaded()) return;
+
+    // Move range and sightings layers to the top after a short delay to ensure they exist
+    const moveTopLayers = () => {
+      // First move range layers
+      rangeMapData.forEach((rangeData) => {
+        const layerIds = [
+          `range-${rangeData.speciesId}-fill`,
+          `range-${rangeData.speciesId}-line`,
+          `range-${rangeData.speciesId}-linestring`
+        ];
+
+        layerIds.forEach(layerId => {
+          if (map.getLayer(layerId)) {
+            try {
+              map.moveLayer(layerId);
+            } catch {
+              // Layer might not exist yet
+            }
+          }
+        });
+      });
+
+      // Then move sightings layer to very top
+      if (map.getLayer('inat-sightings')) {
+        try {
+          map.moveLayer('inat-sightings');
+        } catch {
+          // Layer might not exist yet
+        }
+      }
+    };
+
+    // Run immediately and also after a delay
+    moveTopLayers();
+    const timeoutId = setTimeout(moveTopLayers, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [rangeMapData, speciesData, iNatObservations, activeLayers]);
 
   // Add a map reference
   const mapRef = useRef<MapRef>(null);
@@ -427,6 +531,20 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               </span>
             </label>
           )}
+          {iNatObservations.length > 0 && (
+            <label className="flex items-center space-x-2 pt-2 border-t border-gray-200 mt-2">
+              <input
+                type="checkbox"
+                checked={activeLayers.sightings}
+                onChange={() => toggleLayer('sightings')}
+                className="rounded"
+              />
+              <span className="text-sm">
+                <span className="inline-block w-3 h-3 rounded-full mr-1 bg-red-500"></span>
+                Sightings ({iNatObservations.length})
+              </span>
+            </label>
+          )}
         </div>
       </div>
 
@@ -435,7 +553,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         <button
           onClick={handleBackToOrigin}
           className="absolute left-4 z-10 bg-white rounded-lg shadow-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-50 transition-colors"
-          style={{ top: 'calc(1rem + 180px)' }}
+          style={{ top: 'calc(1rem + 220px)' }}
         >
           <Icon name="origin" style="line" size="sm" className="text-gray-600" />
           <span className="text-sm font-medium text-gray-700">Back to Origin</span>
@@ -679,6 +797,45 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             </Source>
           );
         })}
+
+        {/* Render iNaturalist Sightings as red dots */}
+        {iNatObservations.length > 0 && (
+          <Source
+            id="inat-sightings"
+            type="geojson"
+            data={{
+              type: 'FeatureCollection',
+              features: iNatObservations.map(obs => ({
+                type: 'Feature' as const,
+                properties: { id: obs.id },
+                geometry: {
+                  type: 'Point' as const,
+                  coordinates: [obs.longitude, obs.latitude]
+                }
+              }))
+            }}
+          >
+            <Layer
+              id="inat-sightings"
+              type="circle"
+              layout={{ visibility: activeLayers.sightings ? 'visible' : 'none' }}
+              paint={{
+                'circle-radius': [
+                  'interpolate',
+                  ['linear'],
+                  ['zoom'],
+                  1, 3,
+                  5, 5,
+                  10, 8
+                ],
+                'circle-color': '#ef4444', // red-500
+                'circle-stroke-color': '#b91c1c', // red-700
+                'circle-stroke-width': 1,
+                'circle-opacity': 0.8
+              }}
+            />
+          </Source>
+        )}
       </Map>
     </div>
   );
