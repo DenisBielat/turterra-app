@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Map, { Source, Layer, NavigationControl, ViewState, MapRef, MapMouseEvent } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/lib/db/supabaseClient';
-import type { FeatureCollection, MultiPolygon } from 'geojson';
+import type { FeatureCollection, MultiPolygon, Geometry } from 'geojson';
 
 type DistributionProperties = {
   presence_status?: string;
@@ -21,10 +21,16 @@ interface SpeciesData {
   geojson: FeatureCollection<MultiPolygon>;
 }
 
+interface RangeMapData {
+  speciesId: string | number;
+  geojson: FeatureCollection<Geometry>;
+}
+
 interface LayerState {
   native: boolean;
   introduced: boolean;
   extinct: boolean;
+  range: boolean;
 }
 
 interface TurtleDistributionMapProps {
@@ -48,11 +54,13 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   });
   
   const [speciesData, setSpeciesData] = useState<SpeciesData[]>([]);
+  const [rangeMapData, setRangeMapData] = useState<RangeMapData[]>([]);
   const lastHoverRef = useRef<{ source: string; id: string | number } | null>(null);
   const [activeLayers, setActiveLayers] = useState<LayerState>({
     native: true,
     introduced: true,
-    extinct: true
+    extinct: true,
+    range: true
   });
   
   // Track zoom level for layer visibility
@@ -119,7 +127,44 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     
     fetchDistributions();
   }, [selectedSpeciesIds]);
-  
+
+  // Fetch range map GeoJSON for selected species
+  useEffect(() => {
+    const fetchRangeMaps = async () => {
+      if (selectedSpeciesIds.length === 0) {
+        setRangeMapData([]);
+        return;
+      }
+
+      const promises = selectedSpeciesIds.map(async (speciesId) => {
+        // Fetch range map using the RPC function
+        const { data: rangeGeojson, error: rangeError } = await supabase
+          .rpc('get_species_range_geojson', { p_species_id: speciesId });
+
+        if (rangeError) {
+          // Range map might not exist for all species, this is not an error
+          console.log('No range map found for species', speciesId);
+          return null;
+        }
+
+        if (!rangeGeojson || !rangeGeojson.features || rangeGeojson.features.length === 0) {
+          return null;
+        }
+
+        return {
+          speciesId,
+          geojson: rangeGeojson
+        };
+      });
+
+      const results = await Promise.all(promises);
+      const validResults = results.filter((item): item is RangeMapData => item !== null);
+      setRangeMapData(validResults);
+    };
+
+    fetchRangeMaps();
+  }, [selectedSpeciesIds]);
+
   // Helper function to darken a hex color
   const darkenColor = useCallback((hex: string, amount: number = 0.2) => {
     const num = parseInt(hex.replace('#', ''), 16);
@@ -214,51 +259,57 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
 
   // Add a map reference
   const mapRef = useRef<MapRef>(null);
-  
-  // Auto-zoom to species distribution when data loads
+
+  // Auto-zoom to species distribution or range map when data loads
   useEffect(() => {
-    if (speciesData.length > 0 && mapRef.current) {
+    const hasDistributionData = speciesData.length > 0;
+    const hasRangeData = rangeMapData.length > 0;
+
+    if ((hasDistributionData || hasRangeData) && mapRef.current) {
       const map = mapRef.current.getMap();
-      
+
       // Wait for map to be fully loaded
       const waitForMapLoad = () => {
         if (!map.isStyleLoaded()) {
           setTimeout(waitForMapLoad, 100);
           return;
         }
-        
-        
-        // Use the bbox from the GeoJSON if available
-        const allFeatures = speciesData.flatMap(species => species.geojson?.features || []);
-        
-        if (allFeatures.length > 0) {
-          // Try to use the bbox from the first species GeoJSON
-          const firstSpecies = speciesData[0];
-          if (firstSpecies.geojson.bbox) {
-            map.fitBounds([
-              [firstSpecies.geojson.bbox[0], firstSpecies.geojson.bbox[1]],
-              [firstSpecies.geojson.bbox[2], firstSpecies.geojson.bbox[3]]
-            ], {
-              padding: 50,
-              duration: 1500,
-              easing: (t) => t * (2 - t)
-            });
-          } else {
-            // Just zoom to a reasonable level if no bbox
-            map.easeTo({
-              zoom: 3,
-              duration: 1500,
-              easing: (t) => t * (2 - t)
-            });
-          }
-        } else {
-          // no features found
+
+        // Use the bbox from distribution GeoJSON if available, otherwise try range map
+        const distributionFeatures = speciesData.flatMap(species => species.geojson?.features || []);
+        const rangeFeatures = rangeMapData.flatMap(range => range.geojson?.features || []);
+
+        // Prefer distribution data bbox, fall back to range map bbox
+        let bbox: number[] | undefined;
+
+        if (distributionFeatures.length > 0 && speciesData[0]?.geojson?.bbox) {
+          bbox = speciesData[0].geojson.bbox as number[];
+        } else if (rangeFeatures.length > 0 && rangeMapData[0]?.geojson?.bbox) {
+          bbox = rangeMapData[0].geojson.bbox as number[];
+        }
+
+        if (bbox && bbox.length >= 4) {
+          map.fitBounds([
+            [bbox[0], bbox[1]],
+            [bbox[2], bbox[3]]
+          ], {
+            padding: 50,
+            duration: 1500,
+            easing: (t) => t * (2 - t)
+          });
+        } else if (distributionFeatures.length > 0 || rangeFeatures.length > 0) {
+          // Just zoom to a reasonable level if no bbox
+          map.easeTo({
+            zoom: 3,
+            duration: 1500,
+            easing: (t) => t * (2 - t)
+          });
         }
       };
-      
+
       waitForMapLoad();
     }
-  }, [speciesData]);
+  }, [speciesData, rangeMapData]);
 
   const transformCoordinates = (geojson: FeatureCollection<MultiPolygon>) => {
     return {
@@ -322,6 +373,20 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
               Extinct
             </span>
           </label>
+          {rangeMapData.length > 0 && (
+            <label className="flex items-center space-x-2 pt-2 border-t border-gray-200 mt-2">
+              <input
+                type="checkbox"
+                checked={activeLayers.range}
+                onChange={() => toggleLayer('range')}
+                className="rounded"
+              />
+              <span className="text-sm">
+                <span className="inline-block w-3 h-3 rounded mr-1 bg-blue-500"></span>
+                IUCN Range
+              </span>
+            </label>
+          )}
         </div>
       </div>
       <Map
@@ -340,9 +405,10 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           latitude: 20,
           zoom: 1.5
         }}
-        interactiveLayerIds={
-          speciesData.map(species => `species-${species.speciesId}-fill`)
-        }
+        interactiveLayerIds={[
+          ...speciesData.map(species => `species-${species.speciesId}-fill`),
+          ...rangeMapData.map(range => `range-${range.speciesId}-fill`)
+        ]}
         onMouseMove={(e: MapMouseEvent) => {
           if (e.features && e.features.length > 0) {
             const feature = e.features[0];
@@ -483,6 +549,69 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
                   ...(activeLayers.native ? [['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Native']]] : []),
                   ...(activeLayers.introduced ? [['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Introduced']]] : []),
                   ...(activeLayers.extinct ? [['all', ['has', 'origin'], ['!=', ['get', 'origin'], null], ['==', ['get', 'origin'], 'Extinct']]] : [])
+                ]}
+              />
+            </Source>
+          );
+        })}
+
+        {/* Render IUCN Range Maps */}
+        {activeLayers.range && rangeMapData.map((rangeData) => {
+          if (!rangeData.geojson || !rangeData.geojson.features) {
+            return null;
+          }
+
+          return (
+            <Source
+              key={`range-${rangeData.speciesId}`}
+              id={`range-${rangeData.speciesId}`}
+              type="geojson"
+              generateId
+              data={rangeData.geojson}
+            >
+              {/* Fill layer for range polygons */}
+              <Layer
+                id={`range-${rangeData.speciesId}-fill`}
+                type="fill"
+                paint={{
+                  'fill-color': '#3b82f6', // blue-500
+                  'fill-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    0.4,
+                    0.25
+                  ]
+                }}
+                filter={['any',
+                  ['==', ['geometry-type'], 'Polygon'],
+                  ['==', ['geometry-type'], 'MultiPolygon']
+                ]}
+              />
+              {/* Outline layer for range polygons */}
+              <Layer
+                id={`range-${rangeData.speciesId}-line`}
+                type="line"
+                paint={{
+                  'line-color': '#1d4ed8', // blue-700
+                  'line-width': 2,
+                  'line-dasharray': [2, 2]
+                }}
+                filter={['any',
+                  ['==', ['geometry-type'], 'Polygon'],
+                  ['==', ['geometry-type'], 'MultiPolygon']
+                ]}
+              />
+              {/* Line layer for any LineString geometries */}
+              <Layer
+                id={`range-${rangeData.speciesId}-linestring`}
+                type="line"
+                paint={{
+                  'line-color': '#3b82f6', // blue-500
+                  'line-width': 2
+                }}
+                filter={['any',
+                  ['==', ['geometry-type'], 'LineString'],
+                  ['==', ['geometry-type'], 'MultiLineString']
                 ]}
               />
             </Source>

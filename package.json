@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "generate-icons": "tsx scripts/generate-icon-types.ts"
+    "generate-icons": "tsx scripts/generate-icon-types.ts",
+    "import-range-maps": "node scripts/importRangeMaps.js"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
