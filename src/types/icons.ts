@@ -1,7 +1,7 @@
 // Auto-generated file - DO NOT EDIT DIRECTLY
 export type IconStyle = 'line' | 'filled' | 'color';
 
-export type LineIconName = 
+export type LineIconName =
   | 'add'
   | 'animal-skin'
   | 'arrow-left-1'
@@ -29,6 +29,7 @@ export type LineIconName =
   | 'male'
   | 'map-marks'
   | 'move-back'
+  | 'nav-menu'
   | 'origin'
   | 'outdoors-tree-valley'
   | 'pattern'
