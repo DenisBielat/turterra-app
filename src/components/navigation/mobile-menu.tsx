@@ -22,7 +22,7 @@ const MobileMenu = () => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <button
-          className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
+          className="flex items-center justify-center p-2 text-green-950 hover:text-green-600 transition-colors"
           aria-label="Open menu"
         >
           <Icon name="nav-menu" style="line" size="lg" />
