@@ -22,13 +22,13 @@ const MobileMenu = () => {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <button
-          className="flex items-center justify-center p-2 text-green-950 hover:text-green-600 transition-colors"
+          className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
           aria-label="Open menu"
         >
           <Icon name="nav-menu" style="line" size="lg" />
         </button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[300px] p-0 flex flex-col">
+      <SheetContent side="left" className="w-[300px] p-0 flex flex-col bg-warm">
         <VisuallyHidden>
           <SheetTitle>Navigation Menu</SheetTitle>
         </VisuallyHidden>
@@ -37,7 +37,7 @@ const MobileMenu = () => {
         <Link
           href="/account"
           onClick={closeMenu}
-          className="flex items-center gap-3 p-4 border-b border-gray-200 hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-3 p-4 border-b border-gray-300 border-opacity-50 hover:bg-white hover:bg-opacity-50 transition-colors"
         >
           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center overflow-hidden">
             {/* Placeholder avatar - replace with actual user image when available */}
@@ -111,7 +111,7 @@ const MobileMenu = () => {
         </div>
 
         {/* Donate Section - Fixed at bottom */}
-        <div className="border-t border-gray-200 p-4 mt-auto">
+        <div className="border-t border-gray-300 border-opacity-50 p-4 mt-auto">
           <Link
             href="/donate"
             onClick={closeMenu}

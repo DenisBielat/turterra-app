@@ -18,13 +18,12 @@ const Navbar = () => {
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden top-0 z-50 w-full border-b border-gray-300 border-opacity-50 bg-warm py-1 px-4">
+      <header className="lg:hidden top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-1 px-4">
         <div className="flex h-12 items-center justify-between">
           {/* Left: Menu Button + Logo */}
           <div className="flex items-center gap-2">
             <MobileMenu />
             <Link href="/">
-              {/* TODO: Replace with dark logo variant for light background */}
               <Image
                 src="/images/turterra-logo-white-text.png"
                 alt="Turterra"
@@ -39,14 +38,14 @@ const Navbar = () => {
           <div className="flex items-center gap-2">
             <Link
               href="/search"
-              className="flex items-center justify-center p-2 text-green-950 hover:text-green-600 transition-colors"
+              className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
               aria-label="Search"
             >
               <Icon name="search" style="line" size="lg" />
             </Link>
             <Link
               href="/login"
-              className="font-semibold text-green-950 border-2 border-green-950 rounded-full px-4 py-1.5 text-sm hover:text-white hover:bg-green-950 transition-all"
+              className="font-semibold text-white border-2 border-warm rounded-full px-4 py-1.5 text-sm hover:text-green-950 hover:bg-warm transition-all"
             >
               Log in
             </Link>
