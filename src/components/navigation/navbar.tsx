@@ -41,7 +41,7 @@ const Navbar = () => {
               className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
               aria-label="Search"
             >
-              <Icon name="search" style="line" size="lg" />
+              <Icon name="search" style="line" size="base" />
             </Link>
             <Link
               href="/login"
