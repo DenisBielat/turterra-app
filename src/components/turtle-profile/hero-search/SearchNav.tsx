@@ -88,12 +88,14 @@ export default function TurtleSearchNav() {
 
   return (
     <div
-      className={`w-full bg-green-950 py-6 px-10 transition-all duration-300 z-40 ${
-        isSticky ? 'fixed top-0 left-0 right-0 shadow-lg' : ''
+      className={`w-full bg-green-950 transition-all duration-300 ${
+        isSticky
+          ? 'fixed top-0 left-0 right-0 shadow-lg z-[1] py-2 px-10'
+          : 'pt-6 pb-2 px-10'
       }`}
     >
       <div className="container max-w-8xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-6 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-4 items-center">
           {/* Search Section */}
           <div className="relative search-container">
             <div className="relative">
@@ -102,7 +104,7 @@ export default function TurtleSearchNav() {
                 placeholder="Search for turtles"
                 value={searchQuery}
                 onChange={handleSearchInput}
-                className="px-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full min-h-11 focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="px-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full h-10 text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
               {searchQuery && (

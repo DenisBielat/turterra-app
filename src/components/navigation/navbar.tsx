@@ -23,7 +23,7 @@ const Navbar = () => {
     <>
       {/* Mobile Header */}
       <header
-        className={`lg:hidden fixed top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-1 px-4 transition-transform duration-300 ${
+        className={`lg:hidden fixed top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-1 px-4 transition-transform duration-300 before:absolute before:inset-x-0 before:bottom-full before:h-20 before:bg-green-950 ${
           isVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
@@ -65,7 +65,7 @@ const Navbar = () => {
 
       {/* Desktop Header */}
       <header
-        className={`hidden lg:block fixed top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2 px-10 transition-transform duration-300 ${
+        className={`hidden lg:block fixed top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2 px-10 transition-transform duration-300 before:absolute before:inset-x-0 before:bottom-full before:h-20 before:bg-green-950 ${
           isVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
