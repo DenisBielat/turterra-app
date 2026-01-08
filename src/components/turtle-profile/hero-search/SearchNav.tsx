@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Search, ChevronRight, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import debounce from 'lodash/debounce';
 import Image from 'next/image';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
+import { Icon } from '@/components/Icon';
 
 interface SearchResult {
   species_common_name: string;
@@ -20,6 +21,8 @@ export default function TurtleSearchNav() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const { scrollDirection, isAtTop } = useScrollDirection(50);
 
   // SearchNav becomes sticky when scrolling down (navbar is hidden)
@@ -86,51 +89,99 @@ export default function TurtleSearchNav() {
     setMessage(null);
   };
 
+  const closeMobileSearch = () => {
+    setMobileSearchOpen(false);
+    clearSearch();
+  };
+
+  // Focus mobile search input when opened
+  useEffect(() => {
+    if (mobileSearchOpen && mobileSearchInputRef.current) {
+      mobileSearchInputRef.current.focus();
+    }
+  }, [mobileSearchOpen]);
+
   return (
-    <div
-      className={`w-full bg-green-950 transition-all duration-300 ${
-        isSticky
-          ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-10 z-10'
-          : 'relative pt-6 pb-4 px-10 z-20'
-      }`}
-    >
-      <div className="container max-w-8xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-4 items-center">
-          {/* Search Section */}
-          <div className={`relative search-container ${isSticky ? 'max-w-[240px]' : ''}`}>
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Search for turtles"
-                value={searchQuery}
-                onChange={handleSearchInput}
-                className={`px-8 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0 ${
-                  isSticky ? 'h-8' : 'h-10'
-                }`}
-              />
-              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 text-white/70 ${isSticky ? 'h-3 w-3' : 'h-4 w-4'}`} />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 group"
-                >
-                  <X className="h-4 w-4 text-white/70 group-hover:text-green-500 transition-colors" />
-                </button>
-              )}
+    <>
+      {/* Mobile SearchNav */}
+      <div
+        className={`lg:hidden w-full bg-green-950 transition-all duration-300 ${
+          isSticky
+            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-4 z-10'
+            : 'relative py-3 px-4 z-20'
+        }`}
+      >
+        <div className="flex items-center justify-between">
+          {/* Left: Placeholder icon + Search icon */}
+          <div className="flex items-center gap-3">
+            <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors">
+              <Icon name="turtle" style="line" size="base" />
+            </Link>
+            <button
+              onClick={() => setMobileSearchOpen(true)}
+              className="text-white hover:text-green-400 transition-colors"
+              aria-label="Open search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Center: Species Guide link */}
+          <Link
+            href="/species-guide"
+            className="font-heading font-semibold text-white uppercase text-sm tracking-wide hover:text-green-400 transition-colors"
+          >
+            Species Guide
+          </Link>
+
+          {/* Right: Empty placeholder for balance */}
+          <div className="w-16" />
+        </div>
+
+        {/* Mobile Search Overlay */}
+        {mobileSearchOpen && (
+          <div className="fixed inset-0 bg-green-950 z-50 p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                onClick={closeMobileSearch}
+                className="text-white hover:text-green-400 transition-colors"
+                aria-label="Close search"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              <div className="relative flex-1 search-container">
+                <Input
+                  ref={mobileSearchInputRef}
+                  type="text"
+                  placeholder="Search for turtles"
+                  value={searchQuery}
+                  onChange={handleSearchInput}
+                  className="px-10 h-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+                />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
+                {searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 group"
+                  >
+                    <X className="h-4 w-4 text-white/70 group-hover:text-green-500 transition-colors" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            {/* Search Results or Messages */}
+            {/* Mobile Search Results */}
             {showResults && searchQuery && (searchResults.length > 0 || message) && (
-            <div className="absolute z-[100] w-full mt-2 bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[80vh]">
-              {message ? (
-                <div className="p-3 text-white/70 text-center">{message}</div>
-              ) : (
-                searchResults.map((result) => (
+              <div className="bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[calc(100vh-120px)]">
+                {message ? (
+                  <div className="p-3 text-white/70 text-center">{message}</div>
+                ) : (
+                  searchResults.map((result) => (
                     <Link
                       key={result.slug}
                       href={`/turtle/${result.slug}`}
                       className="flex gap-3 p-3 hover:bg-green-950 transition-colors"
-                      onClick={clearSearch}
+                      onClick={closeMobileSearch}
                     >
                       <Image
                         src={result.avatar_image_circle_url}
@@ -153,22 +204,93 @@ export default function TurtleSearchNav() {
               </div>
             )}
           </div>
+        )}
+      </div>
 
-          {/* Breadcrumbs Section - Centered */}
-          <nav className="flex items-center justify-center space-x-2 text-white/90">
-            <Link href="/species-guide" className="hover:text-orange-500 font-semibold transition-colors">
-              Species Guide
-            </Link>
-            <ChevronRight className="h-4 w-4 text-gray-300" />
-            <span className="font-semibold hover:text-orange-500 transition-colors cursor-pointer text-white/90">
-              Austro-American Sideneck Turtles
-            </span>
-          </nav>
+      {/* Desktop SearchNav */}
+      <div
+        className={`hidden lg:block w-full bg-green-950 transition-all duration-300 ${
+          isSticky
+            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-10 z-10'
+            : 'relative pt-6 pb-4 px-10 z-20'
+        }`}
+      >
+        <div className="container max-w-8xl mx-auto">
+          <div className="grid grid-cols-[1fr_2fr_1fr] gap-4 items-center">
+            {/* Search Section */}
+            <div className={`relative search-container ${isSticky ? 'max-w-[240px]' : ''}`}>
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Search for turtles"
+                  value={searchQuery}
+                  onChange={handleSearchInput}
+                  className={`px-8 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0 ${
+                    isSticky ? 'h-8' : 'h-10'
+                  }`}
+                />
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 text-white/70 ${isSticky ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                {searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 group"
+                  >
+                    <X className="h-4 w-4 text-white/70 group-hover:text-green-500 transition-colors" />
+                  </button>
+                )}
+              </div>
 
-          {/* Empty Section - Reserved for future use */}
-          <div className="hidden md:block" />
+              {/* Search Results or Messages */}
+              {showResults && searchQuery && (searchResults.length > 0 || message) && (
+                <div className="absolute z-[100] w-full mt-2 bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[80vh]">
+                  {message ? (
+                    <div className="p-3 text-white/70 text-center">{message}</div>
+                  ) : (
+                    searchResults.map((result) => (
+                      <Link
+                        key={result.slug}
+                        href={`/turtle/${result.slug}`}
+                        className="flex gap-3 p-3 hover:bg-green-950 transition-colors"
+                        onClick={clearSearch}
+                      >
+                        <Image
+                          src={result.avatar_image_circle_url}
+                          alt={result.species_common_name}
+                          className="w-12 h-12 rounded-full object-cover flex-shrink-0 self-start mt-1"
+                          width={500}
+                          height={300}
+                        />
+                        <div className="flex flex-col min-w-0">
+                          <p className="font-bold text-white break-words">
+                            {result.species_common_name}
+                          </p>
+                          <p className="text-gray-300 text-sm italic break-words">
+                            {result.species_scientific_name}
+                          </p>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Breadcrumbs Section - Centered */}
+            <nav className="flex items-center justify-center space-x-2 text-white/90">
+              <Link href="/species-guide" className="hover:text-orange-500 font-semibold transition-colors">
+                Species Guide
+              </Link>
+              <ChevronRight className="h-4 w-4 text-gray-300" />
+              <span className="font-semibold hover:text-orange-500 transition-colors cursor-pointer text-white/90">
+                Austro-American Sideneck Turtles
+              </span>
+            </nav>
+
+            {/* Empty Section - Reserved for future use */}
+            <div />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

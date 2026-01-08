@@ -102,11 +102,21 @@
 }
 
 .navButtonLeft {
-  left: 5rem;
+  left: 1rem;
 }
 
 .navButtonRight {
-  right: 5rem;
+  right: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .navButtonLeft {
+    left: 5rem;
+  }
+
+  .navButtonRight {
+    right: 5rem;
+  }
 }
 
 .navButton[class*="swiper-button-disabled"] {
