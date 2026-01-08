@@ -85,14 +85,14 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
   return (
     <section className="bg-green-950 text-white">
       {/* Header */}
-      <div className="text-center mx-auto w-full max-w-3xl pb-12">
-        <h1 className="text-6xl font-bold text-white leading-[1.1em]">{turtleName}</h1>
+      <div className="text-center mx-auto w-full max-w-3xl px-4 pb-8 lg:pb-12">
+        <h1 className="text-3xl lg:text-6xl font-bold text-white leading-[1.1em]">{turtleName}</h1>
       </div>
 
       {/* Slider */}
       <div className={styles.sliderWrapper}>
         <div className={styles.swiperContainer}>
-          <div className={styles.navContainer}>
+          <div className={`${styles.navContainer} hidden lg:block`}>
             <div className={`${styles.navButton} ${styles.navButtonLeft}`}>
               <Icon name="arrow-left-1" style="line" size="lg" />
             </div>

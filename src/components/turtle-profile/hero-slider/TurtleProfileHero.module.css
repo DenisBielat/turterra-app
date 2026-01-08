@@ -1,7 +1,6 @@
 .sliderWrapper {
   position: relative;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
+  width: 100%;
   overflow: hidden;
 }
 
@@ -22,8 +21,15 @@
   flex-shrink: 0;
   margin: 0 10px;
   margin-bottom: 6rem;
-  max-width: calc(100vw - 60px);
+  max-width: calc(100% - 40px);
   height: 472px;
+}
+
+@media (max-width: 1023px) {
+  .swiperSlide {
+    height: 300px;
+    margin-bottom: 4rem;
+  }
 }
 
 .mediaData {
