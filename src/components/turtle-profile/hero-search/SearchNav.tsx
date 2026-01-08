@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Search, ChevronRight, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import debounce from 'lodash/debounce';
-import Image from 'next/image'
+import Image from 'next/image';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 
 interface SearchResult {
   species_common_name: string;
@@ -19,6 +20,10 @@ export default function TurtleSearchNav() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const { scrollDirection, isAtTop } = useScrollDirection(50);
+
+  // SearchNav becomes sticky when scrolling down (navbar is hidden)
+  const isSticky = !isAtTop && scrollDirection === 'down';
 
   const debouncedSearch = debounce(async (query: string) => {
     if (!query) {
@@ -82,7 +87,11 @@ export default function TurtleSearchNav() {
   };
 
   return (
-    <div className="w-full bg-green-950 py-6 px-10">
+    <div
+      className={`w-full bg-green-950 py-6 px-10 transition-all duration-300 z-40 ${
+        isSticky ? 'fixed top-0 left-0 right-0 shadow-lg' : ''
+      }`}
+    >
       <div className="container max-w-8xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-6 items-center">
           {/* Search Section */}

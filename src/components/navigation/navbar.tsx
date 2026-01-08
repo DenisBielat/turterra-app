@@ -5,6 +5,7 @@ import Link from 'next/link'
 import NavLink from './navlink'
 import MobileMenu from './mobile-menu'
 import { Icon } from '@/components/Icon'
+import { useScrollDirection } from '@/hooks/useScrollDirection'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -15,10 +16,17 @@ import {
 } from "@/components/ui/navigation-menu"
 
 const Navbar = () => {
+  const { scrollDirection, isAtTop } = useScrollDirection(50);
+  const isVisible = isAtTop || scrollDirection === 'up';
+
   return (
     <>
       {/* Mobile Header */}
-      <header className="lg:hidden top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-1 px-4">
+      <header
+        className={`lg:hidden fixed top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-1 px-4 transition-transform duration-300 ${
+          isVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
         <div className="flex h-12 items-center justify-between">
           {/* Left: Menu Button + Logo */}
           <div className="flex items-center gap-2">
@@ -52,9 +60,15 @@ const Navbar = () => {
           </div>
         </div>
       </header>
+      {/* Mobile header spacer */}
+      <div className="lg:hidden h-14" />
 
       {/* Desktop Header */}
-      <header className="hidden lg:block top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2 px-10">
+      <header
+        className={`hidden lg:block fixed top-0 z-50 w-full border-b border-white border-opacity-20 bg-green-950 py-2 px-10 transition-transform duration-300 ${
+          isVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
         <div className="container mx-auto max-w-8xl flex h-16 items-center justify-between">
           <div className="flex items-center gap-16">
             <Link href="/" className="flex-shrink-0">
@@ -164,6 +178,8 @@ const Navbar = () => {
           </div>
         </div>
       </header>
+      {/* Desktop header spacer */}
+      <div className="hidden lg:block h-20" />
     </>
   )
 }
