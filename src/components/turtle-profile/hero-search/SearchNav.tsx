@@ -88,10 +88,10 @@ export default function TurtleSearchNav() {
 
   return (
     <div
-      className={`w-full bg-green-950 transition-all duration-300 ${
+      className={`w-full bg-green-950 transition-all duration-300 z-10 ${
         isSticky
-          ? 'fixed top-0 left-0 right-0 shadow-lg z-[1] py-2 px-10'
-          : 'pt-6 pb-2 px-10'
+          ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-10'
+          : 'pt-6 pb-4 px-10'
       }`}
     >
       <div className="container max-w-8xl mx-auto">
@@ -119,7 +119,7 @@ export default function TurtleSearchNav() {
 
             {/* Search Results or Messages */}
             {showResults && searchQuery && (searchResults.length > 0 || message) && (
-            <div className="absolute z-50 w-full mt-2 bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[80vh]">
+            <div className="absolute z-[100] w-full mt-2 bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[80vh]">
               {message ? (
                 <div className="p-3 text-white/70 text-center">{message}</div>
               ) : (
