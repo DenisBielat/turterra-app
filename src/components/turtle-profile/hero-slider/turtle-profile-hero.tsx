@@ -36,6 +36,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
   const [images, setImages] = useState<ImageData[]>([]);
   const [turtleName, setTurtleName] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState(0);
+  const [initialSlide, setInitialSlide] = useState(0);
 
   // Fetch Turtle Name from Supabase
   useEffect(() => {
@@ -67,10 +68,18 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
         if (!response.ok) throw new Error("Failed to fetch images");
         const data = await response.json();
 
-        // Find and set primary photo
-        const primaryPhoto = data.find((img: ImageData) => img.metadata.primary_photo);
+        // Find primary photo and its index
+        const primaryPhotoIndex = data.findIndex((img: ImageData) => img.metadata.primary_photo);
+        const primaryPhoto = primaryPhotoIndex >= 0 ? data[primaryPhotoIndex] : null;
+
         if (primaryPhoto && onPrimaryImageLoad) {
           onPrimaryImageLoad(primaryPhoto.secure_url);
+        }
+
+        // Set initial slide to primary photo index (or 0 if not found)
+        if (primaryPhotoIndex >= 0) {
+          setInitialSlide(primaryPhotoIndex);
+          setActiveIndex(primaryPhotoIndex);
         }
 
         setImages(data);
@@ -102,6 +111,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
           </div>
           
           <Swiper
+            key={`swiper-${images.length}-${initialSlide}`}
             modules={[Navigation]}
             navigation={{
               prevEl: `.${styles.navButtonLeft}`,
@@ -110,6 +120,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
             loop
             centeredSlides
             slidesPerView="auto"
+            initialSlide={initialSlide}
             className={styles.swiperWrapper}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
           >
