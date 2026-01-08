@@ -116,7 +116,7 @@ export const ProfileNavigation = ({ name, species, imageUrl, taxonomy }: Profile
   }
 
   return (
-      <div className="sticky top-40 z-[60] bg-neutral rounded-2xl w-full max-w-[15rem] mb-8">
+      <div className="sticky top-40 z-[2] bg-neutral rounded-2xl w-full max-w-[15rem] mb-8">
         <div className="flex flex-col gap-4 items-center justify-center relative -mt-20 mb-4 text-center">
           <Image
             src={imageUrl}
