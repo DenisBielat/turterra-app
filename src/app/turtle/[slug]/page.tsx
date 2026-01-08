@@ -48,11 +48,11 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
       <div className="w-full h-8 bg-orange-500"></div>
       
       <div className="bg-warm">
-        <div className="px-10 py-12">
+        <div className="px-4 lg:px-10 py-12">
           <div className="max-w-[90rem] mx-auto">
-            <div className="grid grid-cols-12 gap-4 relative">
-              {/* Left sidebar */}
-              <div className="flex flex-col col-span-3 justify-start w-full overflow-visible">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 relative">
+              {/* Left sidebar - hidden on mobile */}
+              <div className="hidden lg:flex flex-col col-span-3 justify-start w-full overflow-visible">
                 <ProfileNavigation
                   name={data.commonName}
                   species={data.scientificName}
@@ -62,7 +62,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
               </div>
 
               {/* Right content area */}
-              <div className="col-span-9 flex flex-col">
+              <div className="col-span-1 lg:col-span-9 flex flex-col">
                 <TurtleAtAGlance 
                   description={data.description}
                   conservationStatus={data.conservationStatus}
