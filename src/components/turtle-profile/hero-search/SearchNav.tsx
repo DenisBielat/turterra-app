@@ -114,17 +114,17 @@ export default function TurtleSearchNav() {
         {/* Default view - shown when search is closed */}
         {!mobileSearchOpen && (
           <div className="flex items-center justify-between h-10">
-            {/* Left: Book icon + Search icon */}
-            <div className="flex items-center gap-3">
-              <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors">
-                <Icon name="book-open" style="line" size="base" />
+            {/* Left: Book icon + Search icon - book icon has p-2 to match navbar menu button */}
+            <div className="flex items-center gap-1 -ml-2">
+              <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors">
+                <Icon name="book-open" style="line" size="lg" />
               </Link>
               <button
                 onClick={() => setMobileSearchOpen(true)}
-                className="text-white hover:text-green-400 transition-colors"
+                className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
                 aria-label="Open search"
               >
-                <Search className="h-5 w-5" />
+                <Icon name="search" style="line" size="lg" />
               </button>
             </div>
 
@@ -143,10 +143,10 @@ export default function TurtleSearchNav() {
 
         {/* Inline search view - shown when search is open */}
         {mobileSearchOpen && (
-          <div className="flex items-center gap-3 search-container h-10">
-            {/* Left: Book icon linking to species guide */}
-            <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors flex-shrink-0">
-              <Icon name="book-open" style="line" size="base" />
+          <div className="flex items-center gap-1 search-container h-10 -ml-2">
+            {/* Left: Book icon linking to species guide - p-2 to match navbar menu button */}
+            <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0">
+              <Icon name="book-open" style="line" size="lg" />
             </Link>
 
             {/* Center: Search input */}
@@ -165,50 +165,54 @@ export default function TurtleSearchNav() {
             {/* Right: Close button */}
             <button
               onClick={closeMobileSearch}
-              className="text-white hover:text-green-400 transition-colors flex-shrink-0"
+              className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0"
               aria-label="Close search"
             >
-              <X className="h-5 w-5" />
+              <X className="h-6 w-6" />
             </button>
           </div>
         )}
-
-        {/* Mobile Search Results - dropdown below the sticky menu */}
-        {mobileSearchOpen && showResults && searchQuery && (searchResults.length > 0 || message) && (
-          <div className="absolute left-0 right-0 top-full px-4 pt-2 pb-4 bg-green-950">
-            <div className="bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[60vh]">
-              {message ? (
-                <div className="p-3 text-white/70 text-center">{message}</div>
-              ) : (
-                searchResults.map((result) => (
-                  <Link
-                    key={result.slug}
-                    href={`/turtle/${result.slug}`}
-                    className="flex gap-3 p-3 hover:bg-green-950 transition-colors"
-                    onClick={closeMobileSearch}
-                  >
-                    <Image
-                      src={result.avatar_image_circle_url}
-                      alt={result.species_common_name}
-                      className="w-12 h-12 rounded-full object-cover flex-shrink-0 self-start mt-1"
-                      width={500}
-                      height={300}
-                    />
-                    <div className="flex flex-col min-w-0">
-                      <p className="font-bold text-white break-words">
-                        {result.species_common_name}
-                      </p>
-                      <p className="text-gray-300 text-sm italic break-words">
-                        {result.species_scientific_name}
-                      </p>
-                    </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Mobile Search Results - floating overlay below search bar */}
+      {mobileSearchOpen && showResults && searchQuery && (searchResults.length > 0 || message) && (
+        <div
+          className={`lg:hidden fixed left-4 right-4 z-50 search-container ${
+            isSticky ? 'top-[64px]' : 'top-[136px]'
+          }`}
+        >
+          <div className="bg-neutral border border-green-700 rounded-xl shadow-2xl overflow-auto max-h-[60vh]">
+            {message ? (
+              <div className="p-3 text-white/70 text-center">{message}</div>
+            ) : (
+              searchResults.map((result) => (
+                <Link
+                  key={result.slug}
+                  href={`/turtle/${result.slug}`}
+                  className="flex gap-3 p-3 hover:bg-green-800 transition-colors"
+                  onClick={closeMobileSearch}
+                >
+                  <Image
+                    src={result.avatar_image_circle_url}
+                    alt={result.species_common_name}
+                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                    width={500}
+                    height={300}
+                  />
+                  <div className="flex flex-col min-w-0 justify-center">
+                    <p className="font-bold text-white break-words">
+                      {result.species_common_name}
+                    </p>
+                    <p className="text-gray-300 text-sm italic break-words">
+                      {result.species_scientific_name}
+                    </p>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Desktop SearchNav */}
       <div
