@@ -92,7 +92,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
   }, [slug, onPrimaryImageLoad]);
 
   return (
-    <section className="bg-green-950 text-white">
+    <section className="bg-green-950 text-white border-0">
       {/* Header */}
       <div className="text-center mx-auto w-full max-w-3xl px-4 pb-8 lg:pb-12">
         <h1 className="text-3xl lg:text-6xl font-bold text-white leading-[1.1em]">{turtleName}</h1>
