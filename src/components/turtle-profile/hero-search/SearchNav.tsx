@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Search, ChevronRight, X } from 'lucide-react';
+import { Search, ChevronRight, X, BookOpen } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import debounce from 'lodash/debounce';
 import Image from 'next/image';
@@ -111,98 +111,109 @@ export default function TurtleSearchNav() {
             : 'relative py-3 px-4 z-20'
         }`}
       >
-        <div className="flex items-center justify-between">
-          {/* Left: Placeholder icon + Search icon */}
-          <div className="flex items-center gap-3">
-            <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors">
-              <Icon name="turtle" style="line" size="base" />
-            </Link>
-            <button
-              onClick={() => setMobileSearchOpen(true)}
-              className="text-white hover:text-green-400 transition-colors"
-              aria-label="Open search"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-          </div>
-
-          {/* Center: Species Guide link */}
-          <Link
-            href="/species-guide"
-            className="font-heading font-semibold text-white uppercase text-sm tracking-wide hover:text-green-400 transition-colors"
-          >
-            Species Guide
-          </Link>
-
-          {/* Right: Empty placeholder for balance */}
-          <div className="w-16" />
-        </div>
-
-        {/* Mobile Search Overlay */}
-        {mobileSearchOpen && (
-          <div className="fixed inset-0 bg-green-950 z-50 p-4">
-            <div className="flex items-center gap-3 mb-4">
+        {/* Default view - shown when search is closed */}
+        {!mobileSearchOpen && (
+          <div className="flex items-center justify-between">
+            {/* Left: Placeholder icon + Search icon */}
+            <div className="flex items-center gap-3">
+              <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors">
+                <Icon name="turtle" style="line" size="base" />
+              </Link>
               <button
-                onClick={closeMobileSearch}
+                onClick={() => setMobileSearchOpen(true)}
                 className="text-white hover:text-green-400 transition-colors"
-                aria-label="Close search"
+                aria-label="Open search"
               >
-                <X className="h-6 w-6" />
+                <Search className="h-5 w-5" />
               </button>
-              <div className="relative flex-1 search-container">
-                <Input
-                  ref={mobileSearchInputRef}
-                  type="text"
-                  placeholder="Search for turtles"
-                  value={searchQuery}
-                  onChange={handleSearchInput}
-                  className="px-10 h-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
-                {searchQuery && (
-                  <button
-                    onClick={clearSearch}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 group"
-                  >
-                    <X className="h-4 w-4 text-white/70 group-hover:text-green-500 transition-colors" />
-                  </button>
-                )}
-              </div>
             </div>
 
-            {/* Mobile Search Results */}
-            {showResults && searchQuery && (searchResults.length > 0 || message) && (
-              <div className="bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[calc(100vh-120px)]">
-                {message ? (
-                  <div className="p-3 text-white/70 text-center">{message}</div>
-                ) : (
-                  searchResults.map((result) => (
-                    <Link
-                      key={result.slug}
-                      href={`/turtle/${result.slug}`}
-                      className="flex gap-3 p-3 hover:bg-green-950 transition-colors"
-                      onClick={closeMobileSearch}
-                    >
-                      <Image
-                        src={result.avatar_image_circle_url}
-                        alt={result.species_common_name}
-                        className="w-12 h-12 rounded-full object-cover flex-shrink-0 self-start mt-1"
-                        width={500}
-                        height={300}
-                      />
-                      <div className="flex flex-col min-w-0">
-                        <p className="font-bold text-white break-words">
-                          {result.species_common_name}
-                        </p>
-                        <p className="text-gray-300 text-sm italic break-words">
-                          {result.species_scientific_name}
-                        </p>
-                      </div>
-                    </Link>
-                  ))
-                )}
-              </div>
-            )}
+            {/* Center: Species Guide link */}
+            <Link
+              href="/species-guide"
+              className="font-heading font-semibold text-white uppercase text-sm tracking-wide hover:text-green-400 transition-colors"
+            >
+              Species Guide
+            </Link>
+
+            {/* Right: Empty placeholder for balance */}
+            <div className="w-16" />
+          </div>
+        )}
+
+        {/* Inline search view - shown when search is open */}
+        {mobileSearchOpen && (
+          <div className="flex items-center gap-3 search-container">
+            {/* Left: Book icon linking to species guide */}
+            <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors flex-shrink-0">
+              <BookOpen className="h-5 w-5" />
+            </Link>
+
+            {/* Center: Search input */}
+            <div className="relative flex-1">
+              <Input
+                ref={mobileSearchInputRef}
+                type="text"
+                placeholder="Search for turtles"
+                value={searchQuery}
+                onChange={handleSearchInput}
+                className="px-10 h-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 group"
+                >
+                  <X className="h-4 w-4 text-white/70 group-hover:text-green-500 transition-colors" />
+                </button>
+              )}
+            </div>
+
+            {/* Right: Close button */}
+            <button
+              onClick={closeMobileSearch}
+              className="text-white hover:text-green-400 transition-colors flex-shrink-0"
+              aria-label="Close search"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        )}
+
+        {/* Mobile Search Results - dropdown below the sticky menu */}
+        {mobileSearchOpen && showResults && searchQuery && (searchResults.length > 0 || message) && (
+          <div className="absolute left-0 right-0 top-full px-4 pt-2 pb-4 bg-green-950">
+            <div className="bg-green-900 border-2 border-green-800 rounded-lg shadow-lg overflow-auto max-h-[60vh]">
+              {message ? (
+                <div className="p-3 text-white/70 text-center">{message}</div>
+              ) : (
+                searchResults.map((result) => (
+                  <Link
+                    key={result.slug}
+                    href={`/turtle/${result.slug}`}
+                    className="flex gap-3 p-3 hover:bg-green-950 transition-colors"
+                    onClick={closeMobileSearch}
+                  >
+                    <Image
+                      src={result.avatar_image_circle_url}
+                      alt={result.species_common_name}
+                      className="w-12 h-12 rounded-full object-cover flex-shrink-0 self-start mt-1"
+                      width={500}
+                      height={300}
+                    />
+                    <div className="flex flex-col min-w-0">
+                      <p className="font-bold text-white break-words">
+                        {result.species_common_name}
+                      </p>
+                      <p className="text-gray-300 text-sm italic break-words">
+                        {result.species_scientific_name}
+                      </p>
+                    </div>
+                  </Link>
+                ))
+              )}
+            </div>
           </div>
         )}
       </div>
