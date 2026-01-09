@@ -55,98 +55,99 @@ export default function Identification({
   relatedSpecies = [],
 }: IdentificationProps) {
   return (
-    <section className="pb-12">
-      <h2 id="identification" className="scroll-m-20 text-5xl">
+    <section id="identification-section" className="pb-12">
+      <h2 id="identification" className="scroll-m-20 text-3xl md:text-5xl">
         Identification
       </h2>
-      
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
+
+      <div className="mt-6 md:mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-9 gap-4">
           {/* Left content area - Description */}
-          <div className="col-span-5">
-            <div className="font-heading text-xl font-semibold">Description</div>
-            <div className="mt-4 text-lg whitespace-pre-line">
+          <div className="col-span-1 md:col-span-5">
+            <div className="font-heading text-lg md:text-xl font-semibold">Description</div>
+            <div className="mt-4 text-base md:text-lg whitespace-pre-line">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {description}
               </ReactMarkdown>
             </div>
           </div>
 
-          {/* Empty column for spacing */}
-          <div className="col-span-1" />
+          {/* Empty column for spacing - hidden on mobile */}
+          <div className="hidden md:block md:col-span-1" />
 
           {/* Right content area - Measurements */}
-          <div className="col-span-3">
-            <div className="space-y-0">
+          <div className="col-span-1 md:col-span-3 mt-6 md:mt-0">
+            {/* Mobile: horizontal scroll, Desktop: vertical stack */}
+            <div className="flex md:flex-col gap-4 md:gap-0 overflow-x-auto md:overflow-visible pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none">
               {/* Adult Weight */}
-              <div className="pb-6">
-                <div className="text-sm uppercase mb-3 text-green-900 ">Adult Weight</div>
+              <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pb-6 border border-gray-200 md:border-0">
+                <div className="text-sm uppercase mb-3 text-green-900">Adult Weight</div>
                 <div className="flex items-baseline gap-1 mb-2">
-                  <span className="text-3xl font-bold leading-none">
-                    {measurements.adultWeight === 'Unknown' 
-                      ? 'Unknown' 
+                  <span className="text-2xl md:text-3xl font-bold leading-none">
+                    {measurements.adultWeight === 'Unknown'
+                      ? 'Unknown'
                       : measurements.adultWeight.split(' ')[0]}
                   </span>
                   {measurements.adultWeight !== 'Unknown' && (
-                    <span className="text-base font-normal">
+                    <span className="text-sm md:text-base font-normal">
                       {measurements.adultWeight.split(' ').slice(1).join(' ')}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-700">
+                <p className="text-xs md:text-sm text-gray-700">
                   Best estimate of natural adult weight based on turtles caught in the wild.
                 </p>
               </div>
 
-              {/* Divider */}
-              <div className="w-full h-px bg-gray-300 mb-6" />
+              {/* Divider - hidden on mobile */}
+              <div className="hidden md:block w-full h-px bg-gray-300 mb-6" />
 
               {/* Length */}
-              <div className="pt-6 pb-6">
-                <div className="text-sm uppercase mb-3 text-green-900 ">Length (Max SCL)</div>
-                <div className="flex gap-8 mb-2">
+              <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pt-6 md:pb-6 border border-gray-200 md:border-0">
+                <div className="text-sm uppercase mb-3 text-green-900">Length (Max SCL)</div>
+                <div className="flex gap-4 md:gap-8 mb-2">
                   {/* Female Column */}
                   <div className="flex-1">
-                    <div className="text-sm mb-1 flex items-center gap-1">
+                    <div className="text-xs md:text-sm mb-1 flex items-center gap-1">
                       <Icon name="female" style="line" size="sm" />
                       <span>Female</span>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold leading-none">
-                        {measurements.length.female === 'Unknown' 
-                          ? 'Unknown' 
+                      <span className="text-2xl md:text-3xl font-bold leading-none">
+                        {measurements.length.female === 'Unknown'
+                          ? 'Unknown'
                           : measurements.length.female.split(' ')[0]}
                       </span>
                       {measurements.length.female !== 'Unknown' && (
-                        <span className="text-base font-normal">
+                        <span className="text-sm md:text-base font-normal">
                           {measurements.length.female.split(' ').slice(1).join(' ')}
                         </span>
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Male Column */}
                   <div className="flex-1">
-                    <div className="text-sm mb-1 flex items-center gap-1">
+                    <div className="text-xs md:text-sm mb-1 flex items-center gap-1">
                       <Icon name="male" style="line" size="sm" />
                       <span>Male</span>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold leading-none">
-                        {measurements.length.male === 'Unknown' 
-                          ? 'Unknown' 
+                      <span className="text-2xl md:text-3xl font-bold leading-none">
+                        {measurements.length.male === 'Unknown'
+                          ? 'Unknown'
                           : measurements.length.male.split(' ')[0]}
                       </span>
                       {measurements.length.male !== 'Unknown' && (
-                        <span className="text-base font-normal">
+                        <span className="text-sm md:text-base font-normal">
                           {measurements.length.male.split(' ').slice(1).join(' ')}
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-gray-700">
-                  {measurements.length.generallyLarger === 'female' 
+                <p className="text-xs md:text-sm text-gray-700">
+                  {measurements.length.generallyLarger === 'female'
                     ? 'The female is generally larger than the male.'
                     : measurements.length.generallyLarger === 'male'
                     ? 'The male is generally larger than the female.'
@@ -156,45 +157,45 @@ export default function Identification({
                 </p>
               </div>
 
-              {/* Divider */}
-              <div className="w-full h-px bg-gray-300 mb-6" />
+              {/* Divider - hidden on mobile */}
+              <div className="hidden md:block w-full h-px bg-gray-300 mb-6" />
 
               {/* Lifespan */}
-              <div className="pt-6">
-                <div className="text-sm uppercase mb-3 text-green-900 ">Lifespan</div>
-                <div className="flex items-start gap-8 mb-2">
+              <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pt-6 border border-gray-200 md:border-0">
+                <div className="text-sm uppercase mb-3 text-green-900">Lifespan</div>
+                <div className="flex items-start gap-4 md:gap-8 mb-2">
                   <div className="flex-1">
-                    <div className="text-sm mb-1">In the Wild</div>
+                    <div className="text-xs md:text-sm mb-1">In the Wild</div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold leading-none">
-                        {measurements.lifespan.wild === 'Unknown' 
-                          ? 'Unknown' 
+                      <span className="text-2xl md:text-3xl font-bold leading-none">
+                        {measurements.lifespan.wild === 'Unknown'
+                          ? 'Unknown'
                           : measurements.lifespan.wild.split(' ')[0]}
                       </span>
                       {measurements.lifespan.wild !== 'Unknown' && (
-                        <span className="text-base font-normal">
+                        <span className="text-sm md:text-base font-normal">
                           {measurements.lifespan.wild.split(' ').slice(1).join(' ')}
                         </span>
                       )}
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm mb-1">In Captivity</div>
+                    <div className="text-xs md:text-sm mb-1">In Captivity</div>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold leading-none">
-                        {measurements.lifespan.captivity === 'Unknown' 
-                          ? 'Unknown' 
+                      <span className="text-2xl md:text-3xl font-bold leading-none">
+                        {measurements.lifespan.captivity === 'Unknown'
+                          ? 'Unknown'
                           : measurements.lifespan.captivity.split(' ')[0]}
                       </span>
                       {measurements.lifespan.captivity !== 'Unknown' && (
-                        <span className="text-base font-normal">
+                        <span className="text-sm md:text-base font-normal">
                           {measurements.lifespan.captivity.split(' ').slice(1).join(' ')}
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-gray-700">
+                <p className="text-xs md:text-sm text-gray-700">
                   These are best estimates based on what has been observed and recorded.
                 </p>
               </div>
@@ -203,9 +204,9 @@ export default function Identification({
         </div>
 
         {/* Physical Features Header*/}
-        <div className="mt-12 max-w-lg">
-          <h3 className="text-3xl font-bold">Physical Features</h3>
-          <p className="mt-2 text-base">
+        <div className="mt-8 md:mt-12 max-w-lg">
+          <h3 className="text-2xl md:text-3xl font-bold">Physical Features</h3>
+          <p className="mt-2 text-sm md:text-base">
           Features shown are for Adult Males (reference). Look for the variant icon{' '}
           <span className="inline-flex items-center justify-center rounded bg-gray-200/60 px-1.5 py-0.5 align-baseline">
             <Icon

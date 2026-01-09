@@ -38,6 +38,15 @@ const getPopulationTrendIcon = (trend: string) => {
   return 'dotted-line-horizontal';
 };
 
+// Helper function to get population trend color
+const getPopulationTrendColor = (trend: string) => {
+  const normalizedTrend = trend.toLowerCase();
+  if (normalizedTrend.includes('decreasing')) return 'text-red-500';
+  if (normalizedTrend.includes('increasing') || normalizedTrend.includes('stable')) return 'text-green-700';
+  // Unknown, Null, or any other value
+  return 'text-gray-500';
+};
+
 // Helper function to get conservation status color classes
 const getConservationStatusColor = (code: string) => {
   switch (code) {
@@ -89,25 +98,25 @@ export default function TurtleAtAGlance({
   };
 
   return (
-    <section>
-      <h2 id="intro" className="scroll-m-20 text-5xl">
+    <section id="at-a-glance-section" className="mb-12">
+      <h2 id="intro" className="scroll-m-20 text-3xl md:text-5xl">
         At a Glance
       </h2>
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
-          {/* Description area - spans 4 columns */}
-          <div className="col-span-4 text-lg leading-relaxed">
+      <div className="mt-6 md:mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-9 gap-4">
+          {/* Description area - spans 4 columns on desktop, full width on mobile */}
+          <div className="col-span-1 md:col-span-4 text-base md:text-lg leading-relaxed">
             {/* Render the markdown description */}
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {description}
             </ReactMarkdown>
           </div>
           
-          {/* Empty column */}
-          <div className="col-span-1" />
-          
-          {/* Stats area - spans 4 columns */}
-          <div className="col-span-4 space-y-6">
+          {/* Empty column - hidden on mobile */}
+          <div className="hidden md:block md:col-span-1" />
+
+          {/* Stats area - spans 4 columns on desktop, full width on mobile */}
+          <div className="col-span-1 md:col-span-4 space-y-6 mt-6 md:mt-0">
             {/* Conservation Status */}
             <button
               onClick={() => scrollToSection('conservation')}
@@ -117,8 +126,8 @@ export default function TurtleAtAGlance({
                 <span className="font-bold text-white">{conservationStatus.code}</span>
               </div>
               <div className="flex flex-col justify-center">
-                <div className="font-heading font-bold text-lg">{conservationStatus.status}</div>
-                <p className="text-sm">IUCN RedList | {conservationStatus.year}</p>
+                <div className="font-heading font-bold text-base md:text-lg">{conservationStatus.status}</div>
+                <p className="text-xs md:text-sm">IUCN RedList | {conservationStatus.year}</p>
               </div>
             </button>
 
@@ -130,13 +139,15 @@ export default function TurtleAtAGlance({
                   className="w-[calc(50%-10px)] border-t border-t-gray-200 py-4"
                 >
                   <div className="flex items-center gap-2">
-                    <Icon 
-                      name={key === 'populationTrend' 
+                    <Icon
+                      name={key === 'populationTrend'
                         ? getPopulationTrendIcon(value)
-                        : STAT_ICONS[key as keyof typeof STAT_ICONS]} 
-                      style="line" 
-                      size="base" 
-                      className="text-green-700" 
+                        : STAT_ICONS[key as keyof typeof STAT_ICONS]}
+                      style="line"
+                      size="base"
+                      className={key === 'populationTrend'
+                        ? getPopulationTrendColor(value)
+                        : "text-green-700"}
                     />
                     <div className="text-sm uppercase">
                       {key.replace(/([A-Z])/g, ' $1').trim()}
@@ -151,7 +162,7 @@ export default function TurtleAtAGlance({
 
             {/* Common Names Section */}
             <div className="space-y-3">
-              <h3 className="font-bold text-lg">Other Names People Call Me</h3>
+              <h3 className="font-bold text-base md:text-lg">Other Names People Call Me</h3>
               <div className="h-px border-b border-gray-200" />
               <div className="flex flex-wrap gap-2">
                 {commonNames.map((name, index) => (

@@ -70,11 +70,11 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                   commonNames={data.commonNames}
                 />
                 
-                {/* Divider */}
-                <div className="w-full mt-12 mb-20">
+                {/* Divider - hidden on mobile */}
+                <div className="hidden md:block w-full mt-12 mb-20">
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
-                
+
                 <Identification
                   speciesId={data.id}
                   description={data.identification.description}
