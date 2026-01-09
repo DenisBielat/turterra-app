@@ -90,24 +90,24 @@ export default function TurtleAtAGlance({
 
   return (
     <section>
-      <h2 id="intro" className="scroll-m-20 text-5xl">
+      <h2 id="intro" className="scroll-m-20 text-3xl md:text-5xl">
         At a Glance
       </h2>
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
-          {/* Description area - spans 4 columns */}
-          <div className="col-span-4 text-lg leading-relaxed">
+      <div className="mt-6 md:mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-9 gap-4">
+          {/* Description area - spans 4 columns on desktop, full width on mobile */}
+          <div className="col-span-1 md:col-span-4 text-base md:text-lg leading-relaxed">
             {/* Render the markdown description */}
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {description}
             </ReactMarkdown>
           </div>
           
-          {/* Empty column */}
-          <div className="col-span-1" />
-          
-          {/* Stats area - spans 4 columns */}
-          <div className="col-span-4 space-y-6">
+          {/* Empty column - hidden on mobile */}
+          <div className="hidden md:block md:col-span-1" />
+
+          {/* Stats area - spans 4 columns on desktop, full width on mobile */}
+          <div className="col-span-1 md:col-span-4 space-y-6 mt-6 md:mt-0">
             {/* Conservation Status */}
             <button
               onClick={() => scrollToSection('conservation')}
@@ -117,8 +117,8 @@ export default function TurtleAtAGlance({
                 <span className="font-bold text-white">{conservationStatus.code}</span>
               </div>
               <div className="flex flex-col justify-center">
-                <div className="font-heading font-bold text-lg">{conservationStatus.status}</div>
-                <p className="text-sm">IUCN RedList | {conservationStatus.year}</p>
+                <div className="font-heading font-bold text-base md:text-lg">{conservationStatus.status}</div>
+                <p className="text-xs md:text-sm">IUCN RedList | {conservationStatus.year}</p>
               </div>
             </button>
 
@@ -151,7 +151,7 @@ export default function TurtleAtAGlance({
 
             {/* Common Names Section */}
             <div className="space-y-3">
-              <h3 className="font-bold text-lg">Other Names People Call Me</h3>
+              <h3 className="font-bold text-base md:text-lg">Other Names People Call Me</h3>
               <div className="h-px border-b border-gray-200" />
               <div className="flex flex-wrap gap-2">
                 {commonNames.map((name, index) => (
