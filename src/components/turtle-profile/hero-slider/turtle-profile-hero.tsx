@@ -130,7 +130,6 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                 className={styles.swiperSlide}
                 style={{
                   width: `${image.metadata.width || "auto"}`,
-                  height: `${image.metadata.height || "472px"}`,
                 }}
               >
                 {/* Image */}
