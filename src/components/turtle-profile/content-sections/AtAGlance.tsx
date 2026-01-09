@@ -42,7 +42,7 @@ const getPopulationTrendIcon = (trend: string) => {
 const getPopulationTrendColor = (trend: string) => {
   const normalizedTrend = trend.toLowerCase();
   if (normalizedTrend.includes('decreasing')) return 'text-red-500';
-  if (normalizedTrend.includes('increasing') || normalizedTrend.includes('stable')) return 'text-green-500';
+  if (normalizedTrend.includes('increasing') || normalizedTrend.includes('stable')) return 'text-green-700';
   // Unknown, Null, or any other value
   return 'text-gray-500';
 };
@@ -98,7 +98,7 @@ export default function TurtleAtAGlance({
   };
 
   return (
-    <section>
+    <section id="at-a-glance-section" className="mb-12">
       <h2 id="intro" className="scroll-m-20 text-3xl md:text-5xl">
         At a Glance
       </h2>
