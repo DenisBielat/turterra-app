@@ -117,14 +117,14 @@ export default function TurtleSearchNav() {
             {/* Left: Book icon + Search icon - book icon has p-2 to match navbar menu button */}
             <div className="flex items-center gap-1 -ml-2">
               <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors">
-                <Icon name="book-open" style="line" size="lg" />
+                <Icon name="book-open" style="line" size="base" />
               </Link>
               <button
                 onClick={() => setMobileSearchOpen(true)}
                 className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
                 aria-label="Open search"
               >
-                <Icon name="search" style="line" size="lg" />
+                <Icon name="search" style="line" size="base" />
               </button>
             </div>
 
@@ -146,7 +146,7 @@ export default function TurtleSearchNav() {
           <div className="flex items-center gap-1 search-container h-10 -ml-2">
             {/* Left: Book icon linking to species guide - p-2 to match navbar menu button */}
             <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0">
-              <Icon name="book-open" style="line" size="lg" />
+              <Icon name="book-open" style="line" size="base" />
             </Link>
 
             {/* Center: Search input */}
@@ -168,7 +168,7 @@ export default function TurtleSearchNav() {
               className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0"
               aria-label="Close search"
             >
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5" />
             </button>
           </div>
         )}
@@ -181,7 +181,7 @@ export default function TurtleSearchNav() {
             isSticky ? 'top-[64px]' : 'top-[136px]'
           }`}
         >
-          <div className="bg-neutral border border-green-700 rounded-xl shadow-2xl overflow-auto max-h-[60vh]">
+          <div className="bg-green-900 border border-green-700 rounded-xl shadow-2xl overflow-auto max-h-[60vh]">
             {message ? (
               <div className="p-3 text-white/70 text-center">{message}</div>
             ) : (
