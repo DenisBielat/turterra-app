@@ -124,12 +124,12 @@ export default function VariantModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleChange}>
       <DialogContent
-        className="max-w-xl duration-300"
+        className="max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-xl mx-auto duration-300"
         aria-describedby="variant-modal-description"
       >
         <DialogHeader className="pb-2">
-          <DialogTitle className="font-heading font-bold text-xl">{featureName}</DialogTitle>
-          <DialogDescription id="variant-modal-description" className="text-gray-500 text-sm">
+          <DialogTitle className="font-heading font-bold text-lg md:text-xl">{featureName}</DialogTitle>
+          <DialogDescription id="variant-modal-description" className="text-gray-500 text-xs md:text-sm">
             How this feature compares across life stages
           </DialogDescription>
         </DialogHeader>
@@ -137,14 +137,14 @@ export default function VariantModal({
         {/* Life stage rows */}
         <div className="flex flex-col gap-3 py-2">
           {/* Reference Row (Adult Male) - warm background */}
-          <div className="grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border border-gray-300 bg-warm">
-            <div className="flex items-center gap-3 whitespace-nowrap">
-              <span className="font-medium">Adult Male</span>
+          <div className="flex flex-col md:grid md:grid-cols-[180px_1fr] gap-1 md:gap-4 p-3 md:p-4 rounded-lg border border-gray-300 bg-warm">
+            <div className="flex items-center gap-2 md:gap-3">
+              <span className="font-medium text-sm md:text-base">Adult Male</span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-gray-500 text-white font-medium">
                 Reference
               </span>
             </div>
-            <div>
+            <div className="text-sm md:text-base text-gray-700 md:text-black">
               {formatDisplayValue(variants.reference)}
             </div>
           </div>
@@ -158,14 +158,14 @@ export default function VariantModal({
             return (
               <div
                 key={`${variant.sex}-${variant.lifeStage}`}
-                className={`grid grid-cols-[180px_1fr] gap-4 p-4 rounded-lg border ${
+                className={`flex flex-col md:grid md:grid-cols-[180px_1fr] gap-1 md:gap-4 p-3 md:p-4 rounded-lg border ${
                   isDifferent
                     ? 'border-orange-500 bg-orange-500/20'
                     : 'border-gray-300 bg-white'
                 }`}
               >
-                <span className="font-medium whitespace-nowrap">{label}</span>
-                <div>
+                <span className="font-medium text-sm md:text-base">{label}</span>
+                <div className="text-sm md:text-base text-gray-700 md:text-black">
                   {formatDisplayValue(variant.value)}
                 </div>
               </div>
