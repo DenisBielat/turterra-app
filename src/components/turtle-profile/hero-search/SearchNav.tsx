@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Search, ChevronRight, X, BookOpen } from 'lucide-react';
+import { Search, ChevronRight, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import debounce from 'lodash/debounce';
 import Image from 'next/image';
@@ -107,17 +107,17 @@ export default function TurtleSearchNav() {
       <div
         className={`lg:hidden w-full bg-green-950 transition-all duration-300 ${
           isSticky
-            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-4 z-10'
-            : 'relative py-3 px-4 z-20'
+            ? 'fixed top-0 left-0 right-0 shadow-lg py-3 px-4 z-10'
+            : 'relative py-4 px-4 z-20 mt-2'
         }`}
       >
         {/* Default view - shown when search is closed */}
         {!mobileSearchOpen && (
-          <div className="flex items-center justify-between">
-            {/* Left: Placeholder icon + Search icon */}
+          <div className="flex items-center justify-between h-10">
+            {/* Left: Book icon + Search icon */}
             <div className="flex items-center gap-3">
               <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors">
-                <Icon name="turtle" style="line" size="base" />
+                <Icon name="book-open" style="line" size="base" />
               </Link>
               <button
                 onClick={() => setMobileSearchOpen(true)}
@@ -143,10 +143,10 @@ export default function TurtleSearchNav() {
 
         {/* Inline search view - shown when search is open */}
         {mobileSearchOpen && (
-          <div className="flex items-center gap-3 search-container">
+          <div className="flex items-center gap-3 search-container h-10">
             {/* Left: Book icon linking to species guide */}
             <Link href="/species-guide" className="text-white hover:text-green-400 transition-colors flex-shrink-0">
-              <BookOpen className="h-5 w-5" />
+              <Icon name="book-open" style="line" size="base" />
             </Link>
 
             {/* Center: Search input */}
@@ -157,17 +157,9 @@ export default function TurtleSearchNav() {
                 placeholder="Search for turtles"
                 value={searchQuery}
                 onChange={handleSearchInput}
-                className="px-10 h-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="pl-10 pr-4 h-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 group"
-                >
-                  <X className="h-4 w-4 text-white/70 group-hover:text-green-500 transition-colors" />
-                </button>
-              )}
             </div>
 
             {/* Right: Close button */}
