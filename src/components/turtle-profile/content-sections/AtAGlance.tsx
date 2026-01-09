@@ -38,6 +38,15 @@ const getPopulationTrendIcon = (trend: string) => {
   return 'dotted-line-horizontal';
 };
 
+// Helper function to get population trend color
+const getPopulationTrendColor = (trend: string) => {
+  const normalizedTrend = trend.toLowerCase();
+  if (normalizedTrend.includes('decreasing')) return 'text-red-500';
+  if (normalizedTrend.includes('increasing') || normalizedTrend.includes('stable')) return 'text-green-500';
+  // Unknown, Null, or any other value
+  return 'text-gray-500';
+};
+
 // Helper function to get conservation status color classes
 const getConservationStatusColor = (code: string) => {
   switch (code) {
@@ -130,13 +139,15 @@ export default function TurtleAtAGlance({
                   className="w-[calc(50%-10px)] border-t border-t-gray-200 py-4"
                 >
                   <div className="flex items-center gap-2">
-                    <Icon 
-                      name={key === 'populationTrend' 
+                    <Icon
+                      name={key === 'populationTrend'
                         ? getPopulationTrendIcon(value)
-                        : STAT_ICONS[key as keyof typeof STAT_ICONS]} 
-                      style="line" 
-                      size="base" 
-                      className="text-green-700" 
+                        : STAT_ICONS[key as keyof typeof STAT_ICONS]}
+                      style="line"
+                      size="base"
+                      className={key === 'populationTrend'
+                        ? getPopulationTrendColor(value)
+                        : "text-green-700"}
                     />
                     <div className="text-sm uppercase">
                       {key.replace(/([A-Z])/g, ' $1').trim()}
