@@ -40,7 +40,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
   }
 
   return (
-    <main className="overflow-x-hidden">
+    <main>
       <TurtleSearchNav />
       <TurtleProfileHero slug={params.slug} />
       <div className="w-full h-16 bg-green-900"></div>
