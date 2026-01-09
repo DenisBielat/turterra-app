@@ -28,8 +28,8 @@
 
 @media (max-width: 1023px) {
   .swiperSlide {
-    height: 300px;
-    margin-bottom: 4rem;
+    height: 250px;
+    margin-bottom: 3rem;
   }
 }
 

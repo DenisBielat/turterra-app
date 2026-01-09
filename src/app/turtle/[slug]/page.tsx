@@ -43,9 +43,9 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
     <main>
       <TurtleSearchNav />
       <TurtleProfileHero slug={params.slug} />
-      <div className="w-full h-16 bg-green-900"></div>
-      <div className="w-full h-12 bg-green-800"></div>
-      <div className="w-full h-8 bg-orange-500"></div>
+      <div className="w-full h-8 lg:h-16 bg-green-900"></div>
+      <div className="w-full h-6 lg:h-12 bg-green-800"></div>
+      <div className="w-full h-4 lg:h-8 bg-orange-500"></div>
       
       <div className="bg-warm">
         <div className="px-4 lg:px-10 py-12">
