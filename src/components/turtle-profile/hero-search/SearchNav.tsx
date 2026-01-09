@@ -101,14 +101,21 @@ export default function TurtleSearchNav() {
     }
   }, [mobileSearchOpen]);
 
+  // Close mobile search when scrolling up (navbar reappears)
+  useEffect(() => {
+    if (mobileSearchOpen && scrollDirection === 'up' && !isAtTop) {
+      closeMobileSearch();
+    }
+  }, [scrollDirection, isAtTop, mobileSearchOpen]);
+
   return (
     <>
       {/* Mobile SearchNav */}
       <div
         className={`lg:hidden w-full bg-green-950 transition-all duration-300 ${
           isSticky
-            ? 'fixed top-0 left-0 right-0 shadow-lg py-3 px-4 z-10'
-            : 'relative py-4 px-4 z-20'
+            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-4 z-10'
+            : 'relative py-2 px-4 z-20'
         }`}
       >
         {/* Default view - shown when search is closed */}
@@ -177,8 +184,8 @@ export default function TurtleSearchNav() {
       {/* Mobile Search Results - floating overlay below search bar */}
       {mobileSearchOpen && showResults && searchQuery && (searchResults.length > 0 || message) && (
         <div
-          className={`lg:hidden fixed left-4 right-4 z-50 search-container ${
-            isSticky ? 'top-[64px]' : 'top-[136px]'
+          className={`lg:hidden fixed left-14 right-4 z-50 search-container ${
+            isSticky ? 'top-[58px]' : 'top-[114px]'
           }`}
         >
           <div className="bg-green-900 border border-green-700 rounded-xl shadow-2xl overflow-auto max-h-[60vh]">
