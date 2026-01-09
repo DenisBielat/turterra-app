@@ -6,6 +6,7 @@ export type LineIconName =
   | 'animal-skin'
   | 'arrow-left-1'
   | 'arrow-right-1'
+  | 'book-open'
   | 'bulleted-list'
   | 'calendar'
   | 'category'
