@@ -116,7 +116,7 @@ export default function PhysicalFeatures({
                 aria-expanded={isOpen}
                 aria-controls={`content-${categoryTag}`}
               >
-                <span className="text-lg font-bold">{formatCategoryName(category.name)}</span>
+                <span className="text-base md:text-lg font-bold">{formatCategoryName(category.name)}</span>
                 <Icon
                   name="chevron-down"
                   size="sm"
@@ -167,8 +167,8 @@ export default function PhysicalFeatures({
                       isOpen ? 'opacity-100' : 'opacity-0'
                     }`}
                   >
-                    {/* Header Row */}
-                    <div className="grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 pt-4 pb-2 bg-white border-b border-gray-200">
+                    {/* Header Row - hidden on mobile */}
+                    <div className="hidden md:grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 pt-4 pb-2 bg-white border-b border-gray-200">
                       <div className="text-xs text-gray-400">Feature</div>
                       <div className="text-xs text-gray-400">Value</div>
                     </div>
@@ -182,13 +182,13 @@ export default function PhysicalFeatures({
                         } ${index === category.features.length - 1 ? 'pb-2' : ''}`}
                       >
                         <div
-                          className={`grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 py-3 ${
+                          className={`flex flex-col md:grid md:grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-1 md:gap-8 px-4 py-3 ${
                             index > 0 ? 'border-t border-gray-200' : ''
                           }`}
                         >
-                          <div className="font-semibold self-start pt-0.5">{feature.name}</div>
+                          <div className="font-semibold text-sm md:text-base self-start pt-0.5">{feature.name}</div>
                           <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 text-sm md:text-base text-gray-700 md:text-black">
                               {formatFeatureValue(feature.value)}
                             </div>
                             {feature.variants && (
@@ -217,19 +217,19 @@ export default function PhysicalFeatures({
                         {feature.subFeatures.map((sub) => (
                           <div
                             key={sub.name}
-                            className="grid grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-8 px-4 py-2"
+                            className="flex flex-col md:grid md:grid-cols-[minmax(200px,1fr)_minmax(200px,2fr)] gap-1 md:gap-8 px-4 py-2"
                           >
-                            <div className="pl-10 relative flex items-start pt-0.5">
+                            <div className="pl-6 md:pl-10 relative flex items-start pt-0.5">
                               <Icon
                                 name="flow-arrow-1"
                                 size="base"
                                 style="filled"
-                                className="absolute left-2 top-1 text-black"
+                                className="absolute left-0 md:left-2 top-1 text-black"
                               />
-                              <span className="font-semibold">{sub.name}</span>
+                              <span className="font-semibold text-sm md:text-base">{sub.name}</span>
                             </div>
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 pl-6 md:pl-0">
+                              <div className="flex-1 min-w-0 text-sm md:text-base text-gray-700 md:text-black">
                                 {formatFeatureValue(sub.value)}
                               </div>
                               {sub.variants && (
