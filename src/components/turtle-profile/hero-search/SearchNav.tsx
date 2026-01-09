@@ -108,7 +108,7 @@ export default function TurtleSearchNav() {
         className={`lg:hidden w-full bg-green-950 transition-all duration-300 ${
           isSticky
             ? 'fixed top-0 left-0 right-0 shadow-lg py-3 px-4 z-10'
-            : 'relative py-4 px-4 z-20 mt-2'
+            : 'relative py-4 px-4 z-20'
         }`}
       >
         {/* Default view - shown when search is closed */}
