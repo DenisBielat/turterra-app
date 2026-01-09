@@ -124,7 +124,7 @@ export default function VariantModal({
   return (
     <Dialog open={isOpen} onOpenChange={handleChange}>
       <DialogContent
-        className="max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-xl mx-auto duration-300"
+        className="max-w-[calc(100%-2rem)] sm:max-w-md md:max-w-xl mx-auto rounded-lg duration-300"
         aria-describedby="variant-modal-description"
       >
         <DialogHeader className="pb-2">
