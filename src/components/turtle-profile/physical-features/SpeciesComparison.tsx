@@ -63,8 +63,8 @@ export default function SpeciesComparison({
 
   return (
     <div className="space-y-6">
-      {/* Top Grid - Species Cards */}
-      <div className="grid grid-cols-[1fr_auto_1fr] gap-4">
+      {/* Top Grid - Species Cards (hidden on mobile) */}
+      <div className="hidden md:grid grid-cols-[1fr_auto_1fr] gap-4">
         {/* Primary Species Card */}
         <div>
           <SpeciesCard {...primarySpecies.speciesCard} />
@@ -124,21 +124,21 @@ export default function SpeciesComparison({
       </div>
 
       {/* Bottom Grid - Physical Features */}
-      <div className="grid grid-cols-[1fr_auto_1fr] gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4">
         {/* Primary Species Features */}
         <div>
-          <PhysicalFeatures 
+          <PhysicalFeatures
             categories={primarySpecies.featureCategories}
             openCategory={openCategory}
             onCategoryClick={handleCategoryClick}
           />
         </div>
 
-        {/* Spacer column */}
-        <div className="w-4 md:w-6" />
+        {/* Spacer column (hidden on mobile) */}
+        <div className="hidden md:block w-4 md:w-6" />
 
-        {/* Comparison Species Features or Related Species */}
-        <div>
+        {/* Comparison Species Features or Related Species (hidden on mobile) */}
+        <div className="hidden md:block">
           {isLoading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
