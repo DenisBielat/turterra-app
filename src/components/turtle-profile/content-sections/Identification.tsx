@@ -80,7 +80,7 @@ export default function Identification({
             {/* Mobile: horizontal scroll, Desktop: vertical stack */}
             <div className="flex md:flex-col gap-4 md:gap-0 overflow-x-auto md:overflow-visible pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none">
               {/* Adult Weight */}
-              <div className="min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pb-6 border border-gray-200 md:border-0">
+              <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pb-6 border border-gray-200 md:border-0">
                 <div className="text-sm uppercase mb-3 text-green-900">Adult Weight</div>
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-2xl md:text-3xl font-bold leading-none">
@@ -103,7 +103,7 @@ export default function Identification({
               <div className="hidden md:block w-full h-px bg-gray-300 mb-6" />
 
               {/* Length */}
-              <div className="min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pt-6 md:pb-6 border border-gray-200 md:border-0">
+              <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pt-6 md:pb-6 border border-gray-200 md:border-0">
                 <div className="text-sm uppercase mb-3 text-green-900">Length (Max SCL)</div>
                 <div className="flex gap-4 md:gap-8 mb-2">
                   {/* Female Column */}
@@ -161,7 +161,7 @@ export default function Identification({
               <div className="hidden md:block w-full h-px bg-gray-300 mb-6" />
 
               {/* Lifespan */}
-              <div className="min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pt-6 border border-gray-200 md:border-0">
+              <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pt-6 border border-gray-200 md:border-0">
                 <div className="text-sm uppercase mb-3 text-green-900">Lifespan</div>
                 <div className="flex items-start gap-4 md:gap-8 mb-2">
                   <div className="flex-1">
