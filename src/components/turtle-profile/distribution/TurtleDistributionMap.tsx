@@ -85,6 +85,18 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
   const [hasMovedFromOrigin, setHasMovedFromOrigin] = useState(false);
   const isInitialZoomRef = useRef(true);
   
+  // Track if we're on mobile for button positioning
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   // Fetch distribution GeoJSON for selected species
   useEffect(() => {
     const fetchDistributions = async () => {
@@ -327,47 +339,76 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     });
   }, [speciesData]);
 
-  // Ensure range and sightings layers are always on top
+  // Ensure proper layer ordering: Sightings (top) > Range Maps > Species Shapes (bottom)
   useEffect(() => {
     const map = mapRef.current?.getMap();
     if (!map || !map.isStyleLoaded()) return;
 
-    // Move range and sightings layers to the top after a short delay to ensure they exist
-    const moveTopLayers = () => {
-      // First move range layers
-      rangeMapData.forEach((rangeData) => {
-        const layerIds = [
+    const reorderLayers = () => {
+      try {
+        // Get all layers that exist
+        const speciesLayerIds = speciesData
+          .map(species => `species-${species.speciesId}-fill`)
+          .filter(id => map.getLayer(id));
+
+        const rangeLayerIds = rangeMapData.flatMap(rangeData => [
           `range-${rangeData.speciesId}-fill`,
           `range-${rangeData.speciesId}-line`,
           `range-${rangeData.speciesId}-linestring`
-        ];
+        ]).filter(id => map.getLayer(id));
 
-        layerIds.forEach(layerId => {
-          if (map.getLayer(layerId)) {
+        const hasSightings = map.getLayer('inat-sightings');
+
+        // Step 1: Ensure species layers are at the bottom
+        // Move them before any range layers or sightings
+        const referenceLayer = rangeLayerIds[0] || (hasSightings ? 'inat-sightings' : null);
+        if (referenceLayer) {
+          speciesLayerIds.forEach((layerId) => {
+            try {
+              map.moveLayer(layerId, referenceLayer);
+            } catch {}
+          });
+        }
+
+        // Step 2: Move range layers above species, but below sightings
+        if (hasSightings) {
+          // Move range layers before sightings (so sightings stay on top)
+          rangeLayerIds.reverse().forEach((layerId) => { // Reverse to maintain order
+            try {
+              map.moveLayer(layerId, 'inat-sightings');
+            } catch {}
+          });
+        } else {
+          // No sightings, so range layers go to top
+          rangeLayerIds.forEach((layerId) => {
             try {
               map.moveLayer(layerId);
-            } catch {
-              // Layer might not exist yet
-            }
-          }
-        });
-      });
-
-      // Then move sightings layer to very top
-      if (map.getLayer('inat-sightings')) {
-        try {
-          map.moveLayer('inat-sightings');
-        } catch {
-          // Layer might not exist yet
+            } catch {}
+          });
         }
+
+        // Step 3: Move sightings to the very top (last operation)
+        if (hasSightings) {
+          try {
+            map.moveLayer('inat-sightings');
+          } catch {}
+        }
+      } catch (error) {
+        // Layers might not all exist yet, will retry
       }
     };
 
-    // Run immediately and also after a delay
-    moveTopLayers();
-    const timeoutId = setTimeout(moveTopLayers, 500);
+    // Run immediately and with delays to catch all layer additions
+    reorderLayers();
+    const timeout1 = setTimeout(reorderLayers, 300);
+    const timeout2 = setTimeout(reorderLayers, 700);
+    const timeout3 = setTimeout(reorderLayers, 1200);
 
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeout1);
+      clearTimeout(timeout2);
+      clearTimeout(timeout3);
+    };
   }, [rangeMapData, speciesData, iNatObservations, activeLayers]);
 
   // Add a map reference
@@ -411,28 +452,37 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
           isInitialZoomRef.current = true;
           setHasMovedFromOrigin(false);
 
+          // Use responsive padding: less on mobile, more on desktop
+          const isMobile = window.innerWidth < 768;
+          const padding = isMobile ? 20 : 50;
+
           map.fitBounds(bounds, {
-            padding: 50,
+            padding: padding,
             duration: 1500,
             easing: (t) => t * (2 - t)
           });
 
-          // Mark initial zoom complete after animation
+          // Mark initial zoom complete after animation with extra buffer to ensure all onMove events are ignored
           setTimeout(() => {
             isInitialZoomRef.current = false;
-          }, 1600);
+            // Ensure hasMovedFromOrigin is still false after initial zoom completes
+            setHasMovedFromOrigin(false);
+          }, 1700);
         } else if (distributionFeatures.length > 0 || rangeFeatures.length > 0) {
           // Just zoom to a reasonable level if no bbox
+          isInitialZoomRef.current = true;
+          setHasMovedFromOrigin(false);
           map.easeTo({
             zoom: 3,
             duration: 1500,
             easing: (t) => t * (2 - t)
           });
 
-          // Mark initial zoom complete after animation
+          // Mark initial zoom complete after animation with extra buffer
           setTimeout(() => {
             isInitialZoomRef.current = false;
-          }, 1600);
+            setHasMovedFromOrigin(false);
+          }, 1700);
         }
       };
 
@@ -445,15 +495,19 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     if (originBounds && mapRef.current) {
       const map = mapRef.current.getMap();
       isInitialZoomRef.current = true;
+      setHasMovedFromOrigin(false);
+      // Use responsive padding: less on mobile, more on desktop
+      const isMobile = window.innerWidth < 768;
+      const padding = isMobile ? 20 : 50;
       map.fitBounds(originBounds, {
-        padding: 50,
+        padding: padding,
         duration: 1000,
         easing: (t) => t * (2 - t)
       });
       setTimeout(() => {
         isInitialZoomRef.current = false;
         setHasMovedFromOrigin(false);
-      }, 1100);
+      }, 1200);
     }
   }, [originBounds]);
 
@@ -571,12 +625,12 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         </div>
       </div>
 
-      {/* Back to Origin Button - positioned below the layer controls */}
+      {/* Back to Origin Button - positioned bottom-left on mobile, below layer controls on desktop */}
       {hasMovedFromOrigin && originBounds && (
         <button
           onClick={handleBackToOrigin}
           className="absolute left-3 md:left-4 z-[5] bg-white rounded-lg shadow-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-50 transition-colors"
-          style={{ top: 'calc(1rem + 220px)' }}
+          style={isMobile ? { bottom: '0.75rem', top: 'auto' } : { top: 'calc(1rem + 220px)', bottom: 'auto' }}
         >
           <Icon name="origin" style="line" size="sm" className="text-gray-600" />
           <span className="text-sm font-medium text-gray-700">Back to Origin</span>
