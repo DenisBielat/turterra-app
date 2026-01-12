@@ -393,7 +393,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
             map.moveLayer('inat-sightings');
           } catch {}
         }
-      } catch (error) {
+      } catch {
         // Layers might not all exist yet, will retry
       }
     };
