@@ -20,6 +20,7 @@ export type LineIconName =
   | 'earth-locate'
   | 'face-id'
   | 'female'
+  | 'filter-settings'
   | 'graph-stats-ascend'
   | 'graph-stats-descend'
   | 'hand-shake-heart'

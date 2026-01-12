@@ -15,21 +15,21 @@ const DistributionSection: React.FC<DistributionSectionProps> = ({
   description
 }) => {
   return (
-    <div id="distribution" className="scroll-mt-20">
-      <div className="mb-8 max-w-2xl">
-        <h2 className="text-5xl font-bold mb-8">Distribution</h2>
+    <section id="distribution-section" className="scroll-mt-20">
+      <div className="mb-6 md:mb-8 max-w-2xl">
+        <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-8">Distribution</h2>
         {currentSpeciesName && (
-          <div className="text-lg whitespace-pre-line">
+          <div className="text-base md:text-lg whitespace-pre-line">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {description?.trim() || `Geographic distribution of the ${currentSpeciesName}`}
             </ReactMarkdown>
           </div>
         )}
       </div>
-      <TurtleDistributionMap 
-        selectedSpeciesIds={currentSpeciesId ? [currentSpeciesId] : []} 
+      <TurtleDistributionMap
+        selectedSpeciesIds={currentSpeciesId ? [currentSpeciesId] : []}
       />
-    </div>
+    </section>
   );
 };
 

@@ -48,6 +48,7 @@ interface TurtleDistributionMapProps {
 
 
 const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedSpeciesIds = [] }) => {
+  const [isLegendOpen, setIsLegendOpen] = useState(false);
   const [viewState, setViewState] = useState<ViewState>({
     longitude: 0,
     latitude: 20, // Centered to show most turtle habitats
@@ -477,10 +478,31 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
 
   return (
     <div className="relative w-full h-96 md:h-[600px] rounded-lg overflow-hidden">
-      {/* Layer Controls */}
-      <div className="absolute top-4 left-4 z-10 bg-white rounded-lg shadow-lg p-3">
-        <h4 className="text-sm font-medium mb-2">Distribution Types</h4>
-        <div className="space-y-2">
+      {/* Mobile Legend Toggle Button */}
+      <button
+        onClick={() => setIsLegendOpen(!isLegendOpen)}
+        className="md:hidden absolute top-3 left-3 z-[5] bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors"
+        aria-label="Toggle map legend"
+      >
+        <Icon name="filter-settings" style="line" size="sm" className="text-gray-700" />
+      </button>
+
+      {/* Layer Controls - Always visible on desktop, toggleable on mobile */}
+      <div className={`absolute top-3 left-3 z-[5] bg-white rounded-lg shadow-lg p-3 min-w-[200px] md:min-w-0 transition-all duration-200 ${
+        isLegendOpen ? 'block' : 'hidden'
+      } md:block md:top-4 md:left-4`}>
+        {/* Mobile header with close button */}
+        <div className="flex items-center justify-between gap-4 mb-2 md:mb-0">
+          <h4 className="text-sm font-medium md:mb-2">Distribution Types</h4>
+          <button
+            onClick={() => setIsLegendOpen(false)}
+            className="md:hidden p-1.5 hover:bg-gray-100 rounded -mr-1"
+            aria-label="Close legend"
+          >
+            <Icon name="close" style="line" size="sm" className="text-gray-500" />
+          </button>
+        </div>
+        <div className="space-y-2 mt-1 md:mt-0">
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -552,7 +574,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
       {hasMovedFromOrigin && originBounds && (
         <button
           onClick={handleBackToOrigin}
-          className="absolute left-4 z-10 bg-white rounded-lg shadow-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+          className="absolute left-3 md:left-4 z-[5] bg-white rounded-lg shadow-lg px-3 py-2 flex items-center gap-2 hover:bg-gray-50 transition-colors"
           style={{ top: 'calc(1rem + 220px)' }}
         >
           <Icon name="origin" style="line" size="sm" className="text-gray-600" />
