@@ -15,18 +15,18 @@ export default function Behavior({
   uniqueTraits,
 }: BehaviorProps) {
   return (
-    <section className="">
-      <h2 className="text-5xl font-bold mb-2">Behavior</h2>
+    <section id="behavior" className="scroll-m-20">
+      <h2 className="text-3xl md:text-5xl font-bold mb-2">Behavior</h2>
       
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
+      <div className="mt-6 md:mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-9 gap-4">
           {/* Left content area - All subsections */}
-          <div className="col-span-5 space-y-12">
+          <div className="col-span-1 md:col-span-5 space-y-8 md:space-y-12">
             {/* Hibernation Subsection */}
             {hibernation && (
               <div>
-                <h3 className="text-3xl font-bold mb-3">Hibernation</h3>
-                <div className="text-lg">
+                <h3 className="text-2xl md:text-3xl font-bold mb-3">Hibernation</h3>
+                <div className="text-base md:text-lg">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {hibernation}
                   </ReactMarkdown>
@@ -37,11 +37,11 @@ export default function Behavior({
             {/* Diet Subsection */}
             {diet && (
               <div>
-                <div className="w-full mb-8">
+                <div className="w-full mb-6 md:mb-8">
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
-                <h3 className="text-3xl font-bold mb-3">Diet</h3>
-                <div className="text-lg">
+                <h3 className="text-2xl md:text-3xl font-bold mb-3">Diet</h3>
+                <div className="text-base md:text-lg">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {diet}
                   </ReactMarkdown>
@@ -52,11 +52,11 @@ export default function Behavior({
             {/* Nesting Subsection */}
             {nesting && (
               <div>
-                <div className="w-full mb-8">
+                <div className="w-full mb-6 md:mb-8">
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
-                <h3 className="text-3xl font-bold mb-3">Nesting</h3>
-                <div className="text-lg">
+                <h3 className="text-2xl md:text-3xl font-bold mb-3">Nesting</h3>
+                <div className="text-base md:text-lg">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {nesting}
                   </ReactMarkdown>
@@ -67,11 +67,11 @@ export default function Behavior({
             {/* Unique Traits and Qualities Subsection */}
             {uniqueTraits && (
               <div>
-                <div className="w-full mb-8">
+                <div className="w-full mb-6 md:mb-8">
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
-                <h3 className="text-3xl font-bold mb-3">Unique Traits and Qualities</h3>
-                <div className="text-lg">
+                <h3 className="text-2xl md:text-3xl font-bold mb-3">Unique Traits and Qualities</h3>
+                <div className="text-base md:text-lg">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {uniqueTraits}
                   </ReactMarkdown>
@@ -80,11 +80,11 @@ export default function Behavior({
             )}
           </div>
 
-          {/* Empty column for spacing */}
-          <div className="col-span-1" />
+          {/* Empty column for spacing - hidden on mobile */}
+          <div className="hidden md:block md:col-span-1" />
 
           {/* Right content area - reserved for future use */}
-          <div className="col-span-3">
+          <div className="hidden md:block md:col-span-3">
             {/* Future content */}
           </div>
         </div>
