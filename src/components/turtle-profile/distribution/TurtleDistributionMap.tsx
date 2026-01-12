@@ -3,6 +3,7 @@ import Map, { Source, Layer, NavigationControl, ViewState, MapRef, MapMouseEvent
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from '@/lib/db/supabaseClient';
 import { Icon } from '@/components/Icon';
+import { X } from 'lucide-react';
 import type { FeatureCollection, MultiPolygon, Geometry } from 'geojson';
 import type { LngLatBoundsLike } from 'mapbox-gl';
 
@@ -481,7 +482,7 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
       {/* Mobile Legend Toggle Button */}
       <button
         onClick={() => setIsLegendOpen(!isLegendOpen)}
-        className="md:hidden absolute top-3 left-3 z-[5] bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors"
+        className="md:hidden absolute top-3 left-3 z-[5] bg-white rounded-lg shadow-lg p-2 hover:bg-gray-50 transition-colors flex items-center justify-center"
         aria-label="Toggle map legend"
       >
         <Icon name="filter-settings" style="line" size="sm" className="text-gray-700" />
@@ -492,17 +493,17 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         isLegendOpen ? 'block' : 'hidden'
       } md:block md:top-4 md:left-4`}>
         {/* Mobile header with close button */}
-        <div className="flex items-center justify-between gap-4 mb-2 md:mb-0">
-          <h4 className="text-sm font-medium md:mb-2">Distribution Types</h4>
+        <div className="flex items-center justify-between md:mb-2">
+          <h4 className="text-sm font-medium">Distribution Types</h4>
           <button
             onClick={() => setIsLegendOpen(false)}
-            className="md:hidden p-1.5 hover:bg-gray-100 rounded -mr-1"
+            className="md:hidden rounded-sm opacity-70 hover:opacity-100 transition-opacity p-1 -mr-1"
             aria-label="Close legend"
           >
-            <Icon name="close" style="line" size="sm" className="text-gray-500" />
+            <X className="h-4 w-4 text-gray-500" />
           </button>
         </div>
-        <div className="space-y-2 mt-1 md:mt-0">
+        <div className="space-y-2 mt-3 md:mt-2">
           <label className="flex items-center space-x-2">
             <input
               type="checkbox"
