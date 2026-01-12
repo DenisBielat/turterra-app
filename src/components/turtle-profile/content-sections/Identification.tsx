@@ -55,7 +55,7 @@ export default function Identification({
   relatedSpecies = [],
 }: IdentificationProps) {
   return (
-    <section id="identification-section" className="pb-12">
+    <section id="identification-section">
       <h2 id="identification" className="scroll-m-20 text-3xl md:text-5xl">
         Identification
       </h2>
