@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { X, RotateCcw } from 'lucide-react';
 import { Icon } from '@/components/Icon';
@@ -42,6 +42,7 @@ export default function MobileProfileNavigation({
   taxonomy
 }: MobileProfileNavigationProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [activeSection, setActiveSection] = useState('intro');
 
   const navItems = useMemo(() => ([
     {
@@ -70,6 +71,45 @@ export default function MobileProfileNavigation({
       icon: <Icon name="hand-shake-heart" style="filled" size="base" />
     }
   ]), []);
+
+  // Track active section based on scroll position
+  useEffect(() => {
+    const SCROLL_OFFSET = 100;
+
+    const getCurrentSection = () => {
+      const sections = navItems.map(item => document.getElementById(item.id));
+      let currentSection = 'intro';
+      let minDistance = Infinity;
+
+      sections.forEach(section => {
+        if (!section) return;
+        const rect = section.getBoundingClientRect();
+        const distance = Math.abs(rect.top - SCROLL_OFFSET);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          currentSection = section.id;
+        }
+      });
+
+      if (window.scrollY < SCROLL_OFFSET) {
+        currentSection = 'intro';
+      }
+
+      return currentSection;
+    };
+
+    // Update active section immediately when opening
+    setActiveSection(getCurrentSection());
+
+    const handleScroll = () => {
+      const current = getCurrentSection();
+      if (current) setActiveSection(current);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [navItems]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -132,7 +172,10 @@ export default function MobileProfileNavigation({
           {/* Front Side - Navigation */}
           <div
             className="relative w-full bg-warm rounded-2xl shadow-2xl p-6"
-            style={{ backfaceVisibility: 'hidden' }}
+            style={{
+              backfaceVisibility: 'hidden',
+              pointerEvents: isFlipped ? 'none' : 'auto'
+            }}
           >
             {/* Close Button */}
             <button
@@ -172,7 +215,11 @@ export default function MobileProfileNavigation({
                 <button
                   key={item.id}
                   onClick={() => scrollToSection(item.id)}
-                  className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition-all duration-200 font-heading uppercase text-sm font-semibold hover:bg-green-800 hover:text-white"
+                  className={`flex items-center gap-3 w-full px-4 py-2.5 rounded-lg transition-all duration-200 font-heading uppercase text-sm font-semibold
+                    ${activeSection === item.id
+                      ? 'bg-green-800 text-white'
+                      : 'hover:bg-green-800 hover:text-white'
+                    }`}
                 >
                   <div className="w-5 h-5 flex items-center justify-center">{item.icon}</div>
                   {item.label}
@@ -196,15 +243,13 @@ export default function MobileProfileNavigation({
             className="absolute top-0 left-0 w-full bg-warm rounded-2xl shadow-2xl p-6"
             style={{
               backfaceVisibility: 'hidden',
-              transform: 'rotateY(180deg)'
+              transform: 'rotateY(180deg)',
+              pointerEvents: isFlipped ? 'auto' : 'none'
             }}
           >
             {/* Flip Back Button */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleFlipBack();
-              }}
+              onClick={handleFlipBack}
               className="absolute top-4 left-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
               aria-label="Back to navigation"
             >
@@ -213,10 +258,7 @@ export default function MobileProfileNavigation({
 
             {/* Close Button */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleClose();
-              }}
+              onClick={handleClose}
               className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
               aria-label="Close"
             >
