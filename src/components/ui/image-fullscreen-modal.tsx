@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
-import { Icon } from '@/components/Icon';
 
 interface ImageFullscreenModalProps {
   isOpen: boolean;
