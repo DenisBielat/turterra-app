@@ -197,36 +197,33 @@ export default function Conservation({
           <div className="flex flex-col md:flex-row md:items-start">
             {/* IUCN Status group - complete with bubbles and labels */}
             {iucnStatuses.length > 0 && (
-              <div className="flex flex-col w-full md:w-auto md:items-start">
+              <div className="flex flex-col w-full md:w-auto md:items-start order-1 md:order-3">
                 {/* IUCN Status bubbles - responsive sizing to span full width on mobile */}
-                <div className="flex items-center justify-between w-full md:w-auto md:justify-start">
-                  {iucnStatuses.map((status, index) => {
+                <div className="relative flex items-center justify-between w-full md:w-auto md:justify-start md:gap-8">
+                  {/* Single horizontal line behind all bubbles */}
+                  <div className="absolute left-[24px] right-[24px] md:left-6 md:right-6 top-1/2 h-px bg-gray-300 z-0"></div>
+                  {iucnStatuses.map((status) => {
                     const isActive = isStatusActive(status.abbreviation);
                     return (
-                      <div key={status.id} className="flex items-center">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div
-                              className={`flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
-                            >
-                              <span className="font-bold text-[clamp(0.75rem,2vw,0.875rem)] md:text-sm">{status.abbreviation}</span>
-                            </div>
-                          </TooltipTrigger>
-                          {status.definition && (
-                            <TooltipContent className="max-w-xs">
-                              <div className="flex flex-col gap-1.5">
-                                <div className="font-bold text-base leading-tight">{status.status}</div>
-                                <div className="text-sm text-gray-600 font-normal">
-                                  {status.definition}
-                                </div>
+                      <Tooltip key={status.id}>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer w-[40px] h-[40px] md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted ring-[5px] ring-[#f2f0e7]' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                          >
+                            <span className="font-bold text-xs md:text-sm">{status.abbreviation}</span>
+                          </div>
+                        </TooltipTrigger>
+                        {status.definition && (
+                          <TooltipContent className="max-w-xs">
+                            <div className="flex flex-col gap-1.5">
+                              <div className="font-bold text-base leading-tight">{status.status}</div>
+                              <div className="text-sm text-gray-600 font-normal">
+                                {status.definition}
                               </div>
-                            </TooltipContent>
-                          )}
-                        </Tooltip>
-                        {index < iucnStatuses.length - 1 && (
-                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[16px] max-w-[32px] md:flex-none md:w-8 -mx-[2px] md:-mx-0 relative z-0"></div>
+                            </div>
+                          </TooltipContent>
                         )}
-                      </div>
+                      </Tooltip>
                     );
                   })}
                 </div>
@@ -303,56 +300,53 @@ export default function Conservation({
               </div>
             )}
 
-            {/* Vertical divider between IUCN and DD/NE - hidden on mobile */}
+            {/* Vertical divider between DD/NE and IUCN - hidden on mobile */}
             {specialStatuses.length > 0 && iucnStatuses.length > 0 && (
-              <div className="hidden md:block w-px h-12 bg-gray-400 mx-4 self-center"></div>
+              <div className="hidden md:block md:order-2 w-px bg-gray-400 mx-4 self-stretch"></div>
             )}
             
             {/* DD and NE group - complete with bubbles and labels */}
             {specialStatuses.length > 0 && (
-              <div className="flex flex-col items-start mt-8 md:mt-0 w-full md:w-auto">
+              <div className="flex flex-col items-center mt-8 md:mt-0 w-full md:w-auto md:items-start order-2 md:order-1">
                 {/* DD and NE bubbles - same sizing as IUCN bubbles */}
-                <div className="flex items-center justify-start w-full md:w-auto">
-                  {specialStatuses.map((status, index) => {
+                <div className="relative flex items-center justify-center gap-4 md:gap-8">
+                  {/* Single horizontal line behind all bubbles */}
+                  <div className="absolute left-[20px] right-[20px] md:left-6 md:right-6 top-1/2 h-px bg-gray-300 z-0"></div>
+                  {specialStatuses.map((status) => {
                     const isActive = isStatusActive(status.abbreviation);
                     return (
-                      <div key={status.id} className="flex items-center">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div
-                              className={`flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
-                            >
-                              <span className="font-bold text-[clamp(0.75rem,2vw,0.875rem)] md:text-sm">{status.abbreviation}</span>
-                            </div>
-                          </TooltipTrigger>
-                          {status.definition && (
-                            <TooltipContent className="max-w-xs">
-                              <div className="flex flex-col gap-1.5">
-                                <div className="font-bold text-base leading-tight">{status.status}</div>
-                                <div className="text-sm text-gray-600 font-normal leading-relaxed">
-                                  {status.definition}
-                                </div>
+                      <Tooltip key={status.id}>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer w-[40px] h-[40px] md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted ring-[5px] ring-[#f2f0e7]' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                          >
+                            <span className="font-bold text-xs md:text-sm">{status.abbreviation}</span>
+                          </div>
+                        </TooltipTrigger>
+                        {status.definition && (
+                          <TooltipContent className="max-w-xs">
+                            <div className="flex flex-col gap-1.5">
+                              <div className="font-bold text-base leading-tight">{status.status}</div>
+                              <div className="text-sm text-gray-600 font-normal leading-relaxed">
+                                {status.definition}
                               </div>
-                            </TooltipContent>
-                          )}
-                        </Tooltip>
-                        {index < specialStatuses.length - 1 && (
-                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[16px] max-w-[32px] md:flex-none md:w-8 -mx-[2px] md:-mx-0 relative z-0"></div>
+                            </div>
+                          </TooltipContent>
                         )}
-                      </div>
+                      </Tooltip>
                     );
                   })}
                 </div>
 
                 {/* Lacks Data label with bracket - responsive sizing */}
-                {/* Mobile label */}
-                <div className="flex flex-col items-start mt-3 md:hidden w-full">
-                  <div className="w-full" style={{ maxWidth: '80px' }}>
+                {/* Mobile label - 2 bubbles (40px each) + 1 gap (16px) = 96px */}
+                <div className="flex flex-col items-center mt-3 md:hidden">
+                  <div style={{ width: '96px' }}>
                     <Bracket
-                      width={containerWidth > 0 ? Math.min(containerWidth * 0.2, 80) : 80}
+                      width={96}
                       className="text-gray-400"
                     />
-                    <span className="text-xs text-gray-600 mt-1">Lacks Data</span>
+                    <span className="text-xs text-gray-600 mt-1 block text-center">Lacks Data</span>
                   </div>
                 </div>
 
