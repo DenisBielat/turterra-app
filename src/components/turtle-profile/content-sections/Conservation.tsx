@@ -302,7 +302,7 @@ export default function Conservation({
 
             {/* Vertical divider between DD/NE and IUCN - hidden on mobile */}
             {specialStatuses.length > 0 && iucnStatuses.length > 0 && (
-              <div className="hidden md:block md:order-2 w-px h-12 bg-gray-400 mx-4 self-center"></div>
+              <div className="hidden md:block md:order-2 w-px bg-gray-400 mx-4 self-stretch"></div>
             )}
             
             {/* DD and NE group - complete with bubbles and labels */}
