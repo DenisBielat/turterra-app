@@ -120,6 +120,7 @@ export default function MobileProfileNavigation({
       <div
         className="relative w-[85%] max-w-sm"
         style={{ perspective: '1000px' }}
+        onClick={(e) => e.stopPropagation()}
       >
         <div
           className="relative w-full transition-transform duration-500"
@@ -130,7 +131,7 @@ export default function MobileProfileNavigation({
         >
           {/* Front Side - Navigation */}
           <div
-            className="relative w-full bg-neutral rounded-2xl shadow-2xl p-6"
+            className="relative w-full bg-warm rounded-2xl shadow-2xl p-6"
             style={{ backfaceVisibility: 'hidden' }}
           >
             {/* Close Button */}
@@ -200,7 +201,10 @@ export default function MobileProfileNavigation({
           >
             {/* Flip Back Button */}
             <button
-              onClick={handleFlipBack}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleFlipBack();
+              }}
               className="absolute top-4 left-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
               aria-label="Back to navigation"
             >
@@ -209,7 +213,10 @@ export default function MobileProfileNavigation({
 
             {/* Close Button */}
             <button
-              onClick={handleClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleClose();
+              }}
               className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
               aria-label="Close"
             >
