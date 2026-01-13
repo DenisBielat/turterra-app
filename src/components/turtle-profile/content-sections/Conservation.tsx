@@ -208,7 +208,7 @@ export default function Conservation({
                       <Tooltip key={status.id}>
                         <TooltipTrigger asChild>
                           <div
-                            className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer w-[40px] h-[40px] md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                            className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer w-[40px] h-[40px] md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted ring-[5px] ring-[#f2f0e7]' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
                           >
                             <span className="font-bold text-xs md:text-sm">{status.abbreviation}</span>
                           </div>
@@ -307,9 +307,9 @@ export default function Conservation({
             
             {/* DD and NE group - complete with bubbles and labels */}
             {specialStatuses.length > 0 && (
-              <div className="flex flex-col items-start mt-8 md:mt-0 w-full md:w-auto">
+              <div className="flex flex-col items-center mt-8 md:mt-0 w-full md:w-auto md:items-start">
                 {/* DD and NE bubbles - same sizing as IUCN bubbles */}
-                <div className="relative flex items-center justify-start gap-4 md:gap-8">
+                <div className="relative flex items-center justify-center gap-4 md:gap-8">
                   {/* Single horizontal line behind all bubbles */}
                   <div className="absolute left-[20px] right-[20px] md:left-6 md:right-6 top-1/2 h-px bg-gray-300 z-0"></div>
                   {specialStatuses.map((status) => {
@@ -318,7 +318,7 @@ export default function Conservation({
                       <Tooltip key={status.id}>
                         <TooltipTrigger asChild>
                           <div
-                            className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer w-[40px] h-[40px] md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                            className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer w-[40px] h-[40px] md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted ring-[5px] ring-[#f2f0e7]' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
                           >
                             <span className="font-bold text-xs md:text-sm">{status.abbreviation}</span>
                           </div>
@@ -339,14 +339,14 @@ export default function Conservation({
                 </div>
 
                 {/* Lacks Data label with bracket - responsive sizing */}
-                {/* Mobile label */}
-                <div className="flex flex-col items-start mt-3 md:hidden w-full">
-                  <div className="w-full" style={{ maxWidth: '80px' }}>
+                {/* Mobile label - 2 bubbles (40px each) + 1 gap (16px) = 96px */}
+                <div className="flex flex-col items-center mt-3 md:hidden">
+                  <div style={{ width: '96px' }}>
                     <Bracket
-                      width={containerWidth > 0 ? Math.min(containerWidth * 0.2, 80) : 80}
+                      width={96}
                       className="text-gray-400"
                     />
-                    <span className="text-xs text-gray-600 mt-1">Lacks Data</span>
+                    <span className="text-xs text-gray-600 mt-1 block text-center">Lacks Data</span>
                   </div>
                 </div>
 
