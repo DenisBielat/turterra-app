@@ -25,7 +25,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
   };
 
   return (
-    <footer className="bg-green-900 bg-[url('/images/textures/turtle-shell-texture-1.png')] bg-[length:235rem_auto] relative">
+    <footer className="bg-green-900 bg-[url('/images/textures/turtle-shell-texture-1.png')] bg-[length:235rem_auto] relative isolate">
       <div className="absolute inset-0 bg-green-900 opacity-95"></div>
       <div className="relative z-10 text-white">
         <div className="px-4 sm:px-6 lg:px-8">
@@ -79,7 +79,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                   </div>
 
                   {/* Right Column - Navigation Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-8 sm:gap-8">
                     {/* Tools Section with Reach Out */}
                     <div className="flex flex-col">
                       <h3 className="font-body font-semibold text-sm text-gray-200">{sections.tools.title}</h3>
@@ -94,7 +94,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                           </Link>
                         ))}
                       </div>
-                      
+
                       <h3 className="font-body font-semibold text-sm text-gray-200 mt-6">{sections.tools.reachOut.title}</h3>
                       <div className="mt-2 flex flex-col">
                         {sections.tools.reachOut.links.map((link) => (
@@ -125,8 +125,8 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                       </div>
                     </div>
 
-                    {/* Social Links Section */}
-                    <div className="flex flex-col">
+                    {/* Social Links Section - Hidden on mobile, shown on sm+ */}
+                    <div className="hidden sm:flex flex-col">
                       <h3 className="font-body font-semibold text-sm text-gray-200">{sections.social.title}</h3>
                       <div className="mt-2 flex flex-col">
                         {sections.social.links.map((link: FooterLink) => (
@@ -135,7 +135,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                             href={link.href}
                             className="py-2 flex items-center gap-3 font-bold hover:text-green-500 transition-colors"
                           >
-                            <Icon 
+                            <Icon
                               name={socialIconConfig[link.label].name}
                               style={socialIconConfig[link.label].style}
                               size="base"
@@ -145,6 +145,24 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                         ))}
                       </div>
                     </div>
+                  </div>
+
+                  {/* Mobile Social Icons - Shown only on mobile */}
+                  <div className="flex sm:hidden gap-4 mt-8">
+                    {sections.social.links.map((link: FooterLink) => (
+                      <Link
+                        key={`social-mobile-${link.label}`}
+                        href={link.href}
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                        aria-label={link.label}
+                      >
+                        <Icon
+                          name={socialIconConfig[link.label].name}
+                          style={socialIconConfig[link.label].style}
+                          size="base"
+                        />
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>
