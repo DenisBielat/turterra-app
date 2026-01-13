@@ -25,7 +25,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
   };
 
   return (
-    <footer className="bg-green-900 bg-[url('/images/textures/turtle-shell-texture-1.png')] bg-[length:235rem_auto] relative">
+    <footer className="bg-green-900 bg-[url('/images/textures/turtle-shell-texture-1.png')] bg-[length:235rem_auto] relative isolate">
       <div className="absolute inset-0 bg-green-900 opacity-95"></div>
       <div className="relative z-10 text-white">
         <div className="px-4 sm:px-6 lg:px-8">
@@ -148,12 +148,12 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                   </div>
 
                   {/* Mobile Social Icons - Shown only on mobile */}
-                  <div className="flex sm:hidden justify-center gap-5 mt-8">
+                  <div className="flex sm:hidden gap-4 mt-8">
                     {sections.social.links.map((link: FooterLink) => (
                       <Link
                         key={`social-mobile-${link.label}`}
                         href={link.href}
-                        className="w-10 h-10 flex items-center justify-center rounded-full border border-white/30 hover:bg-white/10 hover:border-white/50 transition-colors"
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                         aria-label={link.label}
                       >
                         <Icon
