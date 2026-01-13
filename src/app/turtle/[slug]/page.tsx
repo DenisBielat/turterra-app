@@ -41,7 +41,12 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
 
   return (
     <main>
-      <TurtleSearchNav />
+      <TurtleSearchNav
+        turtleName={data.commonName}
+        turtleSpecies={data.scientificName}
+        turtleImageUrl={data.profileImage || "/images/image-placeholder.png"}
+        taxonomy={data.taxonomy}
+      />
       <TurtleProfileHero slug={params.slug} />
       <div className="w-full h-8 lg:h-16 bg-green-900"></div>
       <div className="w-full h-6 lg:h-12 bg-green-800"></div>
