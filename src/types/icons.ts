@@ -1,7 +1,7 @@
 // Auto-generated file - DO NOT EDIT DIRECTLY
 export type IconStyle = 'line' | 'filled' | 'color';
 
-export type LineIconName =
+export type LineIconName = 
   | 'add'
   | 'animal-skin'
   | 'arrow-left-1'
@@ -18,9 +18,11 @@ export type LineIconName =
   | 'compare'
   | 'dotted-line-horizontal'
   | 'earth-locate'
+  | 'expand'
   | 'face-id'
   | 'female'
   | 'filter-settings'
+  | 'flip'
   | 'graph-stats-ascend'
   | 'graph-stats-descend'
   | 'hand-shake-heart'

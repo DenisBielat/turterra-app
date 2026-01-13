@@ -4,7 +4,8 @@
 
 html {
   overflow-x: clip;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
 }
 
 body {
