@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { X, ArrowLeft } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Icon } from '@/components/Icon';
 import { TaxonomyData } from '@/types/turtleTypes';
 
@@ -250,11 +250,9 @@ export default function MobileProfileNavigation({
             {/* Flip Back Button */}
             <button
               onClick={handleFlipBack}
-              className="absolute top-4 left-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
+              className="absolute top-4 left-4 w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
               aria-label="Back to navigation"
-            >
-              <ArrowLeft className="h-4 w-4 text-gray-600" />
-            </button>
+            />
 
             {/* Close Button */}
             <button
