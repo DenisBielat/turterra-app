@@ -8,6 +8,8 @@ import debounce from 'lodash/debounce';
 import Image from 'next/image';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { Icon } from '@/components/Icon';
+import { TaxonomyData } from '@/types/turtleTypes';
+import MobileProfileNavigation from '../navigation/MobileProfileNavigation';
 
 interface SearchResult {
   species_common_name: string;
@@ -16,14 +18,30 @@ interface SearchResult {
   avatar_image_circle_url: string;
 }
 
-export default function TurtleSearchNav() {
+interface TurtleSearchNavProps {
+  turtleName?: string;
+  turtleSpecies?: string;
+  turtleImageUrl?: string;
+  taxonomy?: TaxonomyData | null;
+}
+
+export default function TurtleSearchNav({
+  turtleName,
+  turtleSpecies,
+  turtleImageUrl,
+  taxonomy
+}: TurtleSearchNavProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const mobileSearchInputRef = useRef<HTMLInputElement>(null);
   const { scrollDirection, isAtTop } = useScrollDirection(50);
+
+  // Check if we have turtle profile data for mobile navigation
+  const hasTurtleData = !!(turtleName && turtleSpecies && turtleImageUrl);
 
   // SearchNav becomes sticky when scrolling down (navbar is hidden)
   const isSticky = !isAtTop && scrollDirection === 'down';
@@ -123,9 +141,19 @@ export default function TurtleSearchNav() {
           <div className="flex items-center justify-between h-10">
             {/* Left: Book icon + Search icon - book icon has p-2 to match navbar menu button */}
             <div className="flex items-center gap-1 -ml-2">
-              <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors">
-                <Icon name="book-open" style="line" size="base" />
-              </Link>
+              {hasTurtleData ? (
+                <button
+                  onClick={() => setMobileNavOpen(true)}
+                  className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
+                  aria-label="Open profile navigation"
+                >
+                  <Icon name="book-open" style="line" size="base" />
+                </button>
+              ) : (
+                <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors">
+                  <Icon name="book-open" style="line" size="base" />
+                </Link>
+              )}
               <button
                 onClick={() => setMobileSearchOpen(true)}
                 className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors"
@@ -151,10 +179,23 @@ export default function TurtleSearchNav() {
         {/* Inline search view - shown when search is open */}
         {mobileSearchOpen && (
           <div className="flex items-center gap-1 search-container h-10 -ml-2">
-            {/* Left: Book icon linking to species guide - p-2 to match navbar menu button */}
-            <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0">
-              <Icon name="book-open" style="line" size="base" />
-            </Link>
+            {/* Left: Book icon - opens nav or links to species guide */}
+            {hasTurtleData ? (
+              <button
+                onClick={() => {
+                  closeMobileSearch();
+                  setMobileNavOpen(true);
+                }}
+                className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0"
+                aria-label="Open profile navigation"
+              >
+                <Icon name="book-open" style="line" size="base" />
+              </button>
+            ) : (
+              <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0">
+                <Icon name="book-open" style="line" size="base" />
+              </Link>
+            )}
 
             {/* Center: Search input */}
             <div className="relative flex-1">
@@ -305,6 +346,18 @@ export default function TurtleSearchNav() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Profile Navigation Overlay */}
+      {hasTurtleData && (
+        <MobileProfileNavigation
+          isOpen={mobileNavOpen}
+          onClose={() => setMobileNavOpen(false)}
+          name={turtleName}
+          species={turtleSpecies}
+          imageUrl={turtleImageUrl}
+          taxonomy={taxonomy}
+        />
+      )}
     </>
   );
 }
