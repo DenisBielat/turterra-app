@@ -15,7 +15,7 @@ const DistributionSection: React.FC<DistributionSectionProps> = ({
   description
 }) => {
   return (
-    <section id="distribution-section" className="scroll-mt-20">
+    <section id="distribution" className="scroll-mt-20">
       <div className="mb-6 md:mb-8 max-w-2xl">
         <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-8">Distribution</h2>
         {currentSpeciesName && (
