@@ -97,7 +97,7 @@ export default function TurtleSearchNav() {
   // Focus mobile search input when opened
   useEffect(() => {
     if (mobileSearchOpen && mobileSearchInputRef.current) {
-      mobileSearchInputRef.current.focus();
+      mobileSearchInputRef.current.focus({ preventScroll: true });
     }
   }, [mobileSearchOpen]);
 
@@ -164,7 +164,7 @@ export default function TurtleSearchNav() {
                 placeholder="Search for turtles"
                 value={searchQuery}
                 onChange={handleSearchInput}
-                className="pl-10 pr-4 h-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full text-sm focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="pl-10 pr-4 h-10 bg-green-900 text-white placeholder:text-white/70 border-2 border-green-900 rounded-full focus:border-green-500 focus-visible:ring-0 focus-visible:ring-offset-0"
               />
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/70" />
             </div>
