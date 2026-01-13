@@ -22,13 +22,15 @@ export const Icon = <T extends IconStyle>({
   className = ''
 }: IconProps<T>) => {
   const useCurrentColor = style !== 'color';
+  // Add cache-busting for flip icon to fix mobile caching issue
+  const iconUrl = `/icons/${style}/${name}.svg${name === 'flip' ? '?v=2' : ''}`;
   
   return (
     <span
       className={`inline-block ${className}`}
       style={{
-        WebkitMaskImage: useCurrentColor ? `url('/icons/${style}/${name}.svg')` : undefined,
-        maskImage: useCurrentColor ? `url('/icons/${style}/${name}.svg')` : undefined,
+        WebkitMaskImage: useCurrentColor ? `url('${iconUrl}')` : undefined,
+        maskImage: useCurrentColor ? `url('${iconUrl}')` : undefined,
         WebkitMaskRepeat: useCurrentColor ? 'no-repeat' : undefined,
         maskRepeat: useCurrentColor ? 'no-repeat' : undefined,
         WebkitMaskPosition: useCurrentColor ? 'center' : undefined,
@@ -36,7 +38,7 @@ export const Icon = <T extends IconStyle>({
         WebkitMaskSize: useCurrentColor ? 'contain' : undefined,
         maskSize: useCurrentColor ? 'contain' : undefined,
         backgroundColor: useCurrentColor ? 'currentColor' : undefined,
-        backgroundImage: !useCurrentColor ? `url('/icons/${style}/${name}.svg')` : undefined,
+        backgroundImage: !useCurrentColor ? `url('${iconUrl}')` : undefined,
         backgroundPosition: !useCurrentColor ? 'center' : undefined,
         backgroundRepeat: !useCurrentColor ? 'no-repeat' : undefined,
         backgroundSize: !useCurrentColor ? 'contain' : undefined,
