@@ -253,15 +253,19 @@ export default function MobileProfileNavigation({
               className="absolute top-4 left-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
               aria-label="Back to navigation"
             >
+              {/* Flip icon - inline SVG to avoid mobile caching issues */}
               <svg 
                 viewBox="0 0 24 24" 
-                className="h-4 w-4 text-gray-600"
+                width="16" 
+                height="16"
+                className="text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
                 <path d="m20.25 7.5 3-3-3-3M3.75 16.5l-3 3 3 3" />
                 <path d="M23.25 4.5H10.5a3.75 3.75 0 0 0 0 7.5h3a3.75 3.75 0 0 1 0 7.5H.75" />
