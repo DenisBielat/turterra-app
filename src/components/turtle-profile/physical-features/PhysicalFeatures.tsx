@@ -149,10 +149,12 @@ export default function PhysicalFeatures({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setFullscreenImage({
-                                url: category.image.url,
-                                alt: `${category.name} features`
-                              });
+                              if (category.image) {
+                                setFullscreenImage({
+                                  url: category.image.url,
+                                  alt: `${category.name} features`
+                                });
+                              }
                             }}
                             className="absolute top-2 right-2 p-1.5 rounded-md bg-green-950/80 hover:bg-green-950 transition-colors z-10 flex items-center justify-center"
                             aria-label="Expand image to fullscreen"
