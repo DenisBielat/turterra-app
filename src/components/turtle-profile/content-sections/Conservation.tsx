@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Badge } from '@/components/ui/badge';
@@ -82,6 +83,21 @@ export default function Conservation({
   threats,
   threatTags = [],
 }: ConservationProps) {
+  const labelsContainerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (labelsContainerRef.current) {
+        setContainerWidth(labelsContainerRef.current.offsetWidth);
+      }
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
   // Separate statuses into the two groups
   const specialStatuses = statuses.filter(s => 
     s.abbreviation === 'DD' || s.abbreviation === 'NE'
@@ -141,22 +157,22 @@ export default function Conservation({
 
   return (
     <section id="conservation" className="scroll-m-20 pb-12">
-      <h2 className="text-5xl font-bold mb-2">Conservation</h2>
+      <h2 className="text-3xl md:text-5xl font-bold mb-2">Conservation</h2>
       
-      <div className="mt-12">
-        <div className="grid grid-cols-9 gap-4">
+      <div className="mt-6 md:mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-9 gap-4">
           {/* Left content area - Description */}
-          <div className="col-span-5 space-y-12">
+          <div className="col-span-1 md:col-span-5 space-y-8 md:space-y-12">
             {description && (
               <>
                 <div>
-                  <h3 className="text-3xl font-bold mb-3">Status</h3>
-                  <div className="text-lg">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3">Status</h3>
+                  <div className="text-base md:text-lg">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {description}
                     </ReactMarkdown>
                   </div>
-                  <div className="mt-4 text-lg">
+                  <div className="mt-4 text-base md:text-lg">
                     <p><span className="font-bold">IUCN Red List Status:</span> {currentStatus.status}</p>
                   </div>
                 </div>
@@ -164,11 +180,11 @@ export default function Conservation({
             )}
           </div>
 
-          {/* Empty column for spacing */}
-          <div className="col-span-1" />
+          {/* Empty column for spacing - hidden on mobile */}
+          <div className="hidden md:block md:col-span-1" />
 
           {/* Right content area - reserved for future use */}
-          <div className="col-span-3">
+          <div className="hidden md:block md:col-span-3">
             {/* Future content */}
           </div>
         </div>
@@ -176,12 +192,127 @@ export default function Conservation({
 
       {/* Status Bubbles - Full width, outside grid */}
       <TooltipProvider>
-        <div className="mt-12 w-full">
-          <div className="flex items-center">
-            {/* DD and NE bubbles - disconnected group */}
+        <div className="mt-8 md:mt-12 w-full">
+          {/* Desktop: horizontal layout, Mobile: vertical layout */}
+          <div className="flex flex-col md:flex-row md:items-start">
+            {/* IUCN Status group - complete with bubbles and labels */}
+            {iucnStatuses.length > 0 && (
+              <div className="flex flex-col w-full md:w-auto md:items-start">
+                {/* IUCN Status bubbles - responsive sizing to span full width on mobile */}
+                <div className="flex items-center justify-between w-full md:w-auto md:justify-start">
+                  {iucnStatuses.map((status, index) => {
+                    const isActive = isStatusActive(status.abbreviation);
+                    return (
+                      <div key={status.id} className="flex items-center">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={`flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                            >
+                              <span className="font-bold text-[clamp(0.75rem,2vw,0.875rem)] md:text-sm">{status.abbreviation}</span>
+                            </div>
+                          </TooltipTrigger>
+                          {status.definition && (
+                            <TooltipContent className="max-w-xs">
+                              <div className="flex flex-col gap-1.5">
+                                <div className="font-bold text-base leading-tight">{status.status}</div>
+                                <div className="text-sm text-gray-600 font-normal">
+                                  {status.definition}
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                        {index < iucnStatuses.length - 1 && (
+                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[16px] max-w-[32px] md:flex-none md:w-8 -mx-[2px] md:-mx-0 relative z-0"></div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* IUCN Status labels with brackets - responsive sizing */}
+                {/* Mobile labels */}
+                <div className="relative mt-3 md:hidden w-full">
+                  <div ref={labelsContainerRef} className="relative w-full">
+                    {/* Extinct label - left aligned */}
+                    <span className="absolute left-0 text-xs text-gray-600" style={{ top: '14px' }}>
+                      Extinct
+                    </span>
+
+                    {/* Threatened label with bracket - spanning CR, EN, VU */}
+                    {/* Position: after 2 bubbles (20%) + 2 gaps (10%) = 30%, Width: 3 bubbles (30%) + 2 gaps (10%) = 40% */}
+                    <div
+                      className="absolute flex flex-col items-center"
+                      style={{
+                        left: '30%',
+                        width: '40%'
+                      }}
+                    >
+                      <Bracket 
+                        width={containerWidth > 0 ? containerWidth * 0.4 : 128} 
+                        className="text-gray-400" 
+                      />
+                      <span className="text-xs text-gray-600 mt-1">Threatened</span>
+                    </div>
+
+                    {/* Least Concern label - right aligned */}
+                    <span className="absolute right-0 text-xs text-gray-600" style={{ top: '14px' }}>
+                      Least Concern
+                    </span>
+
+                    {/* Spacer to maintain height */}
+                    <div style={{ height: '32px' }}></div>
+                  </div>
+                </div>
+
+                {/* Desktop labels */}
+                <div className="hidden md:block relative mt-4">
+                  <div
+                    className="relative"
+                    style={{
+                      width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
+                    }}
+                  >
+                    {/* Extinct label - left aligned */}
+                    <span className="absolute left-0 text-sm text-gray-600" style={{ top: '20px' }}>
+                      Extinct
+                    </span>
+
+                    {/* Threatened label with bracket - spanning CR, EN, VU */}
+                    <div
+                      className="absolute flex flex-col items-center"
+                      style={{
+                        left: `${2 * 48 + 2 * 32}px`,
+                        width: `${3 * 48 + 2 * 32}px`
+                      }}
+                    >
+                      <Bracket width={3 * 48 + 2 * 32} className="text-gray-400" />
+                      <span className="text-sm text-gray-600 mt-1">Threatened</span>
+                    </div>
+
+                    {/* Least Concern label - right aligned */}
+                    <span className="absolute right-0 text-sm text-gray-600" style={{ top: '20px' }}>
+                      Least Concern
+                    </span>
+
+                    {/* Spacer to maintain height */}
+                    <div style={{ height: '40px' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Vertical divider between IUCN and DD/NE - hidden on mobile */}
+            {specialStatuses.length > 0 && iucnStatuses.length > 0 && (
+              <div className="hidden md:block w-px h-12 bg-gray-400 mx-4 self-center"></div>
+            )}
+            
+            {/* DD and NE group - complete with bubbles and labels */}
             {specialStatuses.length > 0 && (
-              <>
-                <div className="flex items-center">
+              <div className="flex flex-col items-start mt-8 md:mt-0 w-full md:w-auto">
+                {/* DD and NE bubbles - same sizing as IUCN bubbles */}
+                <div className="flex items-center justify-start w-full md:w-auto">
                   {specialStatuses.map((status, index) => {
                     const isActive = isStatusActive(status.abbreviation);
                     return (
@@ -189,9 +320,9 @@ export default function Conservation({
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div
-                              className={`flex h-12 w-12 items-center justify-center rounded-full cursor-pointer ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                              className={`flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
                             >
-                              <span className="font-bold text-sm">{status.abbreviation}</span>
+                              <span className="font-bold text-[clamp(0.75rem,2vw,0.875rem)] md:text-sm">{status.abbreviation}</span>
                             </div>
                           </TooltipTrigger>
                           {status.definition && (
@@ -206,129 +337,55 @@ export default function Conservation({
                           )}
                         </Tooltip>
                         {index < specialStatuses.length - 1 && (
-                          <div className="h-px w-8 bg-gray-300"></div>
+                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[16px] max-w-[32px] md:flex-none md:w-8 -mx-[2px] md:-mx-0 relative z-0"></div>
                         )}
                       </div>
                     );
                   })}
                 </div>
-                
-                {/* Vertical divider between DD/NE and IUCN statuses */}
-                {iucnStatuses.length > 0 && (
-                  <div className="w-px h-12 bg-gray-400 mx-4"></div>
-                )}
-              </>
+
+                {/* Lacks Data label with bracket - responsive sizing */}
+                {/* Mobile label */}
+                <div className="flex flex-col items-start mt-3 md:hidden w-full">
+                  <div className="w-full" style={{ maxWidth: '80px' }}>
+                    <Bracket
+                      width={containerWidth > 0 ? Math.min(containerWidth * 0.2, 80) : 80}
+                      className="text-gray-400"
+                    />
+                    <span className="text-xs text-gray-600 mt-1">Lacks Data</span>
+                  </div>
+                </div>
+
+                {/* Desktop label */}
+                <div className="hidden md:flex md:flex-col md:items-start mt-4">
+                  <div
+                    style={{
+                      width: `${specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}px`
+                    }}
+                  >
+                    <Bracket
+                      width={specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}
+                      className="text-gray-400"
+                    />
+                    <span className="text-sm text-gray-600 mt-1">Lacks Data</span>
+                  </div>
+                </div>
+              </div>
             )}
-            
-            {/* IUCN Status bubbles - connected group */}
-            {iucnStatuses.length > 0 && (
-              <div className="flex items-center">
-                {iucnStatuses.map((status, index) => {
-                  const isActive = isStatusActive(status.abbreviation);
-                  return (
-                    <div key={status.id} className="flex items-center">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div
-                            className={`flex h-12 w-12 items-center justify-center rounded-full cursor-pointer ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
-                          >
-                            <span className="font-bold text-sm">{status.abbreviation}</span>
-                          </div>
-                        </TooltipTrigger>
-                        {status.definition && (
-                          <TooltipContent className="max-w-xs">
-                            <div className="flex flex-col gap-1.5">
-                              <div className="font-bold text-base leading-tight">{status.status}</div>
-                              <div className="text-sm text-gray-600 font-normal">
-                                {status.definition}
-                              </div>
-                            </div>
-                          </TooltipContent>
-                        )}
-                      </Tooltip>
-                      {index < iucnStatuses.length - 1 && (
-                        <div className="h-px w-8 bg-gray-300"></div>
-                      )}
-                    </div>
-                  );
-                })}
-            </div>
-          )}
           </div>
-        
-          {/* Labels row with brackets */}
-        <div className="flex items-start mt-4">
-          {/* Lacks Data label with bracket - centered under DD and NE section */}
-          {specialStatuses.length > 0 && (
-            <>
-              <div
-                className="flex flex-col items-center"
-                style={{
-                  width: `${specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}px`
-                }}
-              >
-                <Bracket
-                  width={specialStatuses.length * 48 + (specialStatuses.length - 1) * 32}
-                  className="text-gray-400"
-                />
-                <span className="text-sm text-gray-600 mt-1">Lacks Data</span>
-              </div>
-
-              {/* Spacer matching the vertical divider */}
-              {iucnStatuses.length > 0 && (
-                <div className="mx-4" style={{ width: '1px' }}></div>
-              )}
-            </>
-          )}
-
-          {/* IUCN Status labels - positioned across the IUCN bubbles section */}
-          {iucnStatuses.length > 0 && (
-            <div
-              className="relative"
-              style={{
-                width: `${iucnStatuses.length * 48 + (iucnStatuses.length - 1) * 32}px`
-              }}
-            >
-              {/* Extinct label - left aligned, positioned to align with text below brackets */}
-              <span className="absolute left-0 text-sm text-gray-600" style={{ top: '20px' }}>
-                Extinct
-              </span>
-
-              {/* Threatened label with bracket - spanning CR, EN, VU */}
-              <div
-                className="absolute flex flex-col items-center"
-                style={{
-                  left: `${2 * 48 + 2 * 32}px`,
-                  width: `${3 * 48 + 2 * 32}px`
-                }}
-              >
-                <Bracket width={3 * 48 + 2 * 32} className="text-gray-400" />
-                <span className="text-sm text-gray-600 mt-1">Threatened</span>
-              </div>
-
-              {/* Least Concern label - right aligned, positioned to align with text below brackets */}
-              <span className="absolute right-0 text-sm text-gray-600" style={{ top: '20px' }}>
-                Least Concern
-              </span>
-
-              {/* Spacer to maintain height for absolute positioned elements */}
-              <div style={{ height: '40px' }}></div>
-            </div>
-          )}
-        </div>
         </div>
       </TooltipProvider>
 
       {/* Environmental & Manmade Threats Subsection - After bubbles */}
       {threats && (
-        <div className="mt-12">
-          <div className="grid grid-cols-9 gap-4">
-            <div className="col-span-5">
-              <div className="w-full mb-8">
+        <div className="mt-8 md:mt-12">
+          <div className="grid grid-cols-1 md:grid-cols-9 gap-4">
+            <div className="col-span-1 md:col-span-5">
+              <div className="w-full mb-6 md:mb-8">
                 <div className="w-full h-px bg-gray-200"></div>
               </div>
-              <h3 className="text-3xl font-bold mb-3">Environmental & Manmade Threats</h3>
-              <div className="text-lg">
+              <h3 className="text-2xl md:text-3xl font-bold mb-3">Environmental & Manmade Threats</h3>
+              <div className="text-base md:text-lg">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {threats}
                 </ReactMarkdown>
@@ -353,8 +410,8 @@ export default function Conservation({
                 </div>
               )}
             </div>
-            <div className="col-span-1" />
-            <div className="col-span-3">
+            <div className="hidden md:block md:col-span-1" />
+            <div className="hidden md:block md:col-span-3">
               {/* Future content */}
             </div>
           </div>

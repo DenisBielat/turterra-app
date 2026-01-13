@@ -120,7 +120,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                 />
 
                 {/* Divider */}
-                <div className="w-full mt-12 mb-20">
+                <div className="w-full mt-8 mb-12 md:mt-12 md:mb-20">
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
 
