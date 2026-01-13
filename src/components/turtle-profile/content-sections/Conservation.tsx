@@ -207,7 +207,7 @@ export default function Conservation({
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div
-                              className={`relative z-10 flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                              className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
                             >
                               <span className="font-bold text-[clamp(0.75rem,2vw,0.875rem)] md:text-sm">{status.abbreviation}</span>
                             </div>
@@ -224,7 +224,7 @@ export default function Conservation({
                           )}
                         </Tooltip>
                         {index < iucnStatuses.length - 1 && (
-                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[8px] max-w-[32px] md:flex-none md:w-8 -mx-[6px] md:-mx-0 relative z-0"></div>
+                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[12px] max-w-[32px] md:flex-none md:w-8 -mx-[4px] md:mx-0 relative z-0"></div>
                         )}
                       </div>
                     );
@@ -320,7 +320,7 @@ export default function Conservation({
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div
-                              className={`relative z-10 flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
+                              className={`relative z-[1] flex aspect-square items-center justify-center rounded-full cursor-pointer flex-[2_2_0%] min-w-[32px] min-h-[32px] max-w-[48px] max-h-[48px] md:flex-none md:h-12 md:w-12 ${isActive ? 'outline-2 outline-offset-[3px] outline-dotted' : 'border-2'} ${getStatusColor(status.abbreviation, isActive)}`}
                             >
                               <span className="font-bold text-[clamp(0.75rem,2vw,0.875rem)] md:text-sm">{status.abbreviation}</span>
                             </div>
@@ -337,7 +337,7 @@ export default function Conservation({
                           )}
                         </Tooltip>
                         {index < specialStatuses.length - 1 && (
-                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[8px] max-w-[32px] md:flex-none md:w-8 -mx-[6px] md:-mx-0 relative z-0"></div>
+                          <div className="h-px bg-gray-300 flex-[1_1_0%] min-w-[12px] max-w-[32px] md:flex-none md:w-8 -mx-[4px] md:mx-0 relative z-0"></div>
                         )}
                       </div>
                     );
