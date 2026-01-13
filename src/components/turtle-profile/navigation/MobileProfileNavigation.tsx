@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
-import { X } from 'lucide-react';
+import { X, RotateCcw } from 'lucide-react';
 import { Icon } from '@/components/Icon';
 import { TaxonomyData } from '@/types/turtleTypes';
 
@@ -247,17 +247,19 @@ export default function MobileProfileNavigation({
               pointerEvents: isFlipped ? 'auto' : 'none'
             }}
           >
-            {/* Flip Back Button */}
+            {/* Flip Back Button - positioned at right-4 because rotateY(180deg) mirrors left/right */}
             <button
               onClick={handleFlipBack}
-              className="absolute top-4 left-4 w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
               aria-label="Back to navigation"
-            />
+            >
+              <RotateCcw className="h-4 w-4 text-gray-600" />
+            </button>
 
-            {/* Close Button */}
+            {/* Close Button - positioned at left-4 because rotateY(180deg) mirrors left/right */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
+              className="absolute top-4 left-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
               aria-label="Close"
             >
               <X className="h-4 w-4 text-gray-600" />
