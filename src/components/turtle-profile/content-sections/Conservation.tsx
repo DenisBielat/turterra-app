@@ -197,7 +197,7 @@ export default function Conservation({
           <div className="flex flex-col md:flex-row md:items-start">
             {/* IUCN Status group - complete with bubbles and labels */}
             {iucnStatuses.length > 0 && (
-              <div className="flex flex-col w-full md:w-auto md:items-start">
+              <div className="flex flex-col w-full md:w-auto md:items-start order-1 md:order-3">
                 {/* IUCN Status bubbles - responsive sizing to span full width on mobile */}
                 <div className="relative flex items-center justify-between w-full md:w-auto md:justify-start md:gap-8">
                   {/* Single horizontal line behind all bubbles */}
@@ -300,14 +300,14 @@ export default function Conservation({
               </div>
             )}
 
-            {/* Vertical divider between IUCN and DD/NE - hidden on mobile */}
+            {/* Vertical divider between DD/NE and IUCN - hidden on mobile */}
             {specialStatuses.length > 0 && iucnStatuses.length > 0 && (
-              <div className="hidden md:block w-px h-12 bg-gray-400 mx-4 self-center"></div>
+              <div className="hidden md:block md:order-2 w-px h-12 bg-gray-400 mx-4 self-center"></div>
             )}
             
             {/* DD and NE group - complete with bubbles and labels */}
             {specialStatuses.length > 0 && (
-              <div className="flex flex-col items-center mt-8 md:mt-0 w-full md:w-auto md:items-start">
+              <div className="flex flex-col items-center mt-8 md:mt-0 w-full md:w-auto md:items-start order-2 md:order-1">
                 {/* DD and NE bubbles - same sizing as IUCN bubbles */}
                 <div className="relative flex items-center justify-center gap-4 md:gap-8">
                   {/* Single horizontal line behind all bubbles */}
