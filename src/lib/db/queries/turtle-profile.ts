@@ -630,16 +630,19 @@ function transformTurtleDataToProfile(
   const measurementData = turtle_species_measurements?.[0];
   const measurements = measurementData
     ? {
-        adultWeight: measurementData.adult_weight 
-          ? `${measurementData.adult_weight} lbs` 
-          : 'Unknown',
+        adultWeight: {
+          value: measurementData.adult_weight,
+          unit: 'g' // Database stores weight in grams
+        },
         length: {
-          female: measurementData.length_female_max_scl
-            ? `${measurementData.length_female_max_scl} cm`
-            : 'Unknown',
-          male: measurementData.length_male_max_scl
-            ? `${measurementData.length_male_max_scl} cm`
-            : 'Unknown',
+          female: {
+            value: measurementData.length_female_max_scl,
+            unit: 'cm' // Database stores length in centimeters
+          },
+          male: {
+            value: measurementData.length_male_max_scl,
+            unit: 'cm'
+          },
           generallyLarger: measurementData.generally_larger || null
         },
         lifespan: {
@@ -652,8 +655,12 @@ function transformTurtleDataToProfile(
         }
       }
     : {
-        adultWeight: 'Unknown',
-        length: { female: 'Unknown', male: 'Unknown', generallyLarger: null },
+        adultWeight: { value: null, unit: 'g' },
+        length: {
+          female: { value: null, unit: 'cm' },
+          male: { value: null, unit: 'cm' },
+          generallyLarger: null
+        },
         lifespan: { wild: 'Unknown', captivity: 'Unknown' }
       };
 

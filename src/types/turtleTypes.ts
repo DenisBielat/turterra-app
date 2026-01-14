@@ -193,11 +193,24 @@ export interface Variant {
     identification: {
       description: string;
       physicalFeatures: string;
-      measurements: {
-        adultWeight: string;
-        length: { female: string; male: string };
-        lifespan: { wild: string; captivity: string };
+    measurements: {
+      adultWeight: {
+        value: number | null;
+        unit: 'g' | 'lbs';
       };
+      length: {
+        female: {
+          value: number | null;
+          unit: 'cm' | 'in';
+        };
+        male: {
+          value: number | null;
+          unit: 'cm' | 'in';
+        };
+        generallyLarger: 'female' | 'male' | 'equal' | null;
+      };
+      lifespan: { wild: string; captivity: string };
+    };
       featureCategories: FeatureCategory[];
       speciesCard: {
         commonName: string;

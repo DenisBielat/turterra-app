@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from 'react';
 import SpeciesComparison from '../physical-features/SpeciesComparison';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -7,10 +10,19 @@ interface IdentificationProps {
   speciesId?: number;
   description: string;
   measurements: {
-    adultWeight: string;
+    adultWeight: {
+      value: number | null;
+      unit: 'g' | 'lbs';
+    };
     length: {
-      female: string;
-      male: string;
+      female: {
+        value: number | null;
+        unit: 'cm' | 'in';
+      };
+      male: {
+        value: number | null;
+        unit: 'cm' | 'in';
+      };
       generallyLarger: 'female' | 'male' | 'equal' | null;
     };
     lifespan: {
@@ -46,6 +58,34 @@ interface IdentificationProps {
   }[];
 }
 
+// Conversion functions
+const gramsToPounds = (grams: number): number => {
+  return grams / 453.592;
+};
+
+const poundsToGrams = (pounds: number): number => {
+  return pounds * 453.592;
+};
+
+const cmToInches = (cm: number): number => {
+  return cm / 2.54;
+};
+
+const inchesToCm = (inches: number): number => {
+  return inches * 2.54;
+};
+
+// Format number with appropriate decimal places
+const formatNumber = (value: number, isWeight: boolean): string => {
+  if (isWeight) {
+    // For weight, show up to 2 decimal places if needed, otherwise show as integer
+    return value % 1 === 0 ? value.toString() : value.toFixed(2);
+  } else {
+    // For length, show 1 decimal place
+    return value.toFixed(1);
+  }
+};
+
 export default function Identification({
   speciesId,
   description,
@@ -54,6 +94,62 @@ export default function Identification({
   speciesCard,
   relatedSpecies = [],
 }: IdentificationProps) {
+  // State for unit toggles - default to grams and centimeters
+  const [weightUnit, setWeightUnit] = useState<'g' | 'lbs'>('g');
+  const [lengthUnit, setLengthUnit] = useState<'cm' | 'in'>('cm');
+
+  // Convert and format weight
+  const getWeightDisplay = () => {
+    if (measurements.adultWeight.value === null) {
+      return { value: 'Unknown', unit: '' };
+    }
+
+    let displayValue: number;
+    let displayUnit: string;
+
+    if (weightUnit === 'g') {
+      displayValue = measurements.adultWeight.value;
+      displayUnit = 'g';
+    } else {
+      // Convert grams to pounds
+      displayValue = gramsToPounds(measurements.adultWeight.value);
+      displayUnit = 'lbs';
+    }
+
+    return {
+      value: formatNumber(displayValue, true),
+      unit: displayUnit
+    };
+  };
+
+  // Convert and format length
+  const getLengthDisplay = (lengthValue: number | null) => {
+    if (lengthValue === null) {
+      return { value: 'Unknown', unit: '' };
+    }
+
+    let displayValue: number;
+    let displayUnit: string;
+
+    if (lengthUnit === 'cm') {
+      displayValue = lengthValue;
+      displayUnit = 'cm';
+    } else {
+      // Convert cm to inches
+      displayValue = cmToInches(lengthValue);
+      displayUnit = 'in';
+    }
+
+    return {
+      value: formatNumber(displayValue, false),
+      unit: displayUnit
+    };
+  };
+
+  const weightDisplay = getWeightDisplay();
+  const femaleLengthDisplay = getLengthDisplay(measurements.length.female.value);
+  const maleLengthDisplay = getLengthDisplay(measurements.length.male.value);
+
   return (
     <section id="identification-section">
       <h2 id="identification" className="scroll-m-20 text-3xl md:text-5xl">
@@ -81,16 +177,38 @@ export default function Identification({
             <div className="flex md:flex-col gap-4 md:gap-0 overflow-x-auto md:overflow-visible pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none">
               {/* Adult Weight */}
               <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pb-6 border border-gray-200 md:border-0">
-                <div className="text-sm uppercase mb-3 text-green-900">Adult Weight</div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-sm uppercase text-green-900">Adult Weight</div>
+                  <div className="flex gap-1 bg-gray-100 rounded-md p-0.5">
+                    <button
+                      onClick={() => setWeightUnit('g')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                        weightUnit === 'g'
+                          ? 'bg-white text-green-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      g
+                    </button>
+                    <button
+                      onClick={() => setWeightUnit('lbs')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                        weightUnit === 'lbs'
+                          ? 'bg-white text-green-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      lbs
+                    </button>
+                  </div>
+                </div>
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-2xl md:text-3xl font-bold leading-none">
-                    {measurements.adultWeight === 'Unknown'
-                      ? 'Unknown'
-                      : measurements.adultWeight.split(' ')[0]}
+                    {weightDisplay.value}
                   </span>
-                  {measurements.adultWeight !== 'Unknown' && (
+                  {weightDisplay.unit && (
                     <span className="text-sm md:text-base font-normal">
-                      {measurements.adultWeight.split(' ').slice(1).join(' ')}
+                      {weightDisplay.unit}
                     </span>
                   )}
                 </div>
@@ -104,7 +222,31 @@ export default function Identification({
 
               {/* Length */}
               <div className="w-[280px] md:w-auto flex-shrink-0 md:flex-shrink snap-center md:snap-align-none bg-warm-50 md:bg-transparent rounded-lg md:rounded-none p-4 md:p-0 md:pt-6 md:pb-6 border border-gray-200 md:border-0">
-                <div className="text-sm uppercase mb-3 text-green-900">Length (Max SCL)</div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-sm uppercase text-green-900">Length (Max SCL)</div>
+                  <div className="flex gap-1 bg-gray-100 rounded-md p-0.5">
+                    <button
+                      onClick={() => setLengthUnit('cm')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                        lengthUnit === 'cm'
+                          ? 'bg-white text-green-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      cm
+                    </button>
+                    <button
+                      onClick={() => setLengthUnit('in')}
+                      className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
+                        lengthUnit === 'in'
+                          ? 'bg-white text-green-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      in
+                    </button>
+                  </div>
+                </div>
                 <div className="flex gap-4 md:gap-8 mb-2">
                   {/* Female Column */}
                   <div className="flex-1">
@@ -114,13 +256,11 @@ export default function Identification({
                     </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl md:text-3xl font-bold leading-none">
-                        {measurements.length.female === 'Unknown'
-                          ? 'Unknown'
-                          : measurements.length.female.split(' ')[0]}
+                        {femaleLengthDisplay.value}
                       </span>
-                      {measurements.length.female !== 'Unknown' && (
+                      {femaleLengthDisplay.unit && (
                         <span className="text-sm md:text-base font-normal">
-                          {measurements.length.female.split(' ').slice(1).join(' ')}
+                          {femaleLengthDisplay.unit}
                         </span>
                       )}
                     </div>
@@ -134,13 +274,11 @@ export default function Identification({
                     </div>
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl md:text-3xl font-bold leading-none">
-                        {measurements.length.male === 'Unknown'
-                          ? 'Unknown'
-                          : measurements.length.male.split(' ')[0]}
+                        {maleLengthDisplay.value}
                       </span>
-                      {measurements.length.male !== 'Unknown' && (
+                      {maleLengthDisplay.unit && (
                         <span className="text-sm md:text-base font-normal">
-                          {measurements.length.male.split(' ').slice(1).join(' ')}
+                          {maleLengthDisplay.unit}
                         </span>
                       )}
                     </div>
