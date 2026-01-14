@@ -8,6 +8,7 @@ import DistributionSection from "@/components/turtle-profile/distribution/Distri
 import Habitat from "@/components/turtle-profile/content-sections/Habitat";
 import Behavior from "@/components/turtle-profile/content-sections/Behavior";
 import Conservation from "@/components/turtle-profile/content-sections/Conservation";
+import References from "@/components/turtle-profile/content-sections/References";
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -136,6 +137,15 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
                   threats={data.conservation.threats ?? undefined}
                   threatTags={data.conservation.threatTags}
                 />
+
+                {/* Divider - only show if there are references */}
+                {data.references && data.references.length > 0 && (
+                  <div className="w-full mt-8 mb-12 md:mt-12 md:mb-20">
+                    <div className="w-full h-px bg-gray-200"></div>
+                  </div>
+                )}
+
+                <References references={data.references || []} />
               </div>
             </div>
           </div>

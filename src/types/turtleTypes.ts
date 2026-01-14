@@ -90,6 +90,19 @@ export interface Variant {
       icon: string | null;
     } | null;
   }
+
+  export interface ReferenceRow {
+    id: number;
+    reference_text: string;
+    reference_url?: string | null;
+    reference_order?: number;
+  }
+
+  export interface Reference {
+    id: number;
+    text: string;
+    url?: string | null;
+  }
   
   export interface PhysicalFeature {
     id: number;
@@ -136,6 +149,7 @@ export interface Variant {
     turtle_species_physical_features?: PhysicalFeatureData[];
     turtle_species_physical_features_key?: PhysicalFeature[];
     turtle_species_threats?: ThreatRow[];
+    turtle_species_references?: ReferenceRow[];
     related_species?: RelatedSpecies[];
   }
   
@@ -220,6 +234,7 @@ export interface Variant {
       icon: string;
       description: string;
     }>;
+    references: Reference[];
   }
   
   export interface FeatureCategory {

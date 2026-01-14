@@ -102,6 +102,12 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
           threat_name,
           icon
         )
+      ),
+      turtle_species_references(
+        id,
+        reference_text,
+        reference_url,
+        reference_order
       )
     `)
     .eq(column, value)
@@ -573,7 +579,8 @@ function transformTurtleDataToProfile(
     turtle_species_regions_general,
     turtle_species_section_descriptions,
     turtle_species_measurements,
-    turtle_species_threats
+    turtle_species_threats,
+    turtle_species_references
   } = turtle;
 
   // Conservation status
@@ -747,6 +754,18 @@ function transformTurtleDataToProfile(
       });
       console.log('Transformed behaviors:', transformed);
       return transformed;
+    })(),
+    references: (() => {
+      if (!turtle_species_references || turtle_species_references.length === 0) {
+        return [];
+      }
+      return turtle_species_references
+        .sort((a, b) => (a.reference_order ?? 0) - (b.reference_order ?? 0))
+        .map(ref => ({
+          id: ref.id,
+          text: ref.reference_text,
+          url: ref.reference_url || null
+        }));
     })()
   };
 }
