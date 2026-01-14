@@ -132,7 +132,7 @@ export default function TurtleSearchNav({
       <div
         className={`lg:hidden w-full bg-green-950 transition-all duration-300 border-0 ${
           isSticky
-            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-4 z-10'
+            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-4 z-20'
             : 'relative py-2 px-4 z-20'
         }`}
       >
@@ -266,7 +266,7 @@ export default function TurtleSearchNav({
       <div
         className={`hidden lg:block w-full bg-green-950 transition-all duration-300 border-0 ${
           isSticky
-            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-10 z-10'
+            ? 'fixed top-0 left-0 right-0 shadow-lg py-2 px-10 z-20'
             : 'relative pt-6 pb-4 px-10 z-20'
         }`}
       >
