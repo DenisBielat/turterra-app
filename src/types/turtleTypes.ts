@@ -93,15 +93,31 @@ export interface Variant {
 
   export interface ReferenceRow {
     id: number;
-    reference_text: string;
-    reference_url?: string | null;
-    reference_order?: number;
+    species_id: number;
+    reference_type?: string | null;
+    citation_full?: string | null;
+    citation_short?: string | null;
+    authors?: string | null;
+    year?: string | null;
+    title?: string | null;
+    source_name?: string | null;
+    url?: string | null;
+    doi?: string | null;
+    access_date?: string | null;
+    notes?: string | null;
   }
 
   export interface Reference {
     id: number;
-    text: string;
+    type?: string | null;
+    citationFull?: string | null;
+    citationShort?: string | null;
+    authors?: string | null;
+    year?: string | null;
+    title?: string | null;
+    sourceName?: string | null;
     url?: string | null;
+    doi?: string | null;
   }
   
   export interface PhysicalFeature {

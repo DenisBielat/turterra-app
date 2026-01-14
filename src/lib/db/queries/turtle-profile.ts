@@ -105,9 +105,15 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       ),
       turtle_species_references(
         id,
-        reference_text,
-        reference_url,
-        reference_order
+        reference_type,
+        citation_full,
+        citation_short,
+        authors,
+        year,
+        title,
+        source_name,
+        url,
+        doi
       )
     `)
     .eq(column, value)
@@ -756,16 +762,24 @@ function transformTurtleDataToProfile(
       return transformed;
     })(),
     references: (() => {
+      console.log('Transforming references, raw data:', turtle_species_references);
       if (!turtle_species_references || turtle_species_references.length === 0) {
+        console.log('No references data to transform');
         return [];
       }
-      return turtle_species_references
-        .sort((a, b) => (a.reference_order ?? 0) - (b.reference_order ?? 0))
-        .map(ref => ({
-          id: ref.id,
-          text: ref.reference_text,
-          url: ref.reference_url || null
-        }));
+      console.log('References count:', turtle_species_references.length);
+      return turtle_species_references.map(ref => ({
+        id: ref.id,
+        type: ref.reference_type || null,
+        citationFull: ref.citation_full || null,
+        citationShort: ref.citation_short || null,
+        authors: ref.authors || null,
+        year: ref.year || null,
+        title: ref.title || null,
+        sourceName: ref.source_name || null,
+        url: ref.url || null,
+        doi: ref.doi || null
+      }));
     })()
   };
 }
