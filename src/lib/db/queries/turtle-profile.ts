@@ -632,16 +632,16 @@ function transformTurtleDataToProfile(
     ? {
         adultWeight: {
           value: measurementData.adult_weight,
-          unit: 'g' // Database stores weight in grams
+          unit: 'g' as const // Database stores weight in grams
         },
         length: {
           female: {
             value: measurementData.length_female_max_scl,
-            unit: 'cm' // Database stores length in centimeters
+            unit: 'cm' as const // Database stores length in centimeters
           },
           male: {
             value: measurementData.length_male_max_scl,
-            unit: 'cm'
+            unit: 'cm' as const
           },
           generallyLarger: measurementData.generally_larger || null
         },
@@ -655,10 +655,10 @@ function transformTurtleDataToProfile(
         }
       }
     : {
-        adultWeight: { value: null, unit: 'g' },
+        adultWeight: { value: null, unit: 'g' as const },
         length: {
-          female: { value: null, unit: 'cm' },
-          male: { value: null, unit: 'cm' },
+          female: { value: null, unit: 'cm' as const },
+          male: { value: null, unit: 'cm' as const },
           generallyLarger: null
         },
         lifespan: { wild: 'Unknown', captivity: 'Unknown' }
