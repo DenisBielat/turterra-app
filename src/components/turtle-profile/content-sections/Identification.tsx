@@ -63,16 +63,8 @@ const gramsToPounds = (grams: number): number => {
   return grams / 453.592;
 };
 
-const poundsToGrams = (pounds: number): number => {
-  return pounds * 453.592;
-};
-
 const cmToInches = (cm: number): number => {
   return cm / 2.54;
-};
-
-const inchesToCm = (inches: number): number => {
-  return inches * 2.54;
 };
 
 // Format number with appropriate decimal places
