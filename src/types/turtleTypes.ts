@@ -21,7 +21,7 @@ export interface Variant {
   }
   
   export interface PopulationHistory {
-    population_estimate?: number;
+    population_estimate?: string | null;
     population_trend?: string;
     year_of_estimate: string;
   }

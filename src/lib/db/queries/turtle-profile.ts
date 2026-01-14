@@ -603,9 +603,7 @@ function transformTurtleDataToProfile(
   // Population
   const latestPopulation = turtle_species_population_estimate_history
     ?.sort((a, b) => b.year_of_estimate.localeCompare(a.year_of_estimate))[0];
-  const population = latestPopulation?.population_estimate
-    ? latestPopulation.population_estimate.toLocaleString()
-    : "Unknown";
+  const population = latestPopulation?.population_estimate ?? "Unknown";
   const populationTrend = latestPopulation?.population_trend || "Unknown";
 
   // Habitats / ecologies / regions
