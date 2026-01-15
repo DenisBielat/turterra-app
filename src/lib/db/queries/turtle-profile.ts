@@ -811,6 +811,11 @@ export async function getTurtleData(slug: string) {
 
     return {
       ...profileData,
+      stats: {
+        ...profileData.stats,
+        // For now, show family common name as the "Category" in At a Glance
+        category: taxonomyData?.family.common || 'Unknown'
+      },
       taxonomy: taxonomyData
     };
   } catch (error) {
