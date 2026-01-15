@@ -12,7 +12,7 @@ export default function References({ references }: ReferencesProps) {
   return (
     <section id="references" className="scroll-m-20 pb-12">
       <h3 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">References</h3>
-      <ol className="list-decimal list-outside ml-5 space-y-2 md:space-y-3">
+      <ol className="list-decimal list-outside ml-5 space-y-4">
         {references.map((reference) => {
           // Use citation_full as the display text, fallback to constructing from parts
           const displayText = reference.citationFull ||
