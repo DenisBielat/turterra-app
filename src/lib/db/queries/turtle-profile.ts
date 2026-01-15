@@ -50,6 +50,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       avatar_image_circle_url,
       avatar_image_full_url,
       tax_parent_genus,
+      limited_information_toggle,
+      limited_information_description,
       turtle_species_section_descriptions (
         at_a_glance,
         identification,
@@ -577,6 +579,8 @@ function transformTurtleDataToProfile(
     species_scientific_name,
     other_common_names,
     avatar_image_circle_url,
+    limited_information_toggle,
+    limited_information_description,
     turtle_species_conservation_history,
     turtle_species_population_estimate_history,
     turtle_species_habitats,
@@ -683,6 +687,10 @@ function transformTurtleDataToProfile(
     scientificName: species_scientific_name,
     profileImage: avatar_image_circle_url || "",
     description: sectionDescriptions?.at_a_glance || `Learn about the ${species_common_name}.`,
+    limitedInformation: {
+      showWarning: limited_information_toggle === true,
+      description: limited_information_description || "This species profile contains limited information and may be incomplete. Some sections may be missing data or require further research."
+    },
     conservationStatus, 
     stats,
     commonNames: other_common_names || [],

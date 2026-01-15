@@ -47,6 +47,7 @@ export type LineIconName =
   | 'turtle'
   | 'twitter'
   | 'two-arrows'
+  | 'warning'
   | 'warp-shell-lower'
   | 'warp-shell-upper'
   | 'water-droplet';
@@ -66,6 +67,7 @@ export type FilledIconName =
   | 'outdoors-tree-valley'
   | 'trip-map-markers'
   | 'vegetables-salad'
+  | 'warning'
   | 'youtube';
 
 export type ColorIconName = 

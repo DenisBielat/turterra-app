@@ -152,6 +152,8 @@ export interface Variant {
     avatar_image_circle_url: string | null;
     avatar_image_full_url: string | null;
     tax_parent_genus: number;
+    limited_information_toggle?: boolean | null;
+    limited_information_description?: string | null;
     // The next fields often get attached programmatically in the transform
     turtle_species_section_descriptions?: SectionDescriptions[];
     turtle_species_measurements?: Measurements[];
@@ -176,6 +178,10 @@ export interface Variant {
     scientificName: string;
     profileImage: string;
     description: string;
+    limitedInformation: {
+      showWarning: boolean;
+      description: string;
+    };
     conservationStatus: {
       status: string;
       code: string;

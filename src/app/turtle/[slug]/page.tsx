@@ -71,6 +71,7 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
               <div className="col-span-1 lg:col-span-9 flex flex-col">
                 <TurtleAtAGlance 
                   description={data.description}
+                  limitedInformation={data.limitedInformation}
                   conservationStatus={data.conservationStatus}
                   stats={data.stats}
                   commonNames={data.commonNames}
