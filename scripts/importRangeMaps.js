@@ -1,10 +1,12 @@
 // scripts/importRangeMaps.js
-// Imports KML range maps from Supabase storage and converts them to GeoJSON
+// Imports range maps from Supabase storage and converts them to GeoJSON
+// Supports both KML files and Shapefiles (.shp, .shx, .dbf, .prj, .cpg)
 // Usage: node scripts/importRangeMaps.js [species-slug]
 // If no species slug is provided, imports all available range maps
 
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import * as shapefile from 'shapefile';
 
 // Load environment variables from .env.local file
 dotenv.config({ path: '.env.local' });
@@ -400,6 +402,202 @@ async function findKMLFile(speciesSlug) {
 }
 
 /**
+ * Find shapefile components in a species folder
+ * Returns object with paths to .shp and .dbf files if found
+ */
+async function findShapefiles(speciesSlug) {
+  const { data, error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .list(speciesSlug, {
+      limit: 100
+    });
+
+  if (error) {
+    console.error(`Error listing files for ${speciesSlug}:`, error);
+    return null;
+  }
+
+  // Find shapefile components
+  const shpFile = data.find(file =>
+    file.name.toLowerCase().endsWith('.shp')
+  );
+  const dbfFile = data.find(file =>
+    file.name.toLowerCase().endsWith('.dbf')
+  );
+
+  // .shp file is required, .dbf is optional but recommended for attributes
+  if (!shpFile) {
+    return null;
+  }
+
+  return {
+    shp: `${speciesSlug}/${shpFile.name}`,
+    dbf: dbfFile ? `${speciesSlug}/${dbfFile.name}` : null
+  };
+}
+
+/**
+ * Download a file from storage as ArrayBuffer
+ */
+async function downloadAsArrayBuffer(filePath) {
+  const { data, error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .download(filePath);
+
+  if (error) {
+    console.error(`Error downloading ${filePath}:`, error);
+    return null;
+  }
+
+  return await data.arrayBuffer();
+}
+
+/**
+ * Normalize geometry to MultiPolygon format for consistency
+ */
+function normalizeToMultiPolygon(geometry) {
+  if (!geometry) return null;
+
+  if (geometry.type === 'Polygon') {
+    return {
+      type: 'MultiPolygon',
+      coordinates: [geometry.coordinates]
+    };
+  }
+
+  if (geometry.type === 'MultiPolygon') {
+    return geometry;
+  }
+
+  // Return as-is for non-polygon types
+  return geometry;
+}
+
+/**
+ * Download and parse shapefile to GeoJSON
+ */
+async function downloadAndParseShapefile(shapefilePaths) {
+  console.log(`  Downloading shapefile components...`);
+
+  // Download .shp file (required)
+  const shpBuffer = await downloadAsArrayBuffer(shapefilePaths.shp);
+  if (!shpBuffer) {
+    console.error('  Failed to download .shp file');
+    return null;
+  }
+
+  // Download .dbf file (optional, contains attributes)
+  let dbfBuffer = null;
+  if (shapefilePaths.dbf) {
+    dbfBuffer = await downloadAsArrayBuffer(shapefilePaths.dbf);
+    if (!dbfBuffer) {
+      console.log('  Warning: Failed to download .dbf file, proceeding without attributes');
+    }
+  }
+
+  try {
+    // Parse shapefile to GeoJSON
+    // The shapefile library's read() function returns a GeoJSON FeatureCollection
+    const geojson = await shapefile.read(shpBuffer, dbfBuffer);
+
+    if (!geojson || !geojson.features || geojson.features.length === 0) {
+      console.error('  Shapefile parsing returned no features');
+      return null;
+    }
+
+    // Process features to match our expected format
+    const processedFeatures = [];
+    const polygonCoordinates = [];
+
+    for (const feature of geojson.features) {
+      if (!feature.geometry) continue;
+
+      const geomType = feature.geometry.type;
+
+      // Collect all polygon geometries to merge into a single MultiPolygon
+      if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
+        if (geomType === 'Polygon') {
+          polygonCoordinates.push(feature.geometry.coordinates);
+        } else {
+          // MultiPolygon - add each polygon separately
+          for (const polyCoords of feature.geometry.coordinates) {
+            polygonCoordinates.push(polyCoords);
+          }
+        }
+      } else if (geomType === 'LineString' || geomType === 'MultiLineString') {
+        processedFeatures.push({
+          type: 'Feature',
+          properties: {
+            ...feature.properties,
+            source: 'IUCN',
+            geometryType: 'line'
+          },
+          geometry: feature.geometry
+        });
+      } else if (geomType === 'Point' || geomType === 'MultiPoint') {
+        processedFeatures.push({
+          type: 'Feature',
+          properties: {
+            ...feature.properties,
+            source: 'IUCN',
+            geometryType: 'point'
+          },
+          geometry: feature.geometry
+        });
+      }
+    }
+
+    // Create a single MultiPolygon feature from all polygon geometries
+    if (polygonCoordinates.length > 0) {
+      processedFeatures.unshift({
+        type: 'Feature',
+        properties: {
+          name: geojson.features[0]?.properties?.BINOMIAL ||
+                geojson.features[0]?.properties?.SCI_NAME ||
+                geojson.features[0]?.properties?.name ||
+                null,
+          description: geojson.features[0]?.properties?.LEGEND ||
+                       geojson.features[0]?.properties?.PRESENCE ||
+                       null,
+          source: 'IUCN',
+          geometryType: 'range'
+        },
+        geometry: {
+          type: 'MultiPolygon',
+          coordinates: polygonCoordinates
+        }
+      });
+    }
+
+    // Calculate bounding box
+    let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+
+    for (const feature of processedFeatures) {
+      const coords = getAllCoordinates(feature.geometry);
+      for (const [lng, lat] of coords) {
+        minLng = Math.min(minLng, lng);
+        minLat = Math.min(minLat, lat);
+        maxLng = Math.max(maxLng, lng);
+        maxLat = Math.max(maxLat, lat);
+      }
+    }
+
+    const bbox = minLng !== Infinity
+      ? [minLng, minLat, maxLng, maxLat]
+      : undefined;
+
+    return {
+      type: 'FeatureCollection',
+      features: processedFeatures,
+      ...(bbox && { bbox })
+    };
+  } catch (err) {
+    console.error('  Error parsing shapefile:', err.message);
+    return null;
+  }
+}
+
+/**
  * Download and parse a KML file from storage
  */
 async function downloadAndParseKML(filePath) {
@@ -418,6 +616,7 @@ async function downloadAndParseKML(filePath) {
 
 /**
  * Import range map for a single species
+ * Supports both KML files and Shapefiles
  */
 async function importSpeciesRangeMap(speciesSlug) {
   console.log(`\nProcessing: ${speciesSlug}`);
@@ -432,25 +631,38 @@ async function importSpeciesRangeMap(speciesSlug) {
 
   console.log(`  Found species: ${species.species_common_name} (ID: ${species.id})`);
 
-  // Find KML file in storage
+  let geojson = null;
+  let fileFormat = null;
+
+  // Try to find KML file first
   const kmlPath = await findKMLFile(speciesSlug);
-  if (!kmlPath) {
-    console.log(`  ⚠️ No KML file found in storage for: ${speciesSlug}`);
-    results.skipped.push({ slug: speciesSlug, reason: 'No KML file in storage' });
-    return false;
+  if (kmlPath) {
+    console.log(`  Found KML file: ${kmlPath}`);
+    fileFormat = 'KML';
+    geojson = await downloadAndParseKML(kmlPath);
   }
 
-  console.log(`  Found KML file: ${kmlPath}`);
+  // If no KML, try shapefile
+  if (!geojson) {
+    const shapefilePaths = await findShapefiles(speciesSlug);
+    if (shapefilePaths) {
+      console.log(`  Found shapefile: ${shapefilePaths.shp}`);
+      if (shapefilePaths.dbf) {
+        console.log(`  Found DBF file: ${shapefilePaths.dbf}`);
+      }
+      fileFormat = 'Shapefile';
+      geojson = await downloadAndParseShapefile(shapefilePaths);
+    }
+  }
 
-  // Download and parse KML
-  const geojson = await downloadAndParseKML(kmlPath);
+  // Check if we found and parsed any geographic data
   if (!geojson || geojson.features.length === 0) {
-    console.log(`  ⚠️ Failed to parse KML or no features found: ${kmlPath}`);
-    results.failed.push({ slug: speciesSlug, reason: 'Failed to parse KML' });
+    console.log(`  ⚠️ No KML or Shapefile found in storage for: ${speciesSlug}`);
+    results.skipped.push({ slug: speciesSlug, reason: 'No KML or Shapefile in storage' });
     return false;
   }
 
-  console.log(`  Parsed ${geojson.features.length} feature(s)`);
+  console.log(`  Parsed ${geojson.features.length} feature(s) from ${fileFormat}`);
 
   // Check if range map already exists
   const { data: existing } = await supabase
@@ -495,7 +707,8 @@ async function importSpeciesRangeMap(speciesSlug) {
     slug: speciesSlug,
     speciesName: species.species_common_name,
     featuresCount: geojson.features.length,
-    action: existing ? 'updated' : 'created'
+    action: existing ? 'updated' : 'created',
+    format: fileFormat
   });
 
   return true;
@@ -529,7 +742,7 @@ function printSummary() {
   if (results.successful.length > 0) {
     console.log(`\n✅ Successfully imported: ${results.successful.length}`);
     for (const item of results.successful) {
-      console.log(`   - ${item.slug}: ${item.speciesName} (${item.featuresCount} features, ${item.action})`);
+      console.log(`   - ${item.slug}: ${item.speciesName} (${item.featuresCount} features, ${item.action}, ${item.format})`);
     }
   }
 
