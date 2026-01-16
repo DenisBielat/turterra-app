@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -91,6 +92,8 @@ export default function TurtleAtAGlance({
   stats,
   commonNames,
 }: TurtleAtAGlanceProps) {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
   // Smooth scroll handler matching the side menu behavior
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -136,11 +139,21 @@ export default function TurtleAtAGlance({
               <div className="flex flex-col justify-center">
                 <div className="font-heading font-bold text-base md:text-lg">{conservationStatus.status}</div>
                 <div className="flex items-center gap-1.5">
-                  <p className="text-xs md:text-sm">IUCN RedList | {conservationStatus.year}</p>
+                  <p className="text-xs md:text-sm">
+                    {conservationStatus.outOfDate
+                      ? `Turterra | ${new Date().getFullYear()}`
+                      : `IUCN RedList | ${conservationStatus.year}`}
+                  </p>
                   {conservationStatus.outOfDate && conservationStatus.outOfDateDescription && (
                     <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
+                      <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
+                        <TooltipTrigger
+                          asChild
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTooltipOpen(!tooltipOpen);
+                          }}
+                        >
                           <span className="inline-flex items-center">
                             <Icon
                               name="information-circle"
