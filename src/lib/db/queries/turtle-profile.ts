@@ -77,7 +77,7 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       ),
       turtle_species_conservation_history(
         year_status_assigned,
-        conservation_statuses(
+        conservation_statuses!turtle_species_conservation_conservation_status_fkey(
           status,
           abbreviation
         )
@@ -122,13 +122,12 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
     .single<TurtleData>();
 
   if (error) {
-    console.error('Error fetching turtle data', column, value, {
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-      code: error.code,
-      error: error
-    });
+    console.error('Error fetching turtle data', column, value);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error details:', error.details);
+    console.error('Error hint:', error.hint);
+    console.error('Full error object:', JSON.stringify(error, null, 2));
     throw error;
   }
 
@@ -171,7 +170,7 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
       avatar_image_circle_url,
       turtle_species_conservation_history(
         year_status_assigned,
-        conservation_statuses(
+        conservation_statuses!turtle_species_conservation_conservation_status_fkey(
           status,
           abbreviation
         )
@@ -563,13 +562,20 @@ function transformTurtleDataToProfile(
     // Get the latest conservation status
     const latestHistory = species.turtle_species_conservation_history
       ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0];
+    
+    // Handle both array and object cases for conservation_statuses
+    const relatedConservationStatus = latestHistory?.conservation_statuses
+      ? (Array.isArray(latestHistory.conservation_statuses)
+          ? latestHistory.conservation_statuses[0]
+          : latestHistory.conservation_statuses)
+      : null;
 
     return {
       commonName: species.species_common_name,
       scientificName: species.species_scientific_name,
       avatarUrl: species.avatar_image_full_url || '/images/image-placeholder.png',
       avatarCircleUrl: species.avatar_image_circle_url || undefined,
-      conservationStatus: latestHistory?.conservation_statuses?.[0]?.status
+      conservationStatus: relatedConservationStatus?.status
     };
   });
 
@@ -596,10 +602,16 @@ function transformTurtleDataToProfile(
   // Conservation status
   const latestConservation = turtle_species_conservation_history
     ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0];
-  const conservationStatus = latestConservation
+  
+  // Handle both array and object cases for conservation_statuses (Supabase can return either)
+  const conservationStatusObj = Array.isArray(latestConservation?.conservation_statuses)
+    ? latestConservation.conservation_statuses[0]
+    : latestConservation?.conservation_statuses;
+  
+  const conservationStatus = latestConservation && conservationStatusObj
     ? {
-        status: latestConservation.conservation_statuses.status,
-        code: latestConservation.conservation_statuses.abbreviation,
+        status: conservationStatusObj.status,
+        code: conservationStatusObj.abbreviation,
         year: parseInt(latestConservation.year_status_assigned, 10) || 0
       }
     : { status: "Unknown", code: "NA", year: 0 };
@@ -828,6 +840,11 @@ export async function getTurtleData(slug: string) {
     };
   } catch (error) {
     console.error('Error in getTurtleData:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     throw error;
   }
 }
