@@ -3,6 +3,12 @@
 import { Icon } from '@/components/Icon';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TurtleAtAGlanceProps {
   description: string;
@@ -10,6 +16,8 @@ interface TurtleAtAGlanceProps {
     status: string;
     code: string;
     year: number;
+    outOfDate?: boolean;
+    outOfDateDescription?: string;
   };
   stats: {
     population: string;
@@ -127,7 +135,28 @@ export default function TurtleAtAGlance({
               </div>
               <div className="flex flex-col justify-center">
                 <div className="font-heading font-bold text-base md:text-lg">{conservationStatus.status}</div>
-                <p className="text-xs md:text-sm">IUCN RedList | {conservationStatus.year}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs md:text-sm">IUCN RedList | {conservationStatus.year}</p>
+                  {conservationStatus.outOfDate && conservationStatus.outOfDateDescription && (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild onClick={(e) => e.stopPropagation()}>
+                          <span className="inline-flex items-center">
+                            <Icon
+                              name="information-circle"
+                              style="line"
+                              size="sm"
+                              className="text-gray-500 hover:text-gray-700 cursor-help"
+                            />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <p className="text-sm">{conservationStatus.outOfDateDescription}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
+                </div>
               </div>
             </button>
 

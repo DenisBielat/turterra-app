@@ -75,7 +75,13 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       ),
       turtle_species_conservation_history(
         year_status_assigned,
+        out_of_date,
+        out_of_date_description,
         conservation_statuses(
+          status,
+          abbreviation
+        ),
+        self_assigned_status:self_assigned_conservation_status(
           status,
           abbreviation
         )
@@ -579,11 +585,20 @@ function transformTurtleDataToProfile(
   // Conservation status
   const latestConservation = turtle_species_conservation_history
     ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0];
+
+  // If out_of_date is true and self_assigned_status exists, use that instead
+  const isOutOfDate = latestConservation?.out_of_date === true;
+  const effectiveStatus = isOutOfDate && latestConservation?.self_assigned_status
+    ? latestConservation.self_assigned_status
+    : latestConservation?.conservation_statuses;
+
   const conservationStatus = latestConservation
     ? {
-        status: latestConservation.conservation_statuses.status,
-        code: latestConservation.conservation_statuses.abbreviation,
-        year: parseInt(latestConservation.year_status_assigned, 10) || 0
+        status: effectiveStatus?.status || "Unknown",
+        code: effectiveStatus?.abbreviation || "NA",
+        year: parseInt(latestConservation.year_status_assigned, 10) || 0,
+        outOfDate: isOutOfDate,
+        outOfDateDescription: latestConservation.out_of_date_description || undefined
       }
     : { status: "Unknown", code: "NA", year: 0 };
 
