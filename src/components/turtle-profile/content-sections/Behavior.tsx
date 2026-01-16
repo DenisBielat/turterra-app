@@ -26,7 +26,7 @@ export default function Behavior({
             {hibernation && (
               <div>
                 <h3 className="text-2xl md:text-3xl font-bold mb-3">Hibernation</h3>
-                <div className="text-base md:text-lg">
+                <div className="text-base md:text-lg whitespace-pre-line">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {hibernation}
                   </ReactMarkdown>
@@ -41,7 +41,7 @@ export default function Behavior({
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold mb-3">Diet</h3>
-                <div className="text-base md:text-lg">
+                <div className="text-base md:text-lg whitespace-pre-line">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {diet}
                   </ReactMarkdown>
@@ -56,7 +56,7 @@ export default function Behavior({
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold mb-3">Nesting</h3>
-                <div className="text-base md:text-lg">
+                <div className="text-base md:text-lg whitespace-pre-line">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {nesting}
                   </ReactMarkdown>
@@ -71,7 +71,7 @@ export default function Behavior({
                   <div className="w-full h-px bg-gray-200"></div>
                 </div>
                 <h3 className="text-2xl md:text-3xl font-bold mb-3">Unique Traits and Qualities</h3>
-                <div className="text-base md:text-lg">
+                <div className="text-base md:text-lg whitespace-pre-line">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {uniqueTraits}
                   </ReactMarkdown>

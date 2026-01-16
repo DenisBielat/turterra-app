@@ -8,6 +8,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import styles from "./TurtleProfileHero.module.css";
 import Icon from "@/components/Icon";
+import { ImageFullscreenModal } from "@/components/ui/image-fullscreen-modal";
 
 type AssetType = "Image" | "Video" | "Diagram" | "Illustration" | "Artwork";
 
@@ -37,6 +38,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
   const [turtleName, setTurtleName] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState(0);
   const [initialSlide, setInitialSlide] = useState(0);
+  const [fullscreenImage, setFullscreenImage] = useState<{ url: string; alt: string } | null>(null);
 
   // Fetch Turtle Name from Supabase
   useEffect(() => {
@@ -134,6 +136,20 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
               >
                 {/* Image */}
                 <div className={styles.mediaData}>
+                  {/* Expand Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFullscreenImage({
+                        url: image.secure_url,
+                        alt: `${turtleName} image`
+                      });
+                    }}
+                    className="absolute top-2 right-2 p-1.5 rounded-md bg-green-950/80 hover:bg-green-950 transition-colors z-10 flex items-center justify-center"
+                    aria-label="Expand image to fullscreen"
+                  >
+                    <Icon name="expand" style="line" size="sm" className="text-white" />
+                  </button>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={image.secure_url}
@@ -199,6 +215,16 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
           </Swiper>
         </div>
       </div>
+
+      {/* Fullscreen Image Modal */}
+      {fullscreenImage && (
+        <ImageFullscreenModal
+          isOpen={!!fullscreenImage}
+          onClose={() => setFullscreenImage(null)}
+          imageUrl={fullscreenImage.url}
+          alt={fullscreenImage.alt}
+        />
+      )}
     </section>
   );
 }

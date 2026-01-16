@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Icon } from '@/components/Icon';
 import VariantModal from './VariantModal';
 import { formatFeatureValue } from '@/lib/formatters';
+import { ImageFullscreenModal } from '@/components/ui/image-fullscreen-modal';
 
 // Import the types
 import {
@@ -21,6 +22,7 @@ export default function PhysicalFeatures({
     name: string;
     variants: FeatureVariants;
   } | null>(null);
+  const [fullscreenImage, setFullscreenImage] = useState<{ url: string; alt: string } | null>(null);
 
   const toCategoryTag = (category: string) => {
     return category
@@ -143,6 +145,22 @@ export default function PhysicalFeatures({
                     {category.image && (
                       <div className="p-4 bg-white">
                         <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                          {/* Expand Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (category.image) {
+                                setFullscreenImage({
+                                  url: category.image.url,
+                                  alt: `${category.name} features`
+                                });
+                              }
+                            }}
+                            className="absolute top-2 right-2 p-1.5 rounded-md bg-green-950/80 hover:bg-green-950 transition-colors z-10 flex items-center justify-center"
+                            aria-label="Expand image to fullscreen"
+                          >
+                            <Icon name="expand" style="line" size="sm" className="text-white" />
+                          </button>
                           <Image
                             src={category.image.url}
                             alt={`${category.name} features`}
@@ -271,6 +289,16 @@ export default function PhysicalFeatures({
           onClose={() => setSelectedVariant(null)}
           featureName={selectedVariant.name}
           variants={selectedVariant.variants}
+        />
+      )}
+
+      {/* Fullscreen Image Modal */}
+      {fullscreenImage && (
+        <ImageFullscreenModal
+          isOpen={!!fullscreenImage}
+          onClose={() => setFullscreenImage(null)}
+          imageUrl={fullscreenImage.url}
+          alt={fullscreenImage.alt}
         />
       )}
     </>

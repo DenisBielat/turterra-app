@@ -50,6 +50,8 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       avatar_image_circle_url,
       avatar_image_full_url,
       tax_parent_genus,
+      limited_information_toggle,
+      limited_information_description,
       turtle_species_section_descriptions (
         at_a_glance,
         identification,
@@ -108,19 +110,30 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
           threat_name,
           icon
         )
+      ),
+      turtle_species_references(
+        id,
+        reference_type,
+        citation_full,
+        citation_short,
+        authors,
+        year,
+        title,
+        source_name,
+        url,
+        doi
       )
     `)
     .eq(column, value)
     .single<TurtleData>();
 
   if (error) {
-    console.error('Error fetching turtle data', column, value, {
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-      code: error.code,
-      error: error
-    });
+    console.error('Error fetching turtle data', column, value);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error details:', error.details);
+    console.error('Error hint:', error.hint);
+    console.error('Full error object:', JSON.stringify(error, null, 2));
     throw error;
   }
 
@@ -555,13 +568,20 @@ function transformTurtleDataToProfile(
     // Get the latest conservation status
     const latestHistory = species.turtle_species_conservation_history
       ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0];
+    
+    // Handle both array and object cases for conservation_statuses
+    const relatedConservationStatus = latestHistory?.conservation_statuses
+      ? (Array.isArray(latestHistory.conservation_statuses)
+          ? latestHistory.conservation_statuses[0]
+          : latestHistory.conservation_statuses)
+      : null;
 
     return {
       commonName: species.species_common_name,
       scientificName: species.species_scientific_name,
       avatarUrl: species.avatar_image_full_url || '/images/image-placeholder.png',
       avatarCircleUrl: species.avatar_image_circle_url || undefined,
-      conservationStatus: latestHistory?.conservation_statuses?.[0]?.status
+      conservationStatus: relatedConservationStatus?.status
     };
   });
 
@@ -571,6 +591,8 @@ function transformTurtleDataToProfile(
     species_scientific_name,
     other_common_names,
     avatar_image_circle_url,
+    limited_information_toggle,
+    limited_information_description,
     turtle_species_conservation_history,
     turtle_species_population_estimate_history,
     turtle_species_habitats,
@@ -579,23 +601,33 @@ function transformTurtleDataToProfile(
     turtle_species_regions_general,
     turtle_species_section_descriptions,
     turtle_species_measurements,
-    turtle_species_threats
+    turtle_species_threats,
+    turtle_species_references
   } = turtle;
 
   // Conservation status
   const latestConservation = turtle_species_conservation_history
     ?.sort((a, b) => b.year_status_assigned.localeCompare(a.year_status_assigned))[0];
 
-  // If out_of_date is true and self_assigned_status exists, use that instead
-  const isOutOfDate = latestConservation?.out_of_date === true;
-  const effectiveStatus = isOutOfDate && latestConservation?.self_assigned_status
-    ? latestConservation.self_assigned_status
+  // Handle both array and object cases for conservation_statuses (Supabase can return either)
+  const conservationStatusObj = Array.isArray(latestConservation?.conservation_statuses)
+    ? latestConservation.conservation_statuses[0]
     : latestConservation?.conservation_statuses;
 
-  const conservationStatus = latestConservation
+  const selfAssignedStatusObj = Array.isArray(latestConservation?.self_assigned_status)
+    ? latestConservation.self_assigned_status[0]
+    : latestConservation?.self_assigned_status;
+
+  // If out_of_date is true and self_assigned_status exists, use that instead
+  const isOutOfDate = latestConservation?.out_of_date === true;
+  const effectiveStatus = isOutOfDate && selfAssignedStatusObj
+    ? selfAssignedStatusObj
+    : conservationStatusObj;
+
+  const conservationStatus = latestConservation && effectiveStatus
     ? {
-        status: effectiveStatus?.status || "Unknown",
-        code: effectiveStatus?.abbreviation || "NA",
+        status: effectiveStatus.status,
+        code: effectiveStatus.abbreviation,
         year: parseInt(latestConservation.year_status_assigned, 10) || 0,
         outOfDate: isOutOfDate,
         outOfDateDescription: latestConservation.out_of_date_description || undefined
@@ -605,9 +637,7 @@ function transformTurtleDataToProfile(
   // Population
   const latestPopulation = turtle_species_population_estimate_history
     ?.sort((a, b) => b.year_of_estimate.localeCompare(a.year_of_estimate))[0];
-  const population = latestPopulation?.population_estimate
-    ? latestPopulation.population_estimate.toLocaleString()
-    : "Unknown";
+  const population = latestPopulation?.population_estimate ?? "Unknown";
   const populationTrend = latestPopulation?.population_trend || "Unknown";
 
   // Habitats / ecologies / regions
@@ -634,16 +664,19 @@ function transformTurtleDataToProfile(
   const measurementData = turtle_species_measurements?.[0];
   const measurements = measurementData
     ? {
-        adultWeight: measurementData.adult_weight 
-          ? `${measurementData.adult_weight} lbs` 
-          : 'Unknown',
+        adultWeight: {
+          value: measurementData.adult_weight,
+          unit: 'g' as const // Database stores weight in grams
+        },
         length: {
-          female: measurementData.length_female_max_scl
-            ? `${measurementData.length_female_max_scl} cm`
-            : 'Unknown',
-          male: measurementData.length_male_max_scl
-            ? `${measurementData.length_male_max_scl} cm`
-            : 'Unknown',
+          female: {
+            value: measurementData.length_female_max_scl,
+            unit: 'cm' as const // Database stores length in centimeters
+          },
+          male: {
+            value: measurementData.length_male_max_scl,
+            unit: 'cm' as const
+          },
           generallyLarger: measurementData.generally_larger || null
         },
         lifespan: {
@@ -656,8 +689,12 @@ function transformTurtleDataToProfile(
         }
       }
     : {
-        adultWeight: 'Unknown',
-        length: { female: 'Unknown', male: 'Unknown', generallyLarger: null },
+        adultWeight: { value: null, unit: 'g' as const },
+        length: {
+          female: { value: null, unit: 'cm' as const },
+          male: { value: null, unit: 'cm' as const },
+          generallyLarger: null
+        },
         lifespan: { wild: 'Unknown', captivity: 'Unknown' }
       };
 
@@ -680,6 +717,10 @@ function transformTurtleDataToProfile(
     scientificName: species_scientific_name,
     profileImage: avatar_image_circle_url || "",
     description: sectionDescriptions?.at_a_glance || `Learn about the ${species_common_name}.`,
+    limitedInformation: {
+      showWarning: limited_information_toggle === true,
+      description: limited_information_description || "This species profile contains limited information and may be incomplete. Some sections may be missing data or require further research."
+    },
     conservationStatus, 
     stats,
     commonNames: other_common_names || [],
@@ -762,6 +803,26 @@ function transformTurtleDataToProfile(
       });
       console.log('Transformed behaviors:', transformed);
       return transformed;
+    })(),
+    references: (() => {
+      console.log('Transforming references, raw data:', turtle_species_references);
+      if (!turtle_species_references || turtle_species_references.length === 0) {
+        console.log('No references data to transform');
+        return [];
+      }
+      console.log('References count:', turtle_species_references.length);
+      return turtle_species_references.map(ref => ({
+        id: ref.id,
+        type: ref.reference_type || null,
+        citationFull: ref.citation_full || null,
+        citationShort: ref.citation_short || null,
+        authors: ref.authors || null,
+        year: ref.year || null,
+        title: ref.title || null,
+        sourceName: ref.source_name || null,
+        url: ref.url || null,
+        doi: ref.doi || null
+      }));
     })()
   };
 }
@@ -788,10 +849,20 @@ export async function getTurtleData(slug: string) {
 
     return {
       ...profileData,
+      stats: {
+        ...profileData.stats,
+        // For now, show family common name as the "Category" in At a Glance
+        category: taxonomyData?.family.common || 'Unknown'
+      },
       taxonomy: taxonomyData
     };
   } catch (error) {
     console.error('Error in getTurtleData:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     throw error;
   }
 }

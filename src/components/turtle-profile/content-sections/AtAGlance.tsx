@@ -13,6 +13,10 @@ import {
 
 interface TurtleAtAGlanceProps {
   description: string;
+  limitedInformation?: {
+    showWarning: boolean;
+    description: string;
+  };
   conservationStatus: {
     status: string;
     code: string;
@@ -88,6 +92,7 @@ const getConservationStatusColor = (code: string) => {
 
 export default function TurtleAtAGlance({
   description,
+  limitedInformation,
   conservationStatus,
   stats,
   commonNames,
@@ -121,6 +126,25 @@ export default function TurtleAtAGlance({
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {description}
             </ReactMarkdown>
+            
+            {/* Limited Information Warning */}
+            {limitedInformation?.showWarning && (
+              <div className="mt-6 p-4 bg-gray-900/10 border border-gray-900/30 rounded-lg flex gap-3 shadow-sm">
+                <div className="flex-shrink-0 -mt-0.5">
+                  <Icon
+                    name="warning"
+                    style="filled"
+                    size="base"
+                    className="text-orange-500"
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm md:text-base text-gray-800 leading-relaxed">
+                    {limitedInformation.description}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Empty column - hidden on mobile */}

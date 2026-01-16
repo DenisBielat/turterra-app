@@ -180,10 +180,10 @@ export default function MobileProfileNavigation({
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
               aria-label="Close navigation"
             >
-              <X className="h-5 w-5 text-gray-600" />
+              <X className="h-4 w-4 text-gray-600" />
             </button>
 
             {/* Profile Header */}
@@ -247,22 +247,22 @@ export default function MobileProfileNavigation({
               pointerEvents: isFlipped ? 'auto' : 'none'
             }}
           >
-            {/* Flip Back Button */}
+            {/* Flip Back Button - positioned at right-4 so it appears on LEFT after rotateY(180deg) mirror */}
             <button
               onClick={handleFlipBack}
-              className="absolute top-4 left-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
               aria-label="Back to navigation"
             >
-              <RotateCcw className="h-5 w-5 text-gray-600" />
+              <RotateCcw className="h-4 w-4 text-gray-600" />
             </button>
 
-            {/* Close Button */}
+            {/* Close Button - positioned at left-4 so it appears on RIGHT after rotateY(180deg) mirror */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10"
+              className="absolute top-4 left-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors z-10 flex items-center justify-center"
               aria-label="Close"
             >
-              <X className="h-5 w-5 text-gray-600" />
+              <X className="h-4 w-4 text-gray-600" />
             </button>
 
             {/* Taxonomy Content */}

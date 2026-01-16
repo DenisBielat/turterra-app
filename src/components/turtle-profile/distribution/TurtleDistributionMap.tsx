@@ -339,75 +339,114 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
     });
   }, [speciesData]);
 
-  // Ensure proper layer ordering: Sightings (top) > Range Maps > Species Shapes (bottom)
+  // Ensure proper layer ordering: Species Shapes (bottom) > Range Maps > Sightings (top)
   useEffect(() => {
     const map = mapRef.current?.getMap();
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map) return;
 
     const reorderLayers = () => {
+      if (!map.isStyleLoaded()) return;
+
       try {
-        // Get all layers that exist
-        const speciesLayerIds = speciesData
+        // Desired order from bottom to top:
+        // 1. Species distribution layers (country/state fills)
+        // 2. Range map layers (IUCN range polygons)
+        // 3. Sightings layer (iNaturalist points)
+
+        // Get all our layer IDs that currently exist
+        const speciesFillIds = speciesData
           .map(species => `species-${species.speciesId}-fill`)
           .filter(id => map.getLayer(id));
 
-        const rangeLayerIds = rangeMapData.flatMap(rangeData => [
-          `range-${rangeData.speciesId}-fill`,
-          `range-${rangeData.speciesId}-line`,
-          `range-${rangeData.speciesId}-linestring`
-        ]).filter(id => map.getLayer(id));
+        const rangeFillIds = rangeMapData
+          .map(range => `range-${range.speciesId}-fill`)
+          .filter(id => map.getLayer(id));
+
+        const rangeLineIds = rangeMapData
+          .map(range => `range-${range.speciesId}-line`)
+          .filter(id => map.getLayer(id));
+
+        const rangeLinestringIds = rangeMapData
+          .map(range => `range-${range.speciesId}-linestring`)
+          .filter(id => map.getLayer(id));
 
         const hasSightings = map.getLayer('inat-sightings');
 
-        // Step 1: Ensure species layers are at the bottom
-        // Move them before any range layers or sightings
-        const referenceLayer = rangeLayerIds[0] || (hasSightings ? 'inat-sightings' : null);
-        if (referenceLayer) {
-          speciesLayerIds.forEach((layerId) => {
-            try {
-              map.moveLayer(layerId, referenceLayer);
-            } catch {}
-          });
+        // Move sightings to the very top first
+        if (hasSightings) {
+          map.moveLayer('inat-sightings');
         }
 
-        // Step 2: Move range layers above species, but below sightings
-        if (hasSightings) {
-          // Move range layers before sightings (so sightings stay on top)
-          rangeLayerIds.reverse().forEach((layerId) => { // Reverse to maintain order
-            try {
-              map.moveLayer(layerId, 'inat-sightings');
-            } catch {}
-          });
-        } else {
-          // No sightings, so range layers go to top
-          rangeLayerIds.forEach((layerId) => {
-            try {
-              map.moveLayer(layerId);
-            } catch {}
-          });
-        }
+        // Move range linestring layers below sightings (or to top if no sightings)
+        rangeLinestringIds.forEach(id => {
+          if (hasSightings) {
+            map.moveLayer(id, 'inat-sightings');
+          } else {
+            map.moveLayer(id);
+          }
+        });
 
-        // Step 3: Move sightings to the very top (last operation)
-        if (hasSightings) {
-          try {
-            map.moveLayer('inat-sightings');
-          } catch {}
-        }
+        // Move range line layers below linestrings
+        const topRangeLinestring = rangeLinestringIds[0];
+        rangeLineIds.forEach(id => {
+          if (topRangeLinestring) {
+            map.moveLayer(id, topRangeLinestring);
+          } else if (hasSightings) {
+            map.moveLayer(id, 'inat-sightings');
+          } else {
+            map.moveLayer(id);
+          }
+        });
+
+        // Move range fill layers below range lines
+        const topRangeLine = rangeLineIds[0] || topRangeLinestring;
+        rangeFillIds.forEach(id => {
+          if (topRangeLine) {
+            map.moveLayer(id, topRangeLine);
+          } else if (hasSightings) {
+            map.moveLayer(id, 'inat-sightings');
+          } else {
+            map.moveLayer(id);
+          }
+        });
+
+        // Move species layers to be below range layers
+        const topRangeLayer = rangeFillIds[0] || topRangeLine || topRangeLinestring;
+        speciesFillIds.forEach(id => {
+          if (topRangeLayer) {
+            map.moveLayer(id, topRangeLayer);
+          } else if (hasSightings) {
+            map.moveLayer(id, 'inat-sightings');
+          }
+          // If no range or sightings, species stays where it is
+        });
       } catch {
         // Layers might not all exist yet, will retry
       }
     };
 
-    // Run immediately and with delays to catch all layer additions
-    reorderLayers();
-    const timeout1 = setTimeout(reorderLayers, 300);
-    const timeout2 = setTimeout(reorderLayers, 700);
-    const timeout3 = setTimeout(reorderLayers, 1200);
+    // Listen for the 'idle' event which fires after all rendering is complete
+    const onIdle = () => {
+      reorderLayers();
+    };
+
+    // Also run on sourcedata events to catch when new sources are loaded
+    const onSourceData = () => {
+      // Small delay to ensure layers are created from the source
+      setTimeout(reorderLayers, 50);
+    };
+
+    map.on('idle', onIdle);
+    map.on('sourcedata', onSourceData);
+
+    // Run immediately in case map is already idle
+    if (map.isStyleLoaded()) {
+      reorderLayers();
+    }
 
     return () => {
-      clearTimeout(timeout1);
-      clearTimeout(timeout2);
-      clearTimeout(timeout3);
+      map.off('idle', onIdle);
+      map.off('sourcedata', onSourceData);
     };
   }, [rangeMapData, speciesData, iNatObservations, activeLayers]);
 
