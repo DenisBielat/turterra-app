@@ -17,7 +17,10 @@ export interface Variant {
   
   export interface ConservationHistory {
     year_status_assigned: string;
+    out_of_date?: boolean | null;
+    out_of_date_description?: string | null;
     conservation_statuses: ConservationStatus;
+    self_assigned_status?: ConservationStatus | null;
   }
   
   export interface PopulationHistory {
@@ -186,6 +189,8 @@ export interface Variant {
       status: string;
       code: string;
       year: number;
+      outOfDate?: boolean;
+      outOfDateDescription?: string;
     };
     stats: {
       population: string;
