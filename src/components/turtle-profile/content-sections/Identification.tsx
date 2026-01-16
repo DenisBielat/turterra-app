@@ -23,7 +23,7 @@ interface IdentificationProps {
         value: number | null;
         unit: 'cm' | 'in';
       };
-      generallyLarger: 'female' | 'male' | 'equal' | null;
+      generallyLarger: 'female' | 'male' | 'equal' | 'unknown' | null;
     };
     lifespan: {
       wild: string;
@@ -283,7 +283,9 @@ export default function Identification({
                     ? 'The male is generally larger than the female.'
                     : measurements.length.generallyLarger === 'equal'
                     ? 'Both sexes are about the same in length.'
-                    : 'The female is generally larger than the male.'}
+                    : measurements.length.generallyLarger === 'unknown'
+                    ? 'It is unknown whether there is a significant size difference between the sexes.'
+                    : null}
                 </p>
               </div>
 

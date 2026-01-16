@@ -66,7 +66,7 @@ export interface Variant {
     adult_weight: number | null;
     length_female_max_scl: number | null;
     length_male_max_scl: number | null;
-    generally_larger: 'female' | 'male' | 'equal' | null;
+    generally_larger: 'female' | 'male' | 'equal' | 'unknown' | null;
     lifespan_wild_min: number | null;
     lifespan_wild_max: number | null;
     lifespan_captivity_min: number | null;
@@ -218,7 +218,7 @@ export interface Variant {
           value: number | null;
           unit: 'cm' | 'in';
         };
-        generallyLarger: 'female' | 'male' | 'equal' | null;
+        generallyLarger: 'female' | 'male' | 'equal' | 'unknown' | null;
       };
       lifespan: { wild: string; captivity: string };
     };

@@ -677,7 +677,9 @@ function transformTurtleDataToProfile(
             value: measurementData.length_male_max_scl,
             unit: 'cm' as const
           },
-          generallyLarger: measurementData.generally_larger || null
+          generallyLarger: measurementData.generally_larger 
+            ? (measurementData.generally_larger.toLowerCase() as 'female' | 'male' | 'equal' | 'unknown')
+            : null
         },
         lifespan: {
           wild: measurementData.lifespan_wild_max

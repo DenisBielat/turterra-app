@@ -226,21 +226,25 @@ export default function TurtleAtAGlance({
               ))}
             </div>
 
-            {/* Common Names Section */}
-            <div className="space-y-3">
-              <h3 className="font-bold text-base md:text-lg">Other Names People Call Me</h3>
-              <div className="h-px border-b border-gray-200" />
-              <div className="flex flex-wrap gap-2">
-                {commonNames.map((name, index) => (
-                  <span
-                    key={index}
-                    className="rounded-sm bg-green-900/20 px-3 py-1 text-sm"
-                  >
-                    {name}
-                  </span>
-                ))}
+            {/* Common Names Section - only show if there are common names */}
+            {commonNames && commonNames.length > 0 && commonNames.some(name => name && name.trim()) && (
+              <div className="space-y-3">
+                <h3 className="font-bold text-base md:text-lg">Other Names People Call Me</h3>
+                <div className="h-px border-b border-gray-200" />
+                <div className="flex flex-wrap gap-2">
+                  {commonNames.map((name, index) => (
+                    name && name.trim() && (
+                      <span
+                        key={index}
+                        className="rounded-sm bg-green-900/20 px-3 py-1 text-sm"
+                      >
+                        {name}
+                      </span>
+                    )
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
