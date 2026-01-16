@@ -77,11 +77,11 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
         year_status_assigned,
         out_of_date,
         out_of_date_description,
-        conservation_statuses(
+        conservation_statuses!turtle_species_conservation_conservation_status_fkey(
           status,
           abbreviation
         ),
-        self_assigned_status:self_assigned_conservation_status(
+        self_assigned_status:conservation_statuses!turtle_species_conservation_h_self_assigned_conservation_s_fkey(
           status,
           abbreviation
         )
