@@ -163,7 +163,7 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
       avatar_image_circle_url,
       turtle_species_conservation_history(
         year_status_assigned,
-        conservation_statuses(
+        conservation_statuses!turtle_species_conservation_conservation_status_fkey(
           status,
           abbreviation
         )
