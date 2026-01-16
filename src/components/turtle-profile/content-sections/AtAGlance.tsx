@@ -163,7 +163,7 @@ export default function TurtleAtAGlance({
                             />
                           </span>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-xs">
+                        <TooltipContent side="top" className="max-w-xs bg-white/100">
                           <p className="text-sm">{conservationStatus.outOfDateDescription}</p>
                         </TooltipContent>
                       </Tooltip>
