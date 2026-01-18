@@ -174,17 +174,38 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
                       };
 
+                      // Helper function to format life stages - replace underscores with spaces and capitalize each word
+                      // Keeps conjunctions and prepositions lowercase (unless first word)
+                      const formatLifeStage = (str: string) => {
+                        if (!str) return "";
+                        // Words that should remain lowercase in title case (unless first word)
+                        const lowercaseWords = ['and', 'or', 'nor', 'but', 'a', 'an', 'the', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'per', 'to'];
+                        
+                        return str
+                          .replace(/_/g, ' ')
+                          .split(' ')
+                          .map((word, index) => {
+                            const lowerWord = word.toLowerCase();
+                            // Always capitalize first word, otherwise check if it should be lowercase
+                            if (index === 0 || !lowercaseWords.includes(lowerWord)) {
+                              return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                            }
+                            return lowerWord;
+                          })
+                          .join(' ');
+                      };
+
                       const parts: string[] = [];
                       
                       // Format life stages with proper capitalization
                       if (image.metadata.life_stages_descriptor && image.metadata.pictured_life_stages) {
-                        // If descriptor exists: capitalize descriptor, lowercase life stage
+                        // If descriptor exists: capitalize descriptor, format life stage (replace underscores, preserve case)
                         const descriptor = capitalize(image.metadata.life_stages_descriptor);
-                        const lifeStage = image.metadata.pictured_life_stages.toLowerCase();
+                        const lifeStage = formatLifeStage(image.metadata.pictured_life_stages);
                         parts.push(`${descriptor} ${lifeStage}`);
                       } else if (image.metadata.pictured_life_stages) {
-                        // If no descriptor: capitalize life stage
-                        parts.push(capitalize(image.metadata.pictured_life_stages));
+                        // If no descriptor: format life stage (replace underscores, preserve case)
+                        parts.push(formatLifeStage(image.metadata.pictured_life_stages));
                       } else if (image.metadata.life_stages_descriptor) {
                         // Only descriptor, no life stage
                         parts.push(capitalize(image.metadata.life_stages_descriptor));
