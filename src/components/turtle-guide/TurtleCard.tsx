@@ -10,6 +10,7 @@ interface TurtleCardProps {
   familyCommon: string | null;
   slug: string;
   imageUrl: string | null;
+  avatarUrl?: string | null;
   description?: string | null;
   conservationStatus: {
     code: string;
@@ -65,13 +66,16 @@ export default function TurtleCard({
   familyCommon,
   slug,
   imageUrl,
+  avatarUrl,
   description,
   conservationStatus,
   habitats = [],
   viewMode = 'grid'
 }: TurtleCardProps) {
   const [imgSrc, setImgSrc] = useState(imageUrl || PLACEHOLDER_IMAGE);
+  const [listImgSrc, setListImgSrc] = useState(avatarUrl || imageUrl || PLACEHOLDER_IMAGE);
   const [imgError, setImgError] = useState(false);
+  const [listImgError, setListImgError] = useState(false);
 
   const handleImageError = () => {
     if (!imgError) {
@@ -80,31 +84,38 @@ export default function TurtleCard({
     }
   };
 
-  // List view - Audubon style with separated rounded image, description, and details
+  const handleListImageError = () => {
+    if (!listImgError) {
+      setListImgError(true);
+      setListImgSrc(PLACEHOLDER_IMAGE);
+    }
+  };
+
+  // List view - Audubon style with circular image, description, and details
   if (viewMode === 'list') {
     return (
       <Link
         href={`/turtle-guide/${slug}`}
-        className="group block bg-green-900/50 rounded-2xl hover:bg-green-900/70 transition-all duration-300 border border-green-800/50 hover:border-green-700/50 p-4"
+        className="group block bg-green-900/50 rounded-2xl hover:bg-green-900/70 transition-all duration-300 border border-green-800/50 hover:border-green-700/50 p-5"
       >
-        <div className="flex flex-col md:flex-row gap-5">
-          {/* Image - larger rounded square, separated from edges */}
-          <div className="relative w-full md:w-44 lg:w-52 aspect-square flex-shrink-0 rounded-xl overflow-hidden bg-green-800">
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Image - circular avatar */}
+          <div className="relative w-40 h-40 md:w-44 md:h-44 flex-shrink-0 rounded-full overflow-hidden bg-green-800 mx-auto md:mx-0">
             <Image
-              src={imgSrc}
+              src={listImgSrc}
               alt={commonName}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 768px) 100vw, 208px"
-              onError={handleImageError}
-              unoptimized={imgSrc === PLACEHOLDER_IMAGE}
+              sizes="176px"
+              onError={handleListImageError}
+              unoptimized={listImgSrc === PLACEHOLDER_IMAGE}
             />
           </div>
 
           {/* Content area */}
           <div className="flex flex-col lg:flex-row flex-1 gap-6">
             {/* Left content - Name and At a Glance description */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 lg:max-w-md">
               {/* Name */}
               <h3 className="font-heading font-bold text-white text-2xl group-hover:text-green-400 transition-colors">
                 {commonName}
@@ -121,7 +132,7 @@ export default function TurtleCard({
                   <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-2">
                     At a Glance
                   </p>
-                  <p className="text-gray-300 text-sm leading-relaxed line-clamp-4">
+                  <p className="text-gray-300 text-base leading-relaxed line-clamp-4">
                     {stripMarkdown(description)}
                   </p>
                 </div>
@@ -129,14 +140,14 @@ export default function TurtleCard({
             </div>
 
             {/* Right content - Conservation and Habitat */}
-            <div className="lg:w-64 flex-shrink-0 space-y-4">
+            <div className="lg:w-72 flex-shrink-0 space-y-4">
               {/* Conservation Status */}
               {conservationStatus && (
                 <div>
                   <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
                     Conservation Status
                   </p>
-                  <p className="text-gray-300 text-sm">
+                  <p className="text-gray-300 text-base">
                     {conservationStatus.status}
                   </p>
                 </div>
@@ -148,7 +159,7 @@ export default function TurtleCard({
                   <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
                     Habitat
                   </p>
-                  <p className="text-gray-300 text-sm line-clamp-3">
+                  <p className="text-gray-300 text-base line-clamp-3">
                     {habitats.join(', ')}
                   </p>
                 </div>

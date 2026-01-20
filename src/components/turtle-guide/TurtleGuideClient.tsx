@@ -161,6 +161,7 @@ export default function TurtleGuideClient({
                 familyCommon={turtle.familyCommon}
                 slug={turtle.slug}
                 imageUrl={turtle.imageUrl}
+                avatarUrl={turtle.avatarUrl}
                 description={turtle.description}
                 conservationStatus={turtle.conservationStatus}
                 habitats={turtle.habitats}
