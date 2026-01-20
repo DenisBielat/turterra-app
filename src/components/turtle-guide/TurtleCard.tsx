@@ -194,9 +194,9 @@ export default function TurtleCard({
           {commonName}
         </h3>
 
-        {/* Scientific name - slides up on hover */}
+        {/* Scientific name - visible by default */}
         {scientificName && (
-          <p className="text-gray-400 text-sm italic mt-1 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+          <p className="text-gray-400 text-sm italic mt-1">
             {scientificName}
           </p>
         )}
