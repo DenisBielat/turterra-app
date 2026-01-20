@@ -169,7 +169,7 @@ export default async function TurtleGuidePage() {
   const { turtles, filters } = await getTurtleGuideData();
 
   return (
-    <main className="min-h-screen bg-green-950">
+    <main className="min-h-screen bg-green-950 overflow-x-hidden">
       {/* Hero Section */}
       <section className="bg-green-950 pt-16 md:pt-20 pb-12 px-4 lg:px-10">
         <div className="max-w-8xl mx-auto text-center">

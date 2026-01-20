@@ -115,7 +115,8 @@ export default function TurtleGuideClient({
         return 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3';
       case 'grid':
       default:
-        return 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6';
+        // 3 columns max for landscape cards
+        return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
     }
   };
 

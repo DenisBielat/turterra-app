@@ -138,11 +138,11 @@ export default function TurtleCard({
     );
   }
 
-  // Default grid view - largest cards, no conservation badge
+  // Default grid view - landscape cards, no conservation badge
   return (
     <Link
       href={`/turtle-guide/${slug}`}
-      className="group relative block aspect-[4/5] rounded-2xl overflow-hidden bg-green-900"
+      className="group relative block aspect-[16/10] rounded-2xl overflow-hidden bg-green-900"
     >
       {/* Image */}
       <Image
@@ -150,7 +150,7 @@ export default function TurtleCard({
         alt={commonName}
         fill
         className="object-cover group-hover:scale-105 transition-transform duration-300"
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         onError={handleImageError}
         unoptimized={imgSrc === PLACEHOLDER_IMAGE}
       />
