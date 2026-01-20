@@ -253,8 +253,8 @@ export default function TurtleCard({
         </span>
       )}
 
-      {/* Gradient overlay - stronger for reliable text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+      {/* Gradient overlay - lighter for brighter images, concentrated at bottom for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
       {/* Content at bottom */}
       <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
