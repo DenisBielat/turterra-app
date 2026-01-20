@@ -115,14 +115,14 @@ export default function TurtleCard({
     return (
       <Link
         href={`/turtle-guide/${slug}`}
-        className="group relative block aspect-square rounded-xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/30 hover:scale-[1.02]"
+        className="group relative block aspect-square rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-xl hover:shadow-black/30 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02]"
       >
         {/* Image with separate scale */}
         <Image
           src={imgSrc}
           alt={commonName}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          className="object-cover transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-110"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           onError={handleImageError}
           unoptimized={imgSrc === PLACEHOLDER_IMAGE}
@@ -157,14 +157,14 @@ export default function TurtleCard({
   return (
     <Link
       href={`/turtle-guide/${slug}`}
-      className="group relative block aspect-[4/3] rounded-xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40 hover:scale-[1.02]"
+      className="group relative block aspect-[4/3] rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02]"
     >
       {/* Image with separate scale for parallax effect */}
       <Image
         src={imgSrc}
         alt={commonName}
         fill
-        className="object-cover group-hover:scale-110 transition-transform duration-500"
+        className="object-cover transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-110"
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         onError={handleImageError}
         unoptimized={imgSrc === PLACEHOLDER_IMAGE}
