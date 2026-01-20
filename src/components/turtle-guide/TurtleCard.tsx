@@ -105,7 +105,7 @@ export default function TurtleCard({
     return (
       <Link
         href={`/turtle-guide/${slug}`}
-        className="group relative block aspect-square rounded-lg overflow-hidden bg-green-900"
+        className="group relative block aspect-square rounded-2xl overflow-hidden bg-green-900"
       >
         {/* Image */}
         <Image
@@ -118,7 +118,7 @@ export default function TurtleCard({
           unoptimized={imgSrc === PLACEHOLDER_IMAGE}
         />
 
-        {/* Conservation Badge */}
+        {/* Conservation Badge - shown on compact view */}
         {conservationStatus && (
           <span className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-white text-xs font-semibold z-10 ${getConservationBadgeColor(conservationStatus.code)}`}>
             {conservationStatus.status}
@@ -138,11 +138,11 @@ export default function TurtleCard({
     );
   }
 
-  // Default grid view
+  // Default grid view - largest cards, no conservation badge
   return (
     <Link
       href={`/turtle-guide/${slug}`}
-      className="group relative block aspect-[4/5] rounded-lg overflow-hidden bg-green-900"
+      className="group relative block aspect-[4/5] rounded-2xl overflow-hidden bg-green-900"
     >
       {/* Image */}
       <Image
@@ -154,13 +154,6 @@ export default function TurtleCard({
         onError={handleImageError}
         unoptimized={imgSrc === PLACEHOLDER_IMAGE}
       />
-
-      {/* Conservation Badge */}
-      {conservationStatus && (
-        <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-white text-xs font-semibold z-10 ${getConservationBadgeColor(conservationStatus.code)}`}>
-          {conservationStatus.status}
-        </span>
-      )}
 
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

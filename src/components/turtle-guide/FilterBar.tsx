@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +26,9 @@ interface FilterBarProps {
   onClearFilters: () => void;
   hasActiveFilters: boolean;
 }
+
+// Common classes for select items with proper hover/highlight contrast
+const selectItemClasses = "text-white hover:!bg-green-800 focus:!bg-green-800 focus:!text-white data-[highlighted]:!bg-green-800 data-[highlighted]:!text-white";
 
 export default function FilterBar({
   searchQuery,
@@ -79,14 +82,14 @@ export default function FilterBar({
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="bg-green-950 border-green-800">
-              <SelectItem value="all" className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white">
+              <SelectItem value="all" className={selectItemClasses}>
                 All
               </SelectItem>
               {families.map((family) => (
                 <SelectItem
                   key={family.scientific}
                   value={family.scientific}
-                  className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white"
+                  className={selectItemClasses}
                 >
                   {family.common}
                 </SelectItem>
@@ -105,14 +108,14 @@ export default function FilterBar({
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="bg-green-950 border-green-800">
-              <SelectItem value="all" className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white">
+              <SelectItem value="all" className={selectItemClasses}>
                 All
               </SelectItem>
               {habitats.map((habitat) => (
                 <SelectItem
                   key={habitat}
                   value={habitat}
-                  className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white"
+                  className={selectItemClasses}
                 >
                   {habitat}
                 </SelectItem>
@@ -131,14 +134,14 @@ export default function FilterBar({
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent className="bg-green-950 border-green-800">
-              <SelectItem value="all" className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white">
+              <SelectItem value="all" className={selectItemClasses}>
                 All
               </SelectItem>
               {regions.map((region) => (
                 <SelectItem
                   key={region}
                   value={region}
-                  className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white"
+                  className={selectItemClasses}
                 >
                   {region}
                 </SelectItem>
@@ -147,7 +150,7 @@ export default function FilterBar({
           </Select>
         </div>
 
-        {/* Search Button and Advanced Filters */}
+        {/* Search Button */}
         <div className="lg:col-span-2 flex items-end gap-2">
           <Button
             className="flex-1 h-11 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg"
@@ -167,14 +170,6 @@ export default function FilterBar({
               <X className="h-5 w-5" />
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-11 w-11 text-gray-400 hover:text-white hover:bg-green-900"
-            title="Advanced filters"
-          >
-            <SlidersHorizontal className="h-5 w-5" />
-          </Button>
         </div>
       </div>
     </div>
