@@ -91,81 +91,102 @@ export default function TurtleCard({
     }
   };
 
-  // List view - Audubon style with circular image, description, and details
+  // List view - CSS Grid layout matching reference design
   if (viewMode === 'list') {
     return (
       <Link
         href={`/turtle-guide/${slug}`}
         className="group block bg-green-900/50 rounded-2xl hover:bg-green-900/70 transition-all duration-300 border border-green-800/50 hover:border-green-700/50 p-5"
+        style={{
+          fontSize: '18px',
+          lineHeight: '28px',
+          letterSpacing: '0.01em',
+          color: '#E5E2DE',
+          boxSizing: 'border-box',
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: '16px',
+          transition: 'opacity 0.5s, transform 0.5s, height 0.5s'
+        }}
       >
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Image - circular avatar */}
-          <div className="relative w-40 h-40 md:w-44 md:h-44 flex-shrink-0 rounded-full overflow-hidden bg-green-800 mx-auto md:mx-0">
+        <div
+          className="grid items-start"
+          style={{
+            display: 'grid',
+            alignItems: 'start',
+            gap: '10px 20px',
+            gridTemplateColumns: '1fr 2fr 2fr',
+            gridTemplateAreas: '"media content status" "media description habitats"'
+          }}
+        >
+          {/* Image - circular in media grid area */}
+          <div
+            className="relative rounded-full overflow-hidden bg-green-900/50"
+            style={{
+              gridArea: 'media',
+              width: '100%',
+              height: 'auto',
+              aspectRatio: '1 / 1'
+            }}
+          >
             <Image
               src={listImgSrc}
               alt={commonName}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="176px"
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 200px"
               onError={handleListImageError}
               unoptimized={listImgSrc === PLACEHOLDER_IMAGE}
             />
           </div>
 
-          {/* Content area */}
-          <div className="flex flex-col lg:flex-row flex-1 gap-6">
-            {/* Left content - Name and At a Glance description */}
-            <div className="flex-1 min-w-0 lg:max-w-md">
-              {/* Name */}
-              <h3 className="font-heading font-bold text-white text-2xl group-hover:text-green-400 transition-colors">
-                {commonName}
-              </h3>
-              {scientificName && (
-                <p className="text-gray-400 text-base italic mt-1">
-                  {scientificName}
-                </p>
-              )}
-
-              {/* At a Glance description */}
-              {description && (
-                <div className="mt-4">
-                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-2">
-                    At a Glance
-                  </p>
-                  <p className="text-gray-300 text-base leading-relaxed line-clamp-4">
-                    {stripMarkdown(description)}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Right content - Conservation and Habitat */}
-            <div className="lg:w-72 flex-shrink-0 space-y-4">
-              {/* Conservation Status */}
-              {conservationStatus && (
-                <div>
-                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
-                    Conservation Status
-                  </p>
-                  <p className="text-gray-300 text-base">
-                    {conservationStatus.status}
-                  </p>
-                </div>
-              )}
-
-              {/* Habitat */}
-              {habitats.length > 0 && (
-                <div>
-                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
-                    Habitat
-                  </p>
-                  <p className="text-gray-300 text-base line-clamp-3">
-                    {habitats.join(', ')}
-                  </p>
-                </div>
-              )}
-            </div>
+          {/* Content area - Name and Scientific Name */}
+          <div style={{ gridArea: 'content' }}>
+            <h3 className="font-heading font-bold text-white text-2xl group-hover:text-green-400 transition-colors">
+              {commonName}
+            </h3>
+            {scientificName && (
+              <p className="text-gray-400 text-base italic mt-1">
+                {scientificName}
+              </p>
+            )}
           </div>
+
+          {/* Conservation Status */}
+          {conservationStatus && (
+            <div style={{ gridArea: 'status' }}>
+              <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
+                Conservation Status
+              </p>
+              <p className="text-gray-300 text-base">
+                {conservationStatus.status}
+              </p>
+            </div>
+          )}
+
+          {/* At a Glance description */}
+          {description && (
+            <div style={{ gridArea: 'description' }}>
+              <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-2">
+                At a Glance
+              </p>
+              <p className="text-gray-300 text-base leading-relaxed line-clamp-4">
+                {stripMarkdown(description)}
+              </p>
+            </div>
+          )}
+
+          {/* Habitat */}
+          {habitats.length > 0 && (
+            <div style={{ gridArea: 'habitats' }}>
+              <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
+                Habitat
+              </p>
+              <p className="text-gray-300 text-base line-clamp-3">
+                {habitats.join(', ')}
+              </p>
+            </div>
+          )}
         </div>
       </Link>
     );
