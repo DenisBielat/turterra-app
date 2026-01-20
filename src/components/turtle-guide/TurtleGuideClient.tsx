@@ -31,7 +31,6 @@ export default function TurtleGuideClient({
   // Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFamily, setSelectedFamily] = useState('all');
-  const [selectedHabitat, setSelectedHabitat] = useState('all');
   const [selectedRegion, setSelectedRegion] = useState('all');
 
   // View state
@@ -41,14 +40,12 @@ export default function TurtleGuideClient({
   // Check if any filters are active
   const hasActiveFilters = searchQuery !== '' ||
     selectedFamily !== 'all' ||
-    selectedHabitat !== 'all' ||
     selectedRegion !== 'all';
 
   // Clear all filters
   const handleClearFilters = () => {
     setSearchQuery('');
     setSelectedFamily('all');
-    setSelectedHabitat('all');
     setSelectedRegion('all');
   };
 
@@ -69,13 +66,6 @@ export default function TurtleGuideClient({
     if (selectedFamily !== 'all') {
       result = result.filter(turtle =>
         turtle.familyScientific === selectedFamily
-      );
-    }
-
-    // Filter by habitat
-    if (selectedHabitat !== 'all') {
-      result = result.filter(turtle =>
-        turtle.habitats.includes(selectedHabitat)
       );
     }
 
@@ -104,13 +94,13 @@ export default function TurtleGuideClient({
     }
 
     return result;
-  }, [initialTurtles, searchQuery, selectedFamily, selectedHabitat, selectedRegion, sortOption]);
+  }, [initialTurtles, searchQuery, selectedFamily, selectedRegion, sortOption]);
 
   // Grid classes based on view mode
   const getGridClasses = () => {
     switch (viewMode) {
       case 'list':
-        return 'flex flex-col gap-4';
+        return 'flex flex-col gap-6';
       case 'grid':
       default:
         // 3 columns max for landscape cards with extra breathing room
@@ -126,15 +116,10 @@ export default function TurtleGuideClient({
         onSearchChange={setSearchQuery}
         selectedFamily={selectedFamily}
         onFamilyChange={setSelectedFamily}
-        selectedHabitat={selectedHabitat}
-        onHabitatChange={setSelectedHabitat}
         selectedRegion={selectedRegion}
         onRegionChange={setSelectedRegion}
         families={filters.families}
-        habitats={filters.habitats}
         regions={filters.regions}
-        onClearFilters={handleClearFilters}
-        hasActiveFilters={hasActiveFilters}
       />
 
       {/* Results Bar */}
@@ -159,6 +144,7 @@ export default function TurtleGuideClient({
               slug={turtle.slug}
               imageUrl={turtle.imageUrl}
               conservationStatus={turtle.conservationStatus}
+              habitats={turtle.habitats}
               viewMode={viewMode}
             />
           ))}
@@ -166,12 +152,14 @@ export default function TurtleGuideClient({
       ) : (
         <div className="text-center py-16">
           <p className="text-gray-400 text-lg">No turtles found matching your criteria.</p>
-          <button
-            onClick={handleClearFilters}
-            className="mt-4 text-green-500 hover:text-green-400 underline"
-          >
-            Clear all filters
-          </button>
+          {hasActiveFilters && (
+            <button
+              onClick={handleClearFilters}
+              className="mt-4 text-green-500 hover:text-green-400 underline"
+            >
+              Clear all filters
+            </button>
+          )}
         </div>
       )}
     </div>

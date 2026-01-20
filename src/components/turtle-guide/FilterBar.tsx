@@ -16,15 +16,10 @@ interface FilterBarProps {
   onSearchChange: (value: string) => void;
   selectedFamily: string;
   onFamilyChange: (value: string) => void;
-  selectedHabitat: string;
-  onHabitatChange: (value: string) => void;
   selectedRegion: string;
   onRegionChange: (value: string) => void;
   families: Array<{ common: string; scientific: string }>;
-  habitats: string[];
   regions: string[];
-  onClearFilters: () => void;
-  hasActiveFilters: boolean;
 }
 
 // Common classes for select items with proper hover/highlight contrast
@@ -35,12 +30,9 @@ export default function FilterBar({
   onSearchChange,
   selectedFamily,
   onFamilyChange,
-  selectedHabitat,
-  onHabitatChange,
   selectedRegion,
   onRegionChange,
   families,
-  habitats,
   regions,
 }: FilterBarProps) {
   return (
@@ -95,47 +87,6 @@ export default function FilterBar({
                   className={selectItemClasses}
                 >
                   {family.common}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="hidden lg:block w-px h-12 bg-green-700/50" />
-
-      {/* Habitat Filter */}
-      <div className="flex-1 min-w-0 px-2 lg:px-4 py-2 lg:py-0">
-        <div className="flex flex-col">
-          <label className="text-gray-400 text-xs font-medium mb-1">
-            Habitat
-          </label>
-          <Select value={selectedHabitat} onValueChange={onHabitatChange}>
-            <SelectTrigger className="h-8 bg-transparent text-white border-0 focus:ring-0 p-0 text-base [&>svg]:hidden">
-              <div className="flex items-center gap-1">
-                <SelectValue placeholder="All" />
-                <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
-              </div>
-            </SelectTrigger>
-            <SelectContent
-              className="bg-green-950 border-green-800 max-h-[300px]"
-              position="popper"
-              sideOffset={8}
-              align="start"
-              avoidCollisions={true}
-              collisionPadding={16}
-            >
-              <SelectItem value="all" className={selectItemClasses}>
-                All
-              </SelectItem>
-              {habitats.map((habitat) => (
-                <SelectItem
-                  key={habitat}
-                  value={habitat}
-                  className={selectItemClasses}
-                >
-                  {habitat}
                 </SelectItem>
               ))}
             </SelectContent>

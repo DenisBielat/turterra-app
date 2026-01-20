@@ -14,7 +14,8 @@ interface TurtleCardProps {
     code: string;
     status: string;
   } | null;
-  viewMode?: 'grid' | 'compact' | 'list';
+  habitats?: string[];
+  viewMode?: 'grid' | 'list';
 }
 
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
@@ -53,6 +54,7 @@ export default function TurtleCard({
   slug,
   imageUrl,
   conservationStatus,
+  habitats = [],
   viewMode = 'grid'
 }: TurtleCardProps) {
   const [imgSrc, setImgSrc] = useState(imageUrl || PLACEHOLDER_IMAGE);
@@ -65,89 +67,81 @@ export default function TurtleCard({
     }
   };
 
+  // List view - Audubon style with image left, content middle, details right
   if (viewMode === 'list') {
     return (
       <Link
         href={`/turtle-guide/${slug}`}
-        className="group flex items-center gap-4 p-4 bg-green-900/50 rounded-xl hover:bg-green-900 transition-all duration-300 border border-green-800/50 hover:border-green-700/50 hover:shadow-lg hover:shadow-green-950/50"
+        className="group block bg-green-900/50 rounded-2xl overflow-hidden hover:bg-green-900/70 transition-all duration-300 border border-green-800/50 hover:border-green-700/50"
       >
-        {/* Image */}
-        <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-green-800">
-          <Image
-            src={imgSrc}
-            alt={commonName}
-            fill
-            className="object-cover group-hover:scale-110 transition-transform duration-300"
-            sizes="64px"
-            onError={handleImageError}
-            unoptimized={imgSrc === PLACEHOLDER_IMAGE}
-          />
-        </div>
+        <div className="flex flex-col md:flex-row">
+          {/* Image - larger square on left */}
+          <div className="relative w-full md:w-48 lg:w-56 aspect-square md:aspect-auto md:h-auto flex-shrink-0 bg-green-800">
+            <Image
+              src={imgSrc}
+              alt={commonName}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, 224px"
+              onError={handleImageError}
+              unoptimized={imgSrc === PLACEHOLDER_IMAGE}
+            />
+          </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {familyCommon && (
-            <p className="text-green-500 text-xs font-semibold uppercase tracking-wider mb-0.5">
-              {familyCommon}
-            </p>
-          )}
-          <h3 className="font-heading font-bold text-white text-lg group-hover:text-green-400 transition-colors truncate">
-            {commonName}
-          </h3>
-          {scientificName && (
-            <p className="text-gray-500 text-sm italic truncate">
-              {scientificName}
-            </p>
-          )}
-        </div>
+          {/* Content area */}
+          <div className="flex flex-col lg:flex-row flex-1 p-5 lg:p-6 gap-6">
+            {/* Left content - Name and description */}
+            <div className="flex-1 min-w-0">
+              {/* Name */}
+              <h3 className="font-heading font-bold text-white text-2xl group-hover:text-green-400 transition-colors">
+                {commonName}
+              </h3>
+              {scientificName && (
+                <p className="text-gray-400 text-base italic mt-1">
+                  {scientificName}
+                </p>
+              )}
 
-        {/* Conservation Badge */}
-        {conservationStatus && (
-          <span className={`px-3 py-1.5 rounded-full text-white text-xs font-semibold flex-shrink-0 backdrop-blur-sm ${getConservationBadgeColor(conservationStatus.code)}`}>
-            {conservationStatus.status}
-          </span>
-        )}
-      </Link>
-    );
-  }
+              {/* Family label */}
+              {familyCommon && (
+                <div className="mt-4">
+                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
+                    Family
+                  </p>
+                  <p className="text-gray-300 text-sm">
+                    {familyCommon}
+                  </p>
+                </div>
+              )}
+            </div>
 
-  if (viewMode === 'compact') {
-    return (
-      <Link
-        href={`/turtle-guide/${slug}`}
-        className="group relative block aspect-square rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-xl hover:shadow-black/30 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02]"
-      >
-        {/* Image with separate scale */}
-        <Image
-          src={imgSrc}
-          alt={commonName}
-          fill
-          className="object-cover transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-110"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-          onError={handleImageError}
-          unoptimized={imgSrc === PLACEHOLDER_IMAGE}
-        />
+            {/* Right content - Conservation and Habitat */}
+            <div className="lg:w-64 flex-shrink-0 space-y-4">
+              {/* Conservation Status */}
+              {conservationStatus && (
+                <div>
+                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
+                    Conservation Status
+                  </p>
+                  <p className="text-gray-300 text-sm">
+                    {conservationStatus.status}
+                  </p>
+                </div>
+              )}
 
-        {/* Conservation Badge - appears on hover */}
-        {conservationStatus && (
-          <span className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-white text-xs font-semibold z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${getConservationBadgeColor(conservationStatus.code)}`}>
-            {conservationStatus.status}
-          </span>
-        )}
-
-        {/* Gradient overlay - stronger for better text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-
-        {/* Content at bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-          {familyCommon && (
-            <p className="text-green-500 text-xs font-semibold uppercase tracking-wider mb-1">
-              {familyCommon}
-            </p>
-          )}
-          <h3 className="font-heading font-bold text-white text-sm drop-shadow-lg line-clamp-2">
-            {commonName}
-          </h3>
+              {/* Habitat */}
+              {habitats.length > 0 && (
+                <div>
+                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
+                    Habitat
+                  </p>
+                  <p className="text-gray-300 text-sm line-clamp-3">
+                    {habitats.join(', ')}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </Link>
     );
