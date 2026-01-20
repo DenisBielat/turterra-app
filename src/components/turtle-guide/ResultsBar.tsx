@@ -31,9 +31,9 @@ export default function ResultsBar({
   onSortChange
 }: ResultsBarProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 py-4">
-      {/* Results count */}
-      <div className="text-gray-300">
+    <div className="flex items-center justify-between gap-2 py-4">
+      {/* Results count - left aligned */}
+      <div className="text-gray-300 text-sm sm:text-base shrink-0">
         <span className="font-semibold text-white">{resultCount}</span>
         {resultCount !== totalCount && (
           <span className="text-gray-500"> of {totalCount}</span>
@@ -41,13 +41,13 @@ export default function ResultsBar({
         {' '}turtle{resultCount !== 1 ? 's' : ''}
       </div>
 
-      {/* Sort and View controls */}
-      <div className="flex items-center gap-4">
+      {/* Sort and View controls - right aligned */}
+      <div className="flex items-center gap-2 sm:gap-4">
         {/* Sort dropdown */}
-        <div className="flex items-center gap-2">
-          <ArrowUpDown className="h-4 w-4 text-gray-400" />
+        <div className="flex items-center gap-1 sm:gap-2">
+          <ArrowUpDown className="h-4 w-4 text-gray-400 hidden sm:block" />
           <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
-            <SelectTrigger className="w-32 h-9 bg-transparent text-white border-green-800 focus:border-green-600 focus:ring-0">
+            <SelectTrigger className="w-24 sm:w-32 h-8 sm:h-9 bg-transparent text-white text-sm border-green-800 focus:border-green-600 focus:ring-0">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent className="bg-green-950 border-green-800">
@@ -70,7 +70,7 @@ export default function ResultsBar({
           <Button
             variant="ghost"
             size="icon"
-            className={`h-8 w-8 rounded-md ${viewMode === 'grid' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
+            className={`h-7 w-7 sm:h-8 sm:w-8 rounded-md ${viewMode === 'grid' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
             onClick={() => onViewModeChange('grid')}
             title="Grid view"
           >
@@ -80,7 +80,7 @@ export default function ResultsBar({
           <Button
             variant="ghost"
             size="icon"
-            className={`hidden lg:flex h-8 w-8 rounded-md ${viewMode === 'list' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
+            className={`hidden lg:flex h-7 w-7 sm:h-8 sm:w-8 rounded-md ${viewMode === 'list' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
             onClick={() => onViewModeChange('list')}
             title="List view"
           >
@@ -90,7 +90,7 @@ export default function ResultsBar({
           <Button
             variant="ghost"
             size="icon"
-            className={`h-8 w-8 rounded-md ${viewMode === 'compact' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
+            className={`h-7 w-7 sm:h-8 sm:w-8 rounded-md ${viewMode === 'compact' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
             onClick={() => onViewModeChange('compact')}
             title="Compact view"
           >

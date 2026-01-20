@@ -39,39 +39,37 @@ export default function FilterBar({
   onFilterClick,
 }: FilterBarProps) {
   return (
-    <div className="bg-green-900/80 backdrop-blur-sm rounded-full p-2 flex flex-col lg:flex-row lg:items-center">
-      {/* Mobile: Search Input + Filter Button */}
-      <div className="flex items-end gap-2 lg:hidden">
-        {/* Search Input */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-col">
-            <label className="text-gray-400 text-xs font-medium mb-1">
-              Turtle Name
-            </label>
-            <Input
-              type="text"
-              placeholder="All Turtles"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="h-8 bg-transparent text-white placeholder:text-gray-500 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-base"
-            />
-          </div>
+    <>
+      {/* Mobile: Separate Search Bar + Filter Button */}
+      <div className="flex items-stretch gap-3 lg:hidden">
+        {/* Search Input - separate container */}
+        <div className="flex-1 min-w-0 bg-green-900/80 backdrop-blur-sm rounded-xl px-4 py-2">
+          <label className="text-green-400/80 text-[11px] font-medium tracking-wide uppercase">
+            Turtle Name
+          </label>
+          <Input
+            type="text"
+            placeholder="All Turtles"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="h-6 bg-transparent text-white placeholder:text-gray-400 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-sm"
+          />
         </div>
 
-        {/* Filter Button */}
+        {/* Filter Button - separate container */}
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10 bg-green-800/50 hover:bg-green-800 text-white rounded-lg flex-shrink-0"
+          className="h-auto w-12 bg-green-900/80 backdrop-blur-sm hover:bg-green-800 text-green-400 rounded-xl flex-shrink-0"
           onClick={onFilterClick}
           title="Filter"
         >
-          <Icon name="filter-settings" style="line" size="lg" />
+          <Icon name="filter-settings" style="line" size="base" />
         </Button>
       </div>
 
       {/* Desktop: Full Filter Bar */}
-      <div className="hidden lg:flex lg:flex-row lg:items-center lg:w-full">
+      <div className="hidden lg:flex bg-green-900/80 backdrop-blur-sm rounded-full p-2 lg:flex-row lg:items-center lg:w-full">
         {/* Search Input - takes more space, rounded left on desktop */}
         <div className="flex-[2] min-w-0 px-2 lg:px-4 py-2 lg:py-0">
           <div className="flex flex-col">
@@ -181,6 +179,6 @@ export default function FilterBar({
           </Button>
         </div>
       </div>
-    </div>
+    </>
   );
 }
