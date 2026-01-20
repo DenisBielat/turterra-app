@@ -52,7 +52,7 @@ export default function FilterBar({
             placeholder="All Turtles"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="h-6 bg-transparent text-white placeholder:text-gray-400 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-sm"
+            className="h-6 bg-transparent text-white placeholder:text-gray-400 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-base"
           />
         </div>
 
