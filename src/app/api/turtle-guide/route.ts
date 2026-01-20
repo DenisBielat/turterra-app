@@ -10,6 +10,7 @@ export interface TurtleGuideSpecies {
   imageUrl: string | null;
   familyCommon: string | null;
   familyScientific: string | null;
+  description: string | null;
   conservationStatus: {
     code: string;
     status: string;
@@ -42,6 +43,9 @@ export async function GET() {
         avatar_image_circle_url,
         avatar_image_full_url,
         tax_parent_genus,
+        turtle_species_section_descriptions(
+          at_a_glance
+        ),
         turtle_species_conservation_history(
           year_status_assigned,
           conservation_statuses!turtle_species_conservation_conservation_status_fkey(
@@ -156,6 +160,10 @@ export async function GET() {
         })
         .filter((r): r is string => !!r);
 
+      // Get at_a_glance description
+      const sectionDescRaw = turtle.turtle_species_section_descriptions as unknown as Array<{ at_a_glance: string | null }> | null;
+      const description = sectionDescRaw?.[0]?.at_a_glance || null;
+
       return {
         id: turtle.id,
         commonName: turtle.species_common_name,
@@ -166,6 +174,7 @@ export async function GET() {
         imageUrl: turtle.avatar_image_full_url || turtle.avatar_image_circle_url,
         familyCommon: family?.common || null,
         familyScientific: family?.scientific || null,
+        description,
         conservationStatus: conservationStatusData ? {
           code: conservationStatusData.abbreviation,
           status: conservationStatusData.status

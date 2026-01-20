@@ -37,6 +37,9 @@ export default function TurtleGuideClient({
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortOption, setSortOption] = useState<SortOption>('name-asc');
 
+  // Animation key - changes when view mode changes to trigger re-render
+  const [animationKey, setAnimationKey] = useState(0);
+
   // Check if any filters are active
   const hasActiveFilters = searchQuery !== '' ||
     selectedFamily !== 'all' ||
@@ -47,6 +50,12 @@ export default function TurtleGuideClient({
     setSearchQuery('');
     setSelectedFamily('all');
     setSelectedRegion('all');
+  };
+
+  // Handle view mode change with animation
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    setAnimationKey(prev => prev + 1);
   };
 
   // Filter and sort turtles
@@ -110,43 +119,54 @@ export default function TurtleGuideClient({
 
   return (
     <div>
-      {/* Filter Bar */}
-      <FilterBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        selectedFamily={selectedFamily}
-        onFamilyChange={setSelectedFamily}
-        selectedRegion={selectedRegion}
-        onRegionChange={setSelectedRegion}
-        families={filters.families}
-        regions={filters.regions}
-      />
+      {/* Filter Bar - centered and narrower */}
+      <div className="max-w-4xl mx-auto">
+        <FilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          selectedFamily={selectedFamily}
+          onFamilyChange={setSelectedFamily}
+          selectedRegion={selectedRegion}
+          onRegionChange={setSelectedRegion}
+          families={filters.families}
+          regions={filters.regions}
+        />
+      </div>
 
       {/* Results Bar */}
       <ResultsBar
         resultCount={filteredTurtles.length}
         totalCount={initialTurtles.length}
         viewMode={viewMode}
-        onViewModeChange={setViewMode}
+        onViewModeChange={handleViewModeChange}
         sortOption={sortOption}
         onSortChange={setSortOption}
       />
 
-      {/* Results Grid/List */}
+      {/* Results Grid/List with animation */}
       {filteredTurtles.length > 0 ? (
-        <div className={getGridClasses()}>
-          {filteredTurtles.map((turtle) => (
-            <TurtleCard
+        <div key={animationKey} className={getGridClasses()}>
+          {filteredTurtles.map((turtle, index) => (
+            <div
               key={turtle.id}
-              commonName={turtle.commonName}
-              scientificName={turtle.scientificName}
-              familyCommon={turtle.familyCommon}
-              slug={turtle.slug}
-              imageUrl={turtle.imageUrl}
-              conservationStatus={turtle.conservationStatus}
-              habitats={turtle.habitats}
-              viewMode={viewMode}
-            />
+              className="animate-fadeSlideIn opacity-0"
+              style={{
+                animationDelay: `${Math.min(index * 30, 300)}ms`,
+                animationFillMode: 'forwards'
+              }}
+            >
+              <TurtleCard
+                commonName={turtle.commonName}
+                scientificName={turtle.scientificName}
+                familyCommon={turtle.familyCommon}
+                slug={turtle.slug}
+                imageUrl={turtle.imageUrl}
+                description={turtle.description}
+                conservationStatus={turtle.conservationStatus}
+                habitats={turtle.habitats}
+                viewMode={viewMode}
+              />
+            </div>
           ))}
         </div>
       ) : (

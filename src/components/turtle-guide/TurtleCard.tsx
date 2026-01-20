@@ -10,6 +10,7 @@ interface TurtleCardProps {
   familyCommon: string | null;
   slug: string;
   imageUrl: string | null;
+  description?: string | null;
   conservationStatus: {
     code: string;
     status: string;
@@ -47,12 +48,24 @@ const getConservationBadgeColor = (code: string) => {
   }
 };
 
+// Strip markdown formatting for plain text display
+const stripMarkdown = (text: string): string => {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Bold
+    .replace(/\*(.*?)\*/g, '$1')     // Italic
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Links
+    .replace(/#{1,6}\s/g, '')        // Headers
+    .replace(/`(.*?)`/g, '$1')       // Inline code
+    .trim();
+};
+
 export default function TurtleCard({
   commonName,
   scientificName,
   familyCommon,
   slug,
   imageUrl,
+  description,
   conservationStatus,
   habitats = [],
   viewMode = 'grid'
@@ -67,30 +80,30 @@ export default function TurtleCard({
     }
   };
 
-  // List view - Audubon style with image left, content middle, details right
+  // List view - Audubon style with separated rounded image, description, and details
   if (viewMode === 'list') {
     return (
       <Link
         href={`/turtle-guide/${slug}`}
-        className="group block bg-green-900/50 rounded-2xl overflow-hidden hover:bg-green-900/70 transition-all duration-300 border border-green-800/50 hover:border-green-700/50"
+        className="group block bg-green-900/50 rounded-2xl hover:bg-green-900/70 transition-all duration-300 border border-green-800/50 hover:border-green-700/50 p-4"
       >
-        <div className="flex flex-col md:flex-row">
-          {/* Image - larger square on left */}
-          <div className="relative w-full md:w-48 lg:w-56 aspect-square md:aspect-auto md:h-auto flex-shrink-0 bg-green-800">
+        <div className="flex flex-col md:flex-row gap-5">
+          {/* Image - larger rounded square, separated from edges */}
+          <div className="relative w-full md:w-44 lg:w-52 aspect-square flex-shrink-0 rounded-xl overflow-hidden bg-green-800">
             <Image
               src={imgSrc}
               alt={commonName}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              sizes="(max-width: 768px) 100vw, 224px"
+              sizes="(max-width: 768px) 100vw, 208px"
               onError={handleImageError}
               unoptimized={imgSrc === PLACEHOLDER_IMAGE}
             />
           </div>
 
           {/* Content area */}
-          <div className="flex flex-col lg:flex-row flex-1 p-5 lg:p-6 gap-6">
-            {/* Left content - Name and description */}
+          <div className="flex flex-col lg:flex-row flex-1 gap-6">
+            {/* Left content - Name and At a Glance description */}
             <div className="flex-1 min-w-0">
               {/* Name */}
               <h3 className="font-heading font-bold text-white text-2xl group-hover:text-green-400 transition-colors">
@@ -102,14 +115,14 @@ export default function TurtleCard({
                 </p>
               )}
 
-              {/* Family label */}
-              {familyCommon && (
+              {/* At a Glance description */}
+              {description && (
                 <div className="mt-4">
-                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-1">
-                    Family
+                  <p className="text-orange-500 text-xs font-semibold uppercase tracking-wider mb-2">
+                    At a Glance
                   </p>
-                  <p className="text-gray-300 text-sm">
-                    {familyCommon}
+                  <p className="text-gray-300 text-sm leading-relaxed line-clamp-4">
+                    {stripMarkdown(description)}
                   </p>
                 </div>
               )}

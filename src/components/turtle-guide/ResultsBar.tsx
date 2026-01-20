@@ -51,13 +51,13 @@ export default function ResultsBar({
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent className="bg-green-950 border-green-800">
-              <SelectItem value="name-asc" className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white">
+              <SelectItem value="name-asc" className="text-white hover:!bg-green-800 focus:!bg-green-800 focus:!text-white data-[highlighted]:!bg-green-800 data-[highlighted]:!text-white">
                 Name A-Z
               </SelectItem>
-              <SelectItem value="name-desc" className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white">
+              <SelectItem value="name-desc" className="text-white hover:!bg-green-800 focus:!bg-green-800 focus:!text-white data-[highlighted]:!bg-green-800 data-[highlighted]:!text-white">
                 Name Z-A
               </SelectItem>
-              <SelectItem value="status" className="text-white hover:bg-green-900 focus:bg-green-900 focus:text-white">
+              <SelectItem value="status" className="text-white hover:!bg-green-800 focus:!bg-green-800 focus:!text-white data-[highlighted]:!bg-green-800 data-[highlighted]:!text-white">
                 Conservation
               </SelectItem>
             </SelectContent>
