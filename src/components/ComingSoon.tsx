@@ -10,6 +10,9 @@ export default function ComingSoon() {
 
   return (
     <div className="fixed inset-0 z-[9999] bg-white flex items-center justify-center overflow-hidden">
+      {/* Subtle vignette effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_transparent_50%,_rgba(0,0,0,0.03)_100%)]" />
+
       <div className="relative w-[240px] h-[240px] sm:w-[270px] sm:h-[270px]">
         {/* Rotating text circle */}
         <svg
