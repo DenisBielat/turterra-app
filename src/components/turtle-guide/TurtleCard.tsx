@@ -233,7 +233,7 @@ export default function TurtleCard({
   return (
     <Link
       href={`/turtle-guide/${slug}`}
-      className="group relative block aspect-[4/3] rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02]"
+      className="group relative block aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02]"
     >
       {/* Image with separate scale for parallax effect */}
       <Image
@@ -241,14 +241,14 @@ export default function TurtleCard({
         alt={commonName}
         fill
         className="object-cover transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-110"
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
         onError={handleImageError}
         unoptimized={imgSrc === PLACEHOLDER_IMAGE}
       />
 
       {/* Conservation Badge - appears on hover with blur */}
       {conservationStatus && (
-        <span className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-white text-xs font-semibold z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${getConservationBadgeColor(conservationStatus.code)}`}>
+        <span className={`absolute top-2 right-2 sm:top-4 sm:right-4 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full text-white text-[10px] sm:text-xs font-semibold z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${getConservationBadgeColor(conservationStatus.code)}`}>
           {conservationStatus.status}
         </span>
       )}
@@ -257,22 +257,22 @@ export default function TurtleCard({
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
       {/* Content at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
-        {/* Family as eyebrow label */}
+      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 z-10">
+        {/* Family as eyebrow label - hidden on mobile */}
         {familyCommon && (
-          <p className="text-green-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+          <p className="hidden sm:block text-green-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
             {familyCommon}
           </p>
         )}
 
-        {/* Turtle name - larger and bolder */}
-        <h3 className="font-heading font-bold text-white text-xl drop-shadow-lg">
+        {/* Turtle name - smaller on mobile */}
+        <h3 className="font-heading font-bold text-white text-sm sm:text-xl drop-shadow-lg line-clamp-2">
           {commonName}
         </h3>
 
-        {/* Scientific name - visible by default */}
+        {/* Scientific name - hidden on mobile for cleaner look */}
         {scientificName && (
-          <p className="text-gray-400 text-sm italic mt-1">
+          <p className="hidden sm:block text-gray-400 text-sm italic mt-1">
             {scientificName}
           </p>
         )}

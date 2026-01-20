@@ -47,7 +47,7 @@ export default function ResultsBar({
         <div className="flex items-center gap-1 sm:gap-2">
           <ArrowUpDown className="h-4 w-4 text-gray-400 hidden sm:block" />
           <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
-            <SelectTrigger className="w-24 sm:w-32 h-8 sm:h-9 bg-transparent text-white text-sm border-green-800 focus:border-green-600 focus:ring-0">
+            <SelectTrigger className="w-[90px] sm:w-32 h-8 sm:h-9 bg-transparent text-white text-sm border-green-800 focus:border-green-600 focus:ring-0">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent className="bg-green-950 border-green-800">

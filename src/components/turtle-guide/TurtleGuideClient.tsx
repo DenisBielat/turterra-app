@@ -121,8 +121,8 @@ export default function TurtleGuideClient({
         return 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
       case 'grid':
       default:
-        // 3 columns max for landscape cards with extra breathing room
-        return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8';
+        // 2 columns on mobile, 2-3 columns on larger screens
+        return 'grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8';
     }
   };
 
