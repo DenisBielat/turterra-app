@@ -35,7 +35,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                 <div className="grid grid-cols-1 lg:grid-cols-[0.75fr,1fr] gap-8 lg:gap-[8vw]">
                   {/* Left Column */}
                   <div className="flex flex-col">
-                    <Link href="/" className="w-fit">
+                    <Link href="/" className="w-fit" aria-label="Turterra Home">
                       <Image
                         src={logo.src}
                         alt={logo.alt}
