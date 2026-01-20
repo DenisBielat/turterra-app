@@ -58,6 +58,12 @@ export default function TurtleGuideClient({
     setAnimationKey(prev => prev + 1);
   };
 
+  // Handle filter button click (placeholder for now)
+  const handleFilterClick = () => {
+    // TODO: Open filter modal/sheet
+    console.log('Filter button clicked');
+  };
+
   // Filter and sort turtles
   const filteredTurtles = useMemo(() => {
     let result = [...initialTurtles];
@@ -133,6 +139,7 @@ export default function TurtleGuideClient({
           onRegionChange={setSelectedRegion}
           families={filters.families}
           regions={filters.regions}
+          onFilterClick={handleFilterClick}
         />
       </div>
 

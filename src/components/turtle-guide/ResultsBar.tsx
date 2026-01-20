@@ -64,8 +64,9 @@ export default function ResultsBar({
           </Select>
         </div>
 
-        {/* View mode toggle - grid, list, and compact */}
+        {/* View mode toggle - grid and compact on mobile, all three on desktop */}
         <div className="flex items-center bg-green-950/50 rounded-lg p-1">
+          {/* Grid view - shown on mobile and desktop */}
           <Button
             variant="ghost"
             size="icon"
@@ -75,15 +76,17 @@ export default function ResultsBar({
           >
             <LayoutGrid className="h-4 w-4" />
           </Button>
+          {/* List view - hidden on mobile, shown on desktop */}
           <Button
             variant="ghost"
             size="icon"
-            className={`h-8 w-8 rounded-md ${viewMode === 'list' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
+            className={`hidden lg:flex h-8 w-8 rounded-md ${viewMode === 'list' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
             onClick={() => onViewModeChange('list')}
             title="List view"
           >
             <List className="h-4 w-4" />
           </Button>
+          {/* Compact view - shown on mobile and desktop */}
           <Button
             variant="ghost"
             size="icon"
