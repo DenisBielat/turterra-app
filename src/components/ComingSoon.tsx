@@ -16,7 +16,7 @@ export default function ComingSoon() {
       <div className="relative w-[240px] h-[240px] sm:w-[270px] sm:h-[270px] drop-shadow-lg">
         {/* Rotating text circle */}
         <svg
-          className="absolute inset-0 w-full h-full animate-spin-slow drop-shadow-md"
+          className="absolute inset-0 w-full h-full animate-spin-slow drop-shadow-sm"
           viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
         >
           <defs>

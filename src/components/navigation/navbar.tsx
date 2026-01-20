@@ -93,17 +93,17 @@ const Navbar = () => {
                         <p className="text-sm font-bold text-gray-400 px-3">Tools</p>
                       </div>
                       <NavLink
-                        href="/species-guide"
+                        href="/turtle-guide"
                         iconSrc="/images/nav-menu-icons/species-guide.png"
-                        iconAlt="Species Guide Icon"
-                        title="Species Guide"
-                        description="Find the species you're looking for or just browse for fun"
+                        iconAlt="Turtle Guide Icon"
+                        title="Turtle Guide"
+                        description="Find the turtle you're looking for or just browse for fun"
                       />
                       <NavLink
                         href="/species-identifier"
                         iconSrc="/images/nav-menu-icons/species-identifier.png"
-                        iconAlt="Species Identifier Icon"
-                        title="Species Identifier"
+                        iconAlt="Turtle Identifier Icon"
+                        title="Turtle Identifier"
                         description="Identify your turtle and get more information"
                       />
                     </div>

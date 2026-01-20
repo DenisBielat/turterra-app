@@ -9,8 +9,8 @@ export const footerConfig: FooterProps = {
     tools: {
       title: "Tools",
       links: [
-        { label: "Species Browser", href: "/species" },
-        { label: "Species Identifier", href: "/identifier" },
+        { label: "Turtle Guide", href: "/turtle-guide" },
+        { label: "Turtle Identifier", href: "/identifier" },
         { label: "Find a Vet", href: "/vets" }
       ],
       reachOut: {

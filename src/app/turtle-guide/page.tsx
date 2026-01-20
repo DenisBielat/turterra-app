@@ -2,7 +2,7 @@ import { supabase } from "@/lib/db/supabaseClient";
 import Link from "next/link";
 import Image from 'next/image'
 
-const SpeciesGuide = async () => {
+const TurtleGuide = async () => {
   // Fetch turtle data along with primary images
   const { data: turtles, error } = await supabase
     .from("turtle_species")
@@ -21,7 +21,7 @@ const SpeciesGuide = async () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">Species Guide</h1>
+      <h1 className="text-3xl font-bold mb-4">Turtle Guide</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {turtles.map((turtle) => (
           <div key={turtle.id} className="border rounded-lg p-4">
@@ -37,7 +37,7 @@ const SpeciesGuide = async () => {
             )}
             <h2 className="text-xl font-semibold">{turtle.species_common_name}</h2>
             <Link
-              href={`/turtle/${turtle.slug}`}
+              href={`/turtle-guide/${turtle.slug}`}
               className="text-blue-600 hover:underline"
             >
               View Profile
@@ -49,4 +49,4 @@ const SpeciesGuide = async () => {
   );
 };
 
-export default SpeciesGuide;
+export default TurtleGuide;

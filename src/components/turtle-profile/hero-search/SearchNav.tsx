@@ -150,7 +150,7 @@ export default function TurtleSearchNav({
                   <Icon name="book-open" style="line" size="base" />
                 </button>
               ) : (
-                <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors">
+                <Link href="/turtle-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors">
                   <Icon name="book-open" style="line" size="base" />
                 </Link>
               )}
@@ -163,12 +163,12 @@ export default function TurtleSearchNav({
               </button>
             </div>
 
-            {/* Center: Species Guide link */}
+            {/* Center: Turtle Guide link */}
             <Link
-              href="/species-guide"
+              href="/turtle-guide"
               className="font-heading font-semibold text-white uppercase text-sm tracking-wide hover:text-green-400 transition-colors"
             >
-              Species Guide
+              Turtle Guide
             </Link>
 
             {/* Right: Empty placeholder for balance */}
@@ -192,7 +192,7 @@ export default function TurtleSearchNav({
                 <Icon name="book-open" style="line" size="base" />
               </button>
             ) : (
-              <Link href="/species-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0">
+              <Link href="/turtle-guide" className="flex items-center justify-center p-2 text-white hover:text-green-400 transition-colors flex-shrink-0">
                 <Icon name="book-open" style="line" size="base" />
               </Link>
             )}
@@ -236,7 +236,7 @@ export default function TurtleSearchNav({
               searchResults.map((result) => (
                 <Link
                   key={result.slug}
-                  href={`/turtle/${result.slug}`}
+                  href={`/turtle-guide/${result.slug}`}
                   className="flex gap-3 p-3 hover:bg-green-800 transition-colors"
                   onClick={closeMobileSearch}
                 >
@@ -304,7 +304,7 @@ export default function TurtleSearchNav({
                     searchResults.map((result) => (
                       <Link
                         key={result.slug}
-                        href={`/turtle/${result.slug}`}
+                        href={`/turtle-guide/${result.slug}`}
                         className="flex gap-3 p-3 hover:bg-green-950 transition-colors"
                         onClick={clearSearch}
                       >
@@ -332,8 +332,8 @@ export default function TurtleSearchNav({
 
             {/* Breadcrumbs Section - Centered */}
             <nav className="flex items-center justify-center space-x-2 text-white/90">
-              <Link href="/species-guide" className="hover:text-orange-500 font-semibold transition-colors">
-                Species Guide
+              <Link href="/turtle-guide" className="hover:text-orange-500 font-semibold transition-colors">
+                Turtle Guide
               </Link>
               <ChevronRight className="h-4 w-4 text-gray-300" />
               <span className="font-semibold hover:text-orange-500 transition-colors cursor-pointer text-white/90">

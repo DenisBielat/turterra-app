@@ -54,18 +54,18 @@ const MobileMenu = () => {
           <div className="p-4">
             <p className="text-sm font-bold text-gray-400 px-3 mb-2">Tools</p>
             <MobileNavLink
-              href="/species-guide"
+              href="/turtle-guide"
               iconSrc="/images/nav-menu-icons/species-guide.png"
-              iconAlt="Species Guide Icon"
-              title="Species Guide"
-              description="Find the species you're looking for"
+              iconAlt="Turtle Guide Icon"
+              title="Turtle Guide"
+              description="Find the turtle you're looking for"
               onClick={closeMenu}
             />
             <MobileNavLink
               href="/species-identifier"
               iconSrc="/images/nav-menu-icons/species-identifier.png"
-              iconAlt="Species Identifier Icon"
-              title="Species Identifier"
+              iconAlt="Turtle Identifier Icon"
+              title="Turtle Identifier"
               description="Identify your turtle"
               onClick={closeMenu}
             />
