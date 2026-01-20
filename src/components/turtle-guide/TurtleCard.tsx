@@ -19,24 +19,28 @@ interface TurtleCardProps {
 
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
 
-// Conservation status badge colors
+// Conservation status badge colors - matching profile page
 const getConservationBadgeColor = (code: string) => {
   switch (code) {
-    case 'LC': // Least Concern
-      return 'bg-green-600';
-    case 'NT': // Near Threatened
-      return 'bg-green-700';
-    case 'VU': // Vulnerable
-      return 'bg-yellow-500';
-    case 'EN': // Endangered
+    // Extinct categories - red
+    case 'EX':
+    case 'EW':
+      return 'bg-red-500';
+
+    // Threatened categories - orange
+    case 'CR':
+    case 'EN':
+    case 'VU':
       return 'bg-orange-500';
-    case 'CR': // Critically Endangered
-      return 'bg-red-600';
-    case 'EW': // Extinct in the Wild
-    case 'EX': // Extinct
-      return 'bg-red-800';
-    case 'DD': // Data Deficient
-    case 'NE': // Not Evaluated
+
+    // Near Threatened and Least Concern - green
+    case 'NT':
+    case 'LC':
+      return 'bg-green-800';
+
+    // Lacks Data - gray
+    case 'DD':
+    case 'NE':
     default:
       return 'bg-gray-500';
   }

@@ -82,10 +82,12 @@ export default function FilterBar({
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent
-              className="bg-green-950 border-green-800 max-h-[300px]"
-              position="item-aligned"
-              side="bottom"
+              className="bg-green-950 border-green-800 max-h-[300px] min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)]"
+              position="popper"
               sideOffset={4}
+              align="start"
+              avoidCollisions={true}
+              collisionPadding={16}
             >
               <SelectItem value="all" className={selectItemClasses}>
                 All
@@ -113,10 +115,12 @@ export default function FilterBar({
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent
-              className="bg-green-950 border-green-800 max-h-[300px]"
-              position="item-aligned"
-              side="bottom"
+              className="bg-green-950 border-green-800 max-h-[300px] min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)]"
+              position="popper"
               sideOffset={4}
+              align="start"
+              avoidCollisions={true}
+              collisionPadding={16}
             >
               <SelectItem value="all" className={selectItemClasses}>
                 All
@@ -144,10 +148,12 @@ export default function FilterBar({
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent
-              className="bg-green-950 border-green-800 max-h-[300px]"
-              position="item-aligned"
-              side="bottom"
+              className="bg-green-950 border-green-800 max-h-[300px] min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)]"
+              position="popper"
               sideOffset={4}
+              align="start"
+              avoidCollisions={true}
+              collisionPadding={16}
             >
               <SelectItem value="all" className={selectItemClasses}>
                 All
