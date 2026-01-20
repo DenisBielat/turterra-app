@@ -81,7 +81,12 @@ export default function FilterBar({
             <SelectTrigger className="h-11 bg-green-950 text-white border-green-800 focus:border-green-600 focus:ring-0 rounded-lg">
               <SelectValue placeholder="All" />
             </SelectTrigger>
-            <SelectContent className="bg-green-950 border-green-800">
+            <SelectContent
+              className="bg-green-950 border-green-800 max-h-[300px]"
+              position="item-aligned"
+              side="bottom"
+              sideOffset={4}
+            >
               <SelectItem value="all" className={selectItemClasses}>
                 All
               </SelectItem>
@@ -107,7 +112,12 @@ export default function FilterBar({
             <SelectTrigger className="h-11 bg-green-950 text-white border-green-800 focus:border-green-600 focus:ring-0 rounded-lg">
               <SelectValue placeholder="All" />
             </SelectTrigger>
-            <SelectContent className="bg-green-950 border-green-800">
+            <SelectContent
+              className="bg-green-950 border-green-800 max-h-[300px]"
+              position="item-aligned"
+              side="bottom"
+              sideOffset={4}
+            >
               <SelectItem value="all" className={selectItemClasses}>
                 All
               </SelectItem>
@@ -133,7 +143,12 @@ export default function FilterBar({
             <SelectTrigger className="h-11 bg-green-950 text-white border-green-800 focus:border-green-600 focus:ring-0 rounded-lg">
               <SelectValue placeholder="All" />
             </SelectTrigger>
-            <SelectContent className="bg-green-950 border-green-800">
+            <SelectContent
+              className="bg-green-950 border-green-800 max-h-[300px]"
+              position="item-aligned"
+              side="bottom"
+              sideOffset={4}
+            >
               <SelectItem value="all" className={selectItemClasses}>
                 All
               </SelectItem>

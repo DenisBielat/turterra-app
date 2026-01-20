@@ -44,6 +44,7 @@ const getConservationBadgeColor = (code: string) => {
 
 export default function TurtleCard({
   commonName,
+  scientificName,
   familyCommon,
   slug,
   imageUrl,
@@ -64,7 +65,7 @@ export default function TurtleCard({
     return (
       <Link
         href={`/turtle-guide/${slug}`}
-        className="group flex items-center gap-4 p-4 bg-green-900/50 rounded-lg hover:bg-green-900 transition-colors border border-green-800/50"
+        className="group flex items-center gap-4 p-4 bg-green-900/50 rounded-xl hover:bg-green-900 transition-all duration-300 border border-green-800/50 hover:border-green-700/50 hover:shadow-lg hover:shadow-green-950/50"
       >
         {/* Image */}
         <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-green-800">
@@ -72,7 +73,7 @@ export default function TurtleCard({
             src={imgSrc}
             alt={commonName}
             fill
-            className="object-cover"
+            className="object-cover group-hover:scale-110 transition-transform duration-300"
             sizes="64px"
             onError={handleImageError}
             unoptimized={imgSrc === PLACEHOLDER_IMAGE}
@@ -81,19 +82,24 @@ export default function TurtleCard({
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-heading font-semibold text-white text-lg group-hover:text-green-400 transition-colors truncate">
+          {familyCommon && (
+            <p className="text-green-500 text-xs font-semibold uppercase tracking-wider mb-0.5">
+              {familyCommon}
+            </p>
+          )}
+          <h3 className="font-heading font-bold text-white text-lg group-hover:text-green-400 transition-colors truncate">
             {commonName}
           </h3>
-          {familyCommon && (
-            <p className="text-gray-400 text-sm uppercase tracking-wide truncate">
-              {familyCommon}
+          {scientificName && (
+            <p className="text-gray-500 text-sm italic truncate">
+              {scientificName}
             </p>
           )}
         </div>
 
         {/* Conservation Badge */}
         {conservationStatus && (
-          <span className={`px-3 py-1 rounded-full text-white text-xs font-semibold flex-shrink-0 ${getConservationBadgeColor(conservationStatus.code)}`}>
+          <span className={`px-3 py-1.5 rounded-full text-white text-xs font-semibold flex-shrink-0 backdrop-blur-sm ${getConservationBadgeColor(conservationStatus.code)}`}>
             {conservationStatus.status}
           </span>
         )}
@@ -105,32 +111,37 @@ export default function TurtleCard({
     return (
       <Link
         href={`/turtle-guide/${slug}`}
-        className="group relative block aspect-square rounded-2xl overflow-hidden bg-green-900"
+        className="group relative block aspect-square rounded-xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 transition-all duration-300 hover:shadow-xl hover:shadow-black/30 hover:scale-[1.02]"
       >
-        {/* Image */}
+        {/* Image with separate scale */}
         <Image
           src={imgSrc}
           alt={commonName}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           onError={handleImageError}
           unoptimized={imgSrc === PLACEHOLDER_IMAGE}
         />
 
-        {/* Conservation Badge - shown on compact view */}
+        {/* Conservation Badge - appears on hover */}
         {conservationStatus && (
-          <span className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-white text-xs font-semibold z-10 ${getConservationBadgeColor(conservationStatus.code)}`}>
+          <span className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-white text-xs font-semibold z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${getConservationBadgeColor(conservationStatus.code)}`}>
             {conservationStatus.status}
           </span>
         )}
 
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+        {/* Gradient overlay - stronger for better text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
-        {/* Title at bottom */}
+        {/* Content at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
-          <h3 className="font-heading font-semibold text-white text-sm group-hover:text-green-400 transition-colors line-clamp-2">
+          {familyCommon && (
+            <p className="text-green-500 text-xs font-semibold uppercase tracking-wider mb-1">
+              {familyCommon}
+            </p>
+          )}
+          <h3 className="font-heading font-bold text-white text-sm drop-shadow-lg line-clamp-2">
             {commonName}
           </h3>
         </div>
@@ -138,34 +149,51 @@ export default function TurtleCard({
     );
   }
 
-  // Default grid view - landscape cards, no conservation badge
+  // Default grid view - enhanced with parallax effect and smooth animations
   return (
     <Link
       href={`/turtle-guide/${slug}`}
-      className="group relative block aspect-[16/10] rounded-2xl overflow-hidden bg-green-900"
+      className="group relative block aspect-[4/3] rounded-xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40 hover:scale-[1.02]"
     >
-      {/* Image */}
+      {/* Image with separate scale for parallax effect */}
       <Image
         src={imgSrc}
         alt={commonName}
         fill
-        className="object-cover group-hover:scale-105 transition-transform duration-300"
+        className="object-cover group-hover:scale-110 transition-transform duration-500"
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         onError={handleImageError}
         unoptimized={imgSrc === PLACEHOLDER_IMAGE}
       />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      {/* Conservation Badge - appears on hover with blur */}
+      {conservationStatus && (
+        <span className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-white text-xs font-semibold z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm ${getConservationBadgeColor(conservationStatus.code)}`}>
+          {conservationStatus.status}
+        </span>
+      )}
+
+      {/* Gradient overlay - stronger for reliable text readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
       {/* Content at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-        <h3 className="font-heading font-semibold text-white text-lg group-hover:text-green-400 transition-colors">
+      <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+        {/* Family as eyebrow label */}
+        {familyCommon && (
+          <p className="text-green-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+            {familyCommon}
+          </p>
+        )}
+
+        {/* Turtle name - larger and bolder */}
+        <h3 className="font-heading font-bold text-white text-xl drop-shadow-lg">
           {commonName}
         </h3>
-        {familyCommon && (
-          <p className="text-gray-300 text-sm uppercase tracking-wide mt-1">
-            {familyCommon}
+
+        {/* Scientific name - slides up on hover */}
+        {scientificName && (
+          <p className="text-gray-400 text-sm italic mt-1 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+            {scientificName}
           </p>
         )}
       </div>
