@@ -42,11 +42,11 @@ async function getTurtleGuideData(): Promise<{
   const genusIds = [...new Set(turtles?.map(t => t.tax_parent_genus).filter(Boolean))];
 
   const { data: genusData } = await supabase
-    .from('taxonomy_genus')
+    .from('turtle_taxonomy_genuses')
     .select(`
       id,
       tax_parent_family,
-      taxonomy_family!taxonomy_genus_tax_parent_family_fkey(
+      turtle_taxonomy_families!turtle_taxonomy_genuses_tax_parent_family_fkey(
         family_common_name,
         family_scientific_name
       )
@@ -57,7 +57,7 @@ async function getTurtleGuideData(): Promise<{
   const genusToFamily = new Map<number, { common: string; scientific: string }>();
   genusData?.forEach(g => {
     // Supabase returns an array for the joined relation, but we expect a single object
-    const familyData = g.taxonomy_family as unknown;
+    const familyData = g.turtle_taxonomy_families as unknown;
     const family = Array.isArray(familyData) ? familyData[0] : familyData;
     if (family && typeof family === 'object' && 'family_common_name' in family) {
       const typedFamily = family as { family_common_name: string | null; family_scientific_name: string | null };
@@ -70,7 +70,7 @@ async function getTurtleGuideData(): Promise<{
 
   // Fetch all families for filter
   const { data: familiesData } = await supabase
-    .from('taxonomy_family')
+    .from('turtle_taxonomy_families')
     .select('family_common_name, family_scientific_name')
     .order('family_common_name', { ascending: true });
 
