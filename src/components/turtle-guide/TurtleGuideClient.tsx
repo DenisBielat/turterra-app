@@ -110,6 +110,9 @@ export default function TurtleGuideClient({
     switch (viewMode) {
       case 'list':
         return 'flex flex-col gap-6';
+      case 'compact':
+        // Compact grid with more columns
+        return 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
       case 'grid':
       default:
         // 3 columns max for landscape cards with extra breathing room

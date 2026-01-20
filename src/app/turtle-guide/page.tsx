@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/db/supabaseClient";
+import Image from "next/image";
 import TurtleGuideClient from "@/components/turtle-guide/TurtleGuideClient";
 import type { TurtleGuideSpecies, TurtleGuideFilters } from "@/app/api/turtle-guide/route";
 
@@ -181,6 +182,17 @@ export default async function TurtleGuidePage() {
       {/* Hero Section */}
       <section className="bg-green-950 pt-16 md:pt-20 pb-12 px-4 lg:px-10">
         <div className="max-w-8xl mx-auto text-center">
+          <div className="flex justify-center mb-6">
+            <div className="relative h-16 md:h-20 lg:h-24 w-16 md:w-20 lg:w-24">
+              <Image 
+                src="/images/nav-menu-icons/turtle-guide-light.png" 
+                alt="Turtle Guide Icon" 
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
           <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             Guide to World Turtle Species
           </h1>

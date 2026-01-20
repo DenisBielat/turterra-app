@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutGrid, List, ArrowUpDown } from 'lucide-react';
+import { LayoutGrid, List, Grid3x3, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export type ViewMode = 'grid' | 'list';
+export type ViewMode = 'grid' | 'list' | 'compact';
 export type SortOption = 'name-asc' | 'name-desc' | 'status';
 
 interface ResultsBarProps {
@@ -64,7 +64,7 @@ export default function ResultsBar({
           </Select>
         </div>
 
-        {/* View mode toggle - only grid and list */}
+        {/* View mode toggle - grid, list, and compact */}
         <div className="flex items-center bg-green-950/50 rounded-lg p-1">
           <Button
             variant="ghost"
@@ -83,6 +83,15 @@ export default function ResultsBar({
             title="List view"
           >
             <List className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className={`h-8 w-8 rounded-md ${viewMode === 'compact' ? 'bg-green-800 text-white' : 'text-gray-400 hover:text-white hover:bg-green-900'}`}
+            onClick={() => onViewModeChange('compact')}
+            title="Compact view"
+          >
+            <Grid3x3 className="h-4 w-4" />
           </Button>
         </div>
       </div>

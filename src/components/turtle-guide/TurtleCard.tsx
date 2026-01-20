@@ -17,7 +17,7 @@ interface TurtleCardProps {
     status: string;
   } | null;
   habitats?: string[];
-  viewMode?: 'grid' | 'list';
+  viewMode?: 'grid' | 'list' | 'compact';
 }
 
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
@@ -90,6 +90,43 @@ export default function TurtleCard({
       setListImgSrc(PLACEHOLDER_IMAGE);
     }
   };
+
+  // Compact view - compact grid cards with circular image, name, and scientific name only
+  if (viewMode === 'compact') {
+    return (
+      <Link
+        href={`/turtle-guide/${slug}`}
+        className="group block bg-green-900/50 rounded-xl hover:bg-green-900/70 transition-all duration-300 border border-green-800/50 hover:border-green-700/50 p-4"
+      >
+        <div className="flex items-center gap-4">
+          {/* Circular image */}
+          <div className="relative flex-shrink-0 w-16 h-16 rounded-full overflow-hidden bg-green-900/50">
+            <Image
+              src={listImgSrc}
+              alt={commonName}
+              fill
+              className="object-cover"
+              sizes="64px"
+              onError={handleListImageError}
+              unoptimized={listImgSrc === PLACEHOLDER_IMAGE}
+            />
+          </div>
+
+          {/* Name and Scientific Name */}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-heading font-bold text-white text-lg group-hover:text-green-400 transition-colors truncate">
+              {commonName}
+            </h3>
+            {scientificName && (
+              <p className="text-gray-400 text-sm italic mt-0.5 truncate">
+                {scientificName}
+              </p>
+            )}
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
   // List view - CSS Grid layout matching reference design
   if (viewMode === 'list') {
