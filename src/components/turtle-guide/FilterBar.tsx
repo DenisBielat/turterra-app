@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, X } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,49 +42,45 @@ export default function FilterBar({
   families,
   habitats,
   regions,
-  onClearFilters,
-  hasActiveFilters
 }: FilterBarProps) {
   return (
-    <div className="bg-green-950/50 backdrop-blur-sm rounded-xl p-4 lg:p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        {/* Search Input - takes more space */}
-        <div className="lg:col-span-4">
-          <label className="block text-gray-400 text-xs uppercase tracking-wide mb-2">
+    <div className="bg-green-900/80 backdrop-blur-sm rounded-full p-2 flex flex-col lg:flex-row lg:items-center">
+      {/* Search Input - takes more space, rounded left on desktop */}
+      <div className="flex-[2] min-w-0 px-2 lg:px-4 py-2 lg:py-0">
+        <div className="flex flex-col">
+          <label className="text-gray-400 text-xs font-medium mb-1">
             Turtle Name
           </label>
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="All Turtles"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-4 pr-10 h-11 bg-green-950 text-white placeholder:text-gray-500 border-green-800 focus:border-green-600 rounded-lg"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => onSearchChange('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
+          <Input
+            type="text"
+            placeholder="All Turtles"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="h-8 bg-transparent text-white placeholder:text-gray-500 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 text-base"
+          />
         </div>
+      </div>
 
-        {/* Family Filter */}
-        <div className="lg:col-span-2">
-          <label className="block text-gray-400 text-xs uppercase tracking-wide mb-2">
+      {/* Divider */}
+      <div className="hidden lg:block w-px h-12 bg-green-700/50" />
+
+      {/* Family Filter */}
+      <div className="flex-1 min-w-0 px-2 lg:px-4 py-2 lg:py-0">
+        <div className="flex flex-col">
+          <label className="text-gray-400 text-xs font-medium mb-1">
             Family
           </label>
           <Select value={selectedFamily} onValueChange={onFamilyChange}>
-            <SelectTrigger className="h-11 bg-green-950 text-white border-green-800 focus:border-green-600 focus:ring-0 rounded-lg">
-              <SelectValue placeholder="All" />
+            <SelectTrigger className="h-8 bg-transparent text-white border-0 focus:ring-0 p-0 text-base [&>svg]:hidden">
+              <div className="flex items-center gap-1">
+                <SelectValue placeholder="All" />
+                <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+              </div>
             </SelectTrigger>
             <SelectContent
-              className="bg-green-950 border-green-800 max-h-[300px] min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)]"
+              className="bg-green-950 border-green-800 max-h-[300px]"
               position="popper"
-              sideOffset={4}
+              sideOffset={8}
               align="start"
               avoidCollisions={true}
               collisionPadding={16}
@@ -104,20 +100,28 @@ export default function FilterBar({
             </SelectContent>
           </Select>
         </div>
+      </div>
 
-        {/* Habitat Filter */}
-        <div className="lg:col-span-2">
-          <label className="block text-gray-400 text-xs uppercase tracking-wide mb-2">
+      {/* Divider */}
+      <div className="hidden lg:block w-px h-12 bg-green-700/50" />
+
+      {/* Habitat Filter */}
+      <div className="flex-1 min-w-0 px-2 lg:px-4 py-2 lg:py-0">
+        <div className="flex flex-col">
+          <label className="text-gray-400 text-xs font-medium mb-1">
             Habitat
           </label>
           <Select value={selectedHabitat} onValueChange={onHabitatChange}>
-            <SelectTrigger className="h-11 bg-green-950 text-white border-green-800 focus:border-green-600 focus:ring-0 rounded-lg">
-              <SelectValue placeholder="All" />
+            <SelectTrigger className="h-8 bg-transparent text-white border-0 focus:ring-0 p-0 text-base [&>svg]:hidden">
+              <div className="flex items-center gap-1">
+                <SelectValue placeholder="All" />
+                <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+              </div>
             </SelectTrigger>
             <SelectContent
-              className="bg-green-950 border-green-800 max-h-[300px] min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)]"
+              className="bg-green-950 border-green-800 max-h-[300px]"
               position="popper"
-              sideOffset={4}
+              sideOffset={8}
               align="start"
               avoidCollisions={true}
               collisionPadding={16}
@@ -137,20 +141,28 @@ export default function FilterBar({
             </SelectContent>
           </Select>
         </div>
+      </div>
 
-        {/* Region Filter */}
-        <div className="lg:col-span-2">
-          <label className="block text-gray-400 text-xs uppercase tracking-wide mb-2">
+      {/* Divider */}
+      <div className="hidden lg:block w-px h-12 bg-green-700/50" />
+
+      {/* Region Filter */}
+      <div className="flex-1 min-w-0 px-2 lg:px-4 py-2 lg:py-0">
+        <div className="flex flex-col">
+          <label className="text-gray-400 text-xs font-medium mb-1">
             Region
           </label>
           <Select value={selectedRegion} onValueChange={onRegionChange}>
-            <SelectTrigger className="h-11 bg-green-950 text-white border-green-800 focus:border-green-600 focus:ring-0 rounded-lg">
-              <SelectValue placeholder="All" />
+            <SelectTrigger className="h-8 bg-transparent text-white border-0 focus:ring-0 p-0 text-base [&>svg]:hidden">
+              <div className="flex items-center gap-1">
+                <SelectValue placeholder="All" />
+                <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+              </div>
             </SelectTrigger>
             <SelectContent
-              className="bg-green-950 border-green-800 max-h-[300px] min-w-[var(--radix-select-trigger-width)] w-[var(--radix-select-trigger-width)]"
+              className="bg-green-950 border-green-800 max-h-[300px]"
               position="popper"
-              sideOffset={4}
+              sideOffset={8}
               align="start"
               avoidCollisions={true}
               collisionPadding={16}
@@ -170,28 +182,17 @@ export default function FilterBar({
             </SelectContent>
           </Select>
         </div>
+      </div>
 
-        {/* Search Button */}
-        <div className="lg:col-span-2 flex items-end gap-2">
-          <Button
-            className="flex-1 h-11 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-lg"
-            onClick={() => {}}
-          >
-            <Search className="h-4 w-4 mr-2" />
-            Search
-          </Button>
-          {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-11 w-11 text-gray-400 hover:text-white hover:bg-green-900"
-              onClick={onClearFilters}
-              title="Clear all filters"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          )}
-        </div>
+      {/* Search Button - pill shaped, orange */}
+      <div className="px-2 py-2 lg:py-0 lg:pl-2">
+        <Button
+          className="w-full lg:w-auto h-12 px-8 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded-full"
+          onClick={() => {}}
+        >
+          <Search className="h-4 w-4 mr-2" />
+          Search
+        </Button>
       </div>
     </div>
   );
