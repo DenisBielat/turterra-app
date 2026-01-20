@@ -162,7 +162,8 @@ export async function GET() {
         scientificName: turtle.species_scientific_name,
         slug: turtle.slug,
         avatarUrl: turtle.avatar_image_circle_url,
-        imageUrl: turtle.avatar_image_full_url,
+        // Use full image URL, fallback to circle avatar URL
+        imageUrl: turtle.avatar_image_full_url || turtle.avatar_image_circle_url,
         familyCommon: family?.common || null,
         familyScientific: family?.scientific || null,
         conservationStatus: conservationStatusData ? {
