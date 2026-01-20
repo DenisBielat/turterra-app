@@ -31,7 +31,7 @@ const Navbar = () => {
           {/* Left: Menu Button + Logo */}
           <div className="flex items-center gap-2">
             <MobileMenu />
-            <Link href="/">
+            <Link href="/" aria-label="Turterra Home">
               <Image
                 src="/images/turterra-logo-white-text.png"
                 alt="Turterra"
@@ -71,7 +71,7 @@ const Navbar = () => {
       >
         <div className="container mx-auto max-w-8xl flex h-16 items-center justify-between">
           <div className="flex items-center gap-16">
-            <Link href="/" className="flex-shrink-0">
+            <Link href="/" className="flex-shrink-0" aria-label="Turterra Home">
               <Image
                 src="/images/turterra-logo-white-text.png"
                 alt="Turterra"
