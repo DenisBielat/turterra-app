@@ -53,7 +53,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Enter your email"
+                            placeholder="iliketurtles@email.com"
                             className="flex-1 min-w-0 px-4 py-2 text-gray-900 rounded-sm border border-transparent transition-all duration-200 focus:border-green-500 focus:shadow-[0_0_0.25rem_0.03125rem_theme(colors.green.200)] focus:outline-none"
                             required
                           />
@@ -170,7 +170,7 @@ export function Footer({ logo, sections, newsletter, legal }: FooterProps) {
               {/* Bottom Section */}
               <div className="border-t border-neutral-200/20 pt-8">
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                  <p className="text-sm text-gray-200">© 2025 Turterra. All rights reserved.</p>
+                  <p className="text-sm text-gray-200">© {new Date().getFullYear()} Turterra. All rights reserved.</p>
                   <div className="flex gap-6">
                     {legal.map((link) => (
                       <Link
