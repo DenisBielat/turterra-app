@@ -19,7 +19,9 @@ interface ConservationStatus {
 
 interface ConservationHistory {
   year_status_assigned: string;
-  conservation_statuses: ConservationStatus[];
+  out_of_date?: boolean | null;
+  conservation_statuses: ConservationStatus | ConservationStatus[] | null;
+  self_assigned_status?: ConservationStatus | ConservationStatus[] | null;
 }
 
 interface HabitatTypeRelation {
@@ -53,7 +55,11 @@ export async function GET(request: Request) {
         avatar_image_circle_url,
         turtle_species_conservation_history(
           year_status_assigned,
+          out_of_date,
           conservation_statuses!turtle_species_conservation_conservation_status_fkey(
+            abbreviation
+          ),
+          self_assigned_status:conservation_statuses!turtle_species_conservation_h_self_assigned_conservation_s_fkey(
             abbreviation
           )
         ),
@@ -98,10 +104,22 @@ export async function GET(request: Request) {
         (a, b) => parseInt(b.year_status_assigned) - parseInt(a.year_status_assigned)
       );
       const latest = sortedHistory[0];
-      const cs = latest?.conservation_statuses;
-      const currentStatus = cs
-        ? (Array.isArray(cs) ? cs[0]?.abbreviation : (cs as { abbreviation?: string }).abbreviation) ?? null
+      const conservationStatusObj = latest?.conservation_statuses
+        ? (Array.isArray(latest.conservation_statuses)
+            ? latest.conservation_statuses[0]
+            : latest.conservation_statuses)
         : null;
+      const selfAssignedStatusObj = latest?.self_assigned_status
+        ? (Array.isArray(latest.self_assigned_status)
+            ? latest.self_assigned_status[0]
+            : latest.self_assigned_status)
+        : null;
+      // If out_of_date is true and self_assigned_status exists, use that instead
+      const isOutOfDate = latest?.out_of_date === true;
+      const effectiveStatus = isOutOfDate && selfAssignedStatusObj
+        ? selfAssignedStatusObj
+        : conservationStatusObj;
+      const currentStatus = effectiveStatus?.abbreviation ?? null;
 
       return {
         id: s.id,
