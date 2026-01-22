@@ -31,6 +31,7 @@ export interface TurtleGuideResponse {
 }
 
 export async function GET() {
+  console.log('=== TURTLE GUIDE API ROUTE CALLED ===');
   try {
     // Fetch all turtles with their related data
     const { data: turtles, error: turtlesError } = await supabase
@@ -48,7 +49,12 @@ export async function GET() {
         ),
         turtle_species_conservation_history(
           year_status_assigned,
+          out_of_date,
           conservation_statuses!turtle_species_conservation_conservation_status_fkey(
+            status,
+            abbreviation
+          ),
+          self_assigned_status:conservation_statuses!turtle_species_conservation_h_self_assigned_conservation_s_fkey(
             status,
             abbreviation
           )
@@ -124,18 +130,55 @@ export async function GET() {
       // Get conservation status (most recent)
       const conservationHistoryRaw = turtle.turtle_species_conservation_history as unknown as Array<{
         year_status_assigned: string;
+        out_of_date?: boolean | null;
         conservation_statuses: Array<{ status: string; abbreviation: string }> | { status: string; abbreviation: string } | null;
+        self_assigned_status?: Array<{ status: string; abbreviation: string }> | { status: string; abbreviation: string } | null;
       }> | null;
 
       const latestConservation = conservationHistoryRaw
         ?.sort((a, b) => parseInt(b.year_status_assigned) - parseInt(a.year_status_assigned))[0];
 
-      // Handle conservation_statuses which could be array or object
-      let conservationStatusData: { status: string; abbreviation: string } | null = null;
-      if (latestConservation?.conservation_statuses) {
-        const cs = latestConservation.conservation_statuses;
-        conservationStatusData = Array.isArray(cs) ? cs[0] : cs;
+      // Handle both array and object cases for conservation_statuses (Supabase can return either)
+      const conservationStatusObj = latestConservation?.conservation_statuses
+        ? (Array.isArray(latestConservation.conservation_statuses)
+            ? latestConservation.conservation_statuses[0]
+            : latestConservation.conservation_statuses)
+        : null;
+
+      // Handle self_assigned_status - check if it exists in the raw data first
+      let selfAssignedStatusObj = null;
+      if (latestConservation?.self_assigned_status) {
+        if (Array.isArray(latestConservation.self_assigned_status)) {
+          selfAssignedStatusObj = latestConservation.self_assigned_status[0];
+        } else {
+          selfAssignedStatusObj = latestConservation.self_assigned_status;
+        }
       }
+
+      // Debug logging for any turtle with self_assigned_status or out_of_date
+      const hasSelfAssigned = !!selfAssignedStatusObj;
+      const isOutOfDate = latestConservation?.out_of_date === true;
+      
+      if (hasSelfAssigned || isOutOfDate) {
+        console.log(`\n=== DEBUG: ${turtle.species_common_name} ===`);
+        console.log('out_of_date:', isOutOfDate);
+        console.log('has self_assigned_status:', hasSelfAssigned);
+        console.log('conservationStatusObj:', JSON.stringify(conservationStatusObj, null, 2));
+        console.log('selfAssignedStatusObj:', JSON.stringify(selfAssignedStatusObj, null, 2));
+        console.log('raw latestConservation:', JSON.stringify(latestConservation, null, 2));
+      }
+
+      // If out_of_date is true and self_assigned_status exists, use that instead
+      const effectiveStatus = isOutOfDate && selfAssignedStatusObj
+        ? selfAssignedStatusObj
+        : conservationStatusObj;
+
+      if (hasSelfAssigned || isOutOfDate) {
+        console.log('effectiveStatus:', JSON.stringify(effectiveStatus, null, 2));
+        console.log('=== END DEBUG ===\n');
+      }
+
+      const conservationStatusData = effectiveStatus;
 
       // Get family info
       const family = genusToFamily.get(turtle.tax_parent_genus);

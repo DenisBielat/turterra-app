@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import cloudinary from "@/lib/db/cloudinary";
+import cloudinary, { sanitizeSpeciesNameForCloudinary } from "@/lib/db/cloudinary";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { species } = req.query;
@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid species parameter" });
   }
 
-  const formattedSpecies = species.replace(/\s+/g, "-");
+  const formattedSpecies = sanitizeSpeciesNameForCloudinary(species);
   const assetFolder = `Turtle Species Photos/${formattedSpecies}`;
 
   console.log("Asset folder being queried:", assetFolder); // Debugging log

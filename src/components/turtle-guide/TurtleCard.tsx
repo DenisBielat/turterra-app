@@ -30,8 +30,11 @@ const getConservationBadgeColor = (code: string) => {
     case 'EW':
       return 'bg-red-500';
 
-    // Threatened categories - orange
+    // Critically Endangered - red
     case 'CR':
+      return 'bg-red-500';
+
+    // Threatened categories - orange
     case 'EN':
     case 'VU':
       return 'bg-orange-500';

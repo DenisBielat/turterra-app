@@ -133,8 +133,11 @@ export default function Conservation({
       case 'EW':
         return 'bg-red-500 outline-red-500 text-white';
       
-      // Threatened categories - orange
+      // Critically Endangered - red
       case 'CR':
+        return 'bg-red-500 outline-red-500 text-white';
+      
+      // Threatened categories - orange
       case 'EN':
       case 'VU':
         return 'bg-orange-500 outline-orange-500 text-white';

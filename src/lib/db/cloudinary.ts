@@ -19,8 +19,25 @@ cloudinary.config({
 //   };
 // }
 
+/**
+ * Sanitizes a species name for use in Cloudinary folder paths.
+ * Removes apostrophes and other special characters that might cause issues.
+ * 
+ * @param species - The species name to sanitize
+ * @returns A sanitized string suitable for folder names (lowercase, hyphens instead of spaces, no special chars)
+ */
+export function sanitizeSpeciesNameForCloudinary(species: string): string {
+  return species
+    .toLowerCase()
+    .replace(/'/g, '') // Remove apostrophes
+    .replace(/[^\w\s-]/g, '') // Remove any other special characters except word chars, spaces, and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple consecutive hyphens with a single hyphen
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+}
+
 export async function getPhysicalFeatureImages(species: string) {
-  const formattedSpecies = species.toLowerCase().replace(/\s+/g, '-');
+  const formattedSpecies = sanitizeSpeciesNameForCloudinary(species);
   const assetFolder = `Turtle Species Photos/${formattedSpecies}/physical-features`;
 
   try {
