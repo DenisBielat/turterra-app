@@ -53,7 +53,7 @@ export async function GET(request: Request) {
         avatar_image_circle_url,
         turtle_species_conservation_history(
           year_status_assigned,
-          conservation_statuses(
+          conservation_statuses!turtle_species_conservation_conservation_status_fkey(
             abbreviation
           )
         ),
@@ -73,7 +73,10 @@ export async function GET(request: Request) {
 
     // Exclude the primary species from results
     if (excludeId) {
-      speciesQuery = speciesQuery.neq('id', excludeId);
+      const excludeIdNum = parseInt(excludeId, 10);
+      if (!Number.isNaN(excludeIdNum)) {
+        speciesQuery = speciesQuery.neq('id', excludeIdNum);
+      }
     }
 
     // Apply sorting
@@ -94,7 +97,11 @@ export async function GET(request: Request) {
       const sortedHistory = [...conservationHistory].sort(
         (a, b) => parseInt(b.year_status_assigned) - parseInt(a.year_status_assigned)
       );
-      const currentStatus = sortedHistory[0]?.conservation_statuses?.[0]?.abbreviation || null;
+      const latest = sortedHistory[0];
+      const cs = latest?.conservation_statuses;
+      const currentStatus = cs
+        ? (Array.isArray(cs) ? cs[0]?.abbreviation : (cs as { abbreviation?: string }).abbreviation) ?? null
+        : null;
 
       return {
         id: s.id,
@@ -103,9 +110,10 @@ export async function GET(request: Request) {
         avatarUrl: s.avatar_image_circle_url,
         conservationStatus: currentStatus,
         // Keep habitat types for filtering (will be removed from final response)
-        _habitatTypes: (s.turtle_species_habitat_types || []).map(
-          (ht) => ht.habitat_types?.[0]?.habitat_type
-        ).filter(Boolean) as string[]
+        _habitatTypes: (s.turtle_species_habitat_types || []).map((ht) => {
+          const h = ht.habitat_types;
+          return Array.isArray(h) ? h[0]?.habitat_type : (h as { habitat_type?: string })?.habitat_type;
+        }).filter(Boolean) as string[]
       };
     });
 
@@ -135,6 +143,7 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('Error searching species:', error);
-    return NextResponse.json({ error: 'Failed to search species' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to search species';
+    return NextResponse.json({ error: 'Failed to search species', details: message }, { status: 500 });
   }
 }
