@@ -111,14 +111,16 @@ const MobileMenu = () => {
 
         {/* Donate Section - Fixed at bottom */}
         <div className="border-t border-gray-300 border-opacity-50 p-4 mt-auto">
-          <Link
-            href="/donate"
+          <a
+            href="https://buymeacoffee.com/turterra"
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={closeMenu}
             className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-green-600 text-white font-semibold rounded-full hover:bg-green-700 transition-colors"
           >
             <Icon name="hand-shake-heart" style="line" size="lg" />
             Donate
-          </Link>
+          </a>
         </div>
       </SheetContent>
     </Sheet>

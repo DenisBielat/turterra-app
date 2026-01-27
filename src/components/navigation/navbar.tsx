@@ -153,9 +153,14 @@ const Navbar = () => {
 
                 <NavigationMenuItem>
                   <NavigationMenuLink asChild>
-                    <Link href="/donate" className='hover:text-green-600 transition-all'>
+                    <a 
+                      href="https://buymeacoffee.com/turterra" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className='hover:text-green-600 transition-all'
+                    >
                       Donate
-                    </Link>
+                    </a>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               </NavigationMenuList>
