@@ -6,6 +6,7 @@ import NavLink from './navlink'
 import MobileMenu from './mobile-menu'
 import { Icon } from '@/components/Icon'
 import { useScrollDirection } from '@/hooks/useScrollDirection'
+import { useAuthModal } from '@/components/auth/auth-modal-provider'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -18,6 +19,7 @@ import {
 const Navbar = () => {
   const { scrollDirection, isAtTop } = useScrollDirection(50);
   const isVisible = isAtTop || scrollDirection === 'up';
+  const { openModal } = useAuthModal();
 
   return (
     <>
@@ -51,12 +53,12 @@ const Navbar = () => {
             >
               <Icon name="search" style="line" size="base" />
             </Link>
-            <Link
-              href="/login"
+            <button
+              onClick={() => openModal("login")}
               className="font-semibold text-white border-2 border-warm rounded-full px-4 py-1.5 text-sm hover:text-green-950 hover:bg-warm transition-all"
             >
               Log in
-            </Link>
+            </button>
           </div>
         </div>
       </header>
@@ -168,18 +170,18 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link
-              href="/login"
+            <button
+              onClick={() => openModal("login")}
               className="font-semibold text-white border-2 border-warm rounded-full px-6 py-3 hover:text-green-950 hover:bg-warm transition-all"
             >
               Log in
-            </Link>
-            <Link
-              href="/join"
+            </button>
+            <button
+              onClick={() => openModal("join")}
               className="font-semibold rounded-full border-2 border-green-600 bg-green-600 px-6 py-3 text-white hover:bg-green-900 hover:border-green-900 transition-all"
             >
               Join the Community
-            </Link>
+            </button>
           </div>
         </div>
       </header>
