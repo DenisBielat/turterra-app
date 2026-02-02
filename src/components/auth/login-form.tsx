@@ -31,6 +31,27 @@ export function LoginForm() {
       return;
     }
 
+    // Check if user has a profile
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile) {
+        // New user without profile - redirect to onboarding
+        closeModal();
+        router.push("/onboarding");
+        return;
+      }
+    }
+
+    // Existing user with profile - just refresh the page
     closeModal();
     router.refresh();
   };
