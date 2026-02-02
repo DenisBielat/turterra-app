@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import Link from "next/link";
+import { useAuthModal } from "./auth-modal-provider";
 
 export function LoginForm() {
   const router = useRouter();
+  const { openModal, closeModal } = useAuthModal();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/");
+    closeModal();
     router.refresh();
   };
 
@@ -79,12 +80,13 @@ export function LoginForm() {
       </div>
 
       <div className="flex justify-end">
-        <Link
-          href="/forgot-password"
+        <button
+          type="button"
+          onClick={() => openModal("forgot-password")}
           className="text-sm text-green-700 hover:text-green-900 transition-colors"
         >
           Forgot your password?
-        </Link>
+        </button>
       </div>
 
       <button

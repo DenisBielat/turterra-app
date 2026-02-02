@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
+import { AuthModalProvider } from "@/components/auth/auth-modal-provider";
 
 // Add Outfit font (Google Font)
 const outfit = Outfit({
@@ -44,10 +45,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-  modal,
 }: Readonly<{
   children: React.ReactNode;
-  modal: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -55,8 +54,9 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="256x256" href="/images/turterra-favicon-256.png" />
       </head>
       <body className={`${outfit.variable} ${averta.variable} antialiased`} suppressHydrationWarning>
-        {children}
-        {modal}
+        <AuthModalProvider>
+          {children}
+        </AuthModalProvider>
       </body>
     </html>
   );
