@@ -58,13 +58,14 @@ export async function updateSession(request: NextRequest) {
   // This call does two things:
   // 1. Returns the current user (if logged in)
   // 2. Refreshes the session token if it's about to expire
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Note: Even if we don't use the user object here, calling getUser()
+  // is what triggers the session refresh. Don't remove this call!
+  await supabase.auth.getUser();
 
   // OPTIONAL: Protect routes by redirecting unauthenticated users
   // Uncomment and customize this block if you want certain pages to require login
   //
+  // const { data: { user } } = await supabase.auth.getUser() // Move getUser here
   // if (
   //   !user &&
   //   !request.nextUrl.pathname.startsWith('/login') &&
