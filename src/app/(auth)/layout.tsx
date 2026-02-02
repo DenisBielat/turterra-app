@@ -21,11 +21,11 @@ export default function AuthLayout({
           <div className="flex justify-center mb-8">
             <Link href="/">
               <Image
-                src="/images/turterra-logo-green-text.png"
+                src="/images/logomark-dark.png"
                 alt="Turterra"
-                width={150}
-                height={40}
-                className="h-auto w-auto"
+                width={64}
+                height={64}
+                className="h-16 w-16"
                 priority
               />
             </Link>

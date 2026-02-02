@@ -2,9 +2,6 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
-import Navbar from "@/components/navigation/navbar";
-import { Footer } from '@/components/layout/Footer';
-import { footerConfig } from '@/config/footer';
 
 // Add Outfit font (Google Font)
 const outfit = Outfit({
@@ -56,11 +53,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="256x256" href="/images/turterra-favicon-256.png" />
       </head>
       <body className={`${outfit.variable} ${averta.variable} antialiased`} suppressHydrationWarning>
-        <Navbar />
-        <main>
-          {children}
-        </main>
-        <Footer {...footerConfig} />
+        {children}
       </body>
     </html>
   );
