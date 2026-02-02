@@ -124,9 +124,8 @@ export function OnboardingForm({ userId }: OnboardingFormProps) {
         return;
       }
 
-      // Success! Navigate to home page for now
-      // TODO: Update to router.push(`/@${username}`) once Phase 7 (profile page) is implemented
-      router.push("/");
+      // Success! Navigate to the user's new profile
+      router.push(`/user/${username}`);
       router.refresh();
     } catch (err) {
       console.error("Profile creation failed:", err);

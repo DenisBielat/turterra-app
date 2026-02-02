@@ -44,9 +44,8 @@ export default async function OnboardingPage() {
     .single();
 
   if (profile) {
-    // Already has profile - send to home page for now
-    // TODO: Update to redirect(`/@${profile.username}`) once Phase 7 (profile page) is implemented
-    redirect("/");
+    // Already has profile - send to their profile page
+    redirect(`/user/${profile.username}`);
   }
 
   return (
