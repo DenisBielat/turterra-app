@@ -1,8 +1,17 @@
 import * as postmark from "postmark";
 
-const client = new postmark.ServerClient(
-  process.env.POSTMARK_SERVER_TOKEN!
-);
+let client: postmark.ServerClient | null = null;
+
+function getClient() {
+  if (!client) {
+    const token = process.env.POSTMARK_SERVER_TOKEN;
+    if (!token) {
+      throw new Error("POSTMARK_SERVER_TOKEN is not set");
+    }
+    client = new postmark.ServerClient(token);
+  }
+  return client;
+}
 
 const FROM_EMAIL = process.env.POSTMARK_FROM_EMAIL || "noreply@turterra.com";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://turterra.com";
@@ -19,7 +28,7 @@ export async function sendTemplateEmail({
   templateModel,
 }: SendTemplateEmailOptions) {
   try {
-    await client.sendEmailWithTemplate({
+    await getClient().sendEmailWithTemplate({
       From: FROM_EMAIL,
       To: to,
       TemplateAlias: templateAlias,
