@@ -69,10 +69,10 @@ export function SettingsForm({ profile, userEmail }: SettingsFormProps) {
   const handlePasswordChange = async () => {
     setPasswordMessage(null);
 
-    if (newPassword.length < 6) {
+    if (newPassword.length < 8) {
       setPasswordMessage({
         type: "error",
-        text: "Password must be at least 6 characters.",
+        text: "Password must be at least 8 characters.",
       });
       return;
     }
@@ -130,7 +130,7 @@ export function SettingsForm({ profile, userEmail }: SettingsFormProps) {
     (location.trim() || null) !== (profile.location || null);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-12">
       {/* Profile Settings */}
       <section className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="text-xl font-bold text-green-950 font-heading mb-6">
@@ -280,7 +280,7 @@ export function SettingsForm({ profile, userEmail }: SettingsFormProps) {
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="At least 6 characters"
+                  placeholder="At least 8 characters"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                 />
               </div>
@@ -335,30 +335,33 @@ export function SettingsForm({ profile, userEmail }: SettingsFormProps) {
           These actions are permanent and cannot be undone.
         </p>
 
-        <div className="space-y-4">
-          <p className="text-sm text-gray-700">
-            Type <span className="font-mono font-semibold">{profile.username}</span> to
-            confirm account deletion.
-          </p>
-          <input
-            type="text"
-            value={deleteConfirm}
-            onChange={(e) => setDeleteConfirm(e.target.value)}
-            placeholder={profile.username}
-            className="w-full max-w-md px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
-          />
+        <div className="space-y-4 max-w-md">
+          <div className="space-y-2">
+            <p className="text-sm text-gray-700">
+              Type <span className="font-mono font-semibold">{profile.username}</span> to
+              confirm account deletion.
+            </p>
+            <input
+              type="text"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder={profile.username}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+            />
+          </div>
 
-          {deleteMessage && (
-            <p className="text-sm text-red-600">{deleteMessage.text}</p>
-          )}
-
-          <button
-            onClick={handleDeleteAccount}
-            disabled={deleteConfirm !== profile.username || deleting}
-            className="px-6 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            {deleting ? "Deleting..." : "Delete My Account"}
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleDeleteAccount}
+              disabled={deleteConfirm !== profile.username || deleting}
+              className="px-6 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              {deleting ? "Deleting..." : "Delete My Account"}
+            </button>
+            {deleteMessage && (
+              <p className="text-sm text-red-600">{deleteMessage.text}</p>
+            )}
+          </div>
         </div>
       </section>
     </div>

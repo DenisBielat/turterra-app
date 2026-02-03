@@ -355,12 +355,12 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
                     placeholder="Tell us about yourself and your love for turtles..."
-                    maxLength={250}
+                    maxLength={500}
                     rows={3}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all resize-none"
                   />
                   <p className="text-xs text-gray-400 text-right">
-                    {bio.length}/250 characters
+                    {bio.length}/500 characters
                   </p>
                 </div>
 

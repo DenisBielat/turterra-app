@@ -269,7 +269,7 @@ const Navbar = () => {
 
               {/* Dropdown Menu */}
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-1.5 w-64 bg-white rounded-2xl shadow-lg border-2 border-green-950 p-3 z-50">
+                <div className="absolute right-0 top-full mt-1.5 w-64 bg-white rounded-2xl shadow-lg border-2 border-green-950 p-3 z-50 origin-top-right animate-in fade-in zoom-in-90 duration-150">
                   {/* User info header with avatar */}
                   <div className="flex items-center gap-3 px-3 py-3">
                     <UserAvatar
