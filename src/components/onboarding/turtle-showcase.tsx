@@ -72,9 +72,12 @@ export function TurtleShowcase() {
       {turtle && !loading && (
         <div className="absolute bottom-0 left-0 right-0 p-8">
           {/* Species Name */}
-          <h2 className="text-3xl font-bold text-white font-heading mb-2">
+          <h2 className="text-3xl font-bold text-white font-heading">
             {turtle.commonName}
           </h2>
+          <p className="text-white/60 italic text-base mt-1 mb-2">
+            {turtle.scientificName}
+          </p>
 
           {/* Fun Fact */}
           {truncatedFact && (

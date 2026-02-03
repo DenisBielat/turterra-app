@@ -41,17 +41,14 @@ export default async function OnboardingPage() {
   return (
     <div className="min-h-screen flex flex-col p-6 lg:p-10">
       {/* Logo */}
-      <div className="flex items-center gap-2 mb-6 lg:mb-8">
+      <div className="mb-6 lg:mb-8">
         <Image
-          src="/images/logomark-dark.png"
-          alt=""
-          width={36}
-          height={36}
-          className="w-9 h-9"
+          src="/images/turterra-text-logo-dark.png"
+          alt="Turterra"
+          width={160}
+          height={32}
+          className="h-8 w-auto"
         />
-        <span className="text-green-950 font-heading font-bold text-xl">
-          Turterra
-        </span>
       </div>
 
       {/* Main Content */}
