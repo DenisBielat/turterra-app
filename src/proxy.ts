@@ -2,7 +2,7 @@ import { type NextRequest } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
 /**
- * Next.js Middleware
+ * Next.js Proxy
  *
  * This runs on EVERY request that matches the `config.matcher` pattern below.
  * Its main job is to keep the user's auth session fresh.
@@ -17,22 +17,22 @@ import { updateSession } from "@/lib/supabase/middleware";
  * - Server Components couldn't reliably check authentication
  * - Session state would be inconsistent between client and server
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 
 /**
  * Route Matcher Configuration
  *
- * This regex tells Next.js which routes should run through the middleware.
- * We want the middleware to run on almost everything EXCEPT:
+ * This regex tells Next.js which routes should run through the proxy.
+ * We want the proxy to run on almost everything EXCEPT:
  * - Static files (_next/static)
  * - Image optimization files (_next/image)
  * - Favicon
  * - Public assets with file extensions (images, fonts, etc.)
  *
  * WHY EXCLUDE THESE?
- * Static files don't need authentication. Running middleware on them
+ * Static files don't need authentication. Running the proxy on them
  * would just slow things down for no benefit.
  */
 export const config = {
