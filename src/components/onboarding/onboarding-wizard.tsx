@@ -12,11 +12,7 @@ interface OnboardingWizardProps {
 type Step = 1 | 2 | 3;
 type UsernameStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
-const STEPS = [
-  { number: 1, title: "Account", subtitle: "Choose your username" },
-  { number: 2, title: "Profile", subtitle: "Add your details" },
-  { number: 3, title: "Review", subtitle: "Confirm your info" },
-];
+const TOTAL_STEPS = 3;
 
 /**
  * Onboarding Wizard Component
@@ -222,6 +218,9 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
     }
   };
 
+  // Calculate progress percentage
+  const progressPercent = (currentStep / TOTAL_STEPS) * 100;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -234,23 +233,165 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
         </p>
       </div>
 
-      {/* Step Indicator */}
-      <div className="flex items-center justify-center gap-4">
-        {STEPS.map((step, index) => (
-          <div key={step.number} className="flex items-center">
-            <div className="flex flex-col items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all ${
-                  currentStep > step.number
-                    ? "bg-green-600 text-white"
-                    : currentStep === step.number
-                    ? "bg-green-600 text-white ring-4 ring-green-100"
-                    : "bg-gray-100 text-gray-400 border-2 border-gray-200"
-                }`}
-              >
-                {currentStep > step.number ? (
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+          {error}
+        </div>
+      )}
+
+      {/* Step Content Card with Progress Bar */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {/* Subtle Progress Bar */}
+        <div className="h-1 bg-gray-100">
+          <div
+            className="h-full bg-green-500 transition-all duration-300 ease-out"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+
+        <div className="p-6 lg:p-8">
+          {/* Step 1: Username */}
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-green-600">@</span>
+                </div>
+                <h2 className="text-xl font-bold text-green-950 font-heading">
+                  Choose your username
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  This will be your unique identifier on Turterra
+                </p>
+              </div>
+
+              <div className="space-y-2 max-w-sm mx-auto">
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-green-950"
+                >
+                  Username <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">
+                    @
+                  </span>
+                  <input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={handleUsernameChange}
+                    placeholder="turtlelover"
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    className="w-full pl-8 pr-12 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2">
+                    {getStatusIcon()}
+                  </span>
+                </div>
+                <p className="text-xs">{getHelperText()}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Profile Details */}
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
                   <svg
-                    className="w-5 h-5"
+                    className="w-8 h-8 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-green-950 font-heading">
+                  Complete your profile
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  Add some details to personalize your experience (all optional)
+                </p>
+              </div>
+
+              <div className="space-y-4 max-w-sm mx-auto">
+                <div className="space-y-2">
+                  <label
+                    htmlFor="displayName"
+                    className="block text-sm font-medium text-green-950"
+                  >
+                    Display Name
+                  </label>
+                  <input
+                    id="displayName"
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Jane Doe"
+                    maxLength={50}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="bio"
+                    className="block text-sm font-medium text-green-950"
+                  >
+                    Bio
+                  </label>
+                  <textarea
+                    id="bio"
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    placeholder="Tell us about yourself and your love for turtles..."
+                    maxLength={250}
+                    rows={3}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all resize-none"
+                  />
+                  <p className="text-xs text-gray-400 text-right">
+                    {bio.length}/250 characters
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <label
+                    htmlFor="location"
+                    className="block text-sm font-medium text-green-950"
+                  >
+                    Location
+                  </label>
+                  <input
+                    id="location"
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="City, Country"
+                    maxLength={100}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Review */}
+          {currentStep === 3 && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-green-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -262,269 +403,79 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
                       d="M5 13l4 4L19 7"
                     />
                   </svg>
-                ) : (
-                  step.number
-                )}
-              </div>
-              <div className="mt-2 text-center">
-                <p
-                  className={`text-sm font-medium ${
-                    currentStep >= step.number
-                      ? "text-green-950"
-                      : "text-gray-400"
-                  }`}
-                >
-                  {step.title}
-                </p>
-                <p className="text-xs text-gray-400 hidden sm:block">
-                  {step.subtitle}
-                </p>
-              </div>
-            </div>
-            {index < STEPS.length - 1 && (
-              <div
-                className={`w-12 lg:w-20 h-0.5 mx-2 mb-8 ${
-                  currentStep > step.number ? "bg-green-600" : "bg-gray-200"
-                }`}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-          {error}
-        </div>
-      )}
-
-      {/* Step Content */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 lg:p-8">
-        {/* Step 1: Username */}
-        {currentStep === 1 && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                <span className="text-2xl font-bold text-green-600">@</span>
-              </div>
-              <h2 className="text-xl font-bold text-green-950 font-heading">
-                Choose your username
-              </h2>
-              <p className="text-gray-500 mt-1">
-                This will be your unique identifier on Turterra
-              </p>
-            </div>
-
-            <div className="space-y-2 max-w-sm mx-auto">
-              <label
-                htmlFor="username"
-                className="block text-sm font-medium text-green-950"
-              >
-                Username <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-medium">
-                  @
-                </span>
-                <input
-                  id="username"
-                  type="text"
-                  value={username}
-                  onChange={handleUsernameChange}
-                  placeholder="turtlelover"
-                  autoComplete="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  className="w-full pl-8 pr-12 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2">
-                  {getStatusIcon()}
-                </span>
-              </div>
-              <p className="text-xs">{getHelperText()}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Profile Details */}
-        {currentStep === 2 && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-xl font-bold text-green-950 font-heading">
-                Complete your profile
-              </h2>
-              <p className="text-gray-500 mt-1">
-                Add some details to personalize your experience (all optional)
-              </p>
-            </div>
-
-            <div className="space-y-4 max-w-sm mx-auto">
-              <div className="space-y-2">
-                <label
-                  htmlFor="displayName"
-                  className="block text-sm font-medium text-green-950"
-                >
-                  Display Name
-                </label>
-                <input
-                  id="displayName"
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Jane Doe"
-                  maxLength={50}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="bio"
-                  className="block text-sm font-medium text-green-950"
-                >
-                  Bio
-                </label>
-                <textarea
-                  id="bio"
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell us about yourself and your love for turtles..."
-                  maxLength={250}
-                  rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all resize-none"
-                />
-                <p className="text-xs text-gray-400 text-right">
-                  {bio.length}/250 characters
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="location"
-                  className="block text-sm font-medium text-green-950"
-                >
-                  Location
-                </label>
-                <input
-                  id="location"
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="City, Country"
-                  maxLength={100}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Review */}
-        {currentStep === 3 && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-xl font-bold text-green-950 font-heading">
-                You&apos;re all set!
-              </h2>
-              <p className="text-gray-500 mt-1">
-                Review your profile before getting started
-              </p>
-            </div>
-
-            {/* Profile Preview */}
-            <div className="max-w-sm mx-auto">
-              <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                    <svg
-                      className="w-8 h-8 text-green-300"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-green-950">
-                      {displayName || username}
-                    </h3>
-                    <p className="text-gray-500 text-sm">@{username}</p>
-                  </div>
                 </div>
+                <h2 className="text-xl font-bold text-green-950 font-heading">
+                  You&apos;re all set!
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  Review your profile before getting started
+                </p>
+              </div>
 
-                <div className="border-t border-gray-200 pt-4 space-y-2">
-                  {bio && (
-                    <p className="text-sm text-gray-600">{bio}</p>
-                  )}
-                  {location && (
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
+              {/* Profile Preview */}
+              <div className="max-w-sm mx-auto">
+                <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
                       <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
+                        className="w-8 h-8 text-green-300"
+                        fill="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                       </svg>
-                      {location}
-                    </p>
-                  )}
-                  {!bio && !location && (
-                    <p className="text-sm text-gray-400 italic">
-                      You can add more details later from your profile page
-                    </p>
-                  )}
-                </div>
-              </div>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-green-950">
+                        {displayName || username}
+                      </h3>
+                      <p className="text-gray-500 text-sm">@{username}</p>
+                    </div>
+                  </div>
 
-              <p className="text-center text-sm text-gray-500 mt-4">
-                You can always update your profile information later
-              </p>
+                  <div className="border-t border-gray-200 pt-4 space-y-2">
+                    {bio && (
+                      <p className="text-sm text-gray-600">{bio}</p>
+                    )}
+                    {location && (
+                      <p className="text-sm text-gray-500 flex items-center gap-1">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                        </svg>
+                        {location}
+                      </p>
+                    )}
+                    {!bio && !location && (
+                      <p className="text-sm text-gray-400 italic">
+                        You can add more details later from your profile page
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  You can always update your profile information later
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Navigation Buttons */}
@@ -536,7 +487,7 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
           className={`inline-flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-full transition-all ${
             currentStep === 1
               ? "text-gray-300 cursor-not-allowed"
-              : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+              : "text-gray-600 hover:text-gray-800 hover:bg-white/50"
           }`}
         >
           <svg

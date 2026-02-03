@@ -10,7 +10,7 @@ export default function OnboardingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-950 via-green-900 to-green-950">
+    <div className="min-h-screen bg-amber-50">
       {children}
     </div>
   );

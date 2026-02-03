@@ -49,7 +49,7 @@ export default async function OnboardingPage() {
       </div>
 
       {/* Right side - Onboarding Form */}
-      <div className="flex-1 flex flex-col bg-amber-50/95 lg:rounded-l-3xl lg:-ml-6 relative z-10">
+      <div className="flex-1 flex flex-col">
         <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
           <div className="w-full max-w-lg">
             <OnboardingWizard userId={user.id} userEmail={user.email || ""} />

@@ -77,28 +77,15 @@ export function TurtleShowcase() {
       {/* Content */}
       {turtle && !loading && (
         <div className="absolute inset-0 flex flex-col justify-end p-8 lg:p-12">
-          {/* Turterra Logo/Brand */}
+          {/* Turterra Logo */}
           <div className="absolute top-8 left-8 lg:top-12 lg:left-12">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"
-                  />
-                </svg>
-              </div>
-              <span className="text-white font-heading font-bold text-xl">
-                Turterra
-              </span>
-            </div>
+            <Image
+              src="/images/turterra-logo-white-text.png"
+              alt="Turterra"
+              width={140}
+              height={40}
+              className="h-8 w-auto"
+            />
           </div>
 
           {/* Turtle Info Card */}
