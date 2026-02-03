@@ -30,7 +30,7 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
             <button
               disabled
               title="Avatar upload coming soon"
-              className="absolute bottom-0 right-0 w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white hover:bg-green-700 transition-colors opacity-50 cursor-not-allowed"
+              className="absolute bottom-0 right-0 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white hover:bg-orange-600 transition-colors opacity-50 cursor-not-allowed"
             >
               <svg
                 className="w-4 h-4"
