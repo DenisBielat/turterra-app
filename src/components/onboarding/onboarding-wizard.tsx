@@ -124,6 +124,9 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
         return;
       }
 
+      // Send welcome email (fire-and-forget — don't block onboarding)
+      fetch("/api/welcome-email", { method: "POST" }).catch(() => {});
+
       router.push(`/user/${username}`);
       router.refresh();
     } catch (err) {
