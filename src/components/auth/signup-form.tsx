@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useAuthModal } from "./auth-modal-provider";
 
 export function SignupForm() {
+  const router = useRouter();
+  const { closeModal } = useAuthModal();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,7 +35,7 @@ export function SignupForm() {
 
     const supabase = createClient();
 
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -45,6 +49,14 @@ export function SignupForm() {
       return;
     }
 
+    // If session exists, email confirmation is disabled - redirect to onboarding
+    if (data.session) {
+      closeModal();
+      router.push("/onboarding");
+      return;
+    }
+
+    // Email confirmation is enabled - show success message
     setSuccess(true);
     setLoading(false);
   };
