@@ -14,14 +14,8 @@ interface TurtleData {
 /**
  * Turtle Showcase Component
  *
- * Displays a random turtle with its image and a fun fact.
- * Used on the left side of the onboarding split-screen layout.
- *
- * Features:
- * - Fetches random turtle on mount
- * - Beautiful image with gradient overlay
- * - Species name and scientific name
- * - Fun fact from the at_a_glance description
+ * Displays a random turtle in a contained card format.
+ * Black gradient overlay on the bottom half, species name and fun fact at bottom.
  */
 export function TurtleShowcase() {
   const [turtle, setTurtle] = useState<TurtleData | null>(null);
@@ -45,14 +39,14 @@ export function TurtleShowcase() {
     fetchRandomTurtle();
   }, []);
 
-  // Truncate fact to a reasonable length
+  // Truncate fact to keep the overlay compact
   const truncatedFact =
-    turtle?.fact && turtle.fact.length > 280
-      ? turtle.fact.substring(0, 280).trim() + "..."
+    turtle?.fact && turtle.fact.length > 200
+      ? turtle.fact.substring(0, 200).trim() + "..."
       : turtle?.fact;
 
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    <div className="relative w-full h-full min-h-[500px]">
       {/* Background Image */}
       {turtle?.imageUrl && (
         <Image
@@ -64,78 +58,40 @@ export function TurtleShowcase() {
         />
       )}
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-green-950/95 via-green-950/40 to-green-950/20" />
+      {/* Black gradient - 100% opacity at bottom, fading to 0% at midpoint */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black from-0% via-black/60 via-30% to-transparent to-50%" />
 
       {/* Loading State */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-12 h-12 border-4 border-green-400/30 border-t-green-400 rounded-full animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-green-900/80">
+          <div className="w-10 h-10 border-3 border-white/20 border-t-white rounded-full animate-spin" />
         </div>
       )}
 
-      {/* Content */}
+      {/* Content at bottom */}
       {turtle && !loading && (
-        <div className="absolute inset-0 flex flex-col justify-end p-8 lg:p-12">
-          {/* Turterra Logo */}
-          <div className="absolute top-8 left-8 lg:top-12 lg:left-12">
-            <Image
-              src="/images/turterra-logo-white-text.png"
-              alt="Turterra"
-              width={140}
-              height={40}
-              className="h-8 w-auto"
-            />
-          </div>
+        <div className="absolute bottom-0 left-0 right-0 p-8">
+          {/* Species Name */}
+          <h2 className="text-3xl font-bold text-white font-heading mb-2">
+            {turtle.commonName}
+          </h2>
 
-          {/* Turtle Info Card */}
-          <div className="space-y-4">
-            {/* Species Label */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-500/20 backdrop-blur-sm rounded-full border border-green-400/30">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-green-300 text-sm font-medium">
-                Featured Species
-              </span>
-            </div>
-
-            {/* Species Name */}
-            <div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-white font-heading">
-                {turtle.commonName}
-              </h2>
-              <p className="text-green-300 italic text-lg mt-1">
-                {turtle.scientificName}
-              </p>
-            </div>
-
-            {/* Fun Fact */}
-            {truncatedFact && (
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10 max-w-md">
-                <p className="text-white/90 text-sm leading-relaxed">
-                  {truncatedFact}
-                </p>
-              </div>
-            )}
-
-            {/* Decorative Element */}
-            <div className="flex items-center gap-2 pt-4">
-              <div className="h-px flex-1 bg-gradient-to-r from-green-400/50 to-transparent" />
-              <span className="text-green-400/70 text-xs tracking-wider uppercase">
-                Did you know?
-              </span>
-              <div className="h-px w-8 bg-green-400/30" />
-            </div>
-          </div>
+          {/* Fun Fact */}
+          {truncatedFact && (
+            <p className="text-white/80 text-sm leading-relaxed max-w-md">
+              {truncatedFact}
+            </p>
+          )}
         </div>
       )}
 
       {/* Fallback when no image */}
       {!turtle?.imageUrl && !loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-green-800 to-green-950">
-          <div className="text-center space-y-4 p-8">
-            <div className="w-24 h-24 mx-auto rounded-full bg-green-700/50 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-green-900">
+          <div className="text-center p-8">
+            <div className="w-20 h-20 mx-auto rounded-full bg-green-800 flex items-center justify-center mb-4">
               <svg
-                className="w-12 h-12 text-green-400"
+                className="w-10 h-10 text-green-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

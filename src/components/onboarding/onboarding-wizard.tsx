@@ -225,10 +225,10 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-green-950 font-heading mb-2">
+        <h1 className="text-4xl font-bold text-green-950 font-heading mb-3">
           Welcome to Turterra
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-500 text-lg">
           Let&apos;s set up your profile so you can start exploring
         </p>
       </div>
@@ -243,30 +243,30 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
       {/* Step Content Card with Progress Bar */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {/* Subtle Progress Bar */}
-        <div className="h-1 bg-gray-100">
+        <div className="h-1.5 bg-gray-100">
           <div
             className="h-full bg-green-500 transition-all duration-300 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
 
-        <div className="p-6 lg:p-8">
+        <div className="p-8 lg:p-10">
           {/* Step 1: Username */}
           {currentStep === 1 && (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
                   <span className="text-2xl font-bold text-green-600">@</span>
                 </div>
-                <h2 className="text-xl font-bold text-green-950 font-heading">
+                <h2 className="text-2xl font-bold text-green-950 font-heading">
                   Choose your username
                 </h2>
-                <p className="text-gray-500 mt-1">
+                <p className="text-gray-500 mt-2">
                   This will be your unique identifier on Turterra
                 </p>
               </div>
 
-              <div className="space-y-2 max-w-sm mx-auto">
+              <div className="space-y-2 max-w-md mx-auto">
                 <label
                   htmlFor="username"
                   className="block text-sm font-medium text-green-950"
@@ -299,7 +299,7 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
 
           {/* Step 2: Profile Details */}
           {currentStep === 2 && (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
                   <svg
@@ -316,15 +316,15 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
                     />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-green-950 font-heading">
+                <h2 className="text-2xl font-bold text-green-950 font-heading">
                   Complete your profile
                 </h2>
-                <p className="text-gray-500 mt-1">
+                <p className="text-gray-500 mt-2">
                   Add some details to personalize your experience (all optional)
                 </p>
               </div>
 
-              <div className="space-y-4 max-w-sm mx-auto">
+              <div className="space-y-5 max-w-md mx-auto">
                 <div className="space-y-2">
                   <label
                     htmlFor="displayName"
@@ -387,7 +387,7 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
 
           {/* Step 3: Review */}
           {currentStep === 3 && (
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className="text-center">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
                   <svg
@@ -404,16 +404,16 @@ export function OnboardingWizard({ userId }: OnboardingWizardProps) {
                     />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-green-950 font-heading">
+                <h2 className="text-2xl font-bold text-green-950 font-heading">
                   You&apos;re all set!
                 </h2>
-                <p className="text-gray-500 mt-1">
+                <p className="text-gray-500 mt-2">
                   Review your profile before getting started
                 </p>
               </div>
 
               {/* Profile Preview */}
-              <div className="max-w-sm mx-auto">
+              <div className="max-w-md mx-auto">
                 <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">

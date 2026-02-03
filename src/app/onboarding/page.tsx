@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingWizard } from "@/components/onboarding/onboarding-wizard";
 import { TurtleShowcase } from "@/components/onboarding/turtle-showcase";
+import Image from "next/image";
 
 export const metadata = {
   title: "Welcome to Turterra | Complete Your Profile",
@@ -11,17 +12,14 @@ export const metadata = {
 /**
  * Onboarding Page
  *
- * A beautiful split-screen onboarding experience featuring:
- * - Left side: Random turtle showcase with image and fun fact
- * - Right side: Multi-step profile setup wizard
- *
- * Protected route - redirects to login if not authenticated,
- * redirects to profile if user already has one.
+ * Split-screen layout with:
+ * - Logo at top-left (on warm background)
+ * - Left: Turtle image showcase in a rounded card
+ * - Right: Multi-step onboarding wizard
  */
 export default async function OnboardingPage() {
   const supabase = await createClient();
 
-  // Check if user is logged in
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -30,7 +28,6 @@ export default async function OnboardingPage() {
     redirect("/login");
   }
 
-  // Check if user already has a profile
   const { data: profile } = await supabase
     .from("profiles")
     .select("username")
@@ -42,16 +39,33 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Turtle Showcase (hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-[45%] relative">
-        <TurtleShowcase />
+    <div className="min-h-screen flex flex-col p-6 lg:p-10">
+      {/* Logo */}
+      <div className="flex items-center gap-2 mb-6 lg:mb-8">
+        <Image
+          src="/images/logomark-dark.png"
+          alt=""
+          width={36}
+          height={36}
+          className="w-9 h-9"
+        />
+        <span className="text-green-950 font-heading font-bold text-xl">
+          Turterra
+        </span>
       </div>
 
-      {/* Right side - Onboarding Form */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
-          <div className="w-full max-w-lg">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col lg:flex-row gap-8 lg:gap-12">
+        {/* Left side - Turtle Showcase Card (hidden on mobile) */}
+        <div className="hidden lg:block lg:w-[42%]">
+          <div className="h-full rounded-2xl overflow-hidden">
+            <TurtleShowcase />
+          </div>
+        </div>
+
+        {/* Right side - Onboarding Form */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-xl">
             <OnboardingWizard userId={user.id} userEmail={user.email || ""} />
           </div>
         </div>

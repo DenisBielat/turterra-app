@@ -17,7 +17,7 @@ export interface RandomTurtleResponse {
  */
 export async function GET() {
   try {
-    // Fetch all turtles with images and descriptions
+    // Fetch all turtles with images and unique traits
     const { data: turtles, error } = await supabase
       .from("turtle_species")
       .select(
@@ -29,6 +29,7 @@ export async function GET() {
         avatar_image_full_url,
         avatar_image_circle_url,
         turtle_species_section_descriptions(
+          unique_traits_and_qualities,
           at_a_glance
         )
       `
@@ -54,11 +55,15 @@ export async function GET() {
     const randomIndex = Math.floor(Math.random() * turtles.length);
     const turtle = turtles[randomIndex];
 
-    // Extract the at_a_glance description
+    // Prefer unique_traits_and_qualities, fall back to at_a_glance
     const sectionDesc = turtle.turtle_species_section_descriptions as Array<{
+      unique_traits_and_qualities: string | null;
       at_a_glance: string | null;
     }> | null;
-    const fact = sectionDesc?.[0]?.at_a_glance || null;
+    const fact =
+      sectionDesc?.[0]?.unique_traits_and_qualities ||
+      sectionDesc?.[0]?.at_a_glance ||
+      null;
 
     const response: RandomTurtleResponse = {
       commonName: turtle.species_common_name,
