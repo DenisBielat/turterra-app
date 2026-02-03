@@ -92,30 +92,18 @@ export function ProfileSidebar({ profile, isOwnProfile }: ProfileSidebarProps) {
             >
               Account Settings
             </Link>
-            <Link
-              href="/settings/privacy"
-              className="block text-gray-400 cursor-not-allowed"
-              onClick={(e) => e.preventDefault()}
-            >
+            <span className="block text-gray-400 cursor-not-allowed">
               Privacy Settings
               <span className="ml-2 text-xs">(coming soon)</span>
-            </Link>
-            <Link
-              href="/my-posts"
-              className="block text-gray-400 cursor-not-allowed"
-              onClick={(e) => e.preventDefault()}
-            >
+            </span>
+            <span className="block text-gray-400 cursor-not-allowed">
               My Forum Posts
               <span className="ml-2 text-xs">(coming soon)</span>
-            </Link>
-            <Link
-              href="/my-identifications"
-              className="block text-gray-400 cursor-not-allowed"
-              onClick={(e) => e.preventDefault()}
-            >
+            </span>
+            <span className="block text-gray-400 cursor-not-allowed">
               My Identifications
               <span className="ml-2 text-xs">(coming soon)</span>
-            </Link>
+            </span>
           </nav>
         </section>
       )}
