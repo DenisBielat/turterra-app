@@ -40,7 +40,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const isOwnProfile = user?.id === profile.id;
 
   return (
-    <div className="min-h-screen bg-amber-50/50">
+    <div className="min-h-screen bg-warm">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Main Content */}

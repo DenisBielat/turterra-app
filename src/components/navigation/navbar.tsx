@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import NavLink from './navlink'
@@ -7,6 +8,9 @@ import MobileMenu from './mobile-menu'
 import { Icon } from '@/components/Icon'
 import { useScrollDirection } from '@/hooks/useScrollDirection'
 import { useAuthModal } from '@/components/auth/auth-modal-provider'
+import { UserAvatar } from '@/components/user-avatar'
+import { createClient } from '@/lib/supabase/client'
+import { signOut } from '@/app/actions/auth'
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -16,10 +20,67 @@ import {
   NavigationMenuContent,
 } from "@/components/ui/navigation-menu"
 
+interface UserProfile {
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+}
+
 const Navbar = () => {
   const { scrollDirection, isAtTop } = useScrollDirection(50);
   const isVisible = isAtTop || scrollDirection === 'up';
   const { openModal } = useAuthModal();
+
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch auth state and profile on mount + auth changes
+  useEffect(() => {
+    const supabase = createClient();
+
+    const fetchProfile = async () => {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        setUser(null);
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username, display_name, avatar_url')
+        .eq('id', authUser.id)
+        .single();
+
+      if (profile) {
+        setUser(profile);
+      } else {
+        setUser(null);
+      }
+    };
+
+    fetchProfile();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+      fetchProfile();
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
 
   return (
     <>
@@ -32,7 +93,7 @@ const Navbar = () => {
         <div className="flex h-12 items-center justify-between">
           {/* Left: Menu Button + Logo */}
           <div className="flex items-center gap-2">
-            <MobileMenu />
+            <MobileMenu user={user} />
             <Link href="/" aria-label="Turterra Home">
               <Image
                 src="/images/turterra-logo-white-text.png"
@@ -44,7 +105,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Right: Search + Login */}
+          {/* Right: Search + Auth */}
           <div className="flex items-center gap-2">
             <Link
               href="/search"
@@ -53,12 +114,23 @@ const Navbar = () => {
             >
               <Icon name="search" style="line" size="base" />
             </Link>
-            <button
-              onClick={() => openModal("login")}
-              className="font-semibold text-white border-2 border-warm rounded-full px-4 py-1.5 text-sm hover:text-green-950 hover:bg-warm transition-all"
-            >
-              Log in
-            </button>
+            {user ? (
+              <Link href={`/user/${user.username}`}>
+                <UserAvatar
+                  avatarUrl={user.avatar_url}
+                  displayName={user.display_name}
+                  username={user.username}
+                  size="sm"
+                />
+              </Link>
+            ) : (
+              <button
+                onClick={() => openModal("login")}
+                className="font-semibold text-white border-2 border-warm rounded-full px-4 py-1.5 text-sm hover:text-green-950 hover:bg-warm transition-all"
+              >
+                Log in
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -155,8 +227,8 @@ const Navbar = () => {
 
                 <NavigationMenuItem>
                   <NavigationMenuLink asChild>
-                    <a 
-                      href="https://buymeacoffee.com/turterra" 
+                    <a
+                      href="https://buymeacoffee.com/turterra"
                       target="_blank"
                       rel="noopener noreferrer"
                       className='hover:text-green-600 transition-all'
@@ -169,20 +241,97 @@ const Navbar = () => {
             </NavigationMenu>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => openModal("login")}
-              className="font-semibold text-white border-2 border-warm rounded-full px-6 py-3 hover:text-green-950 hover:bg-warm transition-all"
-            >
-              Log in
-            </button>
-            <button
-              onClick={() => openModal("join")}
-              className="font-semibold rounded-full border-2 border-green-600 bg-green-600 px-6 py-3 text-white hover:bg-green-900 hover:border-green-900 transition-all"
-            >
-              Join the Community
-            </button>
-          </div>
+          {/* Right side: Auth buttons or User menu */}
+          {user ? (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="flex items-center gap-3 rounded-full p-1 pr-3 hover:bg-white/10 transition-colors"
+              >
+                <UserAvatar
+                  avatarUrl={user.avatar_url}
+                  displayName={user.display_name}
+                  username={user.username}
+                  size="sm"
+                />
+                <span className="text-white text-sm font-medium hidden xl:block">
+                  {user.display_name || user.username}
+                </span>
+                <svg
+                  className={`w-4 h-4 text-white/70 transition-transform ${menuOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Dropdown Menu */}
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="font-semibold text-green-950 text-sm">
+                      {user.display_name || user.username}
+                    </p>
+                    <p className="text-gray-500 text-xs">@{user.username}</p>
+                  </div>
+                  <div className="py-1">
+                    <Link
+                      href={`/user/${user.username}`}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      My Profile
+                    </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Settings
+                    </Link>
+                  </div>
+                  <div className="border-t border-gray-100 py-1">
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        signOut();
+                      }}
+                      className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => openModal("login")}
+                className="font-semibold text-white border-2 border-warm rounded-full px-6 py-3 hover:text-green-950 hover:bg-warm transition-all"
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => openModal("join")}
+                className="font-semibold rounded-full border-2 border-green-600 bg-green-600 px-6 py-3 text-white hover:bg-green-900 hover:border-green-900 transition-all"
+              >
+                Join the Community
+              </button>
+            </div>
+          )}
         </div>
       </header>
       {/* Desktop header spacer */}

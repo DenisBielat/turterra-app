@@ -1,5 +1,5 @@
 import { Profile } from "@/types/database";
-import Image from "next/image";
+import { UserAvatar } from "@/components/user-avatar";
 
 interface ProfileHeaderProps {
   profile: Profile;
@@ -20,25 +20,12 @@ export function ProfileHeader({ profile, isOwnProfile }: ProfileHeaderProps) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
         {/* Avatar */}
         <div className="relative">
-          <div className="w-28 h-28 rounded-full bg-green-100 overflow-hidden flex items-center justify-center">
-            {profile.avatar_url ? (
-              <Image
-                src={profile.avatar_url}
-                alt={displayName}
-                width={112}
-                height={112}
-                className="object-cover w-full h-full"
-              />
-            ) : (
-              <svg
-                className="w-16 h-16 text-green-300"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-              </svg>
-            )}
-          </div>
+          <UserAvatar
+            avatarUrl={profile.avatar_url}
+            displayName={profile.display_name}
+            username={profile.username}
+            size="xl"
+          />
           {isOwnProfile && (
             <button
               disabled

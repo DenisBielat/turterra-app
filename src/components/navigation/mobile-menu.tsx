@@ -3,6 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Icon } from '@/components/Icon'
+import { UserAvatar } from '@/components/user-avatar'
+import { useAuthModal } from '@/components/auth/auth-modal-provider'
+import { signOut } from '@/app/actions/auth'
 import MobileNavLink from './mobile-navlink'
 import {
   Sheet,
@@ -12,8 +15,19 @@ import {
 } from "@/components/ui/sheet"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
-const MobileMenu = () => {
+interface UserProfile {
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+}
+
+interface MobileMenuProps {
+  user: UserProfile | null;
+}
+
+const MobileMenu = ({ user }: MobileMenuProps) => {
   const [isOpen, setIsOpen] = useState(false)
+  const { openModal } = useAuthModal()
 
   const closeMenu = () => setIsOpen(false)
 
@@ -33,20 +47,46 @@ const MobileMenu = () => {
         </VisuallyHidden>
 
         {/* Account Section */}
-        <Link
-          href="/account"
-          onClick={closeMenu}
-          className="flex items-center gap-3 p-4 border-b border-gray-300 border-opacity-50 hover:bg-white hover:bg-opacity-50 transition-colors"
-        >
-          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center overflow-hidden">
-            {/* Placeholder avatar - replace with actual user image when available */}
-            <Icon name="face-id" style="line" size="xlg" className="text-green-700" />
+        {user ? (
+          <Link
+            href={`/user/${user.username}`}
+            onClick={closeMenu}
+            className="flex items-center gap-3 p-4 border-b border-gray-300 border-opacity-50 hover:bg-white hover:bg-opacity-50 transition-colors"
+          >
+            <UserAvatar
+              avatarUrl={user.avatar_url}
+              displayName={user.display_name}
+              username={user.username}
+              size="lg"
+            />
+            <div className="flex flex-col">
+              <span className="font-semibold text-black">
+                {user.display_name || user.username}
+              </span>
+              <span className="text-xs text-gray-500">@{user.username}</span>
+            </div>
+          </Link>
+        ) : (
+          <div className="flex items-center gap-3 p-4 border-b border-gray-300 border-opacity-50">
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center overflow-hidden">
+              <Icon name="face-id" style="line" size="xlg" className="text-green-700" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <button
+                onClick={() => { closeMenu(); openModal("login"); }}
+                className="text-sm font-semibold text-green-700 hover:text-green-900 text-left"
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => { closeMenu(); openModal("join"); }}
+                className="text-xs text-gray-500 hover:text-gray-700 text-left"
+              >
+                or Join the Community
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="font-semibold text-black">My Account</span>
-            <span className="text-xs text-green-700 font-medium">Hopeful Hatchling</span>
-          </div>
-        </Link>
+        )}
 
         {/* Scrollable Menu Content */}
         <div className="flex-1 overflow-y-auto">
@@ -109,8 +149,19 @@ const MobileMenu = () => {
           </div>
         </div>
 
-        {/* Donate Section - Fixed at bottom */}
-        <div className="border-t border-gray-300 border-opacity-50 p-4 mt-auto">
+        {/* Bottom section */}
+        <div className="border-t border-gray-300 border-opacity-50 p-4 mt-auto space-y-3">
+          {user && (
+            <button
+              onClick={() => { closeMenu(); signOut(); }}
+              className="flex items-center justify-center gap-2 w-full py-3 px-4 text-red-600 font-medium rounded-full border border-red-200 hover:bg-red-50 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign Out
+            </button>
+          )}
           <a
             href="https://buymeacoffee.com/turterra"
             target="_blank"
