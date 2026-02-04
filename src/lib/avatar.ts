@@ -2,11 +2,11 @@ import imageCompression from "browser-image-compression";
 
 /**
  * Compress and resize an image before upload.
- * Target: max 500x500px, max 200KB, WebP format.
+ * Target: max 500x500px, max 500KB, WebP format.
  */
 export async function compressImage(file: File): Promise<File> {
   const options = {
-    maxSizeMB: 0.2,
+    maxSizeMB: 0.5,
     maxWidthOrHeight: 500,
     useWebWorker: true,
     fileType: "image/webp" as const,
