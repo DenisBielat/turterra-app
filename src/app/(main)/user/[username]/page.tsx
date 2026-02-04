@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ProfileHeader } from "@/components/profile/profile-header";
 import { ProfileAbout } from "@/components/profile/profile-about";
 import { ProfileSidebar } from "@/components/profile/profile-sidebar";
+import { UserTurtles } from "@/components/profile/user-turtles";
 
 interface ProfilePageProps {
   params: Promise<{ username: string }>;
@@ -39,47 +40,30 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   } = await supabase.auth.getUser();
   const isOwnProfile = user?.id === profile.id;
 
+  // Fetch the user's turtles
+  const { data: turtles } = await supabase
+    .from("user_turtles")
+    .select("*")
+    .eq("user_id", profile.id)
+    .order("created_at", { ascending: true });
+
   return (
     <div className="min-h-screen bg-warm">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Main Content */}
           <main className="flex-1 space-y-6">
-            <ProfileHeader profile={profile} isOwnProfile={isOwnProfile} />
+            <ProfileHeader
+              profile={profile}
+              isOwnProfile={isOwnProfile}
+              turtleCount={turtles?.length ?? 0}
+            />
             <ProfileAbout profile={profile} isOwnProfile={isOwnProfile} />
-
-            {/* My Turtles Section - Placeholder for future */}
-            <section className="bg-white rounded-xl border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-green-950 font-heading">
-                  My Turtles
-                </h2>
-                {isOwnProfile && (
-                  <button
-                    disabled
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-full opacity-50 cursor-not-allowed"
-                  >
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                    Add Turtle
-                  </button>
-                )}
-              </div>
-              <p className="text-gray-500 text-center py-8">
-                Turtle profiles coming soon!
-              </p>
-            </section>
+            <UserTurtles
+              turtles={turtles || []}
+              userId={profile.id}
+              isOwnProfile={isOwnProfile}
+            />
           </main>
 
           {/* Sidebar */}
