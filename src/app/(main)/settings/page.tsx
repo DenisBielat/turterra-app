@@ -34,13 +34,21 @@ export default async function SettingsPage() {
     redirect("/onboarding");
   }
 
+  // Get linked identity providers (email, google, etc.)
+  const identities = user.identities || [];
+  const linkedProviders = identities.map((i) => i.provider);
+
   return (
     <div className="min-h-screen bg-warm">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-green-950 font-heading mb-8">
           Settings
         </h1>
-        <SettingsForm profile={profile} userEmail={user.email || ""} />
+        <SettingsForm
+          profile={profile}
+          userEmail={user.email || ""}
+          linkedProviders={linkedProviders}
+        />
       </div>
     </div>
   );
