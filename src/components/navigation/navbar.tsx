@@ -179,6 +179,7 @@ const Navbar = () => {
                         iconAlt="Turtle Identifier Icon"
                         title="Turtle Identifier"
                         description="Identify your turtle and get more information"
+                        comingSoon
                       />
                     </div>
                   </NavigationMenuContent>
@@ -206,6 +207,7 @@ const Navbar = () => {
                         iconAlt="Guides Icon"
                         title="Guides"
                         description="Learn more about everything turtle related"
+                        comingSoon
                       />
                       <NavLink
                         href="/blog"
@@ -213,6 +215,7 @@ const Navbar = () => {
                         iconAlt="Blog Icon"
                         title="Blog"
                         description="Our latest articles and announcements"
+                        comingSoon
                       />
                       <NavLink
                         href="/vets"
@@ -220,6 +223,7 @@ const Navbar = () => {
                         iconAlt="Vet Finder Icon"
                         title="Find a Vet"
                         description="Vets near you that are known to handle turtles with care"
+                        comingSoon
                       />
                     </div>
                   </NavigationMenuContent>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Profile } from "@/types/database";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions/auth";
 import { AvatarUpload } from "@/components/profile/avatar-upload";
+import { TwoFactorSetup } from "@/components/settings/two-factor-setup";
 
 interface SettingsFormProps {
   profile: Profile;
@@ -42,6 +43,23 @@ export function SettingsForm({ profile, userEmail, linkedProviders }: SettingsFo
     type: "error";
     text: string;
   } | null>(null);
+
+  // 2FA status
+  const [has2FAEnabled, setHas2FAEnabled] = useState(false);
+  const [loading2FAStatus, setLoading2FAStatus] = useState(true);
+
+  // Fetch 2FA status on mount
+  useEffect(() => {
+    const check2FAStatus = async () => {
+      const supabase = createClient();
+      const { data: factorsData } = await supabase.auth.mfa.listFactors();
+      const verifiedFactors = factorsData?.totp?.filter((f) => f.status === "verified") || [];
+      setHas2FAEnabled(verifiedFactors.length > 0);
+      setLoading2FAStatus(false);
+    };
+
+    check2FAStatus();
+  }, []);
 
   const handleProfileSave = async () => {
     setProfileSaving(true);
@@ -325,6 +343,25 @@ export function SettingsForm({ profile, userEmail, linkedProviders }: SettingsFo
                 )}
               </div>
             </div>
+          </div>
+
+          {/* Two-Factor Authentication */}
+          <div className="border-t border-gray-100 pt-6">
+            {loading2FAStatus ? (
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-gray-100">
+                  <div className="w-5 h-5 rounded-full border-2 border-gray-300 border-t-green-600 animate-spin" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-green-950">
+                    Two-Factor Authentication
+                  </h3>
+                  <p className="text-sm text-gray-400">Checking status...</p>
+                </div>
+              </div>
+            ) : (
+              <TwoFactorSetup isEnabled={has2FAEnabled} />
+            )}
           </div>
         </div>
       </section>

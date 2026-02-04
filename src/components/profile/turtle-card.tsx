@@ -160,7 +160,7 @@ export function TurtleCard({ turtle, isOwnProfile, onEdit }: TurtleCardProps) {
   const hasBirthday = isBirthday(turtle.date_acquired);
 
   return (
-    <div className="relative bg-white rounded-xl border border-gray-100 overflow-hidden group">
+    <div className="relative bg-white rounded-xl border border-gray-100 overflow-hidden group shadow-sm">
       {/* Photo or placeholder */}
       <div className="relative aspect-square bg-green-50">
         {turtle.photo_url && !imageError ? (
