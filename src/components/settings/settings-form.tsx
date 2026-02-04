@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Profile } from "@/types/database";
-import { UserAvatar } from "@/components/user-avatar";
 import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/app/actions/auth";
+import { AvatarUpload } from "@/components/profile/avatar-upload";
 
 interface SettingsFormProps {
   profile: Profile;
@@ -138,13 +138,15 @@ export function SettingsForm({ profile, userEmail }: SettingsFormProps) {
         </h2>
 
         <div className="space-y-6">
-          {/* Avatar + Username (read-only) */}
+          {/* Avatar + Username */}
           <div className="flex items-center gap-4 pb-6 border-b border-gray-100">
-            <UserAvatar
-              avatarUrl={profile.avatar_url}
+            <AvatarUpload
+              userId={profile.id}
+              currentAvatarUrl={profile.avatar_url}
               displayName={profile.display_name}
               username={profile.username}
               size="lg"
+              onUploadComplete={() => router.refresh()}
             />
             <div>
               <p className="font-semibold text-green-950">
