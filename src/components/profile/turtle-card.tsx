@@ -25,7 +25,7 @@ export function TurtleCard({ turtle, isOwnProfile, onEdit }: TurtleCardProps) {
     if (turtle.photo_url) {
       const ext = turtle.photo_url.includes(".webp") ? "webp" : "jpg";
       const path = `${turtle.user_id}/${turtle.id}.${ext}`;
-      await supabase.storage.from("turtle-photos").remove([path]);
+      await supabase.storage.from("user-turtle-photos").remove([path]);
     }
 
     const { error } = await supabase

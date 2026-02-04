@@ -88,7 +88,7 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
 
     const supabase = createClient();
     const { error: uploadError } = await supabase.storage
-      .from("turtle-photos")
+      .from("user-turtle-photos")
       .upload(path, compressed, { upsert: true, cacheControl: "3600" });
 
     if (uploadError) throw new Error("Failed to upload photo");
