@@ -46,6 +46,37 @@ export interface Profile {
 }
 
 /**
+ * A user's pet turtle stored in the public.user_turtles table.
+ * Users can add, edit, and remove turtles from their profile.
+ */
+export interface UserTurtle {
+  /** UUID primary key */
+  id: string;
+  /** UUID of the owner (references auth.users) */
+  user_id: string;
+  /** The turtle's given name */
+  name: string;
+  /** Optional FK to turtle_species for linked species */
+  species_id: number | null;
+  /** Species common name (denormalized for display) */
+  species_common_name: string | null;
+  /** Species scientific name (denormalized for display) */
+  species_scientific_name: string | null;
+  /** Notes/description about this turtle */
+  bio: string | null;
+  /** URL to turtle photo in Supabase Storage */
+  photo_url: string | null;
+  /** Sex of the turtle */
+  sex: "male" | "female" | "unknown" | null;
+  /** Date the turtle was acquired (YYYY-MM-DD) */
+  date_acquired: string | null;
+  /** When the record was created */
+  created_at: string;
+  /** When the record was last updated */
+  updated_at: string;
+}
+
+/**
  * Reserved username entry.
  * Usernames in this table cannot be registered by users.
  */
@@ -90,6 +121,30 @@ export interface Database {
           avatar_url?: string | null;
           is_verified?: boolean;
           updated_at?: string;
+        };
+      };
+      user_turtles: {
+        Row: UserTurtle;
+        Insert: {
+          user_id: string;
+          name: string;
+          species_id?: number | null;
+          species_common_name?: string | null;
+          species_scientific_name?: string | null;
+          bio?: string | null;
+          photo_url?: string | null;
+          sex?: "male" | "female" | "unknown" | null;
+          date_acquired?: string | null;
+        };
+        Update: {
+          name?: string;
+          species_id?: number | null;
+          species_common_name?: string | null;
+          species_scientific_name?: string | null;
+          bio?: string | null;
+          photo_url?: string | null;
+          sex?: "male" | "female" | "unknown" | null;
+          date_acquired?: string | null;
         };
       };
       reserved_usernames: {
