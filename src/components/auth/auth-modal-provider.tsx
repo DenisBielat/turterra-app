@@ -125,6 +125,7 @@ function AuthModalContent({
   onClose: () => void;
 }) {
   const { openModal } = useAuthModal();
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
 
   return (
     <div className="fixed inset-0 z-50">
@@ -227,15 +228,17 @@ function AuthModalContent({
 
           {type === "forgot-password" && (
             <>
-              <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-green-950 font-heading mb-2">
-                  Reset Password
-                </h1>
-                <p className="text-gray-600">
-                  Enter your email and we&apos;ll send you a reset link
-                </p>
-              </div>
-              <ForgotPasswordForm />
+              {!forgotPasswordSuccess && (
+                <div className="text-center mb-8">
+                  <h1 className="text-2xl font-bold text-green-950 font-heading mb-2">
+                    Reset Password
+                  </h1>
+                  <p className="text-gray-600">
+                    Enter your email and we&apos;ll send you a reset link
+                  </p>
+                </div>
+              )}
+              <ForgotPasswordForm onSuccess={() => setForgotPasswordSuccess(true)} />
               <p className="mt-6 text-center text-sm text-gray-600">
                 Remember your password?{" "}
                 <button

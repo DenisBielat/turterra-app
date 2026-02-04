@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function ForgotPasswordForm() {
+interface ForgotPasswordFormProps {
+  onSuccess?: () => void;
+}
+
+export function ForgotPasswordForm({ onSuccess }: ForgotPasswordFormProps) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,6 +35,7 @@ export function ForgotPasswordForm() {
 
     setSuccess(true);
     setLoading(false);
+    onSuccess?.();
   };
 
   if (success) {
