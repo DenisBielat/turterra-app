@@ -95,7 +95,7 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
 
     const {
       data: { publicUrl },
-    } = supabase.storage.from("turtle-photos").getPublicUrl(path);
+    } = supabase.storage.from("user-turtle-photos").getPublicUrl(path);
 
     return `${publicUrl}?v=${Date.now()}`;
   };
