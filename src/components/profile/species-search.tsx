@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 
 interface SpeciesResult {
+  id: number;
   species_common_name: string;
   species_scientific_name: string;
   slug: string;
@@ -27,12 +28,18 @@ export function SpeciesSearch({ value, onChange }: SpeciesSearchProps) {
   const [results, setResults] = useState<SpeciesResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasSelected, setHasSelected] = useState(!!value.species_common_name);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Search species as user types
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    // Don't search if user has selected a species (prevents reopening)
+    if (hasSelected) {
+      return;
+    }
 
     if (query.trim().length < 2) {
       setResults([]);
@@ -61,7 +68,7 @@ export function SpeciesSearch({ value, onChange }: SpeciesSearchProps) {
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query]);
+  }, [query, hasSelected]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -79,11 +86,13 @@ export function SpeciesSearch({ value, onChange }: SpeciesSearchProps) {
 
   const handleSelect = (result: SpeciesResult) => {
     onChange({
-      species_id: null, // We don't have the numeric ID from the search endpoint
+      species_id: result.id,
       species_common_name: result.species_common_name,
       species_scientific_name: result.species_scientific_name,
     });
     setQuery(result.species_common_name);
+    setHasSelected(true);
+    setResults([]);
     setIsOpen(false);
   };
 
@@ -95,6 +104,22 @@ export function SpeciesSearch({ value, onChange }: SpeciesSearchProps) {
     });
     setQuery("");
     setResults([]);
+    setHasSelected(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setQuery(newValue);
+
+    // If user starts typing again after selection, clear selection state
+    if (hasSelected && newValue !== value.species_common_name) {
+      setHasSelected(false);
+      onChange({
+        species_id: null,
+        species_common_name: "",
+        species_scientific_name: "",
+      });
+    }
   };
 
   return (
@@ -103,19 +128,10 @@ export function SpeciesSearch({ value, onChange }: SpeciesSearchProps) {
         <input
           type="text"
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            // If user is typing, clear the selected species
-            if (value.species_common_name && e.target.value !== value.species_common_name) {
-              onChange({
-                species_id: null,
-                species_common_name: "",
-                species_scientific_name: "",
-              });
-            }
-          }}
+          onChange={handleInputChange}
           onFocus={() => {
-            if (results.length > 0) setIsOpen(true);
+            // Only reopen if no selection and there are results
+            if (!hasSelected && results.length > 0) setIsOpen(true);
           }}
           placeholder="Search for a species..."
           className="w-full px-4 py-3 pr-10 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
@@ -156,7 +172,7 @@ export function SpeciesSearch({ value, onChange }: SpeciesSearchProps) {
       )}
 
       {/* Dropdown results */}
-      {isOpen && (
+      {isOpen && results.length > 0 && (
         <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
           {results.map((result) => (
             <button

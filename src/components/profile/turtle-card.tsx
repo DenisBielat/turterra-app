@@ -11,10 +11,124 @@ interface TurtleCardProps {
   onEdit: () => void;
 }
 
+// Parse date and determine precision
+function parseDateInfo(dateStr: string | null): {
+  year: number | null;
+  month: number | null;
+  day: number | null;
+  precision: "year" | "month" | "day" | null;
+} {
+  if (!dateStr) return { year: null, month: null, day: null, precision: null };
+
+  const parts = dateStr.split("-");
+  const year = parseInt(parts[0]);
+  const month = parseInt(parts[1]);
+  const day = parseInt(parts[2]);
+
+  // Determine precision based on default values
+  if (month === 1 && day === 1) {
+    return { year, month: null, day: null, precision: "year" };
+  }
+  if (day === 1) {
+    return { year, month, day: null, precision: "month" };
+  }
+  return { year, month, day, precision: "day" };
+}
+
+function calculateAge(dateStr: string | null): string | null {
+  const dateInfo = parseDateInfo(dateStr);
+  if (!dateInfo.year) return null;
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+
+  let years = currentYear - dateInfo.year;
+
+  // Adjust based on precision
+  if (dateInfo.precision === "year") {
+    // Just show years
+    if (years === 0) return "< 1 year";
+    return years === 1 ? "1 year" : `${years} years`;
+  }
+
+  if (dateInfo.precision === "month" || dateInfo.precision === "day") {
+    // More precise calculation
+    if (dateInfo.month && currentMonth < dateInfo.month) {
+      years--;
+    }
+    if (years < 0) years = 0;
+    if (years === 0) return "< 1 year";
+    return years === 1 ? "1 year" : `${years} years`;
+  }
+
+  return null;
+}
+
+function isBirthday(dateStr: string | null): boolean {
+  const dateInfo = parseDateInfo(dateStr);
+  if (!dateInfo.month || !dateInfo.day) return false;
+
+  const now = new Date();
+  return now.getMonth() + 1 === dateInfo.month && now.getDate() === dateInfo.day;
+}
+
+// Male icon (Mars symbol)
+function MaleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M20 4v6h-2V7.41l-4.29 4.3A6 6 0 1 1 12 6c1.2 0 2.32.35 3.26.95L19.59 2.6 17 0h6v4a1 1 0 0 1-1 1h-2ZM9 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+    </svg>
+  );
+}
+
+// Female icon (Venus symbol)
+function FemaleIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+    >
+      <path d="M12 2a6 6 0 0 1 6 6c0 2.97-2.16 5.44-5 5.92V16h2v2h-2v2h-2v-2H9v-2h2v-2.08A6.002 6.002 0 0 1 12 2Zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
+    </svg>
+  );
+}
+
+// Cake icon
+function CakeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8" />
+      <path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1" />
+      <path d="M2 21h20" />
+      <path d="M7 8v3" />
+      <path d="M12 8v3" />
+      <path d="M17 8v3" />
+      <path d="M7 4h0.01" />
+      <path d="M12 4h0.01" />
+      <path d="M17 4h0.01" />
+    </svg>
+  );
+}
+
 export function TurtleCard({ turtle, isOwnProfile, onEdit }: TurtleCardProps) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleDelete = async () => {
     setDeleting(true);
@@ -42,24 +156,19 @@ export function TurtleCard({ turtle, isOwnProfile, onEdit }: TurtleCardProps) {
     router.refresh();
   };
 
-  const sexLabel =
-    turtle.sex === "male"
-      ? "Male"
-      : turtle.sex === "female"
-        ? "Female"
-        : turtle.sex === "unknown"
-          ? "Unknown sex"
-          : null;
+  const age = calculateAge(turtle.date_acquired);
+  const hasBirthday = isBirthday(turtle.date_acquired);
 
   return (
     <div className="relative bg-white rounded-xl border border-gray-100 overflow-hidden group">
       {/* Photo or placeholder */}
       <div className="relative aspect-square bg-green-50">
-        {turtle.photo_url ? (
+        {turtle.photo_url && !imageError ? (
           <img
             src={turtle.photo_url}
             alt={turtle.name}
             className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
@@ -132,19 +241,28 @@ export function TurtleCard({ turtle, isOwnProfile, onEdit }: TurtleCardProps) {
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="font-semibold text-green-950 truncate">{turtle.name}</h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="font-semibold text-green-950 truncate">{turtle.name}</h3>
+          {turtle.sex === "male" && (
+            <MaleIcon className="w-4 h-4 text-blue-500 flex-shrink-0" />
+          )}
+          {turtle.sex === "female" && (
+            <FemaleIcon className="w-4 h-4 text-pink-500 flex-shrink-0" />
+          )}
+        </div>
         {turtle.species_common_name && (
           <p className="text-sm text-gray-500 truncate">
             {turtle.species_common_name}
           </p>
         )}
-        <div className="flex items-center gap-2 mt-2">
-          {sexLabel && (
-            <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
-              {sexLabel}
-            </span>
-          )}
-        </div>
+        {age && (
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <span className="text-xs text-gray-400">{age}</span>
+            {hasBirthday && (
+              <CakeIcon className="w-3.5 h-3.5 text-orange-400" />
+            )}
+          </div>
+        )}
       </div>
 
       {/* Delete confirmation overlay */}

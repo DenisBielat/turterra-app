@@ -6,11 +6,70 @@ import { createClient } from "@/lib/supabase/client";
 import { UserTurtle } from "@/types/database";
 import { SpeciesSearch } from "./species-search";
 import { compressImage } from "@/lib/avatar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TurtleFormProps {
   userId: string;
   turtle?: UserTurtle;
   onClose: () => void;
+}
+
+// Generate year options from current year back to 1950
+const currentYear = new Date().getFullYear();
+const yearOptions = Array.from({ length: currentYear - 1949 }, (_, i) =>
+  (currentYear - i).toString()
+);
+
+const monthOptions = [
+  { value: "01", label: "January" },
+  { value: "02", label: "February" },
+  { value: "03", label: "March" },
+  { value: "04", label: "April" },
+  { value: "05", label: "May" },
+  { value: "06", label: "June" },
+  { value: "07", label: "July" },
+  { value: "08", label: "August" },
+  { value: "09", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
+function getDaysInMonth(year: string, month: string): string[] {
+  if (!year || !month) return [];
+  const daysCount = new Date(parseInt(year), parseInt(month), 0).getDate();
+  return Array.from({ length: daysCount }, (_, i) =>
+    (i + 1).toString().padStart(2, "0")
+  );
+}
+
+function parseDateAcquired(dateStr: string | null): {
+  year: string;
+  month: string;
+  day: string;
+} {
+  if (!dateStr) return { year: "", month: "", day: "" };
+
+  // Handle formats: "2020", "2020-06", "2020-06-15"
+  const parts = dateStr.split("-");
+  return {
+    year: parts[0] || "",
+    month: parts[1] && parts[1] !== "01" ? parts[1] : parts[1] === "01" && parts[2] === "01" ? "" : parts[1] || "",
+    day: parts[2] && parts[2] !== "01" ? parts[2] : "",
+  };
+}
+
+function formatDateForStorage(year: string, month: string, day: string): string | null {
+  if (!year || year === "none") return null;
+  if (!month || month === "none") return `${year}-01-01`; // Year only
+  if (!day || day === "none") return `${year}-${month}-01`; // Year + month
+  return `${year}-${month}-${day}`; // Full date
 }
 
 export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
@@ -23,13 +82,16 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
     species_common_name: turtle?.species_common_name || "",
     species_scientific_name: turtle?.species_scientific_name || "",
   });
-  const [sex, setSex] = useState<"male" | "female" | "unknown" | "">(
-    turtle?.sex || ""
+  const [sex, setSex] = useState<"male" | "female" | "unknown" | "not-specified">(
+    turtle?.sex || "not-specified"
   );
-  const [bio, setBio] = useState(turtle?.bio || "");
-  const [dateAcquired, setDateAcquired] = useState(
-    turtle?.date_acquired || ""
-  );
+
+  // Parse existing date into components
+  const existingDate = parseDateAcquired(turtle?.date_acquired ?? null);
+  const [dateYear, setDateYear] = useState(existingDate.year);
+  const [dateMonth, setDateMonth] = useState(existingDate.month);
+  const [dateDay, setDateDay] = useState(existingDate.day);
+
   const [photoUrl, setPhotoUrl] = useState(turtle?.photo_url || "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -37,6 +99,14 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const isEditing = !!turtle;
+  const dayOptions = getDaysInMonth(dateYear, dateMonth);
+
+  // Reset day if month changes and day is no longer valid
+  useEffect(() => {
+    if (dateDay && dayOptions.length > 0 && !dayOptions.includes(dateDay)) {
+      setDateDay("");
+    }
+  }, [dateMonth, dateYear, dateDay, dayOptions]);
 
   // Close on Escape
   useEffect(() => {
@@ -113,6 +183,7 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
 
     try {
       const supabase = createClient();
+      const dateAcquired = formatDateForStorage(dateYear, dateMonth, dateDay);
 
       if (isEditing) {
         // Upload photo first if changed
@@ -128,10 +199,9 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
             species_id: species.species_id,
             species_common_name: species.species_common_name || null,
             species_scientific_name: species.species_scientific_name || null,
-            bio: bio.trim() || null,
             photo_url: finalPhotoUrl || null,
-            sex: (sex as "male" | "female" | "unknown") || null,
-            date_acquired: dateAcquired || null,
+            sex: sex && sex !== "not-specified" ? (sex as "male" | "female" | "unknown") : null,
+            date_acquired: dateAcquired,
           })
           .eq("id", turtle.id);
 
@@ -146,9 +216,8 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
             species_id: species.species_id,
             species_common_name: species.species_common_name || null,
             species_scientific_name: species.species_scientific_name || null,
-            bio: bio.trim() || null,
-            sex: (sex as "male" | "female" | "unknown") || null,
-            date_acquired: dateAcquired || null,
+            sex: sex && sex !== "not-specified" ? (sex as "male" | "female" | "unknown") : null,
+            date_acquired: dateAcquired,
           })
           .select("id")
           .single();
@@ -337,63 +406,97 @@ export function TurtleForm({ userId, turtle, onClose }: TurtleFormProps) {
 
             {/* Sex */}
             <div className="space-y-2">
-              <label
-                htmlFor="turtleSex"
-                className="block text-sm font-medium text-green-950"
-              >
+              <label className="block text-sm font-medium text-green-950">
                 Sex
               </label>
-              <select
-                id="turtleSex"
+              <Select
                 value={sex}
-                onChange={(e) =>
-                  setSex(e.target.value as "male" | "female" | "unknown" | "")
+                onValueChange={(value) =>
+                  setSex(value as "male" | "female" | "unknown" | "not-specified")
                 }
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
               >
-                <option value="">Not specified</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="unknown">Unknown</option>
-              </select>
+                <SelectTrigger className="w-full px-4 py-3 h-auto rounded-xl border border-gray-200 bg-white text-green-950 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent">
+                  <SelectValue placeholder="Not specified" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="not-specified">Not specified</SelectItem>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="unknown">Unknown</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Date Acquired */}
             <div className="space-y-2">
-              <label
-                htmlFor="dateAcquired"
-                className="block text-sm font-medium text-green-950"
-              >
+              <label className="block text-sm font-medium text-green-950">
                 Date Acquired
               </label>
-              <input
-                id="dateAcquired"
-                type="date"
-                value={dateAcquired}
-                onChange={(e) => setDateAcquired(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
-              />
-            </div>
+              <div className="flex gap-2">
+                {/* Year */}
+                <Select value={dateYear} onValueChange={(v) => {
+                  setDateYear(v);
+                  if (!v) {
+                    setDateMonth("");
+                    setDateDay("");
+                  }
+                }}>
+                  <SelectTrigger className="flex-1 px-4 py-3 h-auto rounded-xl border border-gray-200 bg-white text-green-950 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent">
+                    <SelectValue placeholder="Year" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-60">
+                    <SelectItem value="none">No year</SelectItem>
+                    {yearOptions.map((year) => (
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-            {/* Bio */}
-            <div className="space-y-2">
-              <label
-                htmlFor="turtleBio"
-                className="block text-sm font-medium text-green-950"
-              >
-                About
-              </label>
-              <textarea
-                id="turtleBio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell us about your turtle..."
-                maxLength={500}
-                rows={3}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-green-950 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all resize-none"
-              />
-              <p className="text-xs text-gray-400 text-right">
-                {bio.length}/500 characters
+                {/* Month (optional, shown when year selected) */}
+                <Select
+                  value={dateMonth}
+                  onValueChange={(v) => {
+                    setDateMonth(v);
+                    if (!v) setDateDay("");
+                  }}
+                  disabled={!dateYear || dateYear === "none"}
+                >
+                  <SelectTrigger className="flex-1 px-4 py-3 h-auto rounded-xl border border-gray-200 bg-white text-green-950 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed">
+                    <SelectValue placeholder="Month" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="none">No month</SelectItem>
+                    {monthOptions.map((month) => (
+                      <SelectItem key={month.value} value={month.value}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Day (optional, shown when month selected) */}
+                <Select
+                  value={dateDay}
+                  onValueChange={setDateDay}
+                  disabled={!dateMonth || dateMonth === "none"}
+                >
+                  <SelectTrigger className="w-24 px-4 py-3 h-auto rounded-xl border border-gray-200 bg-white text-green-950 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed">
+                    <SelectValue placeholder="Day" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl max-h-60">
+                    <SelectItem value="none">No day</SelectItem>
+                    {dayOptions.map((day) => (
+                      <SelectItem key={day} value={day}>
+                        {parseInt(day)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-xs text-gray-400">
+                You can enter just the year, or be more specific
               </p>
             </div>
 

@@ -5,6 +5,8 @@ import { UserTurtle } from "@/types/database";
 import { TurtleCard } from "./turtle-card";
 import { TurtleForm } from "./turtle-form";
 
+const MAX_TURTLES = 5;
+
 interface UserTurtlesProps {
   turtles: UserTurtle[];
   userId: string;
@@ -34,6 +36,8 @@ export function UserTurtles({
     setEditingTurtle(undefined);
   };
 
+  const canAddMore = turtles.length < MAX_TURTLES;
+
   return (
     <section className="bg-white rounded-xl border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-6">
@@ -41,25 +45,31 @@ export function UserTurtles({
           {isOwnProfile ? "My Turtles" : "Turtles"}
         </h2>
         {isOwnProfile && (
-          <button
-            onClick={handleAdd}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-full hover:bg-green-700 transition-all"
-          >
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">
+              {turtles.length}/{MAX_TURTLES}
+            </span>
+            <button
+              onClick={handleAdd}
+              disabled={!canAddMore}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-full hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Add Turtle
-          </button>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Add Turtle
+            </button>
+          </div>
         )}
       </div>
 
