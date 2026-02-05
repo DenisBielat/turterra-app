@@ -24,7 +24,7 @@ export const footerConfig: FooterProps = {
     community: {
       title: "Community",
       links: [
-        { label: "Community Forums", href: "/forums" },
+        { label: "Community", href: "/community" },
         { label: "Education", href: "/education" },
         { label: "Blog", href: "/blog" }
       ]

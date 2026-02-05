@@ -115,10 +115,10 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
           <div className="p-4 pt-0">
             <p className="text-sm font-bold text-gray-400 px-3 mb-2">Community</p>
             <MobileNavLink
-              href="/forums"
+              href="/community"
               iconSrc="/images/nav-menu-icons/forums.png"
-              iconAlt="Forums Icon"
-              title="Forums"
+              iconAlt="Community Icon"
+              title="Community"
               description="Join discussions about turtle care"
               onClick={closeMenu}
             />
