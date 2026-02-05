@@ -11,8 +11,7 @@ import { ChannelList } from '@/components/community/channels/channel-list';
 /**
  * Community Page
  *
- * Main community hub with news, posts, and channels.
- * Uses client-side state for tab switching.
+ * Main community hub with hero header, news carousel, posts, and channels.
  */
 export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<'posts' | 'channels'>('posts');
@@ -20,11 +19,11 @@ export default function CommunityPage() {
   return (
     <div className="min-h-screen bg-warm">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <CommunityHeader />
-
-        {/* News Carousel */}
-        <NewsCarousel />
+        {/* Hero Section: Header + News Carousel (visually connected) */}
+        <div className="mb-8">
+          <CommunityHeader />
+          <NewsCarousel />
+        </div>
 
         {/* Main Content Area */}
         <div className="flex gap-8">

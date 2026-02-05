@@ -9,7 +9,18 @@ export interface MockNews {
   excerpt: string;
   news_type: 'announcement' | 'featured' | 'partner_news' | 'conservation';
   partner_name: string | null;
+  image_url: string | null;
   published_at: string;
+}
+
+export interface MockFeaturedSpecies {
+  species_id: number;
+  species_common_name: string;
+  species_slug: string;
+  description: string;
+  image_url: string;
+  feature_start_date: string;
+  source_name: string;
 }
 
 export interface MockChannel {
@@ -54,42 +65,61 @@ export interface MockTrendingTopic {
   post_count: number;
 }
 
+export const MOCK_FEATURED_SPECIES: MockFeaturedSpecies = {
+  species_id: 1,
+  species_common_name: 'Red-Eared Slider',
+  species_slug: 'red-eared-slider',
+  description:
+    'Connect with fellow turtle enthusiasts, share your experiences, and learn from the community. Join discussions, ask questions, and help others on their turtle journey.',
+  image_url: '/images/community/featured-species-placeholder.jpg',
+  feature_start_date: '2026-01-20',
+  source_name: 'Turterra',
+};
+
 export const MOCK_NEWS: MockNews[] = [
   {
     id: 1,
-    slug: 'turterra-2-coming-spring',
-    title: 'Turterra 2.0 Coming This Spring',
-    excerpt: "We're excited to announce major updates including AI-powered species identification...",
-    news_type: 'announcement',
-    partner_name: null,
-    published_at: '2026-01-24T12:00:00Z',
+    slug: 'sea-turtle-nesting-report',
+    title: 'Sea Turtle Nesting Season Report',
+    excerpt:
+      'Connect with fellow turtle enthusiasts, share your experiences, and learn from the community. Join discussions, ask questions, and help others on their turtle journey.',
+    news_type: 'conservation',
+    partner_name: 'Re:Wild',
+    image_url: '/images/community/news-placeholder-1.jpg',
+    published_at: '2026-01-13T12:00:00Z',
   },
   {
     id: 2,
-    slug: 'rescue-success-story',
-    title: 'Community Spotlight: Rescue Success Story',
-    excerpt: 'Member @turtlelover_sarah shares her incredible journey rehabilitating an injured...',
-    news_type: 'featured',
-    partner_name: null,
-    published_at: '2026-01-23T12:00:00Z',
+    slug: 'turterra-updates-jan-2026',
+    title: 'Turterra Updates | Jan 2026',
+    excerpt:
+      'Connect with fellow turtle enthusiasts, share your experiences, and learn from the community. Join discussions, ask questions, and help others on their turtle journey.',
+    news_type: 'announcement',
+    partner_name: 'Turterra',
+    image_url: '/images/community/news-placeholder-2.jpg',
+    published_at: '2026-01-08T12:00:00Z',
   },
   {
     id: 3,
     slug: 'tsa-breeding-program',
     title: 'Turtle Survival Alliance Updates',
-    excerpt: 'New conservation breeding program launched for critically endangered Burmese...',
+    excerpt:
+      'Connect with fellow turtle enthusiasts, share your experiences, and learn from the community. Join discussions, ask questions, and help others on their turtle journey.',
     news_type: 'partner_news',
     partner_name: 'Turtle Survival Alliance',
-    published_at: '2026-01-22T12:00:00Z',
+    image_url: '/images/community/news-placeholder-3.jpg',
+    published_at: '2026-01-05T12:00:00Z',
   },
   {
     id: 4,
-    slug: 'sea-turtle-nesting-report',
-    title: 'Sea Turtle Nesting Season Report',
-    excerpt: "Record numbers of Loggerhead sea turtle nests recorded along Florida's Atlantic...",
-    news_type: 'conservation',
+    slug: 'rescue-success-story',
+    title: 'Community Spotlight: Rescue Success Story',
+    excerpt:
+      'Member @turtlelover_sarah shares her incredible journey rehabilitating an injured box turtle.',
+    news_type: 'featured',
     partner_name: null,
-    published_at: '2026-01-21T12:00:00Z',
+    image_url: '/images/community/news-placeholder-4.jpg',
+    published_at: '2026-01-03T12:00:00Z',
   },
 ];
 
@@ -355,6 +385,11 @@ export const NEWS_TYPE_STYLES: Record<
     bg: 'bg-amber-400',
     text: 'text-amber-900',
     label: 'Featured',
+  },
+  featured_species: {
+    bg: 'bg-green-600',
+    text: 'text-white',
+    label: 'Featured Species',
   },
   partner_news: {
     bg: 'bg-orange-500',
