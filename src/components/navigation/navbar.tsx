@@ -195,10 +195,10 @@ const Navbar = () => {
                         <p className="text-sm font-bold text-gray-400 px-3">Community Resources</p>
                       </div>
                       <NavLink
-                        href="/forums"
+                        href="/community"
                         iconSrc="/images/nav-menu-icons/forums.png"
-                        iconAlt="Forums Icon"
-                        title="Forums"
+                        iconAlt="Community Icon"
+                        title="Community"
                         description="Join discussions about turtle care and conservation"
                       />
                       <NavLink
