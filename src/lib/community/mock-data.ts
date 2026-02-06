@@ -393,3 +393,17 @@ export const NEWS_TYPE_STYLES: Record<
   },
 };
 
+// Channel icon background colors for visual variety
+export const CHANNEL_ICON_COLORS: Record<string, string> = {
+  announcements: 'bg-teal-600',
+  roadmap: 'bg-amber-500',
+  introductions: 'bg-blue-500',
+  help: 'bg-emerald-600',
+  care: 'bg-rose-500',
+  habitat: 'bg-orange-500',
+  health: 'bg-red-500',
+  conservation: 'bg-green-600',
+  'species-id': 'bg-violet-500',
+  'wild-observations': 'bg-sky-500',
+};
+

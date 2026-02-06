@@ -4,6 +4,7 @@ import { ArrowLeft, Users } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getChannelBySlug, getChannelStats, getUserChannelMemberships } from '@/lib/queries/community';
+import { CHANNEL_ICON_COLORS } from '@/lib/community/mock-data';
 import { formatNumber } from '@/lib/community/utils';
 import { PostFeedServer } from '@/components/community/posts/post-feed-server';
 import { JoinChannelButton } from '@/components/community/channels/join-channel-button';
@@ -68,7 +69,7 @@ export default async function ChannelPage({ params, searchParams }: ChannelPageP
         <div className="bg-white rounded-xl border border-gray-100 p-6 mb-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
-              <ChannelIcon svg={channel.icon_svg} name={channel.name} size={64} />
+              <ChannelIcon svg={channel.icon_svg} name={channel.name} bgColor={CHANNEL_ICON_COLORS[channel.slug]} size={64} />
 
               {/* Info */}
               <div>

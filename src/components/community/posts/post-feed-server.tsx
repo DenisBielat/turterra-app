@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { getPosts, getUserVotesForPosts } from '@/lib/queries/community';
 import { PostFeedClient } from './post-feed-client';
-import { FileText } from 'lucide-react';
 
 interface PostFeedServerProps {
   sort: 'hot' | 'new' | 'top';
@@ -29,12 +28,8 @@ export async function PostFeedServer({ sort, viewMode, channelId }: PostFeedServ
     ? await getUserVotesForPosts(user.id, postIds)
     : new Map<number, number>();
 
-  if (!posts || posts.length === 0) {
-    return <EmptyFeed sort={sort} viewMode={viewMode} />;
-  }
-
   // Transform posts and votes into serializable props
-  const transformedPosts = posts.map((post) => ({
+  const transformedPosts = (posts ?? []).map((post) => ({
     id: post.id,
     title: post.title,
     body: post.body,
@@ -58,21 +53,5 @@ export async function PostFeedServer({ sort, viewMode, channelId }: PostFeedServ
       posts={transformedPosts}
       userVotes={votesObj}
     />
-  );
-}
-
-function EmptyFeed({ sort, viewMode }: { sort: string; viewMode: string }) {
-  return (
-    <div>
-      {/* Still render controls so user can interact, even on empty state */}
-      <div className="bg-white rounded-xl border border-gray-100 p-12 text-center mt-4">
-        <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-        <h3 className="font-semibold text-green-950 mb-2">No posts yet</h3>
-        <p className="text-gray-600 text-sm max-w-md mx-auto">
-          Be the first to start a discussion! Share a question, story, or photo
-          with the community.
-        </p>
-      </div>
-    </div>
   );
 }

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Users } from 'lucide-react';
-import { MockChannel } from '@/lib/community/mock-data';
+import { MockChannel, CHANNEL_ICON_COLORS } from '@/lib/community/mock-data';
 import { formatNumber } from '@/lib/community/utils';
 import { JoinChannelButton } from './join-channel-button';
 import { ChannelIcon } from './channel-icon';
@@ -18,12 +18,14 @@ interface ChannelCardProps {
  * Renders custom SVG from the icon_svg column in Supabase.
  */
 export function ChannelCard({ channel, isJoined = false, isLoggedIn = false }: ChannelCardProps) {
+  const bgColor = CHANNEL_ICON_COLORS[channel.slug] ?? 'bg-gray-500';
+
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-4">
         {/* Icon and Info */}
         <div className="flex items-start gap-4 flex-1 min-w-0">
-          <ChannelIcon svg={channel.icon_svg} name={channel.name} size={48} />
+          <ChannelIcon svg={channel.icon_svg} name={channel.name} bgColor={bgColor} size={48} />
 
           {/* Channel Info */}
           <div className="flex-1 min-w-0">

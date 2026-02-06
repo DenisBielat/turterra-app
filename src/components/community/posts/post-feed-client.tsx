@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { FileText } from 'lucide-react';
 import { FeedControls } from './feed-controls';
 import { PostCard } from './post-card';
 import { PostCardCompact } from './post-card-compact';
@@ -37,7 +38,16 @@ export function PostFeedClient({
         onViewModeChange={setViewMode}
       />
 
-      {viewMode === 'rich' ? (
+      {posts.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
+          <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+          <h3 className="font-semibold text-green-950 mb-2">No posts yet</h3>
+          <p className="text-gray-600 text-sm max-w-md mx-auto">
+            Be the first to start a discussion! Share a question, story, or photo
+            with the community.
+          </p>
+        </div>
+      ) : viewMode === 'rich' ? (
         <div className="space-y-4">
           {posts.map((post) => (
             <PostCard
