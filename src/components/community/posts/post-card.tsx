@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import {
-  ChevronUp,
-  ChevronDown,
   MessageSquare,
   Share2,
   Bookmark,
@@ -11,9 +9,11 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { MockPost } from '@/lib/community/mock-data';
 import { getRelativeTime, formatNumber } from '@/lib/community/utils';
+import { VoteButtons } from './vote-buttons';
 
 interface PostCardProps {
   post: MockPost;
+  userVote?: number;
 }
 
 /**
@@ -21,24 +21,17 @@ interface PostCardProps {
  *
  * Full display of a post with vote buttons, content preview, and actions.
  */
-export function PostCard({ post }: PostCardProps) {
-  const displayName = post.author.display_name || post.author.username;
-
+export function PostCard({ post, userVote }: PostCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
       <div className="flex">
         {/* Vote Column */}
-        <div className="flex flex-col items-center py-4 px-3 bg-gray-50 rounded-l-xl">
-          <button className="p-1 text-gray-400 hover:text-green-700 transition-colors">
-            <ChevronUp className="h-6 w-6" />
-          </button>
-          <span className="font-semibold text-green-950 my-1">
-            {formatNumber(post.score)}
-          </span>
-          <button className="p-1 text-gray-400 hover:text-red-500 transition-colors">
-            <ChevronDown className="h-6 w-6" />
-          </button>
-        </div>
+        <VoteButtons
+          postId={post.id}
+          score={post.score}
+          userVote={userVote}
+          layout="vertical"
+        />
 
         {/* Content Column */}
         <div className="flex-1 p-4">
@@ -76,8 +69,8 @@ export function PostCard({ post }: PostCardProps) {
           {/* Body Preview */}
           <p className="text-gray-600 text-sm line-clamp-3 mb-3">{post.body}</p>
 
-          {/* Image Placeholder (if post would have images) */}
-          {post.id === 1 && (
+          {/* Image (if post has images) */}
+          {post.image_url && (
             <div className="mb-3 bg-gray-100 rounded-lg aspect-video flex items-center justify-center">
               <ImageIcon className="h-12 w-12 text-gray-300" />
             </div>

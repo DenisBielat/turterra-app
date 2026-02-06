@@ -14,6 +14,7 @@ import {
 import { MockChannel, CHANNEL_ICON_COLORS } from '@/lib/community/mock-data';
 import { formatNumber } from '@/lib/community/utils';
 import { cn } from '@/lib/utils';
+import { JoinChannelButton } from './join-channel-button';
 
 // Map icon names to Lucide components
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -32,6 +33,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
 interface ChannelCardProps {
   channel: MockChannel;
   isJoined?: boolean;
+  isLoggedIn?: boolean;
 }
 
 /**
@@ -39,7 +41,7 @@ interface ChannelCardProps {
  *
  * Displays a single channel with icon, name, description, and stats.
  */
-export function ChannelCard({ channel, isJoined = false }: ChannelCardProps) {
+export function ChannelCard({ channel, isJoined = false, isLoggedIn = false }: ChannelCardProps) {
   const IconComponent = ICON_MAP[channel.icon] || HelpCircle;
   const iconColors = CHANNEL_ICON_COLORS[channel.slug] || {
     bg: 'bg-gray-500',
@@ -74,16 +76,11 @@ export function ChannelCard({ channel, isJoined = false }: ChannelCardProps) {
         </div>
 
         {/* Join Button */}
-        <button
-          className={cn(
-            'px-4 py-1.5 rounded-full text-sm font-medium transition-colors flex-shrink-0',
-            isJoined
-              ? 'border border-green-700 text-green-700 hover:bg-green-50'
-              : 'bg-green-700 text-white hover:bg-green-800'
-          )}
-        >
-          {isJoined ? 'Joined' : 'Join'}
-        </button>
+        <JoinChannelButton
+          channelId={channel.id}
+          isJoined={isJoined}
+          isLoggedIn={isLoggedIn}
+        />
       </div>
 
       {/* Description */}

@@ -5,15 +5,20 @@ import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { NewsCard } from './news-card';
 import { FeaturedSpeciesCard } from './featured-species-card';
-import { MOCK_NEWS, MOCK_FEATURED_SPECIES } from '@/lib/community/mock-data';
+import { MockNews, MockFeaturedSpecies } from '@/lib/community/mock-data';
+
+interface NewsCarouselProps {
+  news: MockNews[];
+  featuredSpecies: MockFeaturedSpecies;
+}
 
 /**
  * News Carousel Component
  *
  * Horizontally scrolling row with a featured species card followed by
- * news cards, all on a dark green background.
+ * news cards. Receives data from the server component wrapper.
  */
-export function NewsCarousel() {
+export function NewsCarousel({ news, featuredSpecies }: NewsCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -68,11 +73,11 @@ export function NewsCarousel() {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {/* Featured Species Card */}
-          <FeaturedSpeciesCard species={MOCK_FEATURED_SPECIES} />
+          <FeaturedSpeciesCard species={featuredSpecies} />
 
           {/* News Cards */}
-          {MOCK_NEWS.map((news) => (
-            <NewsCard key={news.id} news={news} />
+          {news.map((item) => (
+            <NewsCard key={item.id} news={item} />
           ))}
         </div>
       </div>

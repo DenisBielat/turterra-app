@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import { ChevronUp, ChevronDown, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { MockPost } from '@/lib/community/mock-data';
-import { getRelativeTime, formatNumber } from '@/lib/community/utils';
+import { getRelativeTime } from '@/lib/community/utils';
+import { VoteButtons } from './vote-buttons';
 
 interface PostCardCompactProps {
   post: MockPost;
+  userVote?: number;
 }
 
 /**
@@ -12,21 +14,16 @@ interface PostCardCompactProps {
  *
  * Minimal single-row display of a post for list view.
  */
-export function PostCardCompact({ post }: PostCardCompactProps) {
+export function PostCardCompact({ post, userVote }: PostCardCompactProps) {
   return (
     <div className="flex items-center gap-3 py-3 px-4 hover:bg-gray-50 transition-colors">
       {/* Vote Buttons */}
-      <div className="flex items-center gap-1 text-sm">
-        <button className="p-0.5 text-gray-400 hover:text-green-700 transition-colors">
-          <ChevronUp className="h-4 w-4" />
-        </button>
-        <span className="font-medium text-green-950 min-w-[2rem] text-center">
-          {formatNumber(post.score)}
-        </span>
-        <button className="p-0.5 text-gray-400 hover:text-red-500 transition-colors">
-          <ChevronDown className="h-4 w-4" />
-        </button>
-      </div>
+      <VoteButtons
+        postId={post.id}
+        score={post.score}
+        userVote={userVote}
+        layout="horizontal"
+      />
 
       {/* Title */}
       <Link
