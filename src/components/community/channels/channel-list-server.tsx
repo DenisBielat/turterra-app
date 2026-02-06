@@ -51,7 +51,7 @@ export async function ChannelListServer() {
 
           {/* Channel Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {catChannels.map((channel: { id: number; slug: string; name: string; description: string; icon: string }) => {
+            {catChannels.map((channel: { id: number; slug: string; name: string; description: string; icon: string; icon_url?: string | null }) => {
               const channelStats = statsMap.get(channel.id);
               return (
                 <ChannelCard
@@ -62,6 +62,7 @@ export async function ChannelListServer() {
                     name: channel.name,
                     description: channel.description,
                     icon: channel.icon,
+                    icon_url: channel.icon_url,
                     category: category,
                     member_count: channelStats?.member_count ?? 0,
                     post_count: channelStats?.post_count ?? 0,

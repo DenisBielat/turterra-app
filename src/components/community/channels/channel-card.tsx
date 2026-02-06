@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   Megaphone,
@@ -16,7 +17,7 @@ import { formatNumber } from '@/lib/community/utils';
 import { cn } from '@/lib/utils';
 import { JoinChannelButton } from './join-channel-button';
 
-// Map icon names to Lucide components
+// Fallback: map icon names to Lucide components
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   megaphone: Megaphone,
   map: Map,
@@ -40,6 +41,11 @@ interface ChannelCardProps {
  * Channel Card Component
  *
  * Displays a single channel with icon, name, description, and stats.
+ * Uses custom icon_url if set, otherwise falls back to Lucide icons.
+ *
+ * To use custom icons:
+ * 1. Place SVG/PNG files in public/images/channel-icons/
+ * 2. Set icon_url on the channel record in Supabase (e.g., '/images/channel-icons/announcements.svg')
  */
 export function ChannelCard({ channel, isJoined = false, isLoggedIn = false }: ChannelCardProps) {
   const IconComponent = ICON_MAP[channel.icon] || HelpCircle;
@@ -56,11 +62,21 @@ export function ChannelCard({ channel, isJoined = false, isLoggedIn = false }: C
           {/* Icon */}
           <div
             className={cn(
-              'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0',
-              iconColors.bg
+              'w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden',
+              !channel.icon_url && iconColors.bg
             )}
           >
-            <IconComponent className={cn('h-6 w-6', iconColors.icon)} />
+            {channel.icon_url ? (
+              <Image
+                src={channel.icon_url}
+                alt={channel.name}
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <IconComponent className={cn('h-6 w-6', iconColors.icon)} />
+            )}
           </div>
 
           {/* Channel Info */}

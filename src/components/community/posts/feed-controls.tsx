@@ -10,26 +10,28 @@ type ViewMode = 'rich' | 'compact';
 interface FeedControlsProps {
   sort: SortOption;
   viewMode: ViewMode;
+  onViewModeChange: (mode: ViewMode) => void;
 }
 
 /**
  * Feed Controls Component (Client)
  *
- * Sort and view toggle that updates URL search params.
+ * Sort updates URL search params (triggers server re-fetch without scrolling).
+ * View mode is managed client-side for instant toggling.
  */
-export function FeedControls({ sort, viewMode }: FeedControlsProps) {
+export function FeedControls({ sort, viewMode, onViewModeChange }: FeedControlsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const updateParam = (key: string, value: string, defaultValue: string) => {
+  const updateSort = (value: SortOption) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (value === defaultValue) {
-      params.delete(key);
+    if (value === 'hot') {
+      params.delete('sort');
     } else {
-      params.set(key, value);
+      params.set('sort', value);
     }
     const qs = params.toString();
-    router.push(`/community${qs ? `?${qs}` : ''}`);
+    router.replace(`/community${qs ? `?${qs}` : ''}`, { scroll: false });
   };
 
   return (
@@ -43,7 +45,7 @@ export function FeedControls({ sort, viewMode }: FeedControlsProps) {
         ]).map(({ key, icon: Icon, label }) => (
           <button
             key={key}
-            onClick={() => updateParam('sort', key, 'hot')}
+            onClick={() => updateSort(key)}
             className={cn(
               'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors',
               sort === key
@@ -60,7 +62,7 @@ export function FeedControls({ sort, viewMode }: FeedControlsProps) {
       {/* View Toggle */}
       <div className="flex items-center gap-1 bg-white rounded-lg border border-gray-200 p-1">
         <button
-          onClick={() => updateParam('view', 'compact', 'rich')}
+          onClick={() => onViewModeChange('compact')}
           className={cn(
             'p-1.5 rounded transition-colors',
             viewMode === 'compact'
@@ -72,7 +74,7 @@ export function FeedControls({ sort, viewMode }: FeedControlsProps) {
           <List className="h-4 w-4" />
         </button>
         <button
-          onClick={() => updateParam('view', 'rich', 'rich')}
+          onClick={() => onViewModeChange('rich')}
           className={cn(
             'p-1.5 rounded transition-colors',
             viewMode === 'rich'

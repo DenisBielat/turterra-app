@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Users } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -103,11 +104,21 @@ export default async function ChannelPage({ params, searchParams }: ChannelPageP
               {/* Icon */}
               <div
                 className={cn(
-                  'w-16 h-16 rounded-xl flex items-center justify-center',
-                  iconColors.bg
+                  'w-16 h-16 rounded-xl flex items-center justify-center overflow-hidden',
+                  !channel.icon_url && iconColors.bg
                 )}
               >
-                <IconComponent className={cn('h-8 w-8', iconColors.icon)} />
+                {channel.icon_url ? (
+                  <Image
+                    src={channel.icon_url}
+                    alt={channel.name}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <IconComponent className={cn('h-8 w-8', iconColors.icon)} />
+                )}
               </div>
 
               {/* Info */}

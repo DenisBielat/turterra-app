@@ -28,7 +28,7 @@ export function CommunityTabs({ activeTab }: CommunityTabsProps) {
     params.delete('sort');
     params.delete('view');
     const qs = params.toString();
-    router.push(`/community${qs ? `?${qs}` : ''}`);
+    router.replace(`/community${qs ? `?${qs}` : ''}`, { scroll: false });
   };
 
   return (

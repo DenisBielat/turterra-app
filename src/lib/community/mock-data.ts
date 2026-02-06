@@ -29,6 +29,7 @@ export interface MockChannel {
   name: string;
   description: string;
   icon: string;
+  icon_url?: string | null;
   category: 'general' | 'care' | 'conservation';
   member_count: number;
   post_count: number;
