@@ -1,40 +1,13 @@
 import { Suspense } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Users } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getChannelBySlug, getChannelStats, getUserChannelMemberships } from '@/lib/queries/community';
-import { CHANNEL_ICON_COLORS } from '@/lib/community/mock-data';
 import { formatNumber } from '@/lib/community/utils';
 import { PostFeedServer } from '@/components/community/posts/post-feed-server';
 import { JoinChannelButton } from '@/components/community/channels/join-channel-button';
-import {
-  Megaphone,
-  Map,
-  HelpCircle,
-  Heart,
-  Home,
-  Activity,
-  Leaf,
-  Search,
-  Eye,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-// Map icon names to Lucide components
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
-  megaphone: Megaphone,
-  map: Map,
-  users: Users,
-  'help-circle': HelpCircle,
-  heart: Heart,
-  home: Home,
-  activity: Activity,
-  leaf: Leaf,
-  search: Search,
-  eye: Eye,
-};
+import { ChannelIcon } from '@/components/community/channels/channel-icon';
 
 interface ChannelPageProps {
   params: Promise<{ slug: string }>;
@@ -79,12 +52,6 @@ export default async function ChannelPage({ params, searchParams }: ChannelPageP
     | 'top';
   const viewMode = sp.view === 'compact' ? 'compact' : 'rich';
 
-  const IconComponent = ICON_MAP[channel.icon] || HelpCircle;
-  const iconColors = CHANNEL_ICON_COLORS[channel.slug] || {
-    bg: 'bg-gray-500',
-    icon: 'text-white',
-  };
-
   return (
     <div className="min-h-screen bg-warm">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -101,25 +68,7 @@ export default async function ChannelPage({ params, searchParams }: ChannelPageP
         <div className="bg-white rounded-xl border border-gray-100 p-6 mb-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-start gap-4">
-              {/* Icon */}
-              <div
-                className={cn(
-                  'w-16 h-16 rounded-xl flex items-center justify-center overflow-hidden',
-                  !channel.icon_url && iconColors.bg
-                )}
-              >
-                {channel.icon_url ? (
-                  <Image
-                    src={channel.icon_url}
-                    alt={channel.name}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <IconComponent className={cn('h-8 w-8', iconColors.icon)} />
-                )}
-              </div>
+              <ChannelIcon svg={channel.icon_svg} name={channel.name} size={64} />
 
               {/* Info */}
               <div>

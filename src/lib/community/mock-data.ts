@@ -28,8 +28,7 @@ export interface MockChannel {
   slug: string;
   name: string;
   description: string;
-  icon: string;
-  icon_url?: string | null;
+  icon_svg?: string | null;
   category: 'general' | 'care' | 'conservation';
   member_count: number;
   post_count: number;
@@ -130,7 +129,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'announcements',
     name: 'Announcements',
     description: 'Official updates from Turterra about new features, events, and important news.',
-    icon: 'megaphone',
     category: 'general',
     member_count: 12453,
     post_count: 89,
@@ -140,7 +138,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'roadmap',
     name: 'Roadmap & Feedback',
     description: "Share your ideas for Turterra and see what features we're working on next.",
-    icon: 'map',
     category: 'general',
     member_count: 4521,
     post_count: 234,
@@ -150,7 +147,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'introductions',
     name: 'Introductions',
     description: 'New to Turterra? Introduce yourself and your shelled companions!',
-    icon: 'users',
     category: 'general',
     member_count: 8932,
     post_count: 1245,
@@ -160,7 +156,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'help',
     name: 'Q&A Help Desk',
     description: 'Got questions? Ask anything turtle-related and get help from the community.',
-    icon: 'help-circle',
     category: 'general',
     member_count: 10234,
     post_count: 3421,
@@ -170,7 +165,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'care',
     name: 'Care & Husbandry',
     description: 'Diet, feeding schedules, water quality, and general care discussions.',
-    icon: 'heart',
     category: 'care',
     member_count: 9876,
     post_count: 2345,
@@ -180,7 +174,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'habitat',
     name: 'Habitat & Setup',
     description: 'Enclosure builds, tank setups, outdoor habitats, and equipment reviews.',
-    icon: 'home',
     category: 'care',
     member_count: 7654,
     post_count: 1876,
@@ -190,7 +183,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'health',
     name: 'Health & Wellness',
     description: 'Health concerns, vet recommendations, shell care, and wellness tips.',
-    icon: 'activity',
     category: 'care',
     member_count: 6543,
     post_count: 1234,
@@ -200,7 +192,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'conservation',
     name: 'Conservation',
     description: 'Conservation efforts, endangered species updates, and how to help.',
-    icon: 'leaf',
     category: 'conservation',
     member_count: 5432,
     post_count: 987,
@@ -210,7 +201,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'species-id',
     name: 'Species Identification',
     description: 'Help identifying turtle species from photos and field observations.',
-    icon: 'search',
     category: 'conservation',
     member_count: 8765,
     post_count: 2345,
@@ -220,7 +210,6 @@ export const MOCK_CHANNELS: MockChannel[] = [
     slug: 'wild-observations',
     name: 'Wild Observations',
     description: 'Share your wild turtle sightings, nesting observations, and field notes.',
-    icon: 'eye',
     category: 'conservation',
     member_count: 4321,
     post_count: 876,
@@ -404,16 +393,3 @@ export const NEWS_TYPE_STYLES: Record<
   },
 };
 
-// Channel icon colors for visual variety
-export const CHANNEL_ICON_COLORS: Record<string, { bg: string; icon: string }> = {
-  announcements: { bg: 'bg-teal-600', icon: 'text-white' },
-  roadmap: { bg: 'bg-amber-500', icon: 'text-white' },
-  introductions: { bg: 'bg-blue-500', icon: 'text-white' },
-  help: { bg: 'bg-emerald-600', icon: 'text-white' },
-  care: { bg: 'bg-rose-500', icon: 'text-white' },
-  habitat: { bg: 'bg-orange-500', icon: 'text-white' },
-  health: { bg: 'bg-red-500', icon: 'text-white' },
-  conservation: { bg: 'bg-green-600', icon: 'text-white' },
-  'species-id': { bg: 'bg-violet-500', icon: 'text-white' },
-  'wild-observations': { bg: 'bg-sky-500', icon: 'text-white' },
-};
