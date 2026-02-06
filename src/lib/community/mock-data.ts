@@ -394,16 +394,17 @@ export const NEWS_TYPE_STYLES: Record<
 };
 
 // Channel icon background colors for visual variety
+// Available palettes: gray, green, blue, orange, red, violet, teal
 export const CHANNEL_ICON_COLORS: Record<string, string> = {
   announcements: 'bg-teal-600',
-  roadmap: 'bg-amber-500',
-  introductions: 'bg-blue-500',
-  help: 'bg-emerald-600',
-  care: 'bg-rose-500',
-  habitat: 'bg-orange-500',
+  roadmap: 'bg-blue-600',
+  introductions: 'bg-violet-500',
+  help: 'bg-gray-500',
+  care: 'bg-orange-500',
+  habitat: 'bg-green-700',
   health: 'bg-red-500',
   conservation: 'bg-green-600',
-  'species-id': 'bg-violet-500',
-  'wild-observations': 'bg-sky-500',
+  'species-id': 'bg-blue-500',
+  'wild-observations': 'bg-orange-700',
 };
 
