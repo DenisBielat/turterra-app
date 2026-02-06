@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { NewsCard } from './news-card';
 import { FeaturedSpeciesCard } from './featured-species-card';
@@ -30,9 +31,17 @@ export function NewsCarousel() {
       <div className="relative z-10">
         {/* Header with nav buttons - over hero, use light text */}
         <div className="flex items-center justify-between mb-5">
-          <h2 className="font-heading text-lg font-semibold text-white">
-            Latest News
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="font-heading text-lg font-semibold text-white">
+              Latest News
+            </h2>
+            <Link
+              href="/community/news"
+              className="text-sm text-white/60 hover:text-white/90 transition-colors"
+            >
+              View All
+            </Link>
+          </div>
 
           <div className="flex items-center gap-2">
             <button

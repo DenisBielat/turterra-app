@@ -12,31 +12,52 @@ interface FeaturedSpeciesCardProps {
  *
  * Displays the weekly featured species with a full photo background,
  * species name, description, and a link to the species guide profile.
+ * Wrapped in an orange container with grain texture overlay.
  */
 export function FeaturedSpeciesCard({ species }: FeaturedSpeciesCardProps) {
   return (
     <Link
       href={`/turtle-guide/${species.species_slug}`}
-      className="group flex-shrink-0 w-72 h-[384px] rounded-xl overflow-hidden relative shadow-sm block"
+      className="group flex-shrink-0 w-72 h-[384px] rounded-xl overflow-hidden relative shadow-sm block bg-orange-500 p-2"
     >
-      {/* Background image + border layer (below gradient) */}
-      <div className="relative w-full h-[384px] border-[3px] border-orange-500 rounded-xl overflow-hidden">
+      {/* Grain texture overlay on the orange container */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-70 mix-blend-multiply rounded-xl"
+        style={{
+          backgroundImage: 'url(/images/textures/grain-overlay.jpg)',
+          backgroundSize: 'cover',
+        }}
+        aria-hidden
+      />
+
+      {/* Static sheen – diagonal highlight for a glossy look */}
+      <div
+        className="absolute inset-0 pointer-events-none rounded-xl"
+        style={{
+          background:
+            'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.08) 100%)',
+        }}
+        aria-hidden
+      />
+
+      {/* Inner photo card */}
+      <div className="relative w-full h-full rounded-lg overflow-hidden">
         {/* Placeholder background color if image fails to load */}
-        <div className="absolute inset-0 bg-green-800 rounded-xl" />
+        <div className="absolute inset-0 bg-green-800" />
         <Image
           src={species.image_url}
           alt={species.species_common_name}
           fill
-          className="object-cover rounded-xl transition-transform duration-300 ease-out group-hover:scale-105"
-          sizes="288px"
+          className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+          sizes="272px"
         />
 
         {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent rounded-xl" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
         {/* Content positioned at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          {/* Featured Species label: icon + text (no badge) */}
+          {/* Featured Species label: icon + text */}
           <div className="flex items-center gap-1.5 mb-2">
             <Image
               src="/images/nav-menu-icons/species-id-light.png"
