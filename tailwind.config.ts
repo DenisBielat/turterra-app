@@ -6,6 +6,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/lib/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
 	colors: {
@@ -93,6 +94,19 @@ const config: Config = {
 				800: '#5e01d6',
 				900: '#4e03af',
 				950: '#2e0077',
+			},
+			teal: {
+				50: '#effefc',
+				100: '#c7fff6',
+				200: '#90ffed',
+				300: '#51f7e3',
+				400: '#1de4d2',
+				500: '#04c8b9',
+				600: '#00978f',
+				700: '#05807a',
+				800: '#0a6562',
+				900: '#0d5452',
+				950: '#003233',
 			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

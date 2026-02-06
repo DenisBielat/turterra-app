@@ -1,14 +1,20 @@
-import { Users, MessageSquare, Hash } from 'lucide-react';
-import { MOCK_COMMUNITY_STATS } from '@/lib/community/mock-data';
+import { Users } from 'lucide-react';
+import { getCommunityStats } from '@/lib/queries/community';
 import { formatNumber } from '@/lib/community/utils';
 
 /**
- * Community Stats Component
+ * Community Stats Component (Server Component)
  *
- * Displays community-wide statistics in the sidebar.
+ * Fetches and displays community-wide statistics in the sidebar.
  */
-export function CommunityStats() {
-  const stats = MOCK_COMMUNITY_STATS;
+export async function CommunityStats() {
+  let stats;
+  try {
+    stats = await getCommunityStats();
+  } catch {
+    // Fall back to zeros if the view isn't accessible yet
+    stats = { total_members: 0, total_posts: 0, total_channels: 0 };
+  }
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-5">
@@ -20,28 +26,21 @@ export function CommunityStats() {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <div className="text-2xl font-bold text-green-950">
-            {formatNumber(stats.total_members)}
+            {formatNumber(Number(stats.total_members))}
           </div>
           <div className="text-sm text-gray-500">Total Members</div>
         </div>
 
         <div>
           <div className="text-2xl font-bold text-green-950">
-            {formatNumber(stats.online_today)}
-          </div>
-          <div className="text-sm text-gray-500">Online Today</div>
-        </div>
-
-        <div>
-          <div className="text-2xl font-bold text-green-950">
-            {formatNumber(stats.total_posts)}
+            {formatNumber(Number(stats.total_posts))}
           </div>
           <div className="text-sm text-gray-500">Total Posts</div>
         </div>
 
         <div>
           <div className="text-2xl font-bold text-green-950">
-            {formatNumber(stats.total_channels)}
+            {formatNumber(Number(stats.total_channels))}
           </div>
           <div className="text-sm text-gray-500">Channels</div>
         </div>

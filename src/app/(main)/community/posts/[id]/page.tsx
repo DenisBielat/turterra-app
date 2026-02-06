@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import {
   ArrowLeft,
-  ChevronUp,
-  ChevronDown,
   MessageSquare,
   Share2,
   Bookmark,
@@ -10,8 +8,10 @@ import {
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
-import { MOCK_POSTS } from '@/lib/community/mock-data';
+import { createClient } from '@/lib/supabase/server';
+import { getPostById, getUserVotesForPosts } from '@/lib/queries/community';
 import { getRelativeTime, formatNumber } from '@/lib/community/utils';
+import { VoteButtons } from '@/components/community/posts/vote-buttons';
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -20,20 +20,34 @@ interface PostPageProps {
 /**
  * Post Detail Page
  *
- * Placeholder page for viewing a single post and its comments.
+ * Displays a single post fetched from Supabase with its content and actions.
  */
 export default async function PostPage({ params }: PostPageProps) {
   const { id } = await params;
   const postId = parseInt(id, 10);
 
-  // Find the post from mock data
-  const post = MOCK_POSTS.find((p) => p.id === postId);
+  if (isNaN(postId)) return notFound();
 
-  if (!post) {
+  let post;
+  try {
+    post = await getPostById(postId);
+  } catch {
     return notFound();
   }
 
-  const displayName = post.author.display_name || post.author.username;
+  if (!post) return notFound();
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const userVotes = user
+    ? await getUserVotesForPosts(user.id, [postId])
+    : new Map<number, number>();
+
+  const author = post.author as { username: string; display_name: string | null; avatar_url: string | null };
+  const channel = post.channel as { slug: string; name: string };
 
   return (
     <div className="min-h-screen bg-warm">
@@ -51,36 +65,33 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="bg-white rounded-xl border border-gray-100 mb-8">
           <div className="flex">
             {/* Vote Column */}
-            <div className="flex flex-col items-center py-6 px-4 bg-gray-50 rounded-l-xl">
-              <button className="p-1 text-gray-400 hover:text-green-700 transition-colors">
-                <ChevronUp className="h-7 w-7" />
-              </button>
-              <span className="font-bold text-xl text-green-950 my-2">
-                {formatNumber(post.score)}
-              </span>
-              <button className="p-1 text-gray-400 hover:text-red-500 transition-colors">
-                <ChevronDown className="h-7 w-7" />
-              </button>
+            <div className="py-2">
+              <VoteButtons
+                postId={post.id}
+                score={post.score}
+                userVote={userVotes.get(post.id)}
+                layout="vertical"
+              />
             </div>
 
             {/* Content Column */}
             <div className="flex-1 p-6">
               {/* Meta Line */}
               <div className="flex items-center gap-2 text-sm mb-3">
-                <Link href={`/community/channels/${post.channel.slug}`}>
+                <Link href={`/community/channels/${channel.slug}`}>
                   <Badge
                     variant="secondary"
                     className="bg-green-100 text-green-800 hover:bg-green-200"
                   >
-                    {post.channel.name}
+                    {channel.name}
                   </Badge>
                 </Link>
                 <span className="text-gray-400">Posted by</span>
                 <Link
-                  href={`/user/${post.author.username}`}
+                  href={`/user/${author.username}`}
                   className="text-gray-600 hover:text-green-700"
                 >
-                  @{post.author.username}
+                  @{author.username}
                 </Link>
                 <span className="text-gray-400">·</span>
                 <span className="text-gray-500">
@@ -124,7 +135,7 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
           <h3 className="font-semibold text-green-950 mb-3">Add a Comment</h3>
           <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500">
-            Comment form will be added in Phase 2
+            Comment form coming soon
           </div>
         </div>
 
