@@ -14,8 +14,8 @@ export function CommunityHeader() {
         className="absolute inset-0 bg-no-repeat opacity-15 pointer-events-none"
         style={{
           backgroundImage: 'url(/images/textures/topo-community.png)',
-          backgroundPosition: 'right center',
-          backgroundSize: 'auto 100%',
+          backgroundPosition: '600% center',
+          backgroundSize: 'auto 300%',
         }}
         aria-hidden
       />
