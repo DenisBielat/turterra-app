@@ -18,10 +18,14 @@ export default function CommunityPage() {
 
   return (
     <div className="min-h-screen bg-warm">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Hero Section: Header + News Carousel (visually connected) */}
-        <div className="mb-8">
-          <CommunityHeader />
+      {/* Full-width hero section */}
+      <div className="w-full">
+        <CommunityHeader />
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 pt-0 pb-8">
+        {/* Latest News: carousel overlapping hero */}
+        <div className="-mt-48 relative z-10 mb-8">
           <NewsCarousel />
         </div>
 

@@ -382,8 +382,8 @@ export const NEWS_TYPE_STYLES: Record<
     label: 'Announcement',
   },
   featured: {
-    bg: 'bg-amber-400',
-    text: 'text-amber-900',
+    bg: 'bg-blue-500',
+    text: 'text-white',
     label: 'Featured',
   },
   featured_species: {

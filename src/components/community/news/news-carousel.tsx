@@ -26,37 +26,9 @@ export function NewsCarousel() {
   };
 
   return (
-    <div className="bg-green-900 rounded-b-2xl px-8 pb-8 pt-6 relative overflow-hidden">
-      {/* Decorative curved lines (extending from header) */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none"
-        viewBox="0 0 1200 500"
-        preserveAspectRatio="xMidYMid slice"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M600 600 A350 350 0 0 1 1000 200"
-          stroke="rgba(255,255,255,0.05)"
-          strokeWidth="80"
-          fill="none"
-        />
-        <path
-          d="M500 700 A450 450 0 0 1 1050 100"
-          stroke="rgba(255,255,255,0.03)"
-          strokeWidth="80"
-          fill="none"
-        />
-        <path
-          d="M400 800 A550 550 0 0 1 1100 0"
-          stroke="rgba(255,255,255,0.02)"
-          strokeWidth="80"
-          fill="none"
-        />
-      </svg>
-
+    <div className="pb-8 pt-6 relative">
       <div className="relative z-10">
-        {/* Header with nav buttons */}
+        {/* Header with nav buttons - over hero, use light text */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-heading text-lg font-semibold text-white">
             Latest News
@@ -65,17 +37,17 @@ export function NewsCarousel() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => scroll('left')}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
               aria-label="Scroll left"
             >
-              <ChevronLeft className="h-4 w-4 text-white" />
+              <ChevronLeft className="h-4 w-4" />
             </button>
             <button
               onClick={() => scroll('right')}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
               aria-label="Scroll right"
             >
-              <ChevronRight className="h-4 w-4 text-white" />
+              <ChevronRight className="h-4 w-4" />
             </button>
           </div>
         </div>

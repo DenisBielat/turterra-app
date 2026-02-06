@@ -18,24 +18,27 @@ export function NewsCard({ news }: NewsCardProps) {
   return (
     <Link
       href={`/community/news/${news.slug}`}
-      className="flex-shrink-0 w-60 bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col"
+      className="group flex-shrink-0 w-72 h-[384px] flex flex-col bg-white rounded-xl border-2 border-green-950 overflow-hidden shadow-sm"
     >
-      {/* Image */}
-      {news.image_url ? (
-        <div className="relative w-full h-36 bg-green-100">
-          <Image
-            src={news.image_url}
-            alt={news.title}
-            fill
-            className="object-cover"
-          />
-        </div>
-      ) : (
-        <div className="w-full h-36 bg-green-100" />
-      )}
+      {/* Image: inset with rounded corners so it doesn't touch the card edges */}
+      <div className="p-3 pb-0 flex-shrink-0">
+        {news.image_url ? (
+          <div className="relative w-full h-[180px] overflow-hidden bg-green-100 rounded-lg border border-gray-200">
+            <Image
+              src={news.image_url}
+              alt={news.title}
+              fill
+              className="object-cover object-center transition-transform duration-300 ease-out group-hover:scale-105"
+              sizes="264px"
+            />
+          </div>
+        ) : (
+          <div className="w-full h-[180px] bg-green-100 rounded-lg" />
+        )}
+      </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-4 flex flex-col flex-1 min-h-0 overflow-hidden">
         {/* Type Badge */}
         <span
           className={`inline-flex items-center self-start px-2.5 py-1 rounded-full text-xs font-semibold ${typeStyle.bg} ${typeStyle.text}`}
@@ -44,12 +47,12 @@ export function NewsCard({ news }: NewsCardProps) {
         </span>
 
         {/* Title */}
-        <h3 className="mt-2.5 font-semibold text-green-950 line-clamp-2 leading-snug text-sm">
+        <h3 className="mt-2.5 font-semibold text-green-950 line-clamp-2 leading-snug text-base">
           {news.title}
         </h3>
 
         {/* Excerpt */}
-        <p className="mt-1.5 text-xs text-gray-600 line-clamp-3 leading-relaxed flex-1">
+        <p className="mt-1.5 text-sm text-gray-600 line-clamp-3 flex-1">
           {news.excerpt}
         </p>
 
