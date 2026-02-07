@@ -4,12 +4,12 @@ import {
   Share2,
   Bookmark,
   MoreHorizontal,
-  Image as ImageIcon,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { MockPost } from '@/lib/community/mock-data';
 import { getRelativeTime, formatNumber } from '@/lib/community/utils';
 import { VoteButtons } from './vote-buttons';
+import { MarkdownRenderer } from '../editor/markdown-renderer';
 
 interface PostCardProps {
   post: MockPost;
@@ -67,12 +67,26 @@ export function PostCard({ post, userVote }: PostCardProps) {
           </Link>
 
           {/* Body Preview */}
-          <p className="text-gray-600 text-sm line-clamp-3 mb-3">{post.body}</p>
+          {post.body && (
+            <div className="line-clamp-3 text-sm text-gray-600 mb-3">
+              <MarkdownRenderer content={post.body} />
+            </div>
+          )}
 
-          {/* Image (if post has images) */}
-          {post.image_url && (
-            <div className="mb-3 bg-gray-100 rounded-lg aspect-video flex items-center justify-center">
-              <ImageIcon className="h-12 w-12 text-gray-300" />
+          {/* Images */}
+          {post.image_urls && post.image_urls.length > 0 && (
+            <div className="mb-3">
+              <img
+                src={post.image_urls[0]}
+                alt=""
+                className="rounded-lg max-h-64 object-cover w-full"
+                loading="lazy"
+              />
+              {post.image_urls.length > 1 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  +{post.image_urls.length - 1} more image{post.image_urls.length > 2 ? 's' : ''}
+                </p>
+              )}
             </div>
           )}
 

@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getPostById, getUserVotesForPosts } from '@/lib/queries/community';
 import { getRelativeTime, formatNumber } from '@/lib/community/utils';
 import { VoteButtons } from '@/components/community/posts/vote-buttons';
+import { MarkdownRenderer } from '@/components/community/editor/markdown-renderer';
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -105,9 +106,26 @@ export default async function PostPage({ params }: PostPageProps) {
               </h1>
 
               {/* Body */}
-              <div className="prose prose-green max-w-none mb-6">
-                <p className="text-gray-700 whitespace-pre-wrap">{post.body}</p>
-              </div>
+              {post.body && (
+                <div className="mb-6">
+                  <MarkdownRenderer content={post.body} className="prose-green" />
+                </div>
+              )}
+
+              {/* Images */}
+              {post.image_urls && (post.image_urls as string[]).length > 0 && (
+                <div className="mb-6 space-y-3">
+                  {(post.image_urls as string[]).map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt=""
+                      className="rounded-lg max-w-full"
+                      loading="lazy"
+                    />
+                  ))}
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex items-center gap-4 text-sm text-gray-500 pt-4 border-t border-gray-100">

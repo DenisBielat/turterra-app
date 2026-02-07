@@ -37,6 +37,7 @@ export async function PostFeedServer({ sort, viewMode, channelId }: PostFeedServ
     comment_count: post.comment_count,
     created_at: post.created_at,
     image_url: post.image_urls?.[0],
+    image_urls: (post.image_urls ?? []) as string[],
     author: post.author as { username: string; display_name: string | null; avatar_url: string | null },
     channel: post.channel as { slug: string; name: string },
   }));

@@ -42,6 +42,7 @@ export interface MockPost {
   comment_count: number;
   created_at: string;
   image_url?: string;
+  image_urls?: string[];
   author: {
     username: string;
     display_name: string | null;
