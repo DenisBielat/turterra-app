@@ -35,7 +35,7 @@ export default async function NewPostPage({
 
   return (
     <div className="min-h-screen bg-warm">
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         <Link
           href="/community"
           className="inline-flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors mb-6"
@@ -48,13 +48,21 @@ export default async function NewPostPage({
           Create post
         </h1>
 
-        <CommunityRules variant="inline" />
+        <div className="flex gap-8">
+          {/* Editor */}
+          <div className="flex-1 min-w-0">
+            <PostEditor
+              channels={editorChannels}
+              defaultChannelSlug={defaultChannelSlug}
+            />
+          </div>
 
-        <div className="mt-6">
-          <PostEditor
-            channels={editorChannels}
-            defaultChannelSlug={defaultChannelSlug}
-          />
+          {/* Sidebar */}
+          <aside className="hidden lg:block w-72 flex-shrink-0">
+            <div className="sticky top-8">
+              <CommunityRules />
+            </div>
+          </aside>
         </div>
       </div>
     </div>
