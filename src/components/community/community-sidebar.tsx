@@ -3,6 +3,7 @@ import { CreatePostCta } from './sidebar/create-post-cta';
 import { CommunityStats } from './community-stats';
 import { TrendingTopics } from './sidebar/trending-topics';
 import { TopContributors } from './sidebar/top-contributors';
+import { CommunityRules } from './sidebar/community-rules';
 
 /**
  * Community Sidebar Component
@@ -23,6 +24,7 @@ export function CommunitySidebar() {
         <TrendingTopics />
       </Suspense>
       <TopContributors />
+      <CommunityRules />
     </aside>
   );
 }

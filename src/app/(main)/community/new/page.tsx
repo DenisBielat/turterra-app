@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getChannels } from '@/lib/queries/community';
 import { PostEditor } from '@/components/community/editor/post-editor';
+import { CommunityRules } from '@/components/community/sidebar/community-rules';
 
 export const metadata = {
   title: 'Create Post | Turterra Community',
@@ -47,10 +48,14 @@ export default async function NewPostPage({
           Create post
         </h1>
 
-        <PostEditor
-          channels={editorChannels}
-          defaultChannelSlug={defaultChannelSlug}
-        />
+        <CommunityRules variant="inline" />
+
+        <div className="mt-6">
+          <PostEditor
+            channels={editorChannels}
+            defaultChannelSlug={defaultChannelSlug}
+          />
+        </div>
       </div>
     </div>
   );

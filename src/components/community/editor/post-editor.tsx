@@ -5,6 +5,15 @@ import { useRouter } from 'next/navigation'
 import { MarkdownToolbar } from './markdown-toolbar'
 import { ImageUploadArea } from './image-upload-area'
 import { createPost } from '@/app/(main)/community/actions'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface PostEditorProps {
   channels: Array<{ id: number; slug: string; name: string; category: string }>
@@ -69,19 +78,28 @@ export function PostEditor({ channels, defaultChannelSlug }: PostEditorProps) {
       )}
 
       {/* Channel selector */}
-      <select
-        value={channelId}
-        onChange={(e) => setChannelId(Number(e.target.value))}
-        className="border rounded-full px-4 py-2 bg-white text-sm font-medium"
+      <Select
+        value={String(channelId)}
+        onValueChange={(val) => setChannelId(Number(val))}
       >
-        {Object.entries(groupedChannels).map(([category, chs]) => (
-          <optgroup key={category} label={category.charAt(0).toUpperCase() + category.slice(1)}>
-            {chs.map(ch => (
-              <option key={ch.id} value={ch.id}>{ch.name}</option>
-            ))}
-          </optgroup>
-        ))}
-      </select>
+        <SelectTrigger className="w-fit rounded-full bg-white text-sm font-medium">
+          <SelectValue placeholder="Select a channel" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(groupedChannels).map(([category, chs]) => (
+            <SelectGroup key={category}>
+              <SelectLabel className="text-xs text-gray-500 uppercase tracking-wide">
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </SelectLabel>
+              {chs.map(ch => (
+                <SelectItem key={ch.id} value={String(ch.id)}>
+                  {ch.name}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </SelectContent>
+      </Select>
 
       {/* Title */}
       <div>
