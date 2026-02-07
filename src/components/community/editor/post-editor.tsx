@@ -88,7 +88,7 @@ export function PostEditor({ channels, defaultChannelSlug }: PostEditorProps) {
         <SelectContent>
           {Object.entries(groupedChannels).map(([category, chs]) => (
             <SelectGroup key={category}>
-              <SelectLabel className="text-xs text-gray-500 uppercase tracking-wide">
+              <SelectLabel className="text-xs font-bold text-green-800 uppercase tracking-wide border-b border-gray-100 pb-1 mb-1">
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </SelectLabel>
               {chs.map(ch => (
