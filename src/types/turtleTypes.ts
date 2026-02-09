@@ -280,13 +280,15 @@ export interface Variant {
   export interface FeatureCategory {
     name: string;
     features: Feature[];
-    image?: { 
+    image?: {
       url: string;
       metadata?: {
         pictured_life_stages?: string;
         life_stages_descriptor?: string;
         asset_type?: string;
-        credits_basic?: string;
+        author?: string;
+        image_source?: string;
+        image_url?: string;
       };
     };
   }

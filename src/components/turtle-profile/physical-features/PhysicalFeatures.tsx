@@ -50,10 +50,12 @@ export default function PhysicalFeatures({
     return categoryName;
   };
 
-  // Format attribution text (asset type and credits only)
+  // Format attribution text (asset type and author/source)
   const formatAttribution = (metadata?: {
     asset_type?: string;
-    credits_basic?: string;
+    author?: string;
+    image_source?: string;
+    image_url?: string;
   }) => {
     if (!metadata) return null;
 
@@ -62,19 +64,45 @@ export default function PhysicalFeatures({
       if (!str) return "";
       return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
     };
-    
-    // Add asset type (capitalized) and credits basic
+
+    // Build credit string from author and image_source
+    const creditParts: string[] = [];
+    if (metadata.author) creditParts.push(metadata.author);
+    if (metadata.image_source) creditParts.push(metadata.image_source);
+    const creditString = creditParts.join(" / ");
+
+    // Add asset type (capitalized) and credit string
     let attributionText = "";
-    if (metadata.asset_type && metadata.credits_basic) {
+    if (metadata.asset_type && creditString) {
       const assetType = capitalize(metadata.asset_type);
-      attributionText = `${assetType}: ${metadata.credits_basic}`;
+      attributionText = `${assetType}: ${creditString}`;
     } else if (metadata.asset_type) {
       attributionText = capitalize(metadata.asset_type);
-    } else if (metadata.credits_basic) {
-      attributionText = metadata.credits_basic;
+    } else if (creditString) {
+      attributionText = creditString;
     }
-    
-    return attributionText || null;
+
+    if (!attributionText) return null;
+
+    const content = (
+      <>
+        <span>{attributionText}</span>
+        <Icon name="arrow-corner-left" style="line" size="xsm" className="ml-1 rotate-180" />
+      </>
+    );
+
+    return metadata.image_url ? (
+      <a
+        href={metadata.image_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center no-underline hover:underline"
+      >
+        {content}
+      </a>
+    ) : (
+      <span className="inline-flex items-center">{content}</span>
+    );
   };
 
   const scrollToSection = (element: HTMLElement) => {

@@ -363,7 +363,7 @@ function buildFeatureCategories({
   featureKeys: PhysicalFeature[];
   referenceVariant?: PhysicalFeatureData;
   otherVariants: PhysicalFeatureData[];
-  categoryImages: { url: string; tags: string[]; metadata?: { pictured_life_stages?: string; life_stages_descriptor?: string; asset_type?: string; credits_basic?: string } }[];
+  categoryImages: { url: string; tags: string[]; metadata?: { pictured_life_stages?: string; life_stages_descriptor?: string; asset_type?: string; author?: string; image_source?: string; image_url?: string } }[];
 }): FeatureCategory[] {
   // Helper for case-insensitive comparison
   const equalsIgnoreCase = (a: string | null | undefined, b: string | null | undefined): boolean => {
