@@ -75,7 +75,9 @@ export async function getPhysicalFeatureImages(species: string) {
           pictured_life_stages: toString(customData.pictured_life_stages || customData.life_stage),
           life_stages_descriptor: toString(customData.life_stages_descriptor),
           asset_type: toString(customData.asset_type),
-          credits_basic: toString(customData.credits_basic),
+          author: toString(customData.author),
+          image_source: toString(customData.image_source),
+          image_url: toString(customData.image_url),
         }
       };
     });

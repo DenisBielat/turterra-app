@@ -3,7 +3,9 @@ export type IconStyle = 'line' | 'filled' | 'color';
 
 export type LineIconName = 
   | 'add'
+  | 'ai-stars'
   | 'animal-skin'
+  | 'arrow-corner-left'
   | 'arrow-left-1'
   | 'arrow-right-1'
   | 'book-open'

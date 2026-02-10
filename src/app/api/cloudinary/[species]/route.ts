@@ -56,9 +56,9 @@ export async function GET(
             customData.pictured_life_stages || customData.life_stage || "",
           life_stages_descriptor: customData.life_stages_descriptor || "",
           asset_type: customData.asset_type || "",
-          credits_basic: customData.credits_basic || "",
-          credits_full: customData.credits_full || "",
           author: customData.author || "",
+          image_source: customData.image_source || "",
+          image_url: customData.image_url || "",
         },
       };
     });

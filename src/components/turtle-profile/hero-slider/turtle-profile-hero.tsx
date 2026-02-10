@@ -20,9 +20,9 @@ interface ImageData {
     pictured_life_stages: string;
     life_stages_descriptor: string;
     asset_type: AssetType | "";
-    credits_basic: string;
-    credits_full: string;
     author: string;
+    image_source: string;
+    image_url: string;
     width?: number;
     height?: number;
   };
@@ -38,7 +38,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
   const [turtleName, setTurtleName] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState(0);
   const [initialSlide, setInitialSlide] = useState(0);
-  const [fullscreenImage, setFullscreenImage] = useState<{ url: string; alt: string } | null>(null);
+  const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
 
   // Fetch Turtle Name from Supabase
   useEffect(() => {
@@ -140,10 +140,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setFullscreenImage({
-                        url: image.secure_url,
-                        alt: `${turtleName} image`
-                      });
+                      setFullscreenIndex(index);
                     }}
                     className="absolute top-2 right-2 p-1.5 rounded-md bg-green-950/80 hover:bg-green-950 transition-colors z-10 flex items-center justify-center"
                     aria-label="Expand image to fullscreen"
@@ -217,17 +214,43 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                         attributionText = parts.join(" ") + ". ";
                       }
                       
-                      // Add asset type (capitalized) and credits basic
-                      if (image.metadata.asset_type && image.metadata.credits_basic) {
+                      // Build credit string from author and image_source
+                      const creditParts: string[] = [];
+                      if (image.metadata.author) creditParts.push(image.metadata.author);
+                      if (image.metadata.image_source) creditParts.push(image.metadata.image_source);
+                      const creditString = creditParts.join(" / ");
+
+                      // Add asset type (capitalized) and credit string
+                      if (image.metadata.asset_type && creditString) {
                         const assetType = capitalize(image.metadata.asset_type);
-                        attributionText += `${assetType}: ${image.metadata.credits_basic}`;
+                        attributionText += `${assetType}: ${creditString}`;
                       } else if (image.metadata.asset_type) {
                         attributionText += capitalize(image.metadata.asset_type);
-                      } else if (image.metadata.credits_basic) {
-                        attributionText += image.metadata.credits_basic;
+                      } else if (creditString) {
+                        attributionText += creditString;
                       }
-                      
-                      return attributionText ? <span>{attributionText}</span> : null;
+
+                      if (!attributionText) return null;
+
+                      const content = (
+                        <>
+                          <span>{attributionText}</span>
+                          <Icon name="arrow-corner-left" style="line" size="xsm" className="ml-1 rotate-180" />
+                        </>
+                      );
+
+                      return image.metadata.image_url ? (
+                        <a
+                          href={image.metadata.image_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center no-underline hover:underline"
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <span className="inline-flex items-center">{content}</span>
+                      );
                     })()}
                   </div>
                 </div>
@@ -238,12 +261,15 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
       </div>
 
       {/* Fullscreen Image Modal */}
-      {fullscreenImage && (
+      {fullscreenIndex !== null && (
         <ImageFullscreenModal
-          isOpen={!!fullscreenImage}
-          onClose={() => setFullscreenImage(null)}
-          imageUrl={fullscreenImage.url}
-          alt={fullscreenImage.alt}
+          isOpen={fullscreenIndex !== null}
+          onClose={() => setFullscreenIndex(null)}
+          imageUrl={images[fullscreenIndex]?.secure_url || ""}
+          alt={`${turtleName} image`}
+          images={images.map(img => ({ url: img.secure_url, alt: `${turtleName} image` }))}
+          currentIndex={fullscreenIndex}
+          onNavigate={setFullscreenIndex}
         />
       )}
     </section>
