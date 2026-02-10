@@ -38,7 +38,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
   const [turtleName, setTurtleName] = useState<string>("");
   const [activeIndex, setActiveIndex] = useState(0);
   const [initialSlide, setInitialSlide] = useState(0);
-  const [fullscreenImage, setFullscreenImage] = useState<{ url: string; alt: string } | null>(null);
+  const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
 
   // Fetch Turtle Name from Supabase
   useEffect(() => {
@@ -140,10 +140,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setFullscreenImage({
-                        url: image.secure_url,
-                        alt: `${turtleName} image`
-                      });
+                      setFullscreenIndex(index);
                     }}
                     className="absolute top-2 right-2 p-1.5 rounded-md bg-green-950/80 hover:bg-green-950 transition-colors z-10 flex items-center justify-center"
                     aria-label="Expand image to fullscreen"
@@ -264,12 +261,15 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
       </div>
 
       {/* Fullscreen Image Modal */}
-      {fullscreenImage && (
+      {fullscreenIndex !== null && (
         <ImageFullscreenModal
-          isOpen={!!fullscreenImage}
-          onClose={() => setFullscreenImage(null)}
-          imageUrl={fullscreenImage.url}
-          alt={fullscreenImage.alt}
+          isOpen={fullscreenIndex !== null}
+          onClose={() => setFullscreenIndex(null)}
+          imageUrl={images[fullscreenIndex]?.secure_url || ""}
+          alt={`${turtleName} image`}
+          images={images.map(img => ({ url: img.secure_url, alt: `${turtleName} image` }))}
+          currentIndex={fullscreenIndex}
+          onNavigate={setFullscreenIndex}
         />
       )}
     </section>
