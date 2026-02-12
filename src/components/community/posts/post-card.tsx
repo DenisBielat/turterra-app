@@ -9,18 +9,14 @@ import { Badge } from '@/components/ui/badge';
 import { MockPost } from '@/lib/community/mock-data';
 import { getRelativeTime, formatNumber } from '@/lib/community/utils';
 import { VoteButtons } from './vote-buttons';
-import { MarkdownRenderer } from '../editor/markdown-renderer';
+import { HtmlRenderer } from '../editor/html-renderer';
+import { ImageCarousel } from './image-carousel';
 
 interface PostCardProps {
   post: MockPost;
   userVote?: number;
 }
 
-/**
- * Post Card Component (Rich View)
- *
- * Full display of a post with vote buttons, content preview, and actions.
- */
 export function PostCard({ post, userVote }: PostCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
@@ -52,7 +48,7 @@ export function PostCard({ post, userVote }: PostCardProps) {
             >
               @{post.author.username}
             </Link>
-            <span className="text-gray-400">·</span>
+            <span className="text-gray-400">&middot;</span>
             <span className="text-gray-500">
               {getRelativeTime(post.created_at)}
             </span>
@@ -66,27 +62,17 @@ export function PostCard({ post, userVote }: PostCardProps) {
             {post.title}
           </Link>
 
-          {/* Body Preview */}
-          {post.body && (
-            <div className="line-clamp-3 text-sm text-gray-600 mb-3">
-              <MarkdownRenderer content={post.body} />
+          {/* Images (above text) */}
+          {post.image_urls && post.image_urls.length > 0 && (
+            <div className="mb-3">
+              <ImageCarousel images={post.image_urls} />
             </div>
           )}
 
-          {/* Images */}
-          {post.image_urls && post.image_urls.length > 0 && (
-            <div className="mb-3">
-              <img
-                src={post.image_urls[0]}
-                alt=""
-                className="rounded-lg max-h-64 object-cover w-full"
-                loading="lazy"
-              />
-              {post.image_urls.length > 1 && (
-                <p className="text-xs text-gray-500 mt-1">
-                  +{post.image_urls.length - 1} more image{post.image_urls.length > 2 ? 's' : ''}
-                </p>
-              )}
+          {/* Body Preview (below images) */}
+          {post.body && (
+            <div className="line-clamp-3 text-sm text-gray-600 mb-3">
+              <HtmlRenderer content={post.body} />
             </div>
           )}
 

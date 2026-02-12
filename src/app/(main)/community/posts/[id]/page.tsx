@@ -5,6 +5,7 @@ import {
   Share2,
   Bookmark,
   MoreHorizontal,
+  Pencil,
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
@@ -12,17 +13,13 @@ import { createClient } from '@/lib/supabase/server';
 import { getPostById, getUserVotesForPosts } from '@/lib/queries/community';
 import { getRelativeTime, formatNumber } from '@/lib/community/utils';
 import { VoteButtons } from '@/components/community/posts/vote-buttons';
-import { MarkdownRenderer } from '@/components/community/editor/markdown-renderer';
+import { HtmlRenderer } from '@/components/community/editor/html-renderer';
+import { ImageCarousel } from '@/components/community/posts/image-carousel';
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
 }
 
-/**
- * Post Detail Page
- *
- * Displays a single post fetched from Supabase with its content and actions.
- */
 export default async function PostPage({ params }: PostPageProps) {
   const { id } = await params;
   const postId = parseInt(id, 10);
@@ -47,8 +44,9 @@ export default async function PostPage({ params }: PostPageProps) {
     ? await getUserVotesForPosts(user.id, [postId])
     : new Map<number, number>();
 
-  const author = post.author as { username: string; display_name: string | null; avatar_url: string | null };
+  const author = post.author as { id: string; username: string; display_name: string | null; avatar_url: string | null };
   const channel = post.channel as { slug: string; name: string };
+  const isAuthor = user?.id === author.id;
 
   return (
     <div className="min-h-screen bg-warm">
@@ -94,7 +92,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 >
                   @{author.username}
                 </Link>
-                <span className="text-gray-400">·</span>
+                <span className="text-gray-400">&middot;</span>
                 <span className="text-gray-500">
                   {getRelativeTime(post.created_at)}
                 </span>
@@ -105,25 +103,17 @@ export default async function PostPage({ params }: PostPageProps) {
                 {post.title}
               </h1>
 
-              {/* Body */}
-              {post.body && (
+              {/* Images (above text) */}
+              {post.image_urls && (post.image_urls as string[]).length > 0 && (
                 <div className="mb-6">
-                  <MarkdownRenderer content={post.body} className="prose-green" />
+                  <ImageCarousel images={post.image_urls as string[]} />
                 </div>
               )}
 
-              {/* Images */}
-              {post.image_urls && (post.image_urls as string[]).length > 0 && (
-                <div className="mb-6 space-y-3">
-                  {(post.image_urls as string[]).map((url, index) => (
-                    <img
-                      key={index}
-                      src={url}
-                      alt=""
-                      className="rounded-lg max-w-full"
-                      loading="lazy"
-                    />
-                  ))}
+              {/* Body (below images) */}
+              {post.body && (
+                <div className="mb-6">
+                  <HtmlRenderer content={post.body} className="prose-green" />
                 </div>
               )}
 
@@ -141,6 +131,15 @@ export default async function PostPage({ params }: PostPageProps) {
                   <Bookmark className="h-4 w-4" />
                   Save
                 </button>
+                {isAuthor && (
+                  <Link
+                    href={`/community/posts/${post.id}/edit`}
+                    className="flex items-center gap-1.5 hover:text-green-700 transition-colors"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Edit
+                  </Link>
+                )}
                 <button className="p-1 hover:text-green-700 transition-colors ml-auto">
                   <MoreHorizontal className="h-4 w-4" />
                 </button>

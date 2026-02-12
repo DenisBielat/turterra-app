@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, SquarePen } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { getChannelBySlug, getChannelStats, getUserChannelMemberships } from '@/lib/queries/community';
@@ -38,11 +38,18 @@ export default async function ChannelPage({ params, searchParams }: ChannelPageP
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Get channel stats and membership in parallel
-  const [stats, memberships] = await Promise.all([
+  // Get channel stats, membership, and user role in parallel
+  const [stats, memberships, profileResult] = await Promise.all([
     getChannelStats(),
     user ? getUserChannelMemberships(user.id) : Promise.resolve([]),
+    user
+      ? supabase.from('profiles').select('role').eq('id', user.id).single()
+      : Promise.resolve({ data: null }),
   ]);
+
+  const userRole = profileResult?.data?.role ?? 'user';
+  const isRestricted = !!(channel as Record<string, unknown>).restricted;
+  const canPostInChannel = !isRestricted || userRole === 'admin' || userRole === 'moderator';
 
   const channelStats = stats?.find((s) => s.channel_id === channel.id);
   const isJoined = memberships.includes(channel.id);
@@ -103,6 +110,19 @@ export default async function ChannelPage({ params, searchParams }: ChannelPageP
             />
           </div>
         </div>
+
+        {/* Create Post Button */}
+        {user && canPostInChannel && (
+          <div className="mb-6">
+            <Link
+              href={`/community/new?channel=${channel.slug}`}
+              className="inline-flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white font-medium py-2.5 px-5 rounded-lg transition-colors text-sm"
+            >
+              <SquarePen className="h-4 w-4" />
+              Create Post in {channel.name}
+            </Link>
+          </div>
+        )}
 
         {/* Posts filtered to this channel */}
         <Suspense

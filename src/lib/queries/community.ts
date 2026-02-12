@@ -133,6 +133,53 @@ export async function getUserVotesForPosts(
   return new Map(data?.map((v) => [v.post_id, v.value]) ?? []);
 }
 
+// ---------- User Posts ----------
+
+export async function getUserPosts(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('posts')
+    .select(
+      `
+      id, title, created_at, is_draft, score, comment_count, image_urls,
+      channel:channels!channel_id (slug, name)
+    `
+    )
+    .eq('author_id', userId)
+    .eq('is_draft', false)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function getUserDrafts(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('posts')
+    .select(
+      `
+      id, title, created_at, is_draft, image_urls,
+      channel:channels!channel_id (slug, name)
+    `
+    )
+    .eq('author_id', userId)
+    .eq('is_draft', true)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function getUserPostCount(userId: string) {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from('posts')
+    .select('id', { count: 'exact', head: true })
+    .eq('author_id', userId)
+    .eq('is_draft', false);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 // ---------- Hashtags ----------
 
 export async function getTrendingHashtags(limit = 5) {

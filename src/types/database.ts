@@ -39,6 +39,8 @@ export interface Profile {
   avatar_url: string | null;
   /** Whether user is verified (staff, notable members, etc.) */
   is_verified: boolean;
+  /** User role: 'user', 'moderator', or 'admin' */
+  role: 'user' | 'moderator' | 'admin';
   /** When the profile was created */
   created_at: string;
   /** When the profile was last updated */

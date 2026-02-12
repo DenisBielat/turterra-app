@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MarkdownToolbar } from './markdown-toolbar'
+import { RichTextEditor } from './rich-text-editor'
 import { ImageUploadArea } from './image-upload-area'
-import { createPost } from '@/app/(main)/community/actions'
+import { createPost, updatePost } from '@/app/(main)/community/actions'
 import {
   Select,
   SelectContent,
@@ -18,27 +18,44 @@ import {
 interface PostEditorProps {
   channels: Array<{ id: number; slug: string; name: string; category: string }>
   defaultChannelSlug?: string
+  userRole?: string
+  existingPost?: {
+    id: number
+    title: string
+    body: string | null
+    channel_id: number
+    image_urls: string[]
+  }
 }
 
-export function PostEditor({ channels, defaultChannelSlug }: PostEditorProps) {
+export function PostEditor({ channels, defaultChannelSlug, userRole = 'user', existingPost }: PostEditorProps) {
   const router = useRouter()
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const isEditing = !!existingPost
 
-  const defaultChannel = channels.find(c => c.slug === defaultChannelSlug) ?? channels[0]
+  // Filter out restricted channels for regular users
+  const restrictedSlugs = ['announcements', 'roadmaps']
+  const availableChannels = channels.filter(ch => {
+    if (userRole === 'admin' || userRole === 'moderator') return true
+    return !restrictedSlugs.includes(ch.slug)
+  })
 
-  const [channelId, setChannelId] = useState<number>(defaultChannel?.id)
-  const [title, setTitle] = useState('')
-  const [body, setBody] = useState('')
-  const [images, setImages] = useState<string[]>([])
+  const defaultChannel = isEditing
+    ? channels.find(c => c.id === existingPost.channel_id)
+    : channels.find(c => c.slug === defaultChannelSlug) ?? availableChannels[0]
+
+  const [channelId, setChannelId] = useState<number>(defaultChannel?.id ?? availableChannels[0]?.id)
+  const [title, setTitle] = useState(existingPost?.title ?? '')
+  const [body, setBody] = useState(existingPost?.body ?? '')
+  const [images, setImages] = useState<string[]>(existingPost?.image_urls ?? [])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Group channels by category for the dropdown
-  const groupedChannels = channels.reduce((acc, ch) => {
+  const groupedChannels = availableChannels.reduce((acc, ch) => {
     if (!acc[ch.category]) acc[ch.category] = []
     acc[ch.category].push(ch)
     return acc
-  }, {} as Record<string, typeof channels>)
+  }, {} as Record<string, typeof availableChannels>)
 
   async function handleSubmit(isDraft = false) {
     if (!title.trim()) {
@@ -50,21 +67,32 @@ export function PostEditor({ channels, defaultChannelSlug }: PostEditorProps) {
     setError(null)
 
     try {
-      const postId = await createPost({
-        title: title.trim(),
-        body: body.trim(),
-        channelId,
-        imageUrls: images,
-        isDraft,
-      })
-
-      if (isDraft) {
-        router.push('/community')
+      if (isEditing) {
+        await updatePost({
+          postId: existingPost.id,
+          title: title.trim(),
+          body: body,
+          channelId,
+          imageUrls: images,
+        })
+        router.push(`/community/posts/${existingPost.id}`)
       } else {
-        router.push(`/community/posts/${postId}`)
+        const postId = await createPost({
+          title: title.trim(),
+          body: body,
+          channelId,
+          imageUrls: images,
+          isDraft,
+        })
+
+        if (isDraft) {
+          router.push('/community')
+        } else {
+          router.push(`/community/posts/${postId}`)
+        }
       }
     } catch (err) {
-      setError('Failed to create post. Please try again.')
+      setError(err instanceof Error ? err.message : 'Failed to save post. Please try again.')
       console.error(err)
     } finally {
       setLoading(false)
@@ -119,35 +147,32 @@ export function PostEditor({ channels, defaultChannelSlug }: PostEditorProps) {
       {/* Image upload */}
       <ImageUploadArea images={images} onImagesChange={setImages} />
 
-      {/* Body editor with toolbar */}
-      <div className="border rounded-lg overflow-hidden bg-white">
-        <MarkdownToolbar textareaRef={textareaRef} onUpdate={setBody} />
-        <textarea
-          ref={textareaRef}
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          placeholder="Body text (optional)"
-          className="w-full min-h-[200px] p-4 bg-transparent resize-y focus:outline-none text-sm"
-        />
-      </div>
+      {/* Rich text editor */}
+      <RichTextEditor
+        value={body}
+        onChange={setBody}
+        placeholder="Body text (optional)"
+      />
 
       {/* Submit buttons */}
       <div className="flex items-center justify-end gap-3">
-        <button
-          type="button"
-          onClick={() => handleSubmit(true)}
-          disabled={loading || !title.trim()}
-          className="px-5 py-2 rounded-full border text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
-        >
-          Save Draft
-        </button>
+        {!isEditing && (
+          <button
+            type="button"
+            onClick={() => handleSubmit(true)}
+            disabled={loading || !title.trim()}
+            className="px-5 py-2 rounded-full border text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            Save Draft
+          </button>
+        )}
         <button
           type="button"
           onClick={() => handleSubmit(false)}
           disabled={loading || !title.trim()}
           className="px-5 py-2 rounded-full bg-green-700 text-white text-sm font-medium hover:bg-green-800 transition-colors disabled:opacity-50"
         >
-          {loading ? 'Posting...' : 'Post'}
+          {loading ? 'Saving...' : isEditing ? 'Save Changes' : 'Post'}
         </button>
       </div>
     </div>

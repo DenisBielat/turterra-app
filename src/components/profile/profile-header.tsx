@@ -10,6 +10,7 @@ interface ProfileHeaderProps {
   profile: Profile;
   isOwnProfile: boolean;
   turtleCount?: number;
+  postCount?: number;
 }
 
 /**
@@ -18,7 +19,7 @@ interface ProfileHeaderProps {
  * Displays the user's avatar, name, username, and stats.
  * Shows an avatar upload button if viewing own profile.
  */
-export function ProfileHeader({ profile, isOwnProfile, turtleCount = 0 }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, isOwnProfile, turtleCount = 0, postCount = 0 }: ProfileHeaderProps) {
   const router = useRouter();
   const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url);
   const displayName = profile.display_name || profile.username;
@@ -60,7 +61,7 @@ export function ProfileHeader({ profile, isOwnProfile, turtleCount = 0 }: Profil
           {/* Stats */}
           <div className="flex gap-6">
             <div className="text-center">
-              <p className="text-xl font-bold text-green-700">0</p>
+              <p className="text-xl font-bold text-green-700">{postCount}</p>
               <p className="text-sm text-gray-500">Forum Posts</p>
             </div>
             <div className="text-center">

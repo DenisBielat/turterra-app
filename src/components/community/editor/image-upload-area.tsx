@@ -77,41 +77,56 @@ export function ImageUploadArea({
     onImagesChange(images.filter((_, i) => i !== index))
   }
 
+  const remaining = maxImages - images.length
+
   return (
     <div className="space-y-3">
-      {/* Upload area */}
-      <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-          dragOver
-            ? 'border-green-600 bg-green-50'
-            : 'border-gray-300 hover:border-gray-400'
-        }`}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => e.target.files && handleFiles(e.target.files)}
-          className="hidden"
-        />
-
-        {uploading ? (
-          <p className="text-sm text-gray-500">Uploading...</p>
-        ) : (
-          <div className="flex flex-col items-center gap-2">
-            <Upload className="w-6 h-6 text-gray-400" />
-            <p className="text-sm text-gray-500">
-              Drag and drop or{' '}
-              <span className="text-green-700 font-medium">upload media</span>
-            </p>
-          </div>
-        )}
+      {/* Counter */}
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium text-gray-700">Images</p>
+        <p className="text-xs text-gray-500">
+          {images.length} / {maxImages} images
+        </p>
       </div>
+
+      {/* Upload area */}
+      {remaining > 0 && (
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          onClick={() => fileInputRef.current?.click()}
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+            dragOver
+              ? 'border-green-600 bg-green-50'
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+        >
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => e.target.files && handleFiles(e.target.files)}
+            className="hidden"
+          />
+
+          {uploading ? (
+            <p className="text-sm text-gray-500">Uploading...</p>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <Upload className="w-6 h-6 text-gray-400" />
+              <p className="text-sm text-gray-500">
+                Drag and drop or{' '}
+                <span className="text-green-700 font-medium">upload media</span>
+              </p>
+              <p className="text-xs text-gray-400">
+                {remaining} image{remaining !== 1 ? 's' : ''} remaining
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Image previews */}
       {images.length > 0 && (
