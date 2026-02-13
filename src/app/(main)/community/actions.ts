@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { sanitizePostHtml, stripHtml } from '@/lib/community/sanitize';
+import { sanitizePostHtml } from '@/lib/community/sanitize';
 import cloudinary from '@/lib/db/cloudinary';
 
 // ---------- Channel Membership ----------
@@ -138,10 +138,6 @@ export async function createPost({
   // Sanitize the HTML body
   const sanitizedBody = sanitizePostHtml(body);
 
-  // Extract hashtags from plain text version of the body
-  const plainText = stripHtml(body);
-  const hashtags = extractHashtags(plainText);
-
   const { data: post, error } = await supabase
     .from('posts')
     .insert({
@@ -156,11 +152,6 @@ export async function createPost({
     .single();
 
   if (error) throw error;
-
-  // Process hashtags for published posts
-  if (hashtags.length > 0 && !isDraft) {
-    await processHashtags(supabase, post.id, hashtags);
-  }
 
   revalidatePath('/community');
   return post.id;
@@ -265,56 +256,15 @@ export async function publishDraft(postId: number) {
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { data: post, error } = await supabase
+  const { error } = await supabase
     .from('posts')
     .update({ is_draft: false })
     .eq('id', postId)
-    .eq('author_id', user.id)
-    .select('body')
-    .single();
+    .eq('author_id', user.id);
 
   if (error) throw error;
 
-  // Process hashtags now that it's published
-  if (post?.body) {
-    const plainText = stripHtml(post.body);
-    const hashtags = extractHashtags(plainText);
-    if (hashtags.length > 0) {
-      await processHashtags(supabase, postId, hashtags);
-    }
-  }
-
   revalidatePath('/community');
-}
-
-// ---------- Helpers ----------
-
-function extractHashtags(text: string): string[] {
-  const matches = text.match(/#(\w+)/g);
-  if (!matches) return [];
-  return [...new Set(matches.map((m) => m.slice(1).toLowerCase()))];
-}
-
-async function processHashtags(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  postId: number,
-  hashtags: string[]
-) {
-  for (const tag of hashtags) {
-    const { data: hashtag } = await supabase
-      .from('hashtags')
-      .upsert({ name: tag }, { onConflict: 'name' })
-      .select('id')
-      .single();
-
-    if (hashtag) {
-      await supabase
-        .from('post_hashtags')
-        .insert({ post_id: postId, hashtag_id: hashtag.id });
-
-      await supabase.rpc('update_hashtag_count', { hashtag_name: tag });
-    }
-  }
 }
 
 // ---------- Image Upload ----------

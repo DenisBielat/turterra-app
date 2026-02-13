@@ -28,13 +28,3 @@ export function sanitizePostHtml(input: string): string {
     },
   }).trim()
 }
-
-/**
- * Strip all HTML for plain-text extraction (e.g. for previews, hashtag extraction).
- */
-export function stripHtml(input: string): string {
-  return sanitizeHtml(input, {
-    allowedTags: [],
-    allowedAttributes: {},
-  }).trim()
-}

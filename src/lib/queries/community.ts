@@ -180,19 +180,6 @@ export async function getUserPostCount(userId: string) {
   return count ?? 0;
 }
 
-// ---------- Hashtags ----------
-
-export async function getTrendingHashtags(limit = 5) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('hashtags')
-    .select('name, post_count')
-    .order('post_count', { ascending: false })
-    .limit(limit);
-  if (error) throw error;
-  return data;
-}
-
 // ---------- News ----------
 
 export async function getLatestNews(limit = 10) {

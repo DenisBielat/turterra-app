@@ -1,14 +1,13 @@
 import { Suspense } from 'react';
 import { CreatePostCta } from './sidebar/create-post-cta';
 import { CommunityStats } from './community-stats';
-import { TrendingTopics } from './sidebar/trending-topics';
 import { TopContributors } from './sidebar/top-contributors';
 import { CommunityRules } from './sidebar/community-rules';
 
 /**
  * Community Sidebar Component
  *
- * Contains the right sidebar with CTA, stats, trending topics, and top contributors.
+ * Contains the right sidebar with CTA, stats, and top contributors.
  * Hidden on mobile, visible on lg+ screens.
  */
 export function CommunitySidebar() {
@@ -18,10 +17,6 @@ export function CommunitySidebar() {
       <Suspense fallback={<SidebarCardSkeleton />}>
         {/* @ts-expect-error Async Server Component */}
         <CommunityStats />
-      </Suspense>
-      <Suspense fallback={<SidebarCardSkeleton />}>
-        {/* @ts-expect-error Async Server Component */}
-        <TrendingTopics />
       </Suspense>
       <TopContributors />
       <CommunityRules />
