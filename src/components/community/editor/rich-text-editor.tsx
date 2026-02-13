@@ -15,7 +15,7 @@ interface RichTextEditorProps {
 const TOOLBAR_OPTIONS = [
   [{ header: [1, 2, 3, false] }],
   ['bold', 'italic', 'underline', 'strike'],
-  ['blockquote', 'code-block'],
+  ['blockquote'],
   [{ list: 'ordered' }, { list: 'bullet' }],
   ['link'],
   ['clean'],
@@ -32,7 +32,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   const formats = [
     'header',
     'bold', 'italic', 'underline', 'strike',
-    'blockquote', 'code-block',
+    'blockquote',
     'list',
     'link',
   ]
@@ -55,6 +55,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           border-bottom-left-radius: 0.5rem;
           border-bottom-right-radius: 0.5rem;
           border-color: rgb(229 231 235);
+          background: white;
         }
         .quill-editor-wrapper .ql-toolbar {
           border-top-left-radius: 0.5rem;
@@ -64,11 +65,50 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         }
         .quill-editor-wrapper .ql-editor {
           min-height: 200px;
+          background: white;
         }
         .quill-editor-wrapper .ql-editor.ql-blank::before {
           color: rgb(156 163 175);
           font-style: normal;
         }
+        /* Tooltips for toolbar buttons */
+        .quill-editor-wrapper .ql-toolbar button,
+        .quill-editor-wrapper .ql-toolbar .ql-picker-label {
+          position: relative;
+        }
+        .quill-editor-wrapper .ql-toolbar button::after,
+        .quill-editor-wrapper .ql-toolbar .ql-picker-label::after {
+          position: absolute;
+          bottom: calc(100% + 6px);
+          left: 50%;
+          transform: translateX(-50%);
+          padding: 4px 8px;
+          background: rgb(17 24 39);
+          color: white;
+          font-size: 11px;
+          font-weight: 500;
+          line-height: 1.2;
+          white-space: nowrap;
+          border-radius: 4px;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.15s;
+          z-index: 10;
+        }
+        .quill-editor-wrapper .ql-toolbar button:hover::after,
+        .quill-editor-wrapper .ql-toolbar .ql-picker-label:hover::after {
+          opacity: 1;
+        }
+        .quill-editor-wrapper .ql-toolbar .ql-bold::after { content: 'Bold'; }
+        .quill-editor-wrapper .ql-toolbar .ql-italic::after { content: 'Italic'; }
+        .quill-editor-wrapper .ql-toolbar .ql-underline::after { content: 'Underline'; }
+        .quill-editor-wrapper .ql-toolbar .ql-strike::after { content: 'Strikethrough'; }
+        .quill-editor-wrapper .ql-toolbar .ql-blockquote::after { content: 'Quote'; }
+        .quill-editor-wrapper .ql-toolbar .ql-list[value="ordered"]::after { content: 'Numbered List'; }
+        .quill-editor-wrapper .ql-toolbar .ql-list[value="bullet"]::after { content: 'Bullet List'; }
+        .quill-editor-wrapper .ql-toolbar .ql-link::after { content: 'Link'; }
+        .quill-editor-wrapper .ql-toolbar .ql-clean::after { content: 'Clear Formatting'; }
+        .quill-editor-wrapper .ql-toolbar .ql-picker-label::after { content: 'Heading'; }
       `}</style>
     </div>
   )

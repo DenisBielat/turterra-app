@@ -110,7 +110,7 @@ export function PostEditor({ channels, defaultChannelSlug, userRole = 'user', ex
         value={String(channelId)}
         onValueChange={(val) => setChannelId(Number(val))}
       >
-        <SelectTrigger className="w-fit rounded-full bg-white text-sm font-medium">
+        <SelectTrigger className="w-fit rounded-full bg-white text-sm font-medium gap-3 pr-4">
           <SelectValue placeholder="Select a channel" />
         </SelectTrigger>
         <SelectContent>
