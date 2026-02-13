@@ -267,6 +267,123 @@ export async function publishDraft(postId: number) {
   revalidatePath('/community');
 }
 
+// ---------- Comments ----------
+
+export async function createComment({
+  postId,
+  body,
+  parentCommentId,
+}: {
+  postId: number;
+  body: string;
+  parentCommentId?: number | null;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const trimmed = body.trim();
+  if (!trimmed) throw new Error('Comment cannot be empty');
+  if (trimmed.length > 10000) throw new Error('Comment is too long');
+
+  const sanitizedBody = sanitizePostHtml(trimmed);
+
+  const { error } = await supabase.from('comments').insert({
+    post_id: postId,
+    author_id: user.id,
+    body: sanitizedBody,
+    parent_comment_id: parentCommentId ?? null,
+  });
+  if (error) throw error;
+
+  revalidatePath(`/community/posts/${postId}`);
+  revalidatePath('/community');
+}
+
+export async function deleteComment(commentId: number, postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Soft delete: replace body and mark as deleted
+  const { error } = await supabase
+    .from('comments')
+    .update({ body: '[deleted]', is_deleted: true })
+    .eq('id', commentId)
+    .eq('author_id', user.id);
+  if (error) throw error;
+
+  revalidatePath(`/community/posts/${postId}`);
+}
+
+// ---------- Save / Bookmark ----------
+
+export async function savePost(postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('saved_posts')
+    .insert({ user_id: user.id, post_id: postId });
+  if (error && error.code !== '23505') throw error; // ignore duplicate
+  revalidatePath(`/community/posts/${postId}`);
+}
+
+export async function unsavePost(postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('saved_posts')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('post_id', postId);
+  if (error) throw error;
+  revalidatePath(`/community/posts/${postId}`);
+}
+
+// ---------- Report ----------
+
+export async function reportContent({
+  contentType,
+  contentId,
+  reason,
+  details,
+}: {
+  contentType: 'post' | 'comment';
+  contentId: number;
+  reason: string;
+  details?: string;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase.from('reports').insert({
+    reporter_id: user.id,
+    content_type: contentType,
+    content_id: contentId,
+    reason,
+    details: details?.trim() || null,
+  });
+  if (error && error.code === '23505') {
+    throw new Error('You have already reported this content');
+  }
+  if (error) throw error;
+}
+
 // ---------- Image Upload ----------
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB

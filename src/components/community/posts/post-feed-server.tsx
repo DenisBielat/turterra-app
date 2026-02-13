@@ -2,6 +2,18 @@ import { createClient } from '@/lib/supabase/server';
 import { getPosts, getUserVotesForPosts } from '@/lib/queries/community';
 import { PostFeedClient } from './post-feed-client';
 
+async function getUserSavedPostIds(userId: string, postIds: number[]): Promise<Set<number>> {
+  if (postIds.length === 0) return new Set();
+  const { createClient: makeClient } = await import('@/lib/supabase/server');
+  const supabase = await makeClient();
+  const { data } = await supabase
+    .from('saved_posts')
+    .select('post_id')
+    .eq('user_id', userId)
+    .in('post_id', postIds);
+  return new Set(data?.map((d) => d.post_id) ?? []);
+}
+
 interface PostFeedServerProps {
   sort: 'hot' | 'new' | 'top';
   viewMode: 'rich' | 'compact';
@@ -22,11 +34,16 @@ export async function PostFeedServer({ sort, viewMode, channelId }: PostFeedServ
 
   const posts = await getPosts({ channelId, sort });
 
-  // Get user votes for these posts
+  // Get user votes and saved posts for these posts
   const postIds = posts?.map((p) => p.id) ?? [];
-  const userVotes = user
-    ? await getUserVotesForPosts(user.id, postIds)
-    : new Map<number, number>();
+  const [userVotes, savedPostIds] = await Promise.all([
+    user
+      ? getUserVotesForPosts(user.id, postIds)
+      : Promise.resolve(new Map<number, number>()),
+    user
+      ? getUserSavedPostIds(user.id, postIds)
+      : Promise.resolve(new Set<number>()),
+  ]);
 
   // Transform posts and votes into serializable props
   const transformedPosts = (posts ?? []).map((post) => ({
@@ -47,12 +64,16 @@ export async function PostFeedServer({ sort, viewMode, channelId }: PostFeedServ
     votesObj[key] = value;
   });
 
+  const savedArr = Array.from(savedPostIds);
+
   return (
     <PostFeedClient
       sort={sort}
       initialViewMode={viewMode}
       posts={transformedPosts}
       userVotes={votesObj}
+      savedPostIds={savedArr}
+      isLoggedIn={!!user}
     />
   );
 }

@@ -180,6 +180,53 @@ export async function getUserPostCount(userId: string) {
   return count ?? 0;
 }
 
+// ---------- Comments ----------
+
+export async function getCommentsByPostId(postId: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('comments')
+    .select(
+      `
+      *,
+      author:profiles!author_id (id, username, display_name, avatar_url)
+    `
+    )
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function getUserVotesForComments(
+  userId: string,
+  commentIds: number[]
+) {
+  if (commentIds.length === 0) return new Map<number, number>();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('votes')
+    .select('comment_id, value')
+    .eq('user_id', userId)
+    .in('comment_id', commentIds);
+  if (error) throw error;
+  return new Map(data?.map((v) => [v.comment_id, v.value]) ?? []);
+}
+
+// ---------- Saved Posts ----------
+
+export async function isPostSavedByUser(userId: string, postId: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('saved_posts')
+    .select('user_id')
+    .eq('user_id', userId)
+    .eq('post_id', postId)
+    .maybeSingle();
+  if (error) throw error;
+  return !!data;
+}
+
 // ---------- News ----------
 
 export async function getLatestNews(limit = 10) {

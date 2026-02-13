@@ -1,23 +1,22 @@
 import Link from 'next/link';
-import {
-  MessageSquare,
-  Share2,
-  Bookmark,
-  MoreHorizontal,
-} from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { MockPost } from '@/lib/community/mock-data';
 import { getRelativeTime, formatNumber } from '@/lib/community/utils';
 import { VoteButtons } from './vote-buttons';
 import { HtmlRenderer } from '../editor/html-renderer';
 import { ImageCarousel } from './image-carousel';
+import { ShareButton } from './share-button';
+import { SavePostButton } from './save-post-button';
 
 interface PostCardProps {
   post: MockPost;
   userVote?: number;
+  isSaved?: boolean;
+  isLoggedIn?: boolean;
 }
 
-export function PostCard({ post, userVote }: PostCardProps) {
+export function PostCard({ post, userVote, isSaved = false, isLoggedIn = false }: PostCardProps) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
       <div className="flex">
@@ -85,17 +84,10 @@ export function PostCard({ post, userVote }: PostCardProps) {
               <MessageSquare className="h-4 w-4" />
               {formatNumber(post.comment_count)} Comments
             </Link>
-            <button className="flex items-center gap-1.5 hover:text-green-700 transition-colors">
-              <Share2 className="h-4 w-4" />
-              Share
-            </button>
-            <button className="flex items-center gap-1.5 hover:text-green-700 transition-colors">
-              <Bookmark className="h-4 w-4" />
-              Save
-            </button>
-            <button className="p-1 hover:text-green-700 transition-colors ml-auto">
-              <MoreHorizontal className="h-4 w-4" />
-            </button>
+            <ShareButton postId={post.id} />
+            {isLoggedIn && (
+              <SavePostButton postId={post.id} isSaved={isSaved} />
+            )}
           </div>
         </div>
       </div>

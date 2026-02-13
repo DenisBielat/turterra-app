@@ -1,20 +1,22 @@
 import Link from 'next/link';
-import {
-  ArrowLeft,
-  MessageSquare,
-  Share2,
-  Bookmark,
-  MoreHorizontal,
-  Pencil,
-} from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { createClient } from '@/lib/supabase/server';
-import { getPostById, getUserVotesForPosts } from '@/lib/queries/community';
-import { getRelativeTime, formatNumber } from '@/lib/community/utils';
+import {
+  getPostById,
+  getUserVotesForPosts,
+  getCommentsByPostId,
+  getUserVotesForComments,
+  isPostSavedByUser,
+} from '@/lib/queries/community';
+import { getRelativeTime } from '@/lib/community/utils';
 import { VoteButtons } from '@/components/community/posts/vote-buttons';
 import { HtmlRenderer } from '@/components/community/editor/html-renderer';
 import { ImageCarousel } from '@/components/community/posts/image-carousel';
+import { PostActionsBar } from '@/components/community/posts/post-actions-bar';
+import { CommentSection } from '@/components/community/comments/comment-section';
+import type { CommentData } from '@/components/community/comments/comment-item';
 
 interface PostPageProps {
   params: Promise<{ id: string }>;
@@ -40,13 +42,42 @@ export default async function PostPage({ params }: PostPageProps) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const userVotes = user
-    ? await getUserVotesForPosts(user.id, [postId])
-    : new Map<number, number>();
+  // Fetch comments first (needed for vote IDs)
+  const rawComments = await getCommentsByPostId(postId);
+  const commentIds = rawComments.map((c) => c.id);
 
-  const author = post.author as { id: string; username: string; display_name: string | null; avatar_url: string | null };
+  // Fetch remaining data in parallel
+  const [userVotes, commentVotes, isSaved] = await Promise.all([
+    user
+      ? getUserVotesForPosts(user.id, [postId])
+      : Promise.resolve(new Map<number, number>()),
+    user
+      ? getUserVotesForComments(user.id, commentIds)
+      : Promise.resolve(new Map<number, number>()),
+    user ? isPostSavedByUser(user.id, postId) : Promise.resolve(false),
+  ]);
+
+  const author = post.author as {
+    id: string;
+    username: string;
+    display_name: string | null;
+    avatar_url: string | null;
+  };
   const channel = post.channel as { slug: string; name: string };
   const isAuthor = user?.id === author.id;
+
+  // Cast comments to CommentData type
+  const comments: CommentData[] = rawComments.map((c) => ({
+    id: c.id,
+    post_id: c.post_id,
+    parent_comment_id: c.parent_comment_id,
+    author_id: c.author_id,
+    body: c.body,
+    score: c.score,
+    is_deleted: c.is_deleted,
+    created_at: c.created_at,
+    author: c.author as unknown as CommentData['author'],
+  }));
 
   return (
     <div className="min-h-screen bg-warm">
@@ -118,53 +149,25 @@ export default async function PostPage({ params }: PostPageProps) {
               )}
 
               {/* Actions */}
-              <div className="flex items-center gap-4 text-sm text-gray-500 pt-4 border-t border-gray-100">
-                <span className="flex items-center gap-1.5">
-                  <MessageSquare className="h-4 w-4" />
-                  {formatNumber(post.comment_count)} Comments
-                </span>
-                <button className="flex items-center gap-1.5 hover:text-green-700 transition-colors">
-                  <Share2 className="h-4 w-4" />
-                  Share
-                </button>
-                <button className="flex items-center gap-1.5 hover:text-green-700 transition-colors">
-                  <Bookmark className="h-4 w-4" />
-                  Save
-                </button>
-                {isAuthor && (
-                  <Link
-                    href={`/community/posts/${post.id}/edit`}
-                    className="flex items-center gap-1.5 hover:text-green-700 transition-colors"
-                  >
-                    <Pencil className="h-4 w-4" />
-                    Edit
-                  </Link>
-                )}
-                <button className="p-1 hover:text-green-700 transition-colors ml-auto">
-                  <MoreHorizontal className="h-4 w-4" />
-                </button>
-              </div>
+              <PostActionsBar
+                postId={post.id}
+                commentCount={post.comment_count}
+                isSaved={isSaved}
+                isAuthor={isAuthor}
+                isLoggedIn={!!user}
+              />
             </div>
           </div>
         </div>
 
-        {/* Comment Form Placeholder */}
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
-          <h3 className="font-semibold text-green-950 mb-3">Add a Comment</h3>
-          <div className="bg-gray-50 rounded-lg p-4 text-center text-gray-500">
-            Comment form coming soon
-          </div>
-        </div>
-
-        {/* Comments Placeholder */}
-        <div className="bg-white rounded-xl border border-gray-100 p-12 text-center">
-          <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-          <h2 className="font-semibold text-green-950 mb-2">Comments Coming Soon</h2>
-          <p className="text-gray-600 max-w-md mx-auto">
-            Comments will appear here once the community features are fully
-            connected to the database. Check back soon!
-          </p>
-        </div>
+        {/* Comments */}
+        <CommentSection
+          postId={postId}
+          comments={comments}
+          commentVotes={commentVotes}
+          currentUserId={user?.id}
+          commentCount={post.comment_count}
+        />
       </div>
     </div>
   );
