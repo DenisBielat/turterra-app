@@ -102,6 +102,12 @@ export function ProfileSidebar({ profile, isOwnProfile }: ProfileSidebarProps) {
             >
               My Forum Posts
             </a>
+            <Link
+              href="/community/saved"
+              className="block text-green-950 hover:text-green-700 transition-colors"
+            >
+              Saved Posts
+            </Link>
             <span className="block text-gray-400 cursor-not-allowed">
               My Identifications
               <span className="ml-2 text-xs">(coming soon)</span>

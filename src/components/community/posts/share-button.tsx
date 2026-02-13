@@ -13,15 +13,6 @@ export function ShareButton({ postId }: ShareButtonProps) {
   const handleShare = async () => {
     const url = `${window.location.origin}/community/posts/${postId}`;
 
-    if (navigator.share) {
-      try {
-        await navigator.share({ url });
-        return;
-      } catch {
-        // User cancelled or share failed — fall through to clipboard
-      }
-    }
-
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);

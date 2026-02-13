@@ -116,6 +116,11 @@ export async function createPost({
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
+  // Validate post body length
+  if (body && body.length > 50000) {
+    throw new Error('Post body is too long (max 50,000 characters)');
+  }
+
   // Check channel restrictions
   const { data: channel } = await supabase
     .from('channels')

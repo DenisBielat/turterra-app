@@ -16,6 +16,8 @@ import { HtmlRenderer } from '@/components/community/editor/html-renderer';
 import { ImageCarousel } from '@/components/community/posts/image-carousel';
 import { PostActionsBar } from '@/components/community/posts/post-actions-bar';
 import { CommentSection } from '@/components/community/comments/comment-section';
+import { CommentForm } from '@/components/community/comments/comment-form';
+import { SignInPrompt } from '@/components/community/comments/sign-in-prompt';
 import type { CommentData } from '@/components/community/comments/comment-item';
 
 interface PostPageProps {
@@ -81,7 +83,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
   return (
     <div className="min-h-screen bg-warm">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-8 pb-16">
         {/* Back Link */}
         <Link
           href="/community"
@@ -91,8 +93,8 @@ export default async function PostPage({ params }: PostPageProps) {
           Back to Community
         </Link>
 
-        {/* Post */}
-        <div className="bg-white rounded-xl border border-gray-100 mb-8">
+        {/* Post + Comment Input (combined card) */}
+        <div className="bg-white rounded-xl border border-gray-100 mb-6">
           <div className="flex">
             {/* Vote Column */}
             <div className="py-2">
@@ -156,6 +158,15 @@ export default async function PostPage({ params }: PostPageProps) {
                 isAuthor={isAuthor}
                 isLoggedIn={!!user}
               />
+
+              {/* Inline comment form (inside the post card) */}
+              <div className="mt-4">
+                {user ? (
+                  <CommentForm postId={postId} />
+                ) : (
+                  <SignInPrompt />
+                )}
+              </div>
             </div>
           </div>
         </div>

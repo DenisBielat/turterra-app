@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { MessageSquare } from 'lucide-react';
-import { CommentForm } from './comment-form';
 import { CommentItem, type CommentData } from './comment-item';
 import { ReportDialog } from '../posts/report-dialog';
 
@@ -21,6 +20,7 @@ export function CommentSection({
   currentUserId,
   commentCount,
 }: CommentSectionProps) {
+  void postId; // Used by child CommentItems via comment.post_id
   const [reportCommentId, setReportCommentId] = useState<number | null>(null);
 
   // Build children map for threaded rendering
@@ -40,7 +40,7 @@ export function CommentSection({
     return (
       <div
         key={comment.id}
-        className={depth > 0 ? 'ml-6 pl-4 border-l-2 border-gray-100' : ''}
+        className={depth > 0 ? 'comment-thread-child' : ''}
       >
         <CommentItem
           comment={comment}
@@ -56,23 +56,6 @@ export function CommentSection({
 
   return (
     <div>
-      {/* Comment form */}
-      {currentUserId ? (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6">
-          <h3 className="font-semibold text-green-950 mb-3">Add a Comment</h3>
-          <CommentForm postId={postId} />
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-6 text-center">
-          <p className="text-gray-500 text-sm">
-            <a href="/auth/signin" className="text-green-700 hover:underline">
-              Sign in
-            </a>{' '}
-            to join the conversation.
-          </p>
-        </div>
-      )}
-
       {/* Comments list */}
       <div className="bg-white rounded-xl border border-gray-100">
         <div className="px-6 py-4 border-b border-gray-100">
@@ -97,6 +80,34 @@ export function CommentSection({
           </div>
         )}
       </div>
+
+      {/* Comment threading connector styles */}
+      <style jsx global>{`
+        .comment-thread-child {
+          position: relative;
+          margin-left: 20px;
+          padding-left: 16px;
+        }
+        .comment-thread-child::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 2px;
+          background: rgb(229 231 235);
+          border-radius: 1px;
+        }
+        .comment-thread-child::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 20px;
+          width: 12px;
+          height: 2px;
+          background: rgb(229 231 235);
+        }
+      `}</style>
 
       {/* Report dialog */}
       {reportCommentId !== null && (

@@ -35,7 +35,7 @@ export function SavePostButton({ postId, isSaved: initialSaved }: SavePostButton
           : 'text-gray-500 hover:text-green-700'
       }`}
     >
-      <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+      <Bookmark className="h-4 w-4" fill={isSaved ? 'currentColor' : 'none'} />
       {isSaved ? 'Saved' : 'Save'}
     </button>
   );
