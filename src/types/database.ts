@@ -39,6 +39,8 @@ export interface Profile {
   avatar_url: string | null;
   /** Whether user is verified (staff, notable members, etc.) */
   is_verified: boolean;
+  /** User role: 'user', 'moderator', or 'admin' */
+  role: 'user' | 'moderator' | 'admin';
   /** When the profile was created */
   created_at: string;
   /** When the profile was last updated */
@@ -85,6 +87,47 @@ export interface ReservedUsername {
   username: string;
   /** Why it's reserved (system, brand, route, feature, etc.) */
   reason: string | null;
+}
+
+/**
+ * A comment on a community post.
+ * Supports threading via parent_comment_id and soft deletes via is_deleted.
+ */
+export interface Comment {
+  id: number;
+  post_id: number;
+  parent_comment_id: number | null;
+  author_id: string;
+  body: string;
+  score: number;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * A saved/bookmarked post by a user.
+ */
+export interface SavedPost {
+  user_id: string;
+  post_id: number;
+  saved_at: string;
+}
+
+/**
+ * A report filed against a post or comment.
+ */
+export interface Report {
+  id: number;
+  reporter_id: string;
+  content_type: 'post' | 'comment';
+  content_id: number;
+  reason: 'spam' | 'harassment' | 'misinformation' | 'off_topic' | 'inappropriate' | 'self_harm' | 'other';
+  details: string | null;
+  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed';
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  created_at: string;
 }
 
 /**

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { createClient } from '@/lib/supabase/server';
 import { CommunityHeader } from '@/components/community/community-header';
 import { NewsCarouselServer } from '@/components/community/news/news-carousel-server';
 import { CommunityTabs } from '@/components/community/community-tabs';
@@ -28,6 +29,11 @@ export default async function CommunityPage({ searchParams }: CommunityPageProps
     | 'new'
     | 'top';
   const viewMode = params.view === 'compact' ? 'compact' : 'rich';
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="min-h-screen bg-warm">
@@ -67,7 +73,7 @@ export default async function CommunityPage({ searchParams }: CommunityPageProps
           </div>
 
           {/* Sidebar */}
-          <CommunitySidebar />
+          <CommunitySidebar isLoggedIn={!!user} />
         </div>
       </div>
     </div>

@@ -4,21 +4,13 @@ import { ProfileHeader } from "@/components/profile/profile-header";
 import { ProfileAbout } from "@/components/profile/profile-about";
 import { ProfileSidebar } from "@/components/profile/profile-sidebar";
 import { UserTurtles } from "@/components/profile/user-turtles";
+import { UserPosts } from "@/components/profile/user-posts";
+import { getUserPosts, getUserDrafts, getUserPostCount, getUserSavedPosts } from "@/lib/queries/community";
 
 interface ProfilePageProps {
   params: Promise<{ username: string }>;
 }
 
-/**
- * User Profile Page
- *
- * Displays a user's public profile with:
- * - Avatar, name, username, stats
- * - Bio and location (editable if own profile)
- * - Sidebar with member info, badges, quick links
- *
- * Route: /user/[username]
- */
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params;
   const supabase = await createClient();
@@ -47,6 +39,66 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     .eq("user_id", profile.id)
     .order("created_at", { ascending: true });
 
+  // Fetch user's posts and post count
+  const [posts, postCount] = await Promise.all([
+    getUserPosts(profile.id),
+    getUserPostCount(profile.id),
+  ]);
+
+  // Only fetch drafts and saved posts for own profile
+  const [drafts, savedRows] = await Promise.all([
+    isOwnProfile ? getUserDrafts(profile.id) : Promise.resolve([]),
+    isOwnProfile ? getUserSavedPosts(profile.id) : Promise.resolve([]),
+  ]);
+
+  // Normalize post data for the UserPosts component
+  const normalizedPosts = (posts ?? []).map((p) => ({
+    id: p.id as number,
+    title: p.title as string,
+    created_at: p.created_at as string,
+    is_draft: false as const,
+    score: p.score as number,
+    comment_count: p.comment_count as number,
+    channel: p.channel as unknown as { slug: string; name: string } | null,
+  }));
+
+  const normalizedDrafts = (drafts ?? []).map((p) => ({
+    id: p.id as number,
+    title: p.title as string,
+    created_at: p.created_at as string,
+    is_draft: true as const,
+    channel: p.channel as unknown as { slug: string; name: string } | null,
+  }));
+
+  const normalizedSaved = (savedRows ?? [])
+    .map((row) => {
+      const p = row.post as unknown as {
+        id: number;
+        title: string;
+        score: number;
+        comment_count: number;
+        created_at: string;
+        channel: { slug: string; name: string } | null;
+      };
+      if (!p) return null;
+      return {
+        id: p.id,
+        title: p.title,
+        created_at: p.created_at,
+        score: p.score,
+        comment_count: p.comment_count,
+        channel: p.channel,
+      };
+    })
+    .filter(Boolean) as Array<{
+      id: number;
+      title: string;
+      created_at: string;
+      score: number;
+      comment_count: number;
+      channel: { slug: string; name: string } | null;
+    }>;
+
   return (
     <div className="min-h-screen bg-warm">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -57,8 +109,15 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
               profile={profile}
               isOwnProfile={isOwnProfile}
               turtleCount={turtles?.length ?? 0}
+              postCount={postCount}
             />
             <ProfileAbout profile={profile} isOwnProfile={isOwnProfile} />
+            <UserPosts
+              posts={normalizedPosts}
+              drafts={normalizedDrafts}
+              savedPosts={normalizedSaved}
+              isOwnProfile={isOwnProfile}
+            />
             <UserTurtles
               turtles={turtles || []}
               userId={profile.id}

@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { sanitizeMarkdown } from '@/lib/community/sanitize';
+import { sanitizePostHtml } from '@/lib/community/sanitize';
 import cloudinary from '@/lib/db/cloudinary';
 
 // ---------- Channel Membership ----------
@@ -116,11 +116,32 @@ export async function createPost({
   } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  // Sanitize the markdown body
-  const sanitizedBody = sanitizeMarkdown(body);
+  // Validate post body length
+  if (body && body.length > 50000) {
+    throw new Error('Post body is too long (max 50,000 characters)');
+  }
 
-  // Extract hashtags from body
-  const hashtags = extractHashtags(sanitizedBody);
+  // Check channel restrictions
+  const { data: channel } = await supabase
+    .from('channels')
+    .select('restricted')
+    .eq('id', channelId)
+    .single();
+
+  if (channel?.restricted) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'moderator')) {
+      throw new Error('Only admins and moderators can post in this channel');
+    }
+  }
+
+  // Sanitize the HTML body
+  const sanitizedBody = sanitizePostHtml(body);
 
   const { data: post, error } = await supabase
     .from('posts')
@@ -137,44 +158,235 @@ export async function createPost({
 
   if (error) throw error;
 
-  // Process hashtags for published posts
-  if (hashtags.length > 0 && !isDraft) {
-    await processHashtags(supabase, post.id, hashtags);
-  }
-
   revalidatePath('/community');
   return post.id;
 }
 
-function extractHashtags(text: string): string[] {
-  const matches = text.match(/#(\w+)/g);
-  if (!matches) return [];
-  return [...new Set(matches.map((m) => m.slice(1).toLowerCase()))];
-}
+// ---------- Post Update ----------
 
-async function processHashtags(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  postId: number,
-  hashtags: string[]
-) {
-  for (const tag of hashtags) {
-    // Upsert the hashtag (create if not exists)
-    const { data: hashtag } = await supabase
-      .from('hashtags')
-      .upsert({ name: tag }, { onConflict: 'name' })
-      .select('id')
+export async function updatePost({
+  postId,
+  title,
+  body,
+  channelId,
+  imageUrls,
+}: {
+  postId: number;
+  title: string;
+  body: string;
+  channelId: number;
+  imageUrls: string[];
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Verify ownership
+  const { data: existing } = await supabase
+    .from('posts')
+    .select('author_id')
+    .eq('id', postId)
+    .single();
+
+  if (!existing || existing.author_id !== user.id) {
+    throw new Error('You can only edit your own posts');
+  }
+
+  // Check channel restrictions if changing channel
+  const { data: channel } = await supabase
+    .from('channels')
+    .select('restricted')
+    .eq('id', channelId)
+    .single();
+
+  if (channel?.restricted) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
       .single();
 
-    if (hashtag) {
-      // Link hashtag to post
-      await supabase
-        .from('post_hashtags')
-        .insert({ post_id: postId, hashtag_id: hashtag.id });
-
-      // Update the hashtag's post count
-      await supabase.rpc('update_hashtag_count', { hashtag_name: tag });
+    if (!profile || (profile.role !== 'admin' && profile.role !== 'moderator')) {
+      throw new Error('Only admins and moderators can post in this channel');
     }
   }
+
+  const sanitizedBody = sanitizePostHtml(body);
+
+  const { error } = await supabase
+    .from('posts')
+    .update({
+      title: title.trim(),
+      body: sanitizedBody,
+      channel_id: channelId,
+      image_urls: imageUrls,
+    })
+    .eq('id', postId);
+
+  if (error) throw error;
+
+  revalidatePath('/community');
+  revalidatePath(`/community/posts/${postId}`);
+  return postId;
+}
+
+// ---------- Post Deletion ----------
+
+export async function deletePost(postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', postId)
+    .eq('author_id', user.id);
+
+  if (error) throw error;
+
+  revalidatePath('/community');
+}
+
+// ---------- Publish Draft ----------
+
+export async function publishDraft(postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('posts')
+    .update({ is_draft: false })
+    .eq('id', postId)
+    .eq('author_id', user.id);
+
+  if (error) throw error;
+
+  revalidatePath('/community');
+}
+
+// ---------- Comments ----------
+
+export async function createComment({
+  postId,
+  body,
+  parentCommentId,
+}: {
+  postId: number;
+  body: string;
+  parentCommentId?: number | null;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const trimmed = body.trim();
+  if (!trimmed) throw new Error('Comment cannot be empty');
+  if (trimmed.length > 10000) throw new Error('Comment is too long');
+
+  const sanitizedBody = sanitizePostHtml(trimmed);
+
+  const { error } = await supabase.from('comments').insert({
+    post_id: postId,
+    author_id: user.id,
+    body: sanitizedBody,
+    parent_comment_id: parentCommentId ?? null,
+  });
+  if (error) throw error;
+
+  revalidatePath(`/community/posts/${postId}`);
+  revalidatePath('/community');
+}
+
+export async function deleteComment(commentId: number, postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  // Soft delete: replace body and mark as deleted
+  const { error } = await supabase
+    .from('comments')
+    .update({ body: '[deleted]', is_deleted: true })
+    .eq('id', commentId)
+    .eq('author_id', user.id);
+  if (error) throw error;
+
+  revalidatePath(`/community/posts/${postId}`);
+}
+
+// ---------- Save / Bookmark ----------
+
+export async function savePost(postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('saved_posts')
+    .insert({ user_id: user.id, post_id: postId });
+  if (error && error.code !== '23505') throw error; // ignore duplicate
+  revalidatePath(`/community/posts/${postId}`);
+}
+
+export async function unsavePost(postId: number) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('saved_posts')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('post_id', postId);
+  if (error) throw error;
+  revalidatePath(`/community/posts/${postId}`);
+}
+
+// ---------- Report ----------
+
+export async function reportContent({
+  contentType,
+  contentId,
+  reason,
+  details,
+}: {
+  contentType: 'post' | 'comment';
+  contentId: number;
+  reason: string;
+  details?: string;
+}) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase.from('reports').insert({
+    reporter_id: user.id,
+    content_type: contentType,
+    content_id: contentId,
+    reason,
+    details: details?.trim() || null,
+  });
+  if (error && error.code === '23505') {
+    throw new Error('You have already reported this content');
+  }
+  if (error) throw error;
 }
 
 // ---------- Image Upload ----------
@@ -200,7 +412,6 @@ export async function uploadCommunityImage(formData: FormData): Promise<string> 
     throw new Error('Image must be under 5MB');
   }
 
-  // Convert file to base64 data URI for Cloudinary upload
   const bytes = await file.arrayBuffer();
   const base64 = Buffer.from(bytes).toString('base64');
   const dataUri = `data:${file.type};base64,${base64}`;
@@ -209,8 +420,8 @@ export async function uploadCommunityImage(formData: FormData): Promise<string> 
     folder: 'community/posts',
     resource_type: 'image',
     transformation: [
-      { width: 1200, crop: 'limit' }, // Limit max width
-      { quality: 'auto', fetch_format: 'auto' }, // Optimize
+      { width: 1200, crop: 'limit' },
+      { quality: 'auto', fetch_format: 'auto' },
     ],
   });
 

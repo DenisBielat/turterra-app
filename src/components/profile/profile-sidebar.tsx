@@ -96,10 +96,12 @@ export function ProfileSidebar({ profile, isOwnProfile }: ProfileSidebarProps) {
               Privacy Settings
               <span className="ml-2 text-xs">(coming soon)</span>
             </span>
-            <span className="block text-gray-400 cursor-not-allowed">
+            <a
+              href="#my-posts"
+              className="block text-green-950 hover:text-green-700 transition-colors"
+            >
               My Forum Posts
-              <span className="ml-2 text-xs">(coming soon)</span>
-            </span>
+            </a>
             <span className="block text-gray-400 cursor-not-allowed">
               My Identifications
               <span className="ml-2 text-xs">(coming soon)</span>

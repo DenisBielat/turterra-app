@@ -1,20 +1,24 @@
 import { redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { getChannels } from '@/lib/queries/community';
+import { getPostById, getChannels } from '@/lib/queries/community';
 import { PostEditor } from '@/components/community/editor/post-editor';
-import { CommunityRules } from '@/components/community/sidebar/community-rules';
 
 export const metadata = {
-  title: 'Create Post | Turterra Community',
+  title: 'Edit Post | Turterra Community',
 };
 
-export default async function NewPostPage({
-  searchParams,
+export default async function EditPostPage({
+  params,
 }: {
-  searchParams: Promise<{ channel?: string }>;
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+  const postId = parseInt(id, 10);
+  if (isNaN(postId)) return notFound();
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,8 +26,13 @@ export default async function NewPostPage({
 
   if (!user) redirect('/login');
 
+  const post = await getPostById(postId);
+  if (!post) return notFound();
+
+  const author = post.author as { id: string };
+  if (author.id !== user.id) return notFound();
+
   const channels = await getChannels();
-  const { channel: defaultChannelSlug } = await searchParams;
 
   // Get user role
   const { data: profile } = await supabase
@@ -32,7 +41,6 @@ export default async function NewPostPage({
     .eq('id', user.id)
     .single();
 
-  // Map channels to the shape the editor expects
   const editorChannels = (channels ?? []).map((ch) => ({
     id: ch.id as number,
     slug: ch.slug as string,
@@ -44,33 +52,31 @@ export default async function NewPostPage({
     <div className="min-h-screen bg-warm">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <Link
-          href="/community"
+          href={`/community/posts/${postId}`}
           className="inline-flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors mb-6"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Community
+          Back to Post
         </Link>
 
         <h1 className="font-heading text-2xl font-bold text-green-950 mb-6">
-          Create post
+          Edit post
         </h1>
 
         <div className="flex gap-8">
-          {/* Editor */}
           <div className="flex-1 min-w-0">
             <PostEditor
               channels={editorChannels}
-              defaultChannelSlug={defaultChannelSlug}
               userRole={profile?.role ?? 'user'}
+              existingPost={{
+                id: post.id,
+                title: post.title,
+                body: post.body ?? null,
+                channel_id: post.channel_id,
+                image_urls: (post.image_urls as string[]) ?? [],
+              }}
             />
           </div>
-
-          {/* Sidebar */}
-          <aside className="hidden lg:block w-72 flex-shrink-0">
-            <div className="sticky top-8">
-              <CommunityRules />
-            </div>
-          </aside>
         </div>
       </div>
     </div>

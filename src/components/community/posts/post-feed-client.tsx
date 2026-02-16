@@ -14,6 +14,8 @@ interface PostFeedClientProps {
   initialViewMode: ViewMode;
   posts: MockPost[];
   userVotes: Record<number, number>;
+  savedPostIds?: number[];
+  isLoggedIn?: boolean;
 }
 
 /**
@@ -27,7 +29,10 @@ export function PostFeedClient({
   initialViewMode,
   posts,
   userVotes,
+  savedPostIds = [],
+  isLoggedIn = false,
 }: PostFeedClientProps) {
+  const savedSet = new Set(savedPostIds);
   const [viewMode, setViewMode] = useState<ViewMode>(initialViewMode);
 
   return (
@@ -54,6 +59,8 @@ export function PostFeedClient({
               key={post.id}
               post={post}
               userVote={userVotes[post.id]}
+              isSaved={savedSet.has(post.id)}
+              isLoggedIn={isLoggedIn}
             />
           ))}
         </div>

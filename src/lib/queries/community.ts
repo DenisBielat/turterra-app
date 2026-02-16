@@ -133,17 +133,118 @@ export async function getUserVotesForPosts(
   return new Map(data?.map((v) => [v.post_id, v.value]) ?? []);
 }
 
-// ---------- Hashtags ----------
+// ---------- User Posts ----------
 
-export async function getTrendingHashtags(limit = 5) {
+export async function getUserPosts(userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from('hashtags')
-    .select('name, post_count')
-    .order('post_count', { ascending: false })
-    .limit(limit);
+    .from('posts')
+    .select(
+      `
+      id, title, created_at, is_draft, score, comment_count, image_urls,
+      channel:channels!channel_id (slug, name)
+    `
+    )
+    .eq('author_id', userId)
+    .eq('is_draft', false)
+    .order('created_at', { ascending: false });
   if (error) throw error;
   return data;
+}
+
+export async function getUserDrafts(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('posts')
+    .select(
+      `
+      id, title, created_at, is_draft, image_urls,
+      channel:channels!channel_id (slug, name)
+    `
+    )
+    .eq('author_id', userId)
+    .eq('is_draft', true)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function getUserPostCount(userId: string) {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from('posts')
+    .select('id', { count: 'exact', head: true })
+    .eq('author_id', userId)
+    .eq('is_draft', false);
+  if (error) throw error;
+  return count ?? 0;
+}
+
+// ---------- Comments ----------
+
+export async function getCommentsByPostId(postId: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('comments')
+    .select(
+      `
+      *,
+      author:profiles!author_id (id, username, display_name, avatar_url)
+    `
+    )
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function getUserVotesForComments(
+  userId: string,
+  commentIds: number[]
+) {
+  if (commentIds.length === 0) return new Map<number, number>();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('votes')
+    .select('comment_id, value')
+    .eq('user_id', userId)
+    .in('comment_id', commentIds);
+  if (error) throw error;
+  return new Map(data?.map((v) => [v.comment_id, v.value]) ?? []);
+}
+
+// ---------- Saved Posts ----------
+
+export async function getUserSavedPosts(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('saved_posts')
+    .select(
+      `
+      post_id,
+      saved_at,
+      post:posts!post_id (
+        id, title, score, comment_count, created_at,
+        channel:channels!channel_id (slug, name)
+      )
+    `
+    )
+    .eq('user_id', userId)
+    .order('saved_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function isPostSavedByUser(userId: string, postId: number) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('saved_posts')
+    .select('user_id')
+    .eq('user_id', userId)
+    .eq('post_id', postId)
+    .maybeSingle();
+  if (error) throw error;
+  return !!data;
 }
 
 // ---------- News ----------

@@ -1,4 +1,5 @@
 import { LoginForm } from "@/components/auth/login-form";
+import { GoogleSignInButton } from "@/components/auth/google-sign-in-button";
 import Link from "next/link";
 
 export const metadata = {
@@ -17,6 +18,18 @@ export default function LoginPage() {
       </div>
 
       <LoginForm />
+
+      {/* Social login divider */}
+      <div className="relative my-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-200" />
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="bg-white px-4 text-gray-500">or</span>
+        </div>
+      </div>
+
+      <GoogleSignInButton />
 
       <p className="mt-6 text-center text-sm text-gray-600">
         Don&apos;t have an account?{" "}
