@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Flame, Clock, TrendingUp, List, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +21,7 @@ interface FeedControlsProps {
  */
 export function FeedControls({ sort, viewMode, onViewModeChange }: FeedControlsProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const updateSort = (value: SortOption) => {
@@ -31,7 +32,7 @@ export function FeedControls({ sort, viewMode, onViewModeChange }: FeedControlsP
       params.set('sort', value);
     }
     const qs = params.toString();
-    router.replace(`/community${qs ? `?${qs}` : ''}`, { scroll: false });
+    router.replace(`${pathname}${qs ? `?${qs}` : ''}`, { scroll: false });
   };
 
   return (

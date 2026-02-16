@@ -43,19 +43,16 @@ export function PostSidebar({
     <div className="space-y-4">
       {/* Channel Info Card */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-        {/* Header bar */}
-        <div className={`h-8 ${CHANNEL_ICON_COLORS[channel.slug] ?? 'bg-green-700'}`} />
-
         <div className="p-4">
           {/* Channel icon + name */}
-          <div className="flex items-center gap-3 -mt-8 mb-3">
+          <div className="flex items-center gap-3 mb-3">
             <ChannelIcon
               svg={channel.icon_svg}
               name={channel.name}
               bgColor={CHANNEL_ICON_COLORS[channel.slug]}
               size={48}
             />
-            <div className="mt-4">
+            <div>
               <Link
                 href={`/community/channels/${channel.slug}`}
                 className="font-bold text-green-950 hover:text-green-700 transition-colors"

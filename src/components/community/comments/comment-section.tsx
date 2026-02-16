@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { MessageSquare } from 'lucide-react';
 import { CommentItem, type CommentData } from './comment-item';
 import { ReportDialog } from '../posts/report-dialog';
@@ -35,30 +37,81 @@ export function CommentSection({
 
   const topLevel = comments.filter((c) => !c.parent_comment_id);
 
+  function renderAvatar(comment: CommentData) {
+    if (comment.is_deleted) {
+      return <div className="w-8 h-8 rounded-full bg-gray-100 flex-shrink-0" />;
+    }
+
+    const initial = (
+      comment.author.display_name?.[0] || comment.author.username[0]
+    ).toUpperCase();
+
+    return (
+      <Link href={`/user/${comment.author.username}`} className="flex-shrink-0">
+        {comment.author.avatar_url ? (
+          <Image
+            src={comment.author.avatar_url}
+            alt=""
+            width={32}
+            height={32}
+            className="rounded-full object-cover w-8 h-8"
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold text-xs">
+            {initial}
+          </div>
+        )}
+      </Link>
+    );
+  }
+
   function renderThread(comment: CommentData, depth: number): React.ReactNode {
     const kids = childrenMap.get(comment.id) ?? [];
     const hasChildren = kids.length > 0;
 
     return (
-      <div key={comment.id} className="comment-thread">
-        {/* Thread line + content wrapper */}
-        <div className={depth > 0 ? 'comment-nested' : ''}>
-          {/* The comment itself */}
-          <CommentItem
-            comment={comment}
-            currentUserId={currentUserId}
-            userVote={commentVotes.get(comment.id)}
-            depth={depth}
-            onReport={(id) => setReportCommentId(id)}
-          />
+      <div key={comment.id}>
+        {/* Comment row: avatar + content side by side */}
+        <div className="flex gap-3">
+          {/* Avatar */}
+          <div className="flex-shrink-0 w-8">
+            {renderAvatar(comment)}
+          </div>
 
-          {/* Children rendered inside, so the thread line covers them */}
-          {hasChildren && (
-            <div className="comment-children">
-              {kids.map((child) => renderThread(child, depth + 1))}
-            </div>
-          )}
+          {/* Content */}
+          <div className="flex-1 min-w-0">
+            <CommentItem
+              comment={comment}
+              currentUserId={currentUserId}
+              userVote={commentVotes.get(comment.id)}
+              depth={depth}
+              onReport={(id) => setReportCommentId(id)}
+            />
+          </div>
         </div>
+
+        {/* Threaded children with connectors */}
+        {hasChildren && (
+          <div style={{ marginLeft: 15 }}>
+            {kids.map((child, i) => {
+              const isLast = i === kids.length - 1;
+              return (
+                <div key={child.id} className="relative" style={{ paddingLeft: 24 }}>
+                  {/* Vertical pass-through line (continues to next sibling) */}
+                  {!isLast && (
+                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-200" />
+                  )}
+                  {/* Curved branch connector: vertical stem + curve to child avatar */}
+                  <div
+                    className="absolute left-0 top-0 border-l-2 border-b-2 border-gray-200 rounded-bl-xl"
+                    style={{ width: 22, height: 16 }}
+                  />
+                  {renderThread(child, depth + 1)}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
@@ -82,54 +135,13 @@ export function CommentSection({
             </p>
           </div>
         ) : (
-          <div className="px-6 divide-y divide-gray-50">
+          <div className="px-6 py-4 space-y-4">
             {topLevel.map((comment) => (
               <div key={comment.id}>{renderThread(comment, 0)}</div>
             ))}
           </div>
         )}
       </div>
-
-      {/* Reddit-style comment threading */}
-      <style jsx global>{`
-        /* Nested comments: indented with a thread line on the left */
-        .comment-nested {
-          position: relative;
-          margin-left: 12px;
-          padding-left: 20px;
-        }
-
-        /* Vertical thread line */
-        .comment-nested::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 8px;
-          width: 2px;
-          background: rgb(229 231 235);
-          border-radius: 1px;
-          cursor: pointer;
-          transition: background 0.15s;
-        }
-
-        /* Highlight on hover */
-        .comment-nested:hover > ::before,
-        .comment-nested::before:hover {
-          background: rgb(156 163 175);
-        }
-
-        /* Only highlight the directly hovered line, not parent lines */
-        .comment-nested:hover::before {
-          background: rgb(156 163 175);
-        }
-        .comment-nested .comment-nested::before {
-          background: rgb(229 231 235);
-        }
-        .comment-nested .comment-nested:hover::before {
-          background: rgb(156 163 175);
-        }
-      `}</style>
 
       {/* Report dialog */}
       {reportCommentId !== null && (

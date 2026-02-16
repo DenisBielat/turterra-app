@@ -56,14 +56,14 @@ export function CommentItem({
 
   if (comment.is_deleted) {
     return (
-      <div className="py-3">
+      <div className="py-1">
         <span className="text-sm text-gray-400 italic">[deleted]</span>
       </div>
     );
   }
 
   return (
-    <div className="py-3">
+    <div className="pb-2">
       {/* Author line */}
       <div className="flex items-center gap-2 mb-1">
         <Link

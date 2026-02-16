@@ -215,6 +215,26 @@ export async function getUserVotesForComments(
 
 // ---------- Saved Posts ----------
 
+export async function getUserSavedPosts(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('saved_posts')
+    .select(
+      `
+      post_id,
+      saved_at,
+      post:posts!post_id (
+        id, title, score, comment_count, created_at,
+        channel:channels!channel_id (slug, name)
+      )
+    `
+    )
+    .eq('user_id', userId)
+    .order('saved_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 export async function isPostSavedByUser(userId: string, postId: number) {
   const supabase = await createClient();
   const { data, error } = await supabase

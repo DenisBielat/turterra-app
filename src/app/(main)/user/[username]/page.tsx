@@ -5,7 +5,7 @@ import { ProfileAbout } from "@/components/profile/profile-about";
 import { ProfileSidebar } from "@/components/profile/profile-sidebar";
 import { UserTurtles } from "@/components/profile/user-turtles";
 import { UserPosts } from "@/components/profile/user-posts";
-import { getUserPosts, getUserDrafts, getUserPostCount } from "@/lib/queries/community";
+import { getUserPosts, getUserDrafts, getUserPostCount, getUserSavedPosts } from "@/lib/queries/community";
 
 interface ProfilePageProps {
   params: Promise<{ username: string }>;
@@ -45,8 +45,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     getUserPostCount(profile.id),
   ]);
 
-  // Only fetch drafts for own profile
-  const drafts = isOwnProfile ? await getUserDrafts(profile.id) : [];
+  // Only fetch drafts and saved posts for own profile
+  const [drafts, savedRows] = await Promise.all([
+    isOwnProfile ? getUserDrafts(profile.id) : Promise.resolve([]),
+    isOwnProfile ? getUserSavedPosts(profile.id) : Promise.resolve([]),
+  ]);
 
   // Normalize post data for the UserPosts component
   const normalizedPosts = (posts ?? []).map((p) => ({
@@ -67,6 +70,35 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     channel: p.channel as unknown as { slug: string; name: string } | null,
   }));
 
+  const normalizedSaved = (savedRows ?? [])
+    .map((row) => {
+      const p = row.post as unknown as {
+        id: number;
+        title: string;
+        score: number;
+        comment_count: number;
+        created_at: string;
+        channel: { slug: string; name: string } | null;
+      };
+      if (!p) return null;
+      return {
+        id: p.id,
+        title: p.title,
+        created_at: p.created_at,
+        score: p.score,
+        comment_count: p.comment_count,
+        channel: p.channel,
+      };
+    })
+    .filter(Boolean) as Array<{
+      id: number;
+      title: string;
+      created_at: string;
+      score: number;
+      comment_count: number;
+      channel: { slug: string; name: string } | null;
+    }>;
+
   return (
     <div className="min-h-screen bg-warm">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -83,6 +115,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
             <UserPosts
               posts={normalizedPosts}
               drafts={normalizedDrafts}
+              savedPosts={normalizedSaved}
               isOwnProfile={isOwnProfile}
             />
             <UserTurtles
