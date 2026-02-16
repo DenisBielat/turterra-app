@@ -7,7 +7,7 @@ import { VoteButtons } from './vote-buttons';
 import { HtmlRenderer } from '../editor/html-renderer';
 import { ImageCarousel } from './image-carousel';
 import { ShareButton } from './share-button';
-import { SavePostButton } from './save-post-button';
+import { PostMenuButton } from './post-menu-button';
 
 interface PostCardProps {
   post: MockPost;
@@ -51,6 +51,15 @@ export function PostCard({ post, userVote, isSaved = false, isLoggedIn = false }
             <span className="text-gray-500">
               {getRelativeTime(post.created_at)}
             </span>
+            {/* Ellipsis menu (aligned right) */}
+            <div className="ml-auto">
+              <PostMenuButton
+                postId={post.id}
+                isSaved={isSaved}
+                isLoggedIn={isLoggedIn}
+                isAuthor={false}
+              />
+            </div>
           </div>
 
           {/* Title */}
@@ -85,9 +94,6 @@ export function PostCard({ post, userVote, isSaved = false, isLoggedIn = false }
               {formatNumber(post.comment_count)} Comments
             </Link>
             <ShareButton postId={post.id} />
-            {isLoggedIn && (
-              <SavePostButton postId={post.id} isSaved={isSaved} />
-            )}
           </div>
         </div>
       </div>

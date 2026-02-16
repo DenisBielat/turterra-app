@@ -4,16 +4,14 @@ import { CommunityStats } from './community-stats';
 import { TopContributors } from './sidebar/top-contributors';
 import { CommunityRules } from './sidebar/community-rules';
 
-/**
- * Community Sidebar Component
- *
- * Contains the right sidebar with CTA, stats, and top contributors.
- * Hidden on mobile, visible on lg+ screens.
- */
-export function CommunitySidebar() {
+interface CommunitySidebarProps {
+  isLoggedIn?: boolean;
+}
+
+export function CommunitySidebar({ isLoggedIn = false }: CommunitySidebarProps) {
   return (
     <aside className="hidden lg:block w-80 flex-shrink-0 space-y-6">
-      <CreatePostCta />
+      <CreatePostCta isLoggedIn={isLoggedIn} />
       <Suspense fallback={<SidebarCardSkeleton />}>
         {/* @ts-expect-error Async Server Component */}
         <CommunityStats />

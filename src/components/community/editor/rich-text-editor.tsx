@@ -71,6 +71,13 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           color: rgb(156 163 175);
           font-style: normal;
         }
+        .quill-editor-wrapper .ql-container.ql-snow:focus-within {
+          border-color: rgb(22 163 74);
+          box-shadow: 0 0 0 1px rgb(22 163 74);
+        }
+        .quill-editor-wrapper:focus-within .ql-toolbar {
+          border-color: rgb(22 163 74);
+        }
         /* Tooltips for toolbar buttons */
         .quill-editor-wrapper .ql-toolbar button,
         .quill-editor-wrapper .ql-toolbar .ql-picker-label {

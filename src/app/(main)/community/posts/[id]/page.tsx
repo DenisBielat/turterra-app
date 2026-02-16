@@ -18,6 +18,7 @@ import { VoteButtons } from '@/components/community/posts/vote-buttons';
 import { HtmlRenderer } from '@/components/community/editor/html-renderer';
 import { ImageCarousel } from '@/components/community/posts/image-carousel';
 import { PostActionsBar } from '@/components/community/posts/post-actions-bar';
+import { PostMenuButton } from '@/components/community/posts/post-menu-button';
 import { CommentSection } from '@/components/community/comments/comment-section';
 import { CommentForm } from '@/components/community/comments/comment-form';
 import { SignInPrompt } from '@/components/community/comments/sign-in-prompt';
@@ -152,6 +153,15 @@ export default async function PostPage({ params }: PostPageProps) {
                     <span className="text-gray-500">
                       {getRelativeTime(post.created_at)}
                     </span>
+                    {/* Ellipsis menu (aligned right) */}
+                    <div className="ml-auto">
+                      <PostMenuButton
+                        postId={post.id}
+                        isSaved={isSaved}
+                        isLoggedIn={!!user}
+                        isAuthor={isAuthor}
+                      />
+                    </div>
                   </div>
 
                   {/* Title */}
@@ -181,9 +191,7 @@ export default async function PostPage({ params }: PostPageProps) {
                   <PostActionsBar
                     postId={post.id}
                     commentCount={post.comment_count}
-                    isSaved={isSaved}
                     isAuthor={isAuthor}
-                    isLoggedIn={!!user}
                   />
 
                   {/* Inline comment form (inside the post card) */}

@@ -136,7 +136,7 @@ export function PostEditor({ channels, defaultChannelSlug, userRole = 'user', ex
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title*"
-          className="w-full border rounded-lg px-4 py-3 bg-white text-lg focus:outline-none focus:ring-2 focus:ring-green-600/20"
+          className="w-full border border-gray-200 rounded-lg px-4 py-3 bg-white text-lg focus:outline-none focus:ring-1 focus:ring-green-600 focus:border-green-600"
           maxLength={300}
         />
         <p className="text-xs text-gray-500 text-right mt-1">

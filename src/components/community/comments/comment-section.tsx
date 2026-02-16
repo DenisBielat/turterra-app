@@ -70,16 +70,18 @@ export function CommentSection({
     const hasChildren = kids.length > 0;
 
     return (
-      <div key={comment.id}>
-        {/* Comment row: avatar + content side by side */}
-        <div className="flex gap-3">
-          {/* Avatar */}
-          <div className="flex-shrink-0 w-8">
-            {renderAvatar(comment)}
-          </div>
+      <div key={comment.id} className="flex gap-3">
+        {/* Avatar column with thread stem */}
+        <div className="flex flex-col items-center flex-shrink-0 w-8">
+          {renderAvatar(comment)}
+          {hasChildren && (
+            <div className="w-0.5 flex-1 bg-gray-200 mt-2" />
+          )}
+        </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
+        {/* Content + children column */}
+        <div className="flex-1 min-w-0">
+          <div className="pb-1">
             <CommentItem
               comment={comment}
               currentUserId={currentUserId}
@@ -88,30 +90,33 @@ export function CommentSection({
               onReport={(id) => setReportCommentId(id)}
             />
           </div>
-        </div>
 
-        {/* Threaded children with connectors */}
-        {hasChildren && (
-          <div style={{ marginLeft: 15 }}>
-            {kids.map((child, i) => {
-              const isLast = i === kids.length - 1;
-              return (
-                <div key={child.id} className="relative" style={{ paddingLeft: 24 }}>
-                  {/* Vertical pass-through line (continues to next sibling) */}
-                  {!isLast && (
-                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-200" />
-                  )}
-                  {/* Curved branch connector: vertical stem + curve to child avatar */}
-                  <div
-                    className="absolute left-0 top-0 border-l-2 border-b-2 border-gray-200 rounded-bl-xl"
-                    style={{ width: 22, height: 16 }}
-                  />
+          {/* Threaded children with curve connectors */}
+          {hasChildren && (
+            <div>
+              {kids.map((child) => (
+                <div key={child.id} className="relative">
+                  {/* Curved connector from parent stem to child avatar */}
+                  <svg
+                    className="absolute text-gray-200 pointer-events-none"
+                    style={{ left: -27, top: 4 }}
+                    width="27"
+                    height="16"
+                    viewBox="0 0 27 16"
+                    fill="none"
+                  >
+                    <path
+                      d="M 1 0 L 1 8 Q 1 15 8 15 L 27 15"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    />
+                  </svg>
                   {renderThread(child, depth + 1)}
                 </div>
-              );
-            })}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
