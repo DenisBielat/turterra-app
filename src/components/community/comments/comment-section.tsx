@@ -20,7 +20,7 @@ export function CommentSection({
   currentUserId,
   commentCount,
 }: CommentSectionProps) {
-  void postId; // Used by child CommentItems via comment.post_id
+  void postId;
   const [reportCommentId, setReportCommentId] = useState<number | null>(null);
 
   // Build children map for threaded rendering
@@ -37,19 +37,28 @@ export function CommentSection({
 
   function renderThread(comment: CommentData, depth: number): React.ReactNode {
     const kids = childrenMap.get(comment.id) ?? [];
+    const hasChildren = kids.length > 0;
+
     return (
-      <div
-        key={comment.id}
-        className={depth > 0 ? 'comment-thread-child' : ''}
-      >
-        <CommentItem
-          comment={comment}
-          currentUserId={currentUserId}
-          userVote={commentVotes.get(comment.id)}
-          depth={depth}
-          onReport={(id) => setReportCommentId(id)}
-        />
-        {kids.map((child) => renderThread(child, depth + 1))}
+      <div key={comment.id} className="comment-thread">
+        {/* Thread line + content wrapper */}
+        <div className={depth > 0 ? 'comment-nested' : ''}>
+          {/* The comment itself */}
+          <CommentItem
+            comment={comment}
+            currentUserId={currentUserId}
+            userVote={commentVotes.get(comment.id)}
+            depth={depth}
+            onReport={(id) => setReportCommentId(id)}
+          />
+
+          {/* Children rendered inside, so the thread line covers them */}
+          {hasChildren && (
+            <div className="comment-children">
+              {kids.map((child) => renderThread(child, depth + 1))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -81,31 +90,44 @@ export function CommentSection({
         )}
       </div>
 
-      {/* Comment threading connector styles */}
+      {/* Reddit-style comment threading */}
       <style jsx global>{`
-        .comment-thread-child {
+        /* Nested comments: indented with a thread line on the left */
+        .comment-nested {
           position: relative;
-          margin-left: 20px;
-          padding-left: 16px;
+          margin-left: 12px;
+          padding-left: 20px;
         }
-        .comment-thread-child::before {
+
+        /* Vertical thread line */
+        .comment-nested::before {
           content: '';
           position: absolute;
           left: 0;
           top: 0;
-          bottom: 0;
+          bottom: 8px;
           width: 2px;
           background: rgb(229 231 235);
           border-radius: 1px;
+          cursor: pointer;
+          transition: background 0.15s;
         }
-        .comment-thread-child::after {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 20px;
-          width: 12px;
-          height: 2px;
+
+        /* Highlight on hover */
+        .comment-nested:hover > ::before,
+        .comment-nested::before:hover {
+          background: rgb(156 163 175);
+        }
+
+        /* Only highlight the directly hovered line, not parent lines */
+        .comment-nested:hover::before {
+          background: rgb(156 163 175);
+        }
+        .comment-nested .comment-nested::before {
           background: rgb(229 231 235);
+        }
+        .comment-nested .comment-nested:hover::before {
+          background: rgb(156 163 175);
         }
       `}</style>
 

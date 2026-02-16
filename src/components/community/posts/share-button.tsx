@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Share2, Check } from 'lucide-react';
+import { ArrowUpFromLine, Check } from 'lucide-react';
 
 interface ShareButtonProps {
   postId: number;
@@ -34,7 +34,7 @@ export function ShareButton({ postId }: ShareButtonProps) {
         </>
       ) : (
         <>
-          <Share2 className="h-4 w-4" />
+          <ArrowUpFromLine className="h-4 w-4" />
           Share
         </>
       )}
