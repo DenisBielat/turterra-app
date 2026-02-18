@@ -71,10 +71,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
           color: rgb(156 163 175);
           font-style: normal;
         }
-        .quill-editor-wrapper:focus-within {
-          border-radius: 0.5rem;
-          box-shadow: 0 0 0 1px rgb(22 163 74);
-        }
         .quill-editor-wrapper .ql-container.ql-snow:focus-within {
           border-color: rgb(22 163 74);
         }

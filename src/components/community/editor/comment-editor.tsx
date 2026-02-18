@@ -74,10 +74,6 @@ export function CommentEditor({ value, onChange, placeholder, minHeight = 80 }: 
           color: rgb(156 163 175);
           font-style: normal;
         }
-        .comment-editor-wrapper:focus-within {
-          border-radius: 0.5rem;
-          box-shadow: 0 0 0 1px rgb(22 163 74);
-        }
         .comment-editor-wrapper .ql-container.ql-snow:focus-within {
           border-color: rgb(22 163 74);
         }
