@@ -65,7 +65,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         }
         .quill-editor-wrapper .ql-editor {
           min-height: 200px;
-          background: white;
         }
         .quill-editor-wrapper .ql-editor.ql-blank::before {
           color: rgb(156 163 175);

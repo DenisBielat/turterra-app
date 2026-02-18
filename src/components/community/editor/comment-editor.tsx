@@ -67,7 +67,6 @@ export function CommentEditor({ value, onChange, placeholder, minHeight = 80 }: 
         }
         .comment-editor-wrapper .ql-editor {
           min-height: ${minHeight}px;
-          background: white;
           padding: 8px 12px;
         }
         .comment-editor-wrapper .ql-editor.ql-blank::before {
