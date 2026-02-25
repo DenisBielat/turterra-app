@@ -67,7 +67,6 @@ export function CommentEditor({ value, onChange, placeholder, minHeight = 80 }: 
         }
         .comment-editor-wrapper .ql-editor {
           min-height: ${minHeight}px;
-          background: white;
           padding: 8px 12px;
         }
         .comment-editor-wrapper .ql-editor.ql-blank::before {
@@ -76,7 +75,6 @@ export function CommentEditor({ value, onChange, placeholder, minHeight = 80 }: 
         }
         .comment-editor-wrapper .ql-container.ql-snow:focus-within {
           border-color: rgb(22 163 74);
-          box-shadow: 0 0 0 1px rgb(22 163 74);
         }
         .comment-editor-wrapper:focus-within .ql-toolbar {
           border-color: rgb(22 163 74);

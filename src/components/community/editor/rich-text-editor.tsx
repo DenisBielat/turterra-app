@@ -65,7 +65,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         }
         .quill-editor-wrapper .ql-editor {
           min-height: 200px;
-          background: white;
         }
         .quill-editor-wrapper .ql-editor.ql-blank::before {
           color: rgb(156 163 175);
@@ -73,7 +72,6 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         }
         .quill-editor-wrapper .ql-container.ql-snow:focus-within {
           border-color: rgb(22 163 74);
-          box-shadow: 0 0 0 1px rgb(22 163 74);
         }
         .quill-editor-wrapper:focus-within .ql-toolbar {
           border-color: rgb(22 163 74);
