@@ -5,6 +5,15 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 import { voteOnPost } from '@/app/(main)/community/actions';
 import { formatNumber } from '@/lib/community/utils';
 
+function voteContainerBg(
+  vote: number | undefined,
+  hover: 'up' | 'down' | null
+): string {
+  if (vote === 1 || hover === 'up') return 'bg-green-100/90 border-green-200/80';
+  if (vote === -1 || hover === 'down') return 'bg-red-100/90 border-red-200/80';
+  return 'bg-gray-100 border-gray-200/80';
+}
+
 interface VoteButtonsProps {
   postId: number;
   score: number;
@@ -25,6 +34,7 @@ export function VoteButtons({
 }: VoteButtonsProps) {
   const [optimisticScore, setOptimisticScore] = useState(score);
   const [optimisticVote, setOptimisticVote] = useState(userVote);
+  const [hoverVote, setHoverVote] = useState<'up' | 'down' | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const handleVote = (value: 1 | -1) => {
@@ -56,30 +66,35 @@ export function VoteButtons({
   };
 
   if (layout === 'horizontal') {
+    const containerBg = voteContainerBg(optimisticVote, hoverVote);
     return (
-      <div className="flex items-center gap-1 text-sm">
+      <div
+        className={`inline-flex items-center gap-0.5 text-sm rounded-full px-2 py-1 border transition-colors ${containerBg}`}
+      >
         <button
           onClick={() => handleVote(1)}
           disabled={isPending}
+          onMouseEnter={() => setHoverVote('up')}
+          onMouseLeave={() => setHoverVote(null)}
           className={`p-0.5 transition-colors ${
-            optimisticVote === 1
-              ? 'text-green-700'
-              : 'text-gray-400 hover:text-green-700'
+            optimisticVote === 1 ? 'text-green-700' : 'text-gray-400 hover:text-green-700'
           }`}
+          aria-label="Upvote"
         >
           <ChevronUp className="h-4 w-4" />
         </button>
-        <span className="font-medium text-green-950 min-w-[2rem] text-center">
+        <span className="font-medium text-green-950 min-w-[2rem] text-center text-xs tabular-nums">
           {formatNumber(optimisticScore)}
         </span>
         <button
           onClick={() => handleVote(-1)}
           disabled={isPending}
+          onMouseEnter={() => setHoverVote('down')}
+          onMouseLeave={() => setHoverVote(null)}
           className={`p-0.5 transition-colors ${
-            optimisticVote === -1
-              ? 'text-red-500'
-              : 'text-gray-400 hover:text-red-500'
+            optimisticVote === -1 ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
           }`}
+          aria-label="Downvote"
         >
           <ChevronDown className="h-4 w-4" />
         </button>

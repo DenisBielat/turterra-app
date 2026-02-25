@@ -20,14 +20,6 @@ export function PostCard({ post, userVote, isSaved = false, isLoggedIn = false }
   return (
     <div className="bg-white rounded-xl border border-gray-100 hover:shadow-md transition-shadow">
       <div className="flex">
-        {/* Vote Column */}
-        <VoteButtons
-          postId={post.id}
-          score={post.score}
-          userVote={userVote}
-          layout="vertical"
-        />
-
         {/* Content Column */}
         <div className="flex-1 p-4">
           {/* Meta Line */}
@@ -85,7 +77,13 @@ export function PostCard({ post, userVote, isSaved = false, isLoggedIn = false }
           )}
 
           {/* Actions */}
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
+            <VoteButtons
+              postId={post.id}
+              score={post.score}
+              userVote={userVote}
+              layout="horizontal"
+            />
             <Link
               href={`/community/posts/${post.id}`}
               className="flex items-center gap-1.5 hover:text-green-700 transition-colors"

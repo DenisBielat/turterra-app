@@ -78,9 +78,9 @@ export function CommentItem({
         </span>
       </div>
 
-      {/* Comment body */}
-      <div className="text-sm text-gray-700 mb-2">
-        <HtmlRenderer content={comment.body} />
+      {/* Comment body: break-words and min-w-0 so long text wraps within the thread column */}
+      <div className="text-sm text-gray-700 mb-2 min-w-0 overflow-x-hidden">
+        <HtmlRenderer content={comment.body} className="break-words min-w-0 max-w-full" />
       </div>
 
       {/* Actions */}

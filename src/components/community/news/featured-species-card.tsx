@@ -49,7 +49,8 @@ export function FeaturedSpeciesCard({ species }: FeaturedSpeciesCardProps) {
           alt={species.species_common_name}
           fill
           className="object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-          sizes="272px"
+          sizes="(max-width: 272px) 272px, 544px"
+          quality={100}
         />
 
         {/* Gradient overlay for text readability */}

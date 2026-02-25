@@ -14,7 +14,6 @@ import {
   getUserChannelMemberships,
 } from '@/lib/queries/community';
 import { getRelativeTime } from '@/lib/community/utils';
-import { VoteButtons } from '@/components/community/posts/vote-buttons';
 import { HtmlRenderer } from '@/components/community/editor/html-renderer';
 import { ImageCarousel } from '@/components/community/posts/image-carousel';
 import { PostActionsBar } from '@/components/community/posts/post-actions-bar';
@@ -120,16 +119,6 @@ export default async function PostPage({ params }: PostPageProps) {
             {/* Post + Comment Input (combined card) */}
             <div className="bg-white rounded-xl border border-gray-100 mb-6">
               <div className="flex">
-                {/* Vote Column */}
-                <div className="py-2">
-                  <VoteButtons
-                    postId={post.id}
-                    score={post.score}
-                    userVote={userVotes.get(post.id)}
-                    layout="vertical"
-                  />
-                </div>
-
                 {/* Content Column */}
                 <div className="flex-1 p-6">
                   {/* Meta Line */}
@@ -192,6 +181,8 @@ export default async function PostPage({ params }: PostPageProps) {
                     postId={post.id}
                     commentCount={post.comment_count}
                     isAuthor={isAuthor}
+                    score={post.score}
+                    userVote={userVotes.get(post.id)}
                   />
 
                   {/* Inline comment form (inside the post card) */}
