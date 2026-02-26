@@ -190,7 +190,7 @@ export function BrowseGuides() {
                 />
 
                 {/* Stats pill — top-right, appears on hover */}
-                <span className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 flex items-center gap-2 bg-white/90 backdrop-blur-sm text-green-950 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 flex items-center gap-2 bg-white/90 backdrop-blur-sm text-green-950 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full">
                   <span className="flex items-center gap-0.5">
                     <Icon name="ruler" style="line" size="sm" className="text-green-800" />
                     {guide.sizeRange}
