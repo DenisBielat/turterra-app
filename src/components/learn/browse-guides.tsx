@@ -14,8 +14,6 @@ interface GuideCard {
   scientificName: string;
   imageUrl: string;
   category: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  isPopular: boolean;
   sizeRange: string;
   lifespan: string;
 }
@@ -27,8 +25,6 @@ const PLACEHOLDER_GUIDES: GuideCard[] = [
     scientificName: 'Trachemys scripta elegans',
     imageUrl: '/images/image-placeholder.png',
     category: 'Pond & Box Turtles',
-    difficulty: 'Intermediate',
-    isPopular: true,
     sizeRange: '8-12"',
     lifespan: '20-40 years',
   },
@@ -38,8 +34,6 @@ const PLACEHOLDER_GUIDES: GuideCard[] = [
     scientificName: 'Terrapene carolina carolina',
     imageUrl: '/images/image-placeholder.png',
     category: 'Pond & Box Turtles',
-    difficulty: 'Intermediate',
-    isPopular: false,
     sizeRange: '5-7"',
     lifespan: '25-40 years',
   },
@@ -49,8 +43,6 @@ const PLACEHOLDER_GUIDES: GuideCard[] = [
     scientificName: 'Graptemys geographica',
     imageUrl: '/images/image-placeholder.png',
     category: 'Map Turtles',
-    difficulty: 'Intermediate',
-    isPopular: false,
     sizeRange: '7-11"',
     lifespan: '15-20 years',
   },
@@ -60,8 +52,6 @@ const PLACEHOLDER_GUIDES: GuideCard[] = [
     scientificName: 'Sternotherus odoratus',
     imageUrl: '/images/image-placeholder.png',
     category: 'Musk & Mud Turtles',
-    difficulty: 'Beginner',
-    isPopular: true,
     sizeRange: '3-5"',
     lifespan: '30-50 years',
   },
@@ -71,8 +61,6 @@ const PLACEHOLDER_GUIDES: GuideCard[] = [
     scientificName: 'Testudo horsfieldii',
     imageUrl: '/images/image-placeholder.png',
     category: 'Tortoises',
-    difficulty: 'Beginner',
-    isPopular: false,
     sizeRange: '6-10"',
     lifespan: '40-50 years',
   },
@@ -82,27 +70,10 @@ const PLACEHOLDER_GUIDES: GuideCard[] = [
     scientificName: 'Chrysemys picta',
     imageUrl: '/images/image-placeholder.png',
     category: 'Pond & Box Turtles',
-    difficulty: 'Beginner',
-    isPopular: false,
     sizeRange: '5-10"',
     lifespan: '25-30 years',
   },
 ];
-
-/* ------------------------------------------------------------------ */
-/*  Difficulty badge colour helper                                    */
-/* ------------------------------------------------------------------ */
-
-function difficultyColors(level: GuideCard['difficulty']) {
-  switch (level) {
-    case 'Beginner':
-      return 'bg-green-600/90 text-white';
-    case 'Intermediate':
-      return 'bg-orange-500/90 text-white';
-    case 'Advanced':
-      return 'bg-red-500/90 text-white';
-  }
-}
 
 /* ------------------------------------------------------------------ */
 /*  Main component                                                    */
@@ -135,7 +106,7 @@ export function BrowseGuides() {
           }`}
         >
           <Icon name="category" style="line" size="sm" />
-          Species Guides
+          Species Care Guides
         </button>
         <button
           onClick={() => setActiveTab('topic')}
@@ -202,65 +173,54 @@ export function BrowseGuides() {
             {PLACEHOLDER_GUIDES.length} species guides available
           </p>
 
-          {/* Card grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+          {/* Card grid — styled to match TurtleCard grid view */}
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-8">
             {PLACEHOLDER_GUIDES.map((guide) => (
               <div
                 key={guide.id}
-                className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                className="group relative block aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02] cursor-pointer"
               >
-                {/* Image area */}
-                <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-                  <Image
-                    src={guide.imageUrl}
-                    alt={guide.commonName}
-                    fill
-                    className="object-cover"
-                  />
+                {/* Image with parallax hover zoom */}
+                <Image
+                  src={guide.imageUrl}
+                  alt={guide.commonName}
+                  fill
+                  className="object-cover transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-110"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                />
 
-                  {/* Badges */}
-                  <div className="absolute top-2.5 left-2.5 flex gap-1.5">
-                    <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-md ${difficultyColors(
-                        guide.difficulty,
-                      )}`}
-                    >
-                      {guide.difficulty}
-                    </span>
-                    {guide.isPopular && (
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-400/90 text-amber-950">
-                        Popular
-                      </span>
-                    )}
-                  </div>
+                {/* Stats pill — top-right, appears on hover */}
+                <span className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 flex items-center gap-2 bg-white/90 backdrop-blur-sm text-green-950 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="flex items-center gap-0.5">
+                    <Icon name="ruler" style="line" size="sm" className="text-green-800" />
+                    {guide.sizeRange}
+                  </span>
+                  <span className="w-px h-3 bg-green-950/20" />
+                  <span className="flex items-center gap-0.5">
+                    <Icon name="clock" style="line" size="sm" className="text-green-800" />
+                    {guide.lifespan}
+                  </span>
+                </span>
 
-                  {/* Category label */}
-                  <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 to-transparent pt-6 pb-2 px-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-white/90">
-                      {guide.category}
-                    </span>
-                  </div>
-                </div>
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-                {/* Info */}
-                <div className="p-4">
-                  <h3 className="font-heading font-bold text-green-950 text-base mb-0.5">
-                    {guide.commonName}
-                  </h3>
-                  <p className="text-xs text-gray-500 italic mb-3">
-                    {guide.scientificName}
+                {/* Content at bottom */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 z-10">
+                  {/* Family eyebrow */}
+                  <p className="hidden sm:block text-green-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+                    {guide.category}
                   </p>
 
-                  <div className="flex items-center gap-4 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Icon name="ruler" style="line" size="sm" className="text-gray-400" />
-                      {guide.sizeRange}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Icon name="clock" style="line" size="sm" className="text-gray-400" />
-                      {guide.lifespan}
-                    </span>
-                  </div>
+                  {/* Name */}
+                  <h3 className="font-heading font-bold text-white text-sm sm:text-xl drop-shadow-lg line-clamp-2">
+                    {guide.commonName}
+                  </h3>
+
+                  {/* Scientific name */}
+                  <p className="hidden sm:block text-gray-400 text-sm italic mt-1">
+                    {guide.scientificName}
+                  </p>
                 </div>
               </div>
             ))}
