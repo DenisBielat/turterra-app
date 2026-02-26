@@ -9,7 +9,7 @@ import { Icon } from '@/components/Icon';
  */
 export function LearnHeader() {
   return (
-    <header className="relative w-full overflow-hidden bg-green-950">
+    <header className="relative w-full overflow-hidden bg-green-950 min-h-[540px]">
       {/* Topographical pattern: full hero, positioned right */}
       <div
         className="absolute inset-0 bg-no-repeat opacity-15 pointer-events-none"

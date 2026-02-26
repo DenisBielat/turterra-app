@@ -115,7 +115,7 @@ export function BrowseGuides() {
     <section>
       {/* Section heading */}
       <div className="mb-2">
-        <h2 className="font-heading text-2xl md:text-3xl font-bold text-green-950 border-l-4 border-green-600 pl-3">
+        <h2 className="font-heading text-2xl md:text-3xl font-bold text-green-950">
           Browse Guides
         </h2>
       </div>
