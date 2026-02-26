@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { LearnHeader } from '@/components/learn/learn-header';
+import { BrowseGuides } from '@/components/learn/browse-guides';
 
 export const metadata: Metadata = {
   title: 'Learn | Turterra',
@@ -20,15 +21,9 @@ export default function LearnPage() {
         <LearnHeader />
       </div>
 
-      {/* Content area */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="font-heading text-2xl md:text-3xl font-bold text-gray-900 mb-6">
-          Guides &amp; Resources
-        </h2>
-        <p className="text-gray-600 text-base md:text-lg max-w-2xl">
-          Content coming soon. Check back for care guides, habitat setup
-          walkthroughs, feeding schedules, and more.
-        </p>
+      {/* Content area — max-w-8xl + px-10 matches navbar logo alignment */}
+      <div className="max-w-8xl mx-auto px-4 lg:px-10 py-12">
+        <BrowseGuides />
       </div>
     </div>
   );
