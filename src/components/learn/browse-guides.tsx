@@ -4,82 +4,24 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Icon } from '@/components/Icon';
 
-/* ------------------------------------------------------------------ */
-/*  Placeholder data — will be replaced with Supabase queries later   */
-/* ------------------------------------------------------------------ */
-
-interface GuideCard {
-  id: number;
+export interface CareGuide {
+  id: string;
+  slug: string;
   commonName: string;
   scientificName: string;
   imageUrl: string;
-  category: string;
-  sizeRange: string;
-  lifespan: string;
+  category: string | null;
+  sizeRange: string | null;
+  lifespan: string | null;
 }
 
-const PLACEHOLDER_GUIDES: GuideCard[] = [
-  {
-    id: 1,
-    commonName: 'Red-Eared Slider',
-    scientificName: 'Trachemys scripta elegans',
-    imageUrl: '/images/image-placeholder.png',
-    category: 'Pond & Box Turtles',
-    sizeRange: '8-12"',
-    lifespan: '20-40 years',
-  },
-  {
-    id: 2,
-    commonName: 'Eastern Box Turtle',
-    scientificName: 'Terrapene carolina carolina',
-    imageUrl: '/images/image-placeholder.png',
-    category: 'Pond & Box Turtles',
-    sizeRange: '5-7"',
-    lifespan: '25-40 years',
-  },
-  {
-    id: 3,
-    commonName: 'Northern Map Turtle',
-    scientificName: 'Graptemys geographica',
-    imageUrl: '/images/image-placeholder.png',
-    category: 'Map Turtles',
-    sizeRange: '7-11"',
-    lifespan: '15-20 years',
-  },
-  {
-    id: 4,
-    commonName: 'Common Musk Turtle',
-    scientificName: 'Sternotherus odoratus',
-    imageUrl: '/images/image-placeholder.png',
-    category: 'Musk & Mud Turtles',
-    sizeRange: '3-5"',
-    lifespan: '30-50 years',
-  },
-  {
-    id: 5,
-    commonName: 'Russian Tortoise',
-    scientificName: 'Testudo horsfieldii',
-    imageUrl: '/images/image-placeholder.png',
-    category: 'Tortoises',
-    sizeRange: '6-10"',
-    lifespan: '40-50 years',
-  },
-  {
-    id: 6,
-    commonName: 'Painted Turtle',
-    scientificName: 'Chrysemys picta',
-    imageUrl: '/images/image-placeholder.png',
-    category: 'Pond & Box Turtles',
-    sizeRange: '5-10"',
-    lifespan: '25-30 years',
-  },
-];
+interface BrowseGuidesProps {
+  guides: CareGuide[];
+}
 
-/* ------------------------------------------------------------------ */
-/*  Main component                                                    */
-/* ------------------------------------------------------------------ */
+const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
 
-export function BrowseGuides() {
+export function BrowseGuides({ guides }: BrowseGuidesProps) {
   const [activeTab, setActiveTab] = useState<'species' | 'topic'>('species');
 
   return (
@@ -170,61 +112,81 @@ export function BrowseGuides() {
 
           {/* Count */}
           <p className="text-xs text-gray-500 mb-6">
-            {PLACEHOLDER_GUIDES.length} species guides available
+            {guides.length} species guide{guides.length !== 1 ? 's' : ''} available
           </p>
 
           {/* Card grid — styled to match TurtleCard grid view */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-8">
-            {PLACEHOLDER_GUIDES.map((guide) => (
-              <div
-                key={guide.id}
-                className="group relative block aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02] cursor-pointer"
-              >
-                {/* Image with parallax hover zoom */}
-                <Image
-                  src={guide.imageUrl}
-                  alt={guide.commonName}
-                  fill
-                  className="object-cover transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-110"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
-                />
+          {guides.length > 0 ? (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-8">
+              {guides.map((guide) => (
+                <div
+                  key={guide.id}
+                  className="group relative block aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02] cursor-pointer"
+                >
+                  {/* Image with parallax hover zoom */}
+                  <Image
+                    src={guide.imageUrl || PLACEHOLDER_IMAGE}
+                    alt={guide.commonName}
+                    fill
+                    className="object-cover transform-gpu will-change-transform transition-transform duration-500 ease-out group-hover:scale-110"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                  />
 
-                {/* Stats pill — top-right, appears on hover */}
-                <span className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 flex items-center gap-2 bg-white/90 backdrop-blur-sm text-green-950 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full">
-                  <span className="flex items-center gap-0.5">
-                    <Icon name="ruler" style="line" size="sm" className="text-green-800" />
-                    {guide.sizeRange}
-                  </span>
-                  <span className="w-px h-3 bg-green-950/20" />
-                  <span className="flex items-center gap-0.5">
-                    <Icon name="clock" style="line" size="sm" className="text-green-800" />
-                    {guide.lifespan}
-                  </span>
-                </span>
+                  {/* Stats pill — top-right, always visible */}
+                  {(guide.sizeRange || guide.lifespan) && (
+                    <span className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 flex items-center gap-2 bg-white/90 backdrop-blur-sm text-green-950 text-[10px] sm:text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1.5 rounded-full">
+                      {guide.sizeRange && (
+                        <span className="flex items-center gap-0.5">
+                          <Icon name="ruler" style="line" size="sm" className="text-green-800" />
+                          {guide.sizeRange}
+                        </span>
+                      )}
+                      {guide.sizeRange && guide.lifespan && (
+                        <span className="w-px h-3 bg-green-950/20" />
+                      )}
+                      {guide.lifespan && (
+                        <span className="flex items-center gap-0.5">
+                          <Icon name="clock" style="line" size="sm" className="text-green-800" />
+                          {guide.lifespan}
+                        </span>
+                      )}
+                    </span>
+                  )}
 
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-                {/* Content at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 z-10">
-                  {/* Family eyebrow */}
-                  <p className="hidden sm:block text-green-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
-                    {guide.category}
-                  </p>
+                  {/* Content at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 z-10">
+                    {/* Family eyebrow */}
+                    {guide.category && (
+                      <p className="hidden sm:block text-green-500 text-xs font-semibold uppercase tracking-wider mb-1.5">
+                        {guide.category}
+                      </p>
+                    )}
 
-                  {/* Name */}
-                  <h3 className="font-heading font-bold text-white text-sm sm:text-xl drop-shadow-lg line-clamp-2">
-                    {guide.commonName}
-                  </h3>
+                    {/* Name */}
+                    <h3 className="font-heading font-bold text-white text-sm sm:text-xl drop-shadow-lg line-clamp-2">
+                      {guide.commonName}
+                    </h3>
 
-                  {/* Scientific name */}
-                  <p className="hidden sm:block text-gray-400 text-sm italic mt-1">
-                    {guide.scientificName}
-                  </p>
+                    {/* Scientific name */}
+                    {guide.scientificName && (
+                      <p className="hidden sm:block text-gray-400 text-sm italic mt-1">
+                        {guide.scientificName}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 mb-8">
+              <p className="text-gray-500 text-sm">
+                No published species care guides yet. Check back soon!
+              </p>
+            </div>
+          )}
 
           {/* Coming soon banner */}
           <div className="rounded-xl border border-green-200 bg-green-50 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
