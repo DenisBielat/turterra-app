@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Icon } from '@/components/Icon';
 
 export interface CareGuide {
@@ -119,9 +120,10 @@ export function BrowseGuides({ guides }: BrowseGuidesProps) {
           {guides.length > 0 ? (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 lg:gap-8 mb-8">
               {guides.map((guide) => (
-                <div
+                <Link
                   key={guide.id}
-                  className="group relative block aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02] cursor-pointer"
+                  href={`/learn/${guide.slug}`}
+                  className="group relative block aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-green-900 ring-1 ring-white/5 hover:ring-white/20 shadow-lg hover:shadow-2xl hover:shadow-black/40 transform-gpu will-change-transform transition-[transform,box-shadow,ring-color] duration-300 ease-out hover:scale-[1.02]"
                 >
                   {/* Image with parallax hover zoom */}
                   <Image
@@ -177,7 +179,7 @@ export function BrowseGuides({ guides }: BrowseGuidesProps) {
                       </p>
                     )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
