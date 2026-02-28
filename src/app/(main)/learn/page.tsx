@@ -89,7 +89,7 @@ async function getCareGuides(): Promise<CareGuide[]> {
       slug: guide.slug,
       commonName: sp?.species_common_name ?? 'Unknown Species',
       scientificName: sp?.species_scientific_name ?? '',
-      imageUrl: guide.banner_image_url || sp?.avatar_image_full_url || sp?.avatar_image_circle_url || PLACEHOLDER_IMAGE,
+      imageUrl: sp?.avatar_image_full_url || sp?.avatar_image_circle_url || guide.banner_image_url || PLACEHOLDER_IMAGE,
       category: familyCommon,
       sizeRange,
       lifespan,

@@ -2,10 +2,10 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/db/supabaseClient';
 import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
-import { CareGuideSectionNav, type NavSection } from '@/components/care-guide/care-guide-section-nav';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
+import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
 import type { IconNameMap } from '@/types/icons';
 
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
@@ -216,8 +216,6 @@ async function getCareGuide(slug: string) {
     scientificName: species?.species_scientific_name ?? '',
     bannerImageUrl: row.banner_image_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
     category: familyCommon,
-    difficulty: str(row, 'difficulty') ?? str(row, 'experience_level'),
-    lifespan: lifespanRange,
     introText: str(row, 'intro_text') ?? str(row, 'description') ?? str(row, 'at_a_glance_text'),
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
@@ -290,12 +288,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
         scientificName={guide.scientificName}
         category={guide.category}
         bannerImageUrl={guide.bannerImageUrl}
-        difficulty={guide.difficulty}
-        lifespan={guide.lifespan}
       />
-
-      {/* Section navigation */}
-      <CareGuideSectionNav sections={SECTIONS} />
 
       {/* Main content area */}
       <div className="max-w-8xl mx-auto px-4 lg:px-10 py-10 md:py-14">
