@@ -29,7 +29,7 @@ export function LearnHeader() {
           alt=""
           width={64}
           height={64}
-          className="mb-5"
+          className="mb-5 animate-floatUp"
         />
 
         {/* Badge */}
