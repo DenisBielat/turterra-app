@@ -123,7 +123,7 @@ const MobileMenu = ({ user }: MobileMenuProps) => {
               onClick={closeMenu}
             />
             <MobileNavLink
-              href="/guides"
+              href="/learn"
               iconSrc="/images/nav-menu-icons/guides.png"
               iconAlt="Guides Icon"
               title="Guides"

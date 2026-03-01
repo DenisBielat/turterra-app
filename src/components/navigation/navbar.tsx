@@ -202,12 +202,11 @@ const Navbar = () => {
                         description="Join discussions about turtle care and conservation"
                       />
                       <NavLink
-                        href="/guides"
+                        href="/learn"
                         iconSrc="/images/nav-menu-icons/guides.png"
                         iconAlt="Guides Icon"
                         title="Guides"
                         description="Learn more about everything turtle related"
-                        comingSoon
                       />
                       <NavLink
                         href="/blog"
