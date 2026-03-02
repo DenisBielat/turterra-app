@@ -4,6 +4,7 @@ import { supabase } from '@/lib/db/supabaseClient';
 import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
 import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
+import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
@@ -199,9 +200,33 @@ async function getCareGuide(slug: string) {
     })),
   };
 
-  // 7. Build section content (housing handled separately above)
+  // 7. Fetch lighting data
+  const { data: lightingRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_lighting')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const lightingData = {
+    introText: lightingRow ? (lightingRow.intro_text as string | null) : null,
+    uvbBulbType: lightingRow ? (lightingRow.uvb_bulb_type as string | null) : null,
+    uvbTargetUviMin: lightingRow?.uvb_target_uvi_min != null ? Number(lightingRow.uvb_target_uvi_min) : null,
+    uvbTargetUviMax: lightingRow?.uvb_target_uvi_max != null ? Number(lightingRow.uvb_target_uvi_max) : null,
+    uvbTargetNotes: lightingRow ? (lightingRow.uvb_target_notes as string | null) : null,
+    uvbDistance: lightingRow ? (lightingRow.uvb_distance as string | null) : null,
+    uvbReplacement: lightingRow ? (lightingRow.uvb_replacement as string | null) : null,
+    daylightType: lightingRow ? (lightingRow.daylight_type as string | null) : null,
+    daylightCoverage: lightingRow ? (lightingRow.daylight_coverage as string | null) : null,
+    daylightPurpose: lightingRow ? (lightingRow.daylight_purpose as string | null) : null,
+    daylightNote: lightingRow ? (lightingRow.daylight_note as string | null) : null,
+    summerLightHours: lightingRow?.summer_light_hours != null ? Number(lightingRow.summer_light_hours) : null,
+    winterLightHours: lightingRow?.winter_light_hours != null ? Number(lightingRow.winter_light_hours) : null,
+    outdoorHousingNote: lightingRow ? (lightingRow.outdoor_housing_note as string | null) : null,
+  };
+
+  // 8. Build section content (housing + lighting handled separately above)
   const sectionContent = {
-    lighting: str(row, 'lighting_content'),
     temperature: str(row, 'temperature_content'),
     water: str(row, 'water_content'),
     diet: str(row, 'diet_content'),
@@ -220,6 +245,7 @@ async function getCareGuide(slug: string) {
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
     housingData,
+    lightingData,
     sectionContent,
     relatedGuides,
   };
@@ -262,7 +288,6 @@ const SECTIONS: NavSection[] = [
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  lighting: 'Lighting & UVB',
   temperature: 'Temps & Heating',
   water: 'Water Quality',
   diet: 'Diet & Nutrition',
@@ -312,6 +337,24 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               commonMistakes={guide.housingData.commonMistakes}
               cohabitationNotes={guide.housingData.cohabitationNotes}
               enclosureSizes={guide.housingData.enclosureSizes}
+            />
+
+            {/* Lighting & UVB */}
+            <CareGuideLighting
+              introText={guide.lightingData.introText}
+              uvbBulbType={guide.lightingData.uvbBulbType}
+              uvbTargetUviMin={guide.lightingData.uvbTargetUviMin}
+              uvbTargetUviMax={guide.lightingData.uvbTargetUviMax}
+              uvbTargetNotes={guide.lightingData.uvbTargetNotes}
+              uvbDistance={guide.lightingData.uvbDistance}
+              uvbReplacement={guide.lightingData.uvbReplacement}
+              daylightType={guide.lightingData.daylightType}
+              daylightCoverage={guide.lightingData.daylightCoverage}
+              daylightPurpose={guide.lightingData.daylightPurpose}
+              daylightNote={guide.lightingData.daylightNote}
+              summerLightHours={guide.lightingData.summerLightHours}
+              winterLightHours={guide.lightingData.winterLightHours}
+              outdoorHousingNote={guide.lightingData.outdoorHousingNote}
             />
 
             {/* Remaining content sections */}
