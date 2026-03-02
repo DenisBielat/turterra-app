@@ -214,7 +214,8 @@ async function getCareGuide(slug: string) {
   return {
     commonName: species?.species_common_name ?? 'Unknown Species',
     scientificName: species?.species_scientific_name ?? '',
-    bannerImageUrl: row.banner_image_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
+    avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || row.banner_image_url || PLACEHOLDER_IMAGE,
+    avatarCircleUrl: species?.avatar_image_circle_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
     category: familyCommon,
     introText: str(row, 'intro_text') ?? str(row, 'description') ?? str(row, 'at_a_glance_text'),
     stats,
@@ -256,6 +257,8 @@ const SECTIONS: NavSection[] = [
   { id: 'diet', label: 'Diet', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
   { id: 'health', label: 'Health', icon: 'health' },
+  { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
+  { id: 'references', label: 'References', icon: 'book-open' },
 ];
 
 const SECTION_TITLES: Record<string, string> = {
@@ -287,7 +290,8 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
         commonName={guide.commonName}
         scientificName={guide.scientificName}
         category={guide.category}
-        bannerImageUrl={guide.bannerImageUrl}
+        imageUrl={guide.avatarImageUrl}
+        introText={guide.introText}
       />
 
       {/* Main content area */}
@@ -327,6 +331,9 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
             <CareGuideSidebar
               sections={SECTIONS}
               relatedGuides={guide.relatedGuides}
+              commonName={guide.commonName}
+              scientificName={guide.scientificName}
+              imageUrl={guide.avatarCircleUrl}
             />
           </div>
         </div>

@@ -19,6 +19,8 @@ const DEFAULT_SECTIONS: NavSection[] = [
   { id: 'diet', label: 'Diet', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
   { id: 'health', label: 'Health', icon: 'health' },
+  { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
+  { id: 'references', label: 'References', icon: 'book-open' },
 ];
 
 interface CareGuideSectionNavProps {
