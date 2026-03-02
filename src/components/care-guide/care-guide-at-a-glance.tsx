@@ -60,18 +60,18 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
 
       {/* Before You Commit callout */}
       {commitWarning && (
-        <div className="rounded-xl bg-green-50 border border-green-200 p-5 md:p-6">
+        <div className="rounded-xl bg-orange-50 border border-orange-200 p-5 md:p-6">
           <div className="flex gap-3">
             <div className="flex-shrink-0 mt-0.5">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-200">
-                <Icon name="turtle" style="line" size="base" className="text-green-800" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-orange-200">
+                <Icon name="turtle" style="line" size="base" className="text-orange-700" />
               </div>
             </div>
             <div>
-              <h3 className="font-heading font-bold text-green-950 text-sm md:text-base mb-1">
+              <h3 className="font-heading font-bold text-orange-950 text-sm md:text-base mb-1">
                 Before You Commit
               </h3>
-              <p className="text-green-800/80 text-sm leading-relaxed">
+              <p className="text-orange-800/80 text-sm leading-relaxed">
                 {commitWarning}
               </p>
             </div>

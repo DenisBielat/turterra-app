@@ -117,88 +117,57 @@ async function getCareGuide(slug: string) {
     }))
     .filter(g => g.commonName !== 'Unknown');
 
-  // 5. Build stat cards from available data
-  const stats: { icon: IconNameMap['line']; label: string; value: string; description?: string | null }[] = [];
-
-  const sizeRange = formatRange(row.adult_size_min_inches, row.adult_size_max_inches, '"');
-  if (sizeRange) {
-    stats.push({
+  // 5. Build stat cards — always 8 cards matching the schema
+  const stats: { icon: IconNameMap['line']; label: string; value: string; description?: string | null }[] = [
+    {
       icon: 'ruler',
       label: 'Adult Size',
-      value: sizeRange.replace(' "', '"'),
-      description: str(row, 'adult_size_description'),
-    });
-  }
-
-  const lifespanRange = formatRange(row.lifespan_min_years, row.lifespan_max_years, 'years');
-  if (lifespanRange) {
-    stats.push({
+      value: formatRange(row.adult_size_min_inches, row.adult_size_max_inches, '"')?.replace(' "', '"') ?? '—',
+      description: str(row, 'adult_size_notes'),
+    },
+    {
       icon: 'clock',
       label: 'Lifespan',
-      value: lifespanRange,
-      description: str(row, 'lifespan_description') ?? 'With proper care',
-    });
-  }
-
-  const enclosure = str(row, 'enclosure_size');
-  if (enclosure) {
-    stats.push({
-      icon: 'scale',
+      value: formatRange(row.lifespan_min_years, row.lifespan_max_years, 'years') ?? '—',
+      description: str(row, 'lifespan_notes'),
+    },
+    {
+      icon: 'enclosure',
       label: 'Enclosure',
-      value: enclosure,
-      description: str(row, 'enclosure_description'),
-    });
-  }
-
-  const baskingTemp = str(row, 'basking_temp');
-  if (baskingTemp) {
-    stats.push({
-      icon: 'split',
+      value: num(row, 'enclosure_min_gallons') != null ? `${num(row, 'enclosure_min_gallons')}+ gallons` : '—',
+      description: str(row, 'enclosure_notes'),
+    },
+    {
+      icon: 'temperature',
       label: 'Basking Temp',
-      value: baskingTemp,
-      description: str(row, 'basking_temp_description'),
-    });
-  }
-
-  const waterTemp = str(row, 'water_temp');
-  if (waterTemp) {
-    stats.push({
-      icon: 'water-droplet',
+      value: formatRange(num(row, 'basking_temp_min_f'), num(row, 'basking_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
+    },
+    {
+      icon: 'water',
       label: 'Water Temp',
-      value: waterTemp,
-      description: str(row, 'water_temp_description'),
-    });
-  }
-
-  const uvb = str(row, 'uvb_requirements');
-  if (uvb) {
-    stats.push({
-      icon: 'split-2',
-      label: 'UVB Required',
-      value: uvb,
-      description: str(row, 'uvb_description'),
-    });
-  }
-
-  const dietType = str(row, 'diet_type');
-  if (dietType) {
-    stats.push({
-      icon: 'tree',
+      value: formatRange(num(row, 'water_temp_min_f'), num(row, 'water_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
+      description: str(row, 'water_temp_notes'),
+    },
+    {
+      icon: 'lighting',
+      label: 'UVB',
+      value: (num(row, 'uvb_index_min') != null && num(row, 'uvb_index_max') != null)
+        ? `UVI ${num(row, 'uvb_index_min')}-${num(row, 'uvb_index_max')}`
+        : '—',
+      description: str(row, 'uvb_type'),
+    },
+    {
+      icon: 'diet',
       label: 'Diet Type',
-      value: dietType,
-      description: str(row, 'diet_description'),
-    });
-  }
-
-  const experience = str(row, 'experience_level') ?? str(row, 'difficulty');
-  if (experience) {
-    stats.push({
+      value: str(row, 'diet_type') ?? '—',
+      description: str(row, 'diet_notes'),
+    },
+    {
       icon: 'category',
       label: 'Experience',
-      value: experience,
-      description: str(row, 'experience_description'),
-    });
-  }
+      value: str(row, 'difficulty') ?? '—',
+    },
+  ];
 
   // 6. Build section content
   const sectionContent = {
@@ -217,7 +186,8 @@ async function getCareGuide(slug: string) {
     avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || row.banner_image_url || PLACEHOLDER_IMAGE,
     avatarCircleUrl: species?.avatar_image_circle_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
     category: familyCommon,
-    introText: str(row, 'intro_text') ?? str(row, 'description') ?? str(row, 'at_a_glance_text'),
+    heroText: str(row, 'hero_text'),
+    atAGlanceText: str(row, 'at_a_glance_section_text'),
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
     sectionContent,
@@ -238,8 +208,8 @@ export async function generateMetadata(
 
   return {
     title: `${guide.commonName} Care Guide | Turterra`,
-    description: guide.introText
-      ? guide.introText.slice(0, 160)
+    description: guide.heroText
+      ? guide.heroText.slice(0, 160)
       : `Complete care guide for ${guide.commonName}. Housing, diet, temperature, and health tips.`,
   };
 }
@@ -291,7 +261,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
         scientificName={guide.scientificName}
         category={guide.category}
         imageUrl={guide.avatarImageUrl}
-        introText={guide.introText}
+        introText={guide.heroText}
       />
 
       {/* Main content area */}
@@ -301,7 +271,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
           <div className="lg:col-span-8 flex flex-col gap-12 md:gap-16">
             {/* At a Glance */}
             <CareGuideAtAGlance
-              introText={guide.introText}
+              introText={guide.atAGlanceText}
               stats={guide.stats}
               commitWarning={guide.commitWarning}
             />
