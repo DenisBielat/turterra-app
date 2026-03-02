@@ -1,4 +1,5 @@
 import { Icon } from '@/components/Icon';
+import { CareGuideCallout } from './care-guide-callout';
 
 interface EnclosureSize {
   life_stage: string;
@@ -118,21 +119,9 @@ export function CareGuideHousing({
 
       {/* A Note on Cohabitation callout */}
       {cohabitationNotes && (
-        <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 mt-0.5">
-              <Icon name="warning" style="line" size="base" className="text-orange-500" />
-            </div>
-            <div>
-              <h3 className="font-heading font-bold text-black text-base md:text-lg mb-1">
-                A Note on Cohabitation
-              </h3>
-              <p className="text-gray-700 text-base leading-relaxed">
-                {cohabitationNotes}
-              </p>
-            </div>
-          </div>
-        </div>
+        <CareGuideCallout variant="amber" title="A Note on Cohabitation">
+          {cohabitationNotes}
+        </CareGuideCallout>
       )}
     </section>
   );

@@ -1,4 +1,5 @@
 import { Icon } from '@/components/Icon';
+import { CareGuideCallout } from './care-guide-callout';
 import type { IconNameMap } from '@/types/icons';
 
 interface StatCard {
@@ -58,23 +59,9 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
 
       {/* Before You Commit callout */}
       {commitWarning && (
-        <div className="rounded-xl bg-red-50 border border-red-200 p-5 md:p-6">
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 mt-0.5">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-200">
-                <Icon name="turtle" style="line" size="base" className="text-red-700" />
-              </div>
-            </div>
-            <div>
-              <h3 className="font-heading font-bold text-red-950 text-base md:text-lg mb-1">
-                Before You Commit
-              </h3>
-              <p className="text-red-800/80 text-base leading-relaxed">
-                {commitWarning}
-              </p>
-            </div>
-          </div>
-        </div>
+        <CareGuideCallout variant="red" title="Before You Commit">
+          {commitWarning}
+        </CareGuideCallout>
       )}
     </section>
   );
