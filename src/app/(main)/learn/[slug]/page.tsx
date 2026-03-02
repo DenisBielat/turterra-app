@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/db/supabaseClient';
 import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
+import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
@@ -169,9 +170,37 @@ async function getCareGuide(slug: string) {
     },
   ];
 
-  // 6. Build section content
+  // 6. Fetch housing data
+  const { data: housingRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_housing')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: enclosureSizesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_enclosure_sizes')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const housingData = {
+    introText: housingRow ? (housingRow.intro_text as string | null) : null,
+    essentials: Array.isArray(housingRow?.essentials) ? housingRow.essentials as string[] : [],
+    commonMistakes: Array.isArray(housingRow?.common_mistakes) ? housingRow.common_mistakes as string[] : [],
+    cohabitationNotes: housingRow ? (housingRow.cohabitation_notes as string | null) : null,
+    enclosureSizes: (enclosureSizesRaw || []).map(s => ({
+      life_stage: s.life_stage as string,
+      size_range: s.size_range as string | null,
+      min_gallons: s.min_gallons as number,
+      max_gallons: s.max_gallons as number | null,
+      notes: s.notes as string | null,
+    })),
+  };
+
+  // 7. Build section content (housing handled separately above)
   const sectionContent = {
-    housing: str(row, 'housing_content'),
     lighting: str(row, 'lighting_content'),
     temperature: str(row, 'temperature_content'),
     water: str(row, 'water_content'),
@@ -190,6 +219,7 @@ async function getCareGuide(slug: string) {
     atAGlanceText: str(row, 'at_a_glance_section_text'),
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
+    housingData,
     sectionContent,
     relatedGuides,
   };
@@ -220,25 +250,24 @@ export async function generateMetadata(
 
 const SECTIONS: NavSection[] = [
   { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
-  { id: 'housing', label: 'Housing', icon: 'enclosure' },
+  { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
   { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
-  { id: 'temperature', label: 'Temperature', icon: 'temperature' },
-  { id: 'water', label: 'Water', icon: 'water' },
-  { id: 'diet', label: 'Diet', icon: 'diet' },
+  { id: 'temperature', label: 'Temperature & Heating', icon: 'temperature' },
+  { id: 'water', label: 'Water Quality', icon: 'water' },
+  { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
-  { id: 'health', label: 'Health', icon: 'health' },
+  { id: 'health', label: 'Health & Issues', icon: 'health' },
   { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
   { id: 'references', label: 'References', icon: 'book-open' },
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  housing: 'Housing',
   lighting: 'Lighting & UVB',
-  temperature: 'Temperature',
-  water: 'Water',
-  diet: 'Diet',
+  temperature: 'Temperature & Heating',
+  water: 'Water Quality',
+  diet: 'Diet & Nutrition',
   handling: 'Handling',
-  health: 'Health',
+  health: 'Health & Issues',
 };
 
 /* ------------------------------------------------------------------
@@ -274,6 +303,15 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               introText={guide.atAGlanceText}
               stats={guide.stats}
               commitWarning={guide.commitWarning}
+            />
+
+            {/* Housing & Enclosure */}
+            <CareGuideHousing
+              introText={guide.housingData.introText}
+              essentials={guide.housingData.essentials}
+              commonMistakes={guide.housingData.commonMistakes}
+              cohabitationNotes={guide.housingData.cohabitationNotes}
+              enclosureSizes={guide.housingData.enclosureSizes}
             />
 
             {/* Remaining content sections */}

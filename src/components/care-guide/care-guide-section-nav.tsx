@@ -12,13 +12,13 @@ export interface NavSection {
 
 const DEFAULT_SECTIONS: NavSection[] = [
   { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
-  { id: 'housing', label: 'Housing', icon: 'enclosure' },
+  { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
   { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
-  { id: 'temperature', label: 'Temperature', icon: 'temperature' },
-  { id: 'water', label: 'Water', icon: 'water' },
-  { id: 'diet', label: 'Diet', icon: 'diet' },
+  { id: 'temperature', label: 'Temperature & Heating', icon: 'temperature' },
+  { id: 'water', label: 'Water Quality', icon: 'water' },
+  { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
-  { id: 'health', label: 'Health', icon: 'health' },
+  { id: 'health', label: 'Health & Issues', icon: 'health' },
   { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
   { id: 'references', label: 'References', icon: 'book-open' },
 ];

@@ -35,17 +35,15 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="p-4 rounded-xl bg-white border border-gray-100 shadow-sm transition-colors hover:bg-green-900/20"
+              className="p-4 rounded-xl bg-white border border-gray-100 shadow-sm transition-colors duration-150 hover:bg-green-50 hover:border-green-200"
             >
               <div className="flex items-center gap-2.5 mb-2">
-                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-green-900/20 flex-shrink-0">
-                  <Icon name={stat.icon} style="line" size="base" className="text-green-700" />
-                </div>
+                <Icon name={stat.icon} style="line" size="lg" className="text-green-700 flex-shrink-0" />
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
                   {stat.label}
                 </p>
               </div>
-              <p className="text-base font-bold text-green-950 capitalize">
+              <p className="text-lg font-bold text-green-950 capitalize">
                 {stat.value}
               </p>
               {stat.description && (
