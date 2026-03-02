@@ -11,14 +11,16 @@ export interface NavSection {
 }
 
 const DEFAULT_SECTIONS: NavSection[] = [
-  { id: 'at-a-glance', label: 'At a Glance', icon: 'turtle' },
-  { id: 'housing', label: 'Housing', icon: 'outdoors-tree-valley' },
-  { id: 'lighting', label: 'Lighting & UVB', icon: 'split' },
-  { id: 'temperature', label: 'Temperature', icon: 'scale' },
-  { id: 'water', label: 'Water', icon: 'water-droplet' },
-  { id: 'diet', label: 'Diet', icon: 'split-2' },
-  { id: 'handling', label: 'Handling', icon: 'hand-shake-heart' },
-  { id: 'health', label: 'Health', icon: 'information-circle' },
+  { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
+  { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
+  { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
+  { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
+  { id: 'water', label: 'Water Quality', icon: 'water' },
+  { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
+  { id: 'handling', label: 'Handling', icon: 'handling' },
+  { id: 'health', label: 'Health & Issues', icon: 'health' },
+  { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
+  { id: 'references', label: 'References', icon: 'book-open' },
 ];
 
 interface CareGuideSectionNavProps {

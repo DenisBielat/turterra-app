@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/db/supabaseClient';
 import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
+import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
@@ -117,92 +118,89 @@ async function getCareGuide(slug: string) {
     }))
     .filter(g => g.commonName !== 'Unknown');
 
-  // 5. Build stat cards from available data
-  const stats: { icon: IconNameMap['line']; label: string; value: string; description?: string | null }[] = [];
-
-  const sizeRange = formatRange(row.adult_size_min_inches, row.adult_size_max_inches, '"');
-  if (sizeRange) {
-    stats.push({
+  // 5. Build stat cards — always 8 cards matching the schema
+  const stats: { icon: IconNameMap['line']; label: string; value: string; description?: string | null }[] = [
+    {
       icon: 'ruler',
       label: 'Adult Size',
-      value: sizeRange.replace(' "', '"'),
-      description: str(row, 'adult_size_description'),
-    });
-  }
-
-  const lifespanRange = formatRange(row.lifespan_min_years, row.lifespan_max_years, 'years');
-  if (lifespanRange) {
-    stats.push({
+      value: formatRange(row.adult_size_min_inches, row.adult_size_max_inches, '"')?.replace(' "', '"') ?? '—',
+      description: str(row, 'adult_size_notes'),
+    },
+    {
       icon: 'clock',
       label: 'Lifespan',
-      value: lifespanRange,
-      description: str(row, 'lifespan_description') ?? 'With proper care',
-    });
-  }
-
-  const enclosure = str(row, 'enclosure_size');
-  if (enclosure) {
-    stats.push({
-      icon: 'scale',
+      value: formatRange(row.lifespan_min_years, row.lifespan_max_years, 'years') ?? '—',
+      description: str(row, 'lifespan_notes'),
+    },
+    {
+      icon: 'enclosure',
       label: 'Enclosure',
-      value: enclosure,
-      description: str(row, 'enclosure_description'),
-    });
-  }
-
-  const baskingTemp = str(row, 'basking_temp');
-  if (baskingTemp) {
-    stats.push({
-      icon: 'split',
+      value: num(row, 'enclosure_min_gallons') != null ? `${num(row, 'enclosure_min_gallons')}+ gallons` : '—',
+      description: str(row, 'enclosure_notes'),
+    },
+    {
+      icon: 'temperature',
       label: 'Basking Temp',
-      value: baskingTemp,
-      description: str(row, 'basking_temp_description'),
-    });
-  }
-
-  const waterTemp = str(row, 'water_temp');
-  if (waterTemp) {
-    stats.push({
-      icon: 'water-droplet',
+      value: formatRange(num(row, 'basking_temp_min_f'), num(row, 'basking_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
+    },
+    {
+      icon: 'water',
       label: 'Water Temp',
-      value: waterTemp,
-      description: str(row, 'water_temp_description'),
-    });
-  }
-
-  const uvb = str(row, 'uvb_requirements');
-  if (uvb) {
-    stats.push({
-      icon: 'split-2',
-      label: 'UVB Required',
-      value: uvb,
-      description: str(row, 'uvb_description'),
-    });
-  }
-
-  const dietType = str(row, 'diet_type');
-  if (dietType) {
-    stats.push({
-      icon: 'tree',
+      value: formatRange(num(row, 'water_temp_min_f'), num(row, 'water_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
+      description: str(row, 'water_temp_notes'),
+    },
+    {
+      icon: 'lighting',
+      label: 'UVB',
+      value: (num(row, 'uvb_index_min') != null && num(row, 'uvb_index_max') != null)
+        ? `UVI ${num(row, 'uvb_index_min')}-${num(row, 'uvb_index_max')}`
+        : '—',
+      description: str(row, 'uvb_type'),
+    },
+    {
+      icon: 'diet',
       label: 'Diet Type',
-      value: dietType,
-      description: str(row, 'diet_description'),
-    });
-  }
-
-  const experience = str(row, 'experience_level') ?? str(row, 'difficulty');
-  if (experience) {
-    stats.push({
+      value: str(row, 'diet_type') ?? '—',
+      description: str(row, 'diet_notes'),
+    },
+    {
       icon: 'category',
       label: 'Experience',
-      value: experience,
-      description: str(row, 'experience_description'),
-    });
-  }
+      value: str(row, 'difficulty') ?? '—',
+    },
+  ];
 
-  // 6. Build section content
+  // 6. Fetch housing data
+  const { data: housingRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_housing')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: enclosureSizesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_enclosure_sizes')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const housingData = {
+    introText: housingRow ? (housingRow.intro_text as string | null) : null,
+    essentials: Array.isArray(housingRow?.essentials) ? housingRow.essentials as string[] : [],
+    commonMistakes: Array.isArray(housingRow?.common_mistakes) ? housingRow.common_mistakes as string[] : [],
+    cohabitationNotes: housingRow ? (housingRow.cohabitation_notes as string | null) : null,
+    enclosureSizes: (enclosureSizesRaw || []).map(s => ({
+      life_stage: s.life_stage as string,
+      size_range: s.size_range as string | null,
+      min_gallons: s.min_gallons as number,
+      max_gallons: s.max_gallons as number | null,
+      notes: s.notes as string | null,
+    })),
+  };
+
+  // 7. Build section content (housing handled separately above)
   const sectionContent = {
-    housing: str(row, 'housing_content'),
     lighting: str(row, 'lighting_content'),
     temperature: str(row, 'temperature_content'),
     water: str(row, 'water_content'),
@@ -214,11 +212,14 @@ async function getCareGuide(slug: string) {
   return {
     commonName: species?.species_common_name ?? 'Unknown Species',
     scientificName: species?.species_scientific_name ?? '',
-    bannerImageUrl: row.banner_image_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
+    avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || row.banner_image_url || PLACEHOLDER_IMAGE,
+    avatarCircleUrl: species?.avatar_image_circle_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
     category: familyCommon,
-    introText: str(row, 'intro_text') ?? str(row, 'description') ?? str(row, 'at_a_glance_text'),
+    heroText: str(row, 'hero_text'),
+    atAGlanceText: str(row, 'at_a_glance_section_text'),
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
+    housingData,
     sectionContent,
     relatedGuides,
   };
@@ -237,8 +238,8 @@ export async function generateMetadata(
 
   return {
     title: `${guide.commonName} Care Guide | Turterra`,
-    description: guide.introText
-      ? guide.introText.slice(0, 160)
+    description: guide.heroText
+      ? guide.heroText.slice(0, 160)
       : `Complete care guide for ${guide.commonName}. Housing, diet, temperature, and health tips.`,
   };
 }
@@ -248,24 +249,25 @@ export async function generateMetadata(
    ------------------------------------------------------------------ */
 
 const SECTIONS: NavSection[] = [
-  { id: 'at-a-glance', label: 'At a Glance', icon: 'turtle' },
-  { id: 'housing', label: 'Housing', icon: 'outdoors-tree-valley' },
-  { id: 'lighting', label: 'Lighting & UVB', icon: 'split' },
-  { id: 'temperature', label: 'Temperature', icon: 'scale' },
-  { id: 'water', label: 'Water', icon: 'water-droplet' },
-  { id: 'diet', label: 'Diet', icon: 'split-2' },
-  { id: 'handling', label: 'Handling', icon: 'hand-shake-heart' },
-  { id: 'health', label: 'Health', icon: 'information-circle' },
+  { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
+  { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
+  { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
+  { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
+  { id: 'water', label: 'Water Quality', icon: 'water' },
+  { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
+  { id: 'handling', label: 'Handling', icon: 'handling' },
+  { id: 'health', label: 'Health & Issues', icon: 'health' },
+  { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
+  { id: 'references', label: 'References', icon: 'book-open' },
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  housing: 'Housing',
   lighting: 'Lighting & UVB',
-  temperature: 'Temperature',
-  water: 'Water',
-  diet: 'Diet',
+  temperature: 'Temps & Heating',
+  water: 'Water Quality',
+  diet: 'Diet & Nutrition',
   handling: 'Handling',
-  health: 'Health',
+  health: 'Health & Issues',
 };
 
 /* ------------------------------------------------------------------
@@ -287,7 +289,8 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
         commonName={guide.commonName}
         scientificName={guide.scientificName}
         category={guide.category}
-        bannerImageUrl={guide.bannerImageUrl}
+        imageUrl={guide.avatarImageUrl}
+        introText={guide.heroText}
       />
 
       {/* Main content area */}
@@ -297,9 +300,18 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
           <div className="lg:col-span-8 flex flex-col gap-12 md:gap-16">
             {/* At a Glance */}
             <CareGuideAtAGlance
-              introText={guide.introText}
+              introText={guide.atAGlanceText}
               stats={guide.stats}
               commitWarning={guide.commitWarning}
+            />
+
+            {/* Housing & Enclosure */}
+            <CareGuideHousing
+              introText={guide.housingData.introText}
+              essentials={guide.housingData.essentials}
+              commonMistakes={guide.housingData.commonMistakes}
+              cohabitationNotes={guide.housingData.cohabitationNotes}
+              enclosureSizes={guide.housingData.enclosureSizes}
             />
 
             {/* Remaining content sections */}
@@ -327,6 +339,8 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
             <CareGuideSidebar
               sections={SECTIONS}
               relatedGuides={guide.relatedGuides}
+              commonName={guide.commonName}
+              imageUrl={guide.avatarCircleUrl}
             />
           </div>
         </div>
