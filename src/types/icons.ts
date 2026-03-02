@@ -83,6 +83,7 @@ export type FilledIconName =
   | 'trip-map-markers'
   | 'vegetables-salad'
   | 'warning'
+  | 'warning-triangle'
   | 'youtube';
 
 export type ColorIconName = 

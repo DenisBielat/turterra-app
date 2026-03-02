@@ -10,19 +10,21 @@ interface CareGuideCalloutProps {
 
 const variantConfig: Record<
   CalloutVariant,
-  { headerBg: string; bodyBg: string; iconColor: string; texture: string }
+  { headerBg: string; bodyBg: string; iconColor: string; texture: string; textureOpacity: number }
 > = {
   amber: {
-    headerBg: 'bg-orange-800',
-    bodyBg: 'bg-orange-700',
-    iconColor: 'text-green-700',
+    headerBg: 'bg-orange-600',
+    bodyBg: 'bg-[#E79319]',
+    iconColor: 'text-orange-500',
     texture: '/images/textures/topo-1-dark.png',
+    textureOpacity: 0.10,
   },
   red: {
     headerBg: 'bg-red-900',
     bodyBg: 'bg-red-800',
-    iconColor: 'text-white',
+    iconColor: 'text-orange-500',
     texture: '/images/textures/topo-2-dark.png',
+    textureOpacity: 0.10,
   },
 };
 
@@ -34,21 +36,22 @@ export function CareGuideCallout({
   const config = variantConfig[variant];
 
   return (
-    <div className="rounded-2xl overflow-hidden">
-      {/* Header with topo texture overlay */}
-      <div className={`relative ${config.headerBg}`}>
+    <div className={`relative rounded-2xl overflow-hidden ${config.bodyBg}`}>
+      {/* Header overlays the top of the card for a seamless look */}
+      <div className={`absolute inset-x-0 top-0 z-10 rounded-t-2xl ${config.headerBg}`}>
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 rounded-t-2xl"
           style={{
             backgroundImage: `url('${config.texture}')`,
             backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'right center',
-            backgroundSize: '14rem auto',
+            backgroundPosition: '35% 75%',
+            backgroundSize: '150%',
+            opacity: config.textureOpacity,
           }}
         />
         <div className="relative flex items-center gap-3 px-5 py-4">
           <Icon
-            name="warning"
+            name="warning-triangle"
             style="filled"
             size="lg"
             className={`flex-shrink-0 ${config.iconColor}`}
@@ -59,8 +62,8 @@ export function CareGuideCallout({
         </div>
       </div>
 
-      {/* Body */}
-      <div className={`${config.bodyBg} px-5 py-4`}>
+      {/* Body: padding-top reserves space so text sits below the header */}
+      <div className="relative rounded-b-2xl px-5 pt-[72px] pb-4">
         <div className="text-white text-base leading-relaxed">{children}</div>
       </div>
     </div>
