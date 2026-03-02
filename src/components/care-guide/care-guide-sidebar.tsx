@@ -74,7 +74,7 @@ export function CareGuideSidebar({
   };
 
   return (
-    <aside className="hidden lg:block">
+    <aside className="hidden lg:block h-full">
       <div className="sticky top-36 rounded-2xl w-full max-w-[15rem]">
         {/* Profile image + name */}
         <div className="flex flex-col gap-3 items-center text-center mb-6">
