@@ -44,13 +44,13 @@ export function CareGuideHousing({
       {enclosureSizes.length > 0 && (
         <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
           <div className="bg-green-900/10 px-5 py-3">
-            <h3 className="font-heading font-bold text-black text-base">
+            <h3 className="font-heading font-bold text-black text-lg">
               Minimum Enclosure Sizing
             </h3>
           </div>
           <div className="px-5 py-2">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-base">
                 <tbody>
                   {enclosureSizes.map((size, i) => (
                     <tr key={i} className={i < enclosureSizes.length - 1 ? 'border-b border-gray-100' : ''}>
@@ -61,7 +61,7 @@ export function CareGuideHousing({
                           ? `${size.min_gallons}-${size.max_gallons} gal`
                           : `${size.min_gallons} gal`}
                       </td>
-                      <td className="py-3 text-gray-500 text-xs">{size.notes ?? ''}</td>
+                      <td className="py-3 text-gray-500 text-sm">{size.notes ?? ''}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -79,13 +79,13 @@ export function CareGuideHousing({
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
               <div className="flex items-center gap-2 mb-3">
                 <Icon name="checkmark" style="filled" size="base" className="text-green-700" />
-                <h3 className="font-heading font-bold text-black text-base">
+                <h3 className="font-heading font-bold text-black text-lg">
                   Enclosure Essentials
                 </h3>
               </div>
               <ul className="space-y-2">
                 {essentials.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                  <li key={i} className="flex items-start gap-2 text-base text-gray-700">
                     <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
                     {item}
                   </li>
@@ -99,13 +99,13 @@ export function CareGuideHousing({
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
               <div className="flex items-center gap-2 mb-3">
                 <Icon name="warning" style="line" size="base" className="text-red-500" />
-                <h3 className="font-heading font-bold text-black text-base">
+                <h3 className="font-heading font-bold text-black text-lg">
                   Common Mistakes
                 </h3>
               </div>
               <ul className="space-y-2">
                 {commonMistakes.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                  <li key={i} className="flex items-start gap-2 text-base text-gray-700">
                     <span className="text-red-400 mt-0.5 flex-shrink-0">•</span>
                     {item}
                   </li>
@@ -124,10 +124,10 @@ export function CareGuideHousing({
               <Icon name="warning" style="line" size="base" className="text-orange-500" />
             </div>
             <div>
-              <h3 className="font-heading font-bold text-black text-sm md:text-base mb-1">
+              <h3 className="font-heading font-bold text-black text-base md:text-lg mb-1">
                 A Note on Cohabitation
               </h3>
-              <p className="text-gray-700 text-sm leading-relaxed">
+              <p className="text-gray-700 text-base leading-relaxed">
                 {cohabitationNotes}
               </p>
             </div>

@@ -83,7 +83,7 @@ export function CareGuideHero({
 
             {/* Intro text */}
             {introText && (
-              <p className="text-base md:text-lg leading-relaxed max-w-2xl">
+              <p className="text-base md:text-lg leading-relaxed max-w-2xl text-gray-700">
                 {introText}
               </p>
             )}

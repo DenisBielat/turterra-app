@@ -39,7 +39,7 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
             >
               <div className="flex items-center gap-2.5 mb-2">
                 <Icon name={stat.icon} style="line" size="base" className="text-green-700 flex-shrink-0" />
-                <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+                <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
                   {stat.label}
                 </p>
               </div>
@@ -47,7 +47,7 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
                 {stat.value}
               </p>
               {stat.description && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-sm text-gray-500 mt-1">
                   {stat.description}
                 </p>
               )}
@@ -66,10 +66,10 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
               </div>
             </div>
             <div>
-              <h3 className="font-heading font-bold text-red-950 text-sm md:text-base mb-1">
+              <h3 className="font-heading font-bold text-red-950 text-base md:text-lg mb-1">
                 Before You Commit
               </h3>
-              <p className="text-red-800/80 text-sm leading-relaxed">
+              <p className="text-red-800/80 text-base leading-relaxed">
                 {commitWarning}
               </p>
             </div>
