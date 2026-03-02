@@ -12,13 +12,10 @@ export function CareGuideSection({ id, title, content }: CareGuideSectionProps) 
 
   return (
     <section id={id} className="scroll-mt-40">
-      {/* Heading with green left accent */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-1 h-8 bg-green-600 rounded-full" />
-        <h2 className="font-heading text-2xl md:text-3xl font-bold text-green-950">
-          {title}
-        </h2>
-      </div>
+      {/* Heading */}
+      <h2 className="font-heading text-2xl md:text-3xl font-bold text-green-950 mb-6">
+        {title}
+      </h2>
 
       {/* Markdown content */}
       <div className="prose prose-gray max-w-none text-base leading-relaxed
