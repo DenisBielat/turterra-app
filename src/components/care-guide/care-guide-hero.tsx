@@ -52,22 +52,26 @@ export function CareGuideHero({
           </ol>
         </nav>
 
-        {/* Category badge */}
-        {category && (
-          <span className="inline-block border border-green-500 text-green-400 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4 w-fit">
-            {category}
-          </span>
-        )}
+        {/* Care Guide badge */}
+        <span className="inline-block border border-violet-400 text-violet-300 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4 w-fit">
+          Care Guide
+        </span>
 
         {/* Title */}
         <h1 className="font-heading text-3xl md:text-5xl font-bold text-white mb-1.5">
           {commonName} Care Guide
         </h1>
 
-        {/* Scientific name */}
-        {scientificName && (
+        {/* Scientific name & family */}
+        {(scientificName || category) && (
           <p className="text-white/60 text-base md:text-lg italic">
             {scientificName}
+            {scientificName && category && (
+              <span className="not-italic"> | </span>
+            )}
+            {category && (
+              <span className="not-italic">{category}</span>
+            )}
           </p>
         )}
       </div>
