@@ -14,7 +14,7 @@ const DEFAULT_SECTIONS: NavSection[] = [
   { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
   { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
   { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
-  { id: 'temperature', label: 'Temperature & Heating', icon: 'temperature' },
+  { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
   { id: 'water', label: 'Water Quality', icon: 'water' },
   { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },

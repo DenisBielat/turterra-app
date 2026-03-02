@@ -252,7 +252,7 @@ const SECTIONS: NavSection[] = [
   { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
   { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
   { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
-  { id: 'temperature', label: 'Temperature & Heating', icon: 'temperature' },
+  { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
   { id: 'water', label: 'Water Quality', icon: 'water' },
   { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
@@ -263,7 +263,7 @@ const SECTIONS: NavSection[] = [
 
 const SECTION_TITLES: Record<string, string> = {
   lighting: 'Lighting & UVB',
-  temperature: 'Temperature & Heating',
+  temperature: 'Temps & Heating',
   water: 'Water Quality',
   diet: 'Diet & Nutrition',
   handling: 'Handling',
