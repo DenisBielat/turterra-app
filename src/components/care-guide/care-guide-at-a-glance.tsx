@@ -18,13 +18,13 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
   return (
     <section id="at-a-glance" className="scroll-mt-40">
       {/* Heading */}
-      <h2 className="font-heading text-2xl md:text-3xl font-bold text-green-950 mb-4">
+      <h2 className="font-heading text-3xl md:text-5xl font-bold text-black mb-4">
         At a Glance
       </h2>
 
       {/* Intro paragraph */}
       {introText && (
-        <p className="text-gray-700 text-base leading-relaxed mb-8 max-w-3xl">
+        <p className="text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
           {introText}
         </p>
       )}
@@ -43,7 +43,7 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
                   {stat.label}
                 </p>
               </div>
-              <p className="text-lg font-bold text-green-950 capitalize">
+              <p className="text-lg font-bold text-black capitalize">
                 {stat.value}
               </p>
               {stat.description && (

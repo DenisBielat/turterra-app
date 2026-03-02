@@ -340,7 +340,6 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               sections={SECTIONS}
               relatedGuides={guide.relatedGuides}
               commonName={guide.commonName}
-              scientificName={guide.scientificName}
               imageUrl={guide.avatarCircleUrl}
             />
           </div>

@@ -15,7 +15,6 @@ interface CareGuideSidebarProps {
   sections: NavSection[];
   relatedGuides?: RelatedGuide[];
   commonName: string;
-  scientificName: string;
   imageUrl: string;
 }
 
@@ -25,7 +24,6 @@ export function CareGuideSidebar({
   sections,
   relatedGuides = [],
   commonName,
-  scientificName,
   imageUrl,
 }: CareGuideSidebarProps) {
   const [activeSection, setActiveSection] = useState(sections[0]?.id ?? '');
@@ -89,7 +87,6 @@ export function CareGuideSidebar({
             sizes="160px"
           />
           <h5 className="font-heading font-bold text-2xl">{commonName}</h5>
-          <p className="italic text-gray-700 text-sm">{scientificName}</p>
         </div>
 
         {/* Section navigation */}

@@ -29,13 +29,13 @@ export function CareGuideHousing({
   return (
     <section id="housing" className="scroll-mt-40">
       {/* Section header */}
-      <h2 className="font-heading text-2xl md:text-3xl font-bold text-green-950 mb-4">
+      <h2 className="font-heading text-3xl md:text-5xl font-bold text-black mb-4">
         Housing & Enclosure
       </h2>
 
       {/* Intro paragraph */}
       {introText && (
-        <p className="text-gray-700 text-base leading-relaxed mb-8">
+        <p className="text-base md:text-lg leading-relaxed mb-8">
           {introText}
         </p>
       )}
@@ -44,7 +44,7 @@ export function CareGuideHousing({
       {enclosureSizes.length > 0 && (
         <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
           <div className="bg-green-900/10 px-5 py-3">
-            <h3 className="font-heading font-bold text-green-950 text-base">
+            <h3 className="font-heading font-bold text-black text-base">
               Minimum Enclosure Sizing
             </h3>
           </div>
@@ -54,7 +54,7 @@ export function CareGuideHousing({
                 <tbody>
                   {enclosureSizes.map((size, i) => (
                     <tr key={i} className={i < enclosureSizes.length - 1 ? 'border-b border-gray-100' : ''}>
-                      <td className="py-3 pr-4 font-semibold text-green-950">{size.life_stage}</td>
+                      <td className="py-3 pr-4 font-semibold text-black">{size.life_stage}</td>
                       <td className="py-3 pr-4 text-gray-700">{size.size_range ?? '—'}</td>
                       <td className="py-3 pr-4 font-bold text-green-700">
                         {size.max_gallons
@@ -79,7 +79,7 @@ export function CareGuideHousing({
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
               <div className="flex items-center gap-2 mb-3">
                 <Icon name="checkmark" style="filled" size="base" className="text-green-700" />
-                <h3 className="font-heading font-bold text-green-950 text-base">
+                <h3 className="font-heading font-bold text-black text-base">
                   Enclosure Essentials
                 </h3>
               </div>
@@ -99,7 +99,7 @@ export function CareGuideHousing({
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
               <div className="flex items-center gap-2 mb-3">
                 <Icon name="warning" style="line" size="base" className="text-red-500" />
-                <h3 className="font-heading font-bold text-green-950 text-base">
+                <h3 className="font-heading font-bold text-black text-base">
                   Common Mistakes
                 </h3>
               </div>
@@ -124,7 +124,7 @@ export function CareGuideHousing({
               <Icon name="warning" style="line" size="base" className="text-orange-500" />
             </div>
             <div>
-              <h3 className="font-heading font-bold text-green-950 text-sm md:text-base mb-1">
+              <h3 className="font-heading font-bold text-black text-sm md:text-base mb-1">
                 A Note on Cohabitation
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed">

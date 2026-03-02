@@ -64,7 +64,7 @@ export function CareGuideHero({
             </span>
 
             {/* Title */}
-            <h1 className="font-heading text-3xl md:text-5xl font-bold text-green-950 mb-2">
+            <h1 className="font-heading text-3xl md:text-5xl font-bold text-black mb-2">
               {commonName} Care Guide
             </h1>
 
@@ -83,7 +83,7 @@ export function CareGuideHero({
 
             {/* Intro text */}
             {introText && (
-              <p className="text-gray-700 text-base leading-relaxed max-w-2xl">
+              <p className="text-base md:text-lg leading-relaxed max-w-2xl">
                 {introText}
               </p>
             )}
