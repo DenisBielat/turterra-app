@@ -1,5 +1,5 @@
 import { Icon } from '@/components/Icon';
-import { TextWithMarkdown } from '@/components/ui/text-with-markdown';
+import { CareGuideMarkdown } from './care-guide-markdown';
 
 type CalloutVariant = 'amber' | 'red' | 'green' | 'blue';
 
@@ -39,9 +39,9 @@ const variantConfig: Record<
     textureOpacity: 0.10,
   },
   blue: {
-    headerBg: 'bg-blue-900',
-    bodyBg: 'bg-blue-800',
-    iconColor: 'text-blue-400',
+    headerBg: 'bg-blue-800',
+    bodyBg: 'bg-blue-600',
+    iconColor: 'text-blue-200',
     iconName: 'info-circle-flex-solid',
     texture: '/images/textures/topo-blue-1.png',
     textureOpacity: 0.10,
@@ -85,11 +85,7 @@ export function CareGuideCallout({
       {/* Body: padding-top reserves space so text sits below the header */}
       <div className="relative rounded-b-2xl px-5 pt-[72px] pb-4">
         <div className="text-white text-base leading-relaxed">
-          {typeof children === 'string' ? (
-            <TextWithMarkdown>{children}</TextWithMarkdown>
-          ) : (
-            children
-          )}
+          <CareGuideMarkdown>{children}</CareGuideMarkdown>
         </div>
       </div>
     </div>

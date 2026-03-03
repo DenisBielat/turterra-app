@@ -69,6 +69,8 @@ export type LineIconName =
   | 'warp-shell-lower'
   | 'warp-shell-upper'
   | 'water-droplet'
+  | 'water-drop-flex-line'
+  | 'water-filter-flex-line'
   | 'water-heat-flex-line'
   | 'water';
 

@@ -1,4 +1,5 @@
 import { Icon } from '@/components/Icon';
+import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
 
 interface EnclosureSize {
@@ -36,9 +37,9 @@ export function CareGuideHousing({
 
       {/* Intro paragraph */}
       {introText && (
-        <p className="text-base md:text-lg leading-relaxed mb-8">
-          {introText}
-        </p>
+        <div className="text-base md:text-lg leading-relaxed mb-8">
+          <CareGuideMarkdown>{introText}</CareGuideMarkdown>
+        </div>
       )}
 
       {/* Minimum Enclosure Sizing table */}
@@ -88,7 +89,7 @@ export function CareGuideHousing({
                 {essentials.map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-base text-gray-700">
                     <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
-                    {item}
+                    <CareGuideMarkdown inline>{item}</CareGuideMarkdown>
                   </li>
                 ))}
               </ul>
@@ -108,7 +109,7 @@ export function CareGuideHousing({
                 {commonMistakes.map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-base text-gray-700">
                     <span className="text-red-400 mt-0.5 flex-shrink-0">•</span>
-                    {item}
+                    <CareGuideMarkdown inline>{item}</CareGuideMarkdown>
                   </li>
                 ))}
               </ul>

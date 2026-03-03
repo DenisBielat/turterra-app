@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
+import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
 
 /* ------------------------------------------------------------------
@@ -126,7 +127,7 @@ function EquipmentCard({
         {tips.map((tip, i) => (
           <li key={i} className="flex items-start gap-2 text-base text-gray-700">
             <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
-            {tip}
+            <CareGuideMarkdown inline>{tip}</CareGuideMarkdown>
           </li>
         ))}
       </ul>
@@ -179,9 +180,9 @@ export function CareGuideTemperature({
 
       {/* Intro paragraph */}
       {introText && (
-        <p className="text-base md:text-lg leading-relaxed mb-8">
-          {introText}
-        </p>
+        <div className="text-base md:text-lg leading-relaxed mb-8">
+          <CareGuideMarkdown>{introText}</CareGuideMarkdown>
+        </div>
       )}
 
       {/* Temperature Zones chart */}

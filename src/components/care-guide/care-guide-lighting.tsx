@@ -1,4 +1,5 @@
 import { Icon } from '@/components/Icon';
+import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
 
 interface CareGuideLightingProps {
@@ -18,11 +19,11 @@ interface CareGuideLightingProps {
   outdoorHousingNote: string | null;
 }
 
-/** Single row: bold label, colon, value. */
+/** Single row: bold label, colon, value. Values use body text color (gray-700). */
 function LabelValue({ label, value }: { label: string; value: string }) {
   return (
-    <p className="text-base text-black">
-      <span className="font-bold">{label}:</span> {value}
+    <p className="text-base text-gray-700">
+      <span className="font-bold text-gray-900">{label}:</span> {value}
     </p>
   );
 }
@@ -89,9 +90,9 @@ export function CareGuideLighting({
 
       {/* Intro paragraph */}
       {introText && (
-        <p className="text-base md:text-lg leading-relaxed mb-8">
-          {introText}
-        </p>
+        <div className="text-base md:text-lg leading-relaxed mb-8">
+          <CareGuideMarkdown>{introText}</CareGuideMarkdown>
+        </div>
       )}
 
       {/* UVB + Daylight cards — side by side */}
@@ -134,9 +135,9 @@ export function CareGuideLighting({
                 {daylightCoverage && <LabelValue label="Coverage" value={daylightCoverage} />}
                 {daylightPurpose && <LabelValue label="Purpose" value={daylightPurpose} />}
                 {daylightNote && (
-                  <p className="text-sm text-gray-600 italic pt-1">
-                    {daylightNote}
-                  </p>
+                  <div className="text-sm text-gray-600 italic pt-1">
+                    <CareGuideMarkdown inline>{daylightNote}</CareGuideMarkdown>
+                  </div>
                 )}
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { Icon } from '@/components/Icon';
+import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
 import type { IconNameMap } from '@/types/icons';
 
@@ -25,9 +26,9 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
 
       {/* Intro paragraph */}
       {introText && (
-        <p className="text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
-          {introText}
-        </p>
+        <div className="text-base md:text-lg leading-relaxed mb-8 max-w-3xl">
+          <CareGuideMarkdown>{introText}</CareGuideMarkdown>
+        </div>
       )}
 
       {/* Stat cards grid */}
