@@ -55,7 +55,7 @@ function UviScale({ min, max, notes }: { min: number; max: number; notes: string
   );
 }
 
-/** Photoperiod bar — shows light vs dark hours. */
+/** Photoperiod bar — shows light vs dark hours with sun/moon icons. */
 function PhotoperiodBar({
   label,
   lightHours,
@@ -69,19 +69,21 @@ function PhotoperiodBar({
   return (
     <div className="flex items-center gap-3">
       <span className="text-sm font-semibold text-gray-700 w-20 flex-shrink-0">{label}</span>
-      <div className="flex-1 flex h-7 rounded-lg overflow-hidden">
+      <div className="flex-1 flex h-9 rounded-lg overflow-hidden">
         {/* Light portion */}
         <div
-          className="flex items-center justify-center bg-amber-300 text-xs font-bold text-amber-900"
+          className="flex items-center justify-center gap-1.5 bg-amber-300 text-xs font-bold text-amber-900"
           style={{ width: `${lightPct}%` }}
         >
+          <Icon name="sunny" style="color" size="sm" className="flex-shrink-0" />
           {lightHours}h light
         </div>
         {/* Dark portion */}
         <div
-          className="flex items-center justify-center bg-gray-700 text-xs font-bold text-gray-300"
+          className="flex items-center justify-center gap-1.5 bg-gray-700 text-xs font-bold text-gray-300"
           style={{ width: `${100 - lightPct}%` }}
         >
+          <Icon name="sleep" style="color" size="sm" className="flex-shrink-0" />
           {darkHours}h dark
         </div>
       </div>
@@ -132,8 +134,8 @@ export function CareGuideLighting({
           {/* UVB Lighting card */}
           {hasUvb && (
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-              <div className="bg-green-900/10 px-5 py-3 flex items-center gap-2">
-                <Icon name="lighting" style="line" size="base" className="text-green-700" />
+              <div className="bg-blue-500/10 px-5 py-3 flex items-center gap-2">
+                <Icon name="lightbulb-flex-line" style="line" size="base" className="text-blue-600" />
                 <h3 className="font-heading font-bold text-black text-lg">
                   UVB Lighting
                 </h3>
@@ -147,7 +149,10 @@ export function CareGuideLighting({
                 )}
                 {uvbTargetUviMin != null && uvbTargetUviMax != null && (
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Target UVI</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1">
+                      Target UVI
+                      <Icon name="info-circle-flex-solid" style="filled" size="xs" className="text-gray-300" />
+                    </p>
                     <UviScale min={uvbTargetUviMin} max={uvbTargetUviMax} notes={uvbTargetNotes} />
                   </div>
                 )}
@@ -170,8 +175,8 @@ export function CareGuideLighting({
           {/* Daylight Lighting card */}
           {hasDaylight && (
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-              <div className="bg-green-900/10 px-5 py-3 flex items-center gap-2">
-                <Icon name="lighting" style="line" size="base" className="text-green-700" />
+              <div className="bg-amber-400/15 px-5 py-3 flex items-center gap-2">
+                <Icon name="sun-flex-line" style="line" size="base" className="text-amber-500" />
                 <h3 className="font-heading font-bold text-black text-lg">
                   Daylight Lighting
                 </h3>
@@ -206,21 +211,26 @@ export function CareGuideLighting({
         </div>
       )}
 
-      {/* Photoperiod */}
+      {/* Photoperiod (Light Cycle) */}
       {hasPhotoperiod && (
         <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
           <div className="bg-green-900/10 px-5 py-3">
             <h3 className="font-heading font-bold text-black text-lg">
-              Photoperiod
+              Photoperiod <span className="font-normal text-gray-500">(Light Cycle)</span>
             </h3>
           </div>
-          <div className="px-5 py-4 space-y-3">
-            {summerLightHours != null && (
-              <PhotoperiodBar label="Summer" lightHours={summerLightHours} />
-            )}
-            {winterLightHours != null && (
-              <PhotoperiodBar label="Winter" lightHours={winterLightHours} />
-            )}
+          <div className="px-5 py-4 space-y-4">
+            <p className="text-sm text-gray-600">
+              Mimic natural seasonal light changes. Use a timer to keep the cycle consistent and reduce stress on your turtle.
+            </p>
+            <div className="space-y-3">
+              {summerLightHours != null && (
+                <PhotoperiodBar label="Summer" lightHours={summerLightHours} />
+              )}
+              {winterLightHours != null && (
+                <PhotoperiodBar label="Winter" lightHours={winterLightHours} />
+              )}
+            </div>
           </div>
         </div>
       )}

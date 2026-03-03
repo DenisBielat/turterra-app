@@ -1,6 +1,6 @@
 import { Icon } from '@/components/Icon';
 
-type CalloutVariant = 'amber' | 'red';
+type CalloutVariant = 'amber' | 'red' | 'green';
 
 interface CareGuideCalloutProps {
   variant?: CalloutVariant;
@@ -24,6 +24,13 @@ const variantConfig: Record<
     bodyBg: 'bg-red-800',
     iconColor: 'text-orange-500',
     texture: '/images/textures/topo-2-dark.png',
+    textureOpacity: 0.10,
+  },
+  green: {
+    headerBg: 'bg-green-800',
+    bodyBg: 'bg-green-700',
+    iconColor: 'text-green-400',
+    texture: '/images/textures/topo-green-1.png',
     textureOpacity: 0.10,
   },
 };
