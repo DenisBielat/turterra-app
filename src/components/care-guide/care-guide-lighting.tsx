@@ -55,38 +55,32 @@ function UviScale({ min, max, notes }: { min: number; max: number; notes: string
   );
 }
 
-/** Photoperiod bar — shows light vs dark hours with sun/moon icons. */
-function PhotoperiodBar({
-  label,
+/** Single season card for Photoperiod — hours in a colored card. */
+function PhotoperiodSeasonCard({
+  season,
   lightHours,
+  variant,
 }: {
-  label: string;
+  season: string;
   lightHours: number;
+  variant: 'summer' | 'winter';
 }) {
-  const darkHours = 24 - lightHours;
-  const lightPct = (lightHours / 24) * 100;
-
+  const isSummer = variant === 'summer';
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-sm font-semibold text-gray-700 w-20 flex-shrink-0">{label}</span>
-      <div className="flex-1 flex h-9 rounded-lg overflow-hidden">
-        {/* Light portion */}
-        <div
-          className="flex items-center justify-center gap-1.5 bg-amber-300 text-xs font-bold text-amber-900"
-          style={{ width: `${lightPct}%` }}
-        >
-          <Icon name="sunny" style="color" size="sm" className="flex-shrink-0" />
-          {lightHours}h light
-        </div>
-        {/* Dark portion */}
-        <div
-          className="flex items-center justify-center gap-1.5 bg-gray-700 text-xs font-bold text-gray-300"
-          style={{ width: `${100 - lightPct}%` }}
-        >
-          <Icon name="sleep" style="color" size="sm" className="flex-shrink-0" />
-          {darkHours}h dark
-        </div>
-      </div>
+    <div
+      className={`rounded-lg px-5 py-4 text-center flex flex-col items-center justify-center min-h-[100px] ${
+        isSummer ? 'bg-orange-200' : 'bg-blue-200'
+      }`}
+    >
+      <span
+        className={`text-xs font-semibold uppercase tracking-wider mb-1 ${
+          isSummer ? 'text-orange-800' : 'text-blue-800'
+        }`}
+      >
+        {season}
+      </span>
+      <span className="text-2xl font-bold text-gray-900">{lightHours} hrs</span>
+      <span className="text-xs text-gray-600 mt-0.5">light per day</span>
     </div>
   );
 }
@@ -151,7 +145,7 @@ export function CareGuideLighting({
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1">
                       Target UVI
-                      <Icon name="info-circle-flex-solid" style="filled" size="xs" className="text-gray-300" />
+                      <Icon name="info-circle-flex-solid" style="filled" size="sm" className="text-gray-300" />
                     </p>
                     <UviScale min={uvbTargetUviMin} max={uvbTargetUviMax} notes={uvbTargetNotes} />
                   </div>
@@ -175,8 +169,8 @@ export function CareGuideLighting({
           {/* Daylight Lighting card */}
           {hasDaylight && (
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-              <div className="bg-amber-400/15 px-5 py-3 flex items-center gap-2">
-                <Icon name="sun-flex-line" style="line" size="base" className="text-amber-500" />
+              <div className="bg-orange-500/30 px-5 py-3 flex items-center gap-2 border-b border-orange-400/30">
+                <Icon name="sun-flex-line" style="line" size="base" className="text-orange-700" />
                 <h3 className="font-heading font-bold text-black text-lg">
                   Daylight Lighting
                 </h3>
@@ -214,21 +208,21 @@ export function CareGuideLighting({
       {/* Photoperiod (Light Cycle) */}
       {hasPhotoperiod && (
         <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
-          <div className="bg-green-900/10 px-5 py-3">
+          <div className="bg-white px-5 py-3 flex items-center gap-2 border-b border-gray-100">
             <h3 className="font-heading font-bold text-black text-lg">
-              Photoperiod <span className="font-normal text-gray-500">(Light Cycle)</span>
+              Photoperiod <span className="font-normal text-gray-500 text-base">(Light Cycle)</span>
             </h3>
           </div>
           <div className="px-5 py-4 space-y-4">
-            <p className="text-sm text-gray-600">
-              Mimic natural seasonal light changes. Use a timer to keep the cycle consistent and reduce stress on your turtle.
+            <p className="text-base text-gray-600 leading-relaxed">
+              To replicate natural seasonal rhythms, adjust your light schedule throughout the year. This supports healthy behavior and can be important for breeding cycles.
             </p>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {summerLightHours != null && (
-                <PhotoperiodBar label="Summer" lightHours={summerLightHours} />
+                <PhotoperiodSeasonCard season="Summer" lightHours={summerLightHours} variant="summer" />
               )}
               {winterLightHours != null && (
-                <PhotoperiodBar label="Winter" lightHours={winterLightHours} />
+                <PhotoperiodSeasonCard season="Winter" lightHours={winterLightHours} variant="winter" />
               )}
             </div>
           </div>
@@ -237,7 +231,7 @@ export function CareGuideLighting({
 
       {/* Outdoor housing callout */}
       {outdoorHousingNote && (
-        <CareGuideCallout variant="amber" title="Natural Sunlight & Outdoor Housing">
+        <CareGuideCallout variant="green" title="Natural Sunlight & Outdoor Housing">
           {outdoorHousingNote}
         </CareGuideCallout>
       )}

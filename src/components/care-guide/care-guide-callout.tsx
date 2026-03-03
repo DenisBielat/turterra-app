@@ -10,12 +10,13 @@ interface CareGuideCalloutProps {
 
 const variantConfig: Record<
   CalloutVariant,
-  { headerBg: string; bodyBg: string; iconColor: string; texture: string; textureOpacity: number }
+  { headerBg: string; bodyBg: string; iconColor: string; iconName: string; texture: string; textureOpacity: number }
 > = {
   amber: {
     headerBg: 'bg-orange-600',
     bodyBg: 'bg-[#E79319]',
     iconColor: 'text-orange-500',
+    iconName: 'warning-triangle',
     texture: '/images/textures/topo-1-dark.png',
     textureOpacity: 0.10,
   },
@@ -23,6 +24,7 @@ const variantConfig: Record<
     headerBg: 'bg-red-900',
     bodyBg: 'bg-red-800',
     iconColor: 'text-orange-500',
+    iconName: 'warning-triangle',
     texture: '/images/textures/topo-2-dark.png',
     textureOpacity: 0.10,
   },
@@ -30,6 +32,7 @@ const variantConfig: Record<
     headerBg: 'bg-green-800',
     bodyBg: 'bg-green-700',
     iconColor: 'text-green-400',
+    iconName: 'info-circle-flex-solid',
     texture: '/images/textures/topo-green-1.png',
     textureOpacity: 0.10,
   },
@@ -58,7 +61,7 @@ export function CareGuideCallout({
         />
         <div className="relative flex items-center gap-3 px-5 py-4">
           <Icon
-            name="warning-triangle"
+            name={config.iconName as 'warning-triangle' | 'info-circle-flex-solid'}
             style="filled"
             size="lg"
             className={`flex-shrink-0 ${config.iconColor}`}
