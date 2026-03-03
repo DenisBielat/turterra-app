@@ -1,10 +1,12 @@
 import { Icon } from '@/components/Icon';
+import { TextWithMarkdown } from '@/components/ui/text-with-markdown';
 
 type CalloutVariant = 'amber' | 'red' | 'green';
 
 interface CareGuideCalloutProps {
   variant?: CalloutVariant;
   title: string;
+  /** Body content. Pass a string from the DB; use **bold** in the text for bold. */
   children: React.ReactNode;
 }
 
@@ -74,7 +76,13 @@ export function CareGuideCallout({
 
       {/* Body: padding-top reserves space so text sits below the header */}
       <div className="relative rounded-b-2xl px-5 pt-[72px] pb-4">
-        <div className="text-white text-base leading-relaxed">{children}</div>
+        <div className="text-white text-base leading-relaxed">
+          {typeof children === 'string' ? (
+            <TextWithMarkdown>{children}</TextWithMarkdown>
+          ) : (
+            children
+          )}
+        </div>
       </div>
     </div>
   );
