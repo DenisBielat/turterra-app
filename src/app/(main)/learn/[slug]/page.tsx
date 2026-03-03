@@ -6,6 +6,7 @@ import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glan
 import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
 import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
+import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
@@ -257,9 +258,37 @@ async function getCareGuide(slug: string) {
     safetyWarning: temperatureRow ? (temperatureRow.safety_warning as string | null) : null,
   };
 
-  // 9. Build section content (housing, lighting, temperature handled separately above)
+  // 9. Fetch water quality data
+  const { data: waterRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_water')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: waterSchedulesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_water_schedules')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const waterData = {
+    introText: waterRow ? (waterRow.intro_text as string | null) : null,
+    filtrationText: waterRow ? (waterRow.filtration_text as string | null) : null,
+    filtrationExample: waterRow ? (waterRow.filtration_example as string | null) : null,
+    filtrationTips: Array.isArray(waterRow?.filtration_tips) ? waterRow.filtration_tips as string[] : [],
+    waterChangesText: waterRow ? (waterRow.water_changes_text as string | null) : null,
+    waterSchedules: (waterSchedulesRaw || []).map(s => ({
+      tank_size: s.tank_size as string,
+      frequency: s.frequency as string,
+    })),
+    feedingTip: waterRow ? (waterRow.feeding_tip as string | null) : null,
+    conditionerTip: waterRow ? (waterRow.conditioner_tip as string | null) : null,
+  };
+
+  // 10. Build section content (housing, lighting, temperature, water handled separately above)
   const sectionContent = {
-    water: str(row, 'water_content'),
     diet: str(row, 'diet_content'),
     handling: str(row, 'handling_content'),
     health: str(row, 'health_content'),
@@ -278,6 +307,7 @@ async function getCareGuide(slug: string) {
     housingData,
     lightingData,
     temperatureData,
+    waterData,
     sectionContent,
     relatedGuides,
   };
@@ -320,7 +350,6 @@ const SECTIONS: NavSection[] = [
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  water: 'Water Quality',
   diet: 'Diet & Nutrition',
   handling: 'Handling',
   health: 'Health & Issues',
@@ -396,6 +425,18 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               waterHeaterTips={guide.temperatureData.waterHeaterTips}
               thermometerTips={guide.temperatureData.thermometerTips}
               safetyWarning={guide.temperatureData.safetyWarning}
+            />
+
+            {/* Water Quality & Maintenance */}
+            <CareGuideWater
+              introText={guide.waterData.introText}
+              filtrationText={guide.waterData.filtrationText}
+              filtrationExample={guide.waterData.filtrationExample}
+              filtrationTips={guide.waterData.filtrationTips}
+              waterChangesText={guide.waterData.waterChangesText}
+              waterSchedules={guide.waterData.waterSchedules}
+              feedingTip={guide.waterData.feedingTip}
+              conditionerTip={guide.waterData.conditionerTip}
             />
 
             {/* Remaining content sections */}
