@@ -18,40 +18,12 @@ interface CareGuideLightingProps {
   outdoorHousingNote: string | null;
 }
 
-/** UVI scale: 0 → 7+, rendered as a horizontal bar with the target range highlighted. */
-function UviScale({ min, max, notes }: { min: number; max: number; notes: string | null }) {
-  const SCALE_MAX = 7;
-  const leftPct = Math.min((min / SCALE_MAX) * 100, 100);
-  const widthPct = Math.min(((max - min) / SCALE_MAX) * 100, 100 - leftPct);
-
+/** Single row: bold label, colon, value. */
+function LabelValue({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <div className="relative h-3 rounded-full bg-gray-100 overflow-hidden">
-        {/* Target range highlight */}
-        <div
-          className="absolute inset-y-0 rounded-full bg-green-500"
-          style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
-        />
-      </div>
-
-      {/* Scale labels */}
-      <div className="flex justify-between mt-1.5 text-xs text-gray-400">
-        <span>0</span>
-        <span>1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>4</span>
-        <span>5</span>
-        <span>6</span>
-        <span>7+</span>
-      </div>
-
-      {/* Target value + notes */}
-      <p className="text-sm font-bold text-green-700 mt-1">
-        UVI {min}–{max}
-        {notes && <span className="font-normal text-gray-500 ml-1">({notes})</span>}
-      </p>
-    </div>
+    <p className="text-base text-black">
+      <span className="font-bold">{label}:</span> {value}
+    </p>
   );
 }
 
@@ -134,34 +106,16 @@ export function CareGuideLighting({
                   UVB Lighting
                 </h3>
               </div>
-              <div className="px-5 py-4 space-y-4">
-                {uvbBulbType && (
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Bulb Type</p>
-                    <p className="text-base text-gray-800">{uvbBulbType}</p>
-                  </div>
-                )}
+              <div className="px-5 py-4 space-y-3">
+                {uvbBulbType && <LabelValue label="Type" value={uvbBulbType} />}
                 {uvbTargetUviMin != null && uvbTargetUviMax != null && (
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1">
-                      Target UVI
-                      <Icon name="info-circle-flex-solid" style="filled" size="sm" className="text-gray-300" />
-                    </p>
-                    <UviScale min={uvbTargetUviMin} max={uvbTargetUviMax} notes={uvbTargetNotes} />
-                  </div>
+                  <LabelValue
+                    label="Target UVI"
+                    value={[`${uvbTargetUviMin.toFixed(1)} - ${uvbTargetUviMax.toFixed(1)}`, uvbTargetNotes].filter(Boolean).join(' ')}
+                  />
                 )}
-                {uvbDistance && (
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Mounting Distance</p>
-                    <p className="text-base text-gray-800">{uvbDistance}</p>
-                  </div>
-                )}
-                {uvbReplacement && (
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Replace</p>
-                    <p className="text-base text-gray-800">{uvbReplacement}</p>
-                  </div>
-                )}
+                {uvbDistance && <LabelValue label="Distance" value={uvbDistance} />}
+                {uvbReplacement && <LabelValue label="Replacement" value={uvbReplacement} />}
               </div>
             </div>
           )}
@@ -175,27 +129,12 @@ export function CareGuideLighting({
                   Daylight Lighting
                 </h3>
               </div>
-              <div className="px-5 py-4 space-y-4">
-                {daylightType && (
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Bulb Type</p>
-                    <p className="text-base text-gray-800">{daylightType}</p>
-                  </div>
-                )}
-                {daylightCoverage && (
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Coverage</p>
-                    <p className="text-base text-gray-800">{daylightCoverage}</p>
-                  </div>
-                )}
-                {daylightPurpose && (
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">Purpose</p>
-                    <p className="text-base text-gray-800">{daylightPurpose}</p>
-                  </div>
-                )}
+              <div className="px-5 py-4 space-y-3">
+                {daylightType && <LabelValue label="Type" value={daylightType} />}
+                {daylightCoverage && <LabelValue label="Coverage" value={daylightCoverage} />}
+                {daylightPurpose && <LabelValue label="Purpose" value={daylightPurpose} />}
                 {daylightNote && (
-                  <p className="text-sm text-gray-500 italic border-t border-gray-100 pt-3 mt-2">
+                  <p className="text-sm text-gray-600 italic pt-1">
                     {daylightNote}
                   </p>
                 )}
