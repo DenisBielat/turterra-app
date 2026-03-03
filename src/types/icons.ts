@@ -34,6 +34,7 @@ export type LineIconName =
   | 'graph-stats-descend'
   | 'hand-shake-heart'
   | 'handling'
+  | 'heat-lamp-flex-line'
   | 'health'
   | 'hierarchy'
   | 'information-circle'
@@ -59,6 +60,7 @@ export type LineIconName =
   | 'split'
   | 'sun-flex-line'
   | 'temperature'
+  | 'thermometer-flex-line'
   | 'tree'
   | 'turtle'
   | 'twitter'
@@ -67,6 +69,7 @@ export type LineIconName =
   | 'warp-shell-lower'
   | 'warp-shell-upper'
   | 'water-droplet'
+  | 'water-heat-flex-line'
   | 'water';
 
 export type FilledIconName = 

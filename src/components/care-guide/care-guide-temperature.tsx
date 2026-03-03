@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { Icon } from '@/components/Icon';
 import { CareGuideCallout } from './care-guide-callout';
 
 /* ------------------------------------------------------------------
@@ -26,13 +30,14 @@ interface CareGuideTemperatureProps {
    Helpers
    ------------------------------------------------------------------ */
 
-/** Pick a bar color based on the temperature value. */
-function getZoneColor(tempMaxF: number): { bg: string; text: string } {
-  if (tempMaxF >= 90) return { bg: 'bg-red-400', text: 'text-red-950' };
-  if (tempMaxF >= 80) return { bg: 'bg-red-300', text: 'text-red-900' };
-  if (tempMaxF >= 75) return { bg: 'bg-teal-400', text: 'text-teal-950' };
-  if (tempMaxF >= 65) return { bg: 'bg-teal-300', text: 'text-teal-900' };
-  return { bg: 'bg-gray-300', text: 'text-gray-800' };
+/** Static bar colors by zone type. Set once here; not driven by DB or props. */
+function getBarStyleForZone(zoneName: string): { bg: string; text: string } {
+  const name = zoneName.toLowerCase();
+  if (name.includes('basking')) return { bg: 'bg-red-200', text: 'text-red-700' };
+  if (name.includes('air')) return { bg: 'bg-orange-500/40', text: 'text-orange-700' };
+  if (name.includes('water')) return { bg: 'bg-blue-200', text: 'text-blue-900' };
+  if (name.includes('night')) return { bg: 'bg-gray-500/20', text: 'text-gray-800' };
+  return { bg: 'bg-gray-200', text: 'text-gray-800' };
 }
 
 /* ------------------------------------------------------------------
@@ -43,12 +48,12 @@ function getZoneColor(tempMaxF: number): { bg: string; text: string } {
 function TempZoneRow({
   zone,
   maxTempF,
+  barsVisible,
 }: {
   zone: TempZone;
   maxTempF: number;
+  barsVisible: boolean;
 }) {
-  const color = getZoneColor(zone.temp_max_f);
-
   // Bar width proportional to max temp; negative values (nighttime drop) get a minimum width
   const widthPct =
     zone.temp_max_f > 0 && maxTempF > 0
@@ -69,20 +74,22 @@ function TempZoneRow({
     cLabel = zone.notes;
   }
 
+  const color = getBarStyleForZone(zone.zone_name);
+
   return (
     <div className="flex items-center gap-3">
       {/* Zone name */}
-      <span className="text-sm font-medium text-gray-700 w-32 md:w-40 flex-shrink-0">
+      <span className="text-base font-medium text-gray-700 w-32 md:w-40 flex-shrink-0">
         {zone.zone_name}
       </span>
 
-      {/* Colored bar */}
+      {/* Colored bar — static color by zone type; animates from left when in view */}
       <div className="flex-1 min-w-0">
         <div
-          className={`h-8 rounded-md flex items-center px-3 ${color.bg}`}
-          style={{ width: `${widthPct}%` }}
+          className={`h-8 rounded-md flex items-center px-3 transition-[width] duration-500 ease-out ${color.bg}`}
+          style={{ width: barsVisible ? `${widthPct}%` : '0%' }}
         >
-          <span className={`text-xs font-bold whitespace-nowrap ${color.text}`}>
+          <span className={`text-sm font-bold whitespace-nowrap ${color.text}`}>
             {fLabel}
           </span>
         </div>
@@ -90,7 +97,7 @@ function TempZoneRow({
 
       {/* °C / notes column */}
       {cLabel && (
-        <span className="text-xs text-gray-500 w-20 md:w-24 text-right flex-shrink-0">
+        <span className="text-sm text-gray-500 w-20 md:w-24 text-right flex-shrink-0">
           {cLabel}
         </span>
       )}
@@ -99,15 +106,26 @@ function TempZoneRow({
 }
 
 /** An equipment tips card (Heat Lamps, Water Heater, Thermometers). */
-function EquipmentCard({ title, tips }: { title: string; tips: string[] }) {
+function EquipmentCard({
+  title,
+  tips,
+  iconName,
+}: {
+  title: string;
+  tips: string[];
+  iconName: 'heat-lamp-flex-line' | 'water-heat-flex-line' | 'thermometer-flex-line';
+}) {
   if (tips.length === 0) return null;
   return (
-    <div className="rounded-xl border border-gray-100 bg-white shadow-sm p-5">
-      <h4 className="font-heading font-bold text-black text-base mb-3">{title}</h4>
+    <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden px-5 py-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Icon name={iconName} style="line" size="base" className="text-black" />
+        <h4 className="font-heading font-bold text-black text-lg">{title}</h4>
+      </div>
       <ul className="space-y-2">
         {tips.map((tip, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm text-gray-700 leading-relaxed">
-            <span className="mt-1.5 h-2 w-2 rounded-full bg-green-500 flex-shrink-0" />
+          <li key={i} className="flex items-start gap-2 text-base text-gray-700">
+            <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
             {tip}
           </li>
         ))}
@@ -136,6 +154,22 @@ export function CareGuideTemperature({
   // Find the max temp across all zones (for proportional bar widths)
   const maxTempF = tempZones.reduce((max, z) => Math.max(max, z.temp_max_f), 0);
 
+  const chartRef = useRef<HTMLDivElement>(null);
+  const [barsVisible, setBarsVisible] = useState(false);
+
+  useEffect(() => {
+    const el = chartRef.current;
+    if (!el || tempZones.length === 0) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setBarsVisible(true);
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [tempZones.length]);
+
   return (
     <section id="temperature" className="scroll-mt-40">
       {/* Section header */}
@@ -152,7 +186,10 @@ export function CareGuideTemperature({
 
       {/* Temperature Zones chart */}
       {tempZones.length > 0 && (
-        <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+        <div
+          ref={chartRef}
+          className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden"
+        >
           <div className="bg-white px-5 py-3 border-b border-gray-100">
             <h3 className="font-heading font-bold text-black text-lg">
               Temperature Zones
@@ -160,7 +197,12 @@ export function CareGuideTemperature({
           </div>
           <div className="px-5 py-4 space-y-3">
             {tempZones.map((zone) => (
-              <TempZoneRow key={zone.zone_name} zone={zone} maxTempF={maxTempF} />
+              <TempZoneRow
+                key={zone.zone_name}
+                zone={zone}
+                maxTempF={maxTempF}
+                barsVisible={barsVisible}
+              />
             ))}
           </div>
         </div>
@@ -169,9 +211,9 @@ export function CareGuideTemperature({
       {/* Equipment tips — 3 columns */}
       {hasEquipment && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <EquipmentCard title="Heat Lamps" tips={heatLampTips} />
-          <EquipmentCard title="Water Heater" tips={waterHeaterTips} />
-          <EquipmentCard title="Thermometers" tips={thermometerTips} />
+          <EquipmentCard title="Heat Lamps" tips={heatLampTips} iconName="heat-lamp-flex-line" />
+          <EquipmentCard title="Water Heater" tips={waterHeaterTips} iconName="water-heat-flex-line" />
+          <EquipmentCard title="Thermometers" tips={thermometerTips} iconName="thermometer-flex-line" />
         </div>
       )}
 
