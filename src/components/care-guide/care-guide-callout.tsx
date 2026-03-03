@@ -1,7 +1,7 @@
 import { Icon } from '@/components/Icon';
 import { TextWithMarkdown } from '@/components/ui/text-with-markdown';
 
-type CalloutVariant = 'amber' | 'red' | 'green';
+type CalloutVariant = 'amber' | 'red' | 'green' | 'blue';
 
 interface CareGuideCalloutProps {
   variant?: CalloutVariant;
@@ -36,6 +36,14 @@ const variantConfig: Record<
     iconColor: 'text-green-400',
     iconName: 'info-circle-flex-solid',
     texture: '/images/textures/topo-green-1.png',
+    textureOpacity: 0.10,
+  },
+  blue: {
+    headerBg: 'bg-blue-900',
+    bodyBg: 'bg-blue-800',
+    iconColor: 'text-blue-400',
+    iconName: 'info-circle-flex-solid',
+    texture: '/images/textures/topo-blue-1.png',
     textureOpacity: 0.10,
   },
 };
