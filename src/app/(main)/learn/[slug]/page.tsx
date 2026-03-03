@@ -7,6 +7,7 @@ import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
 import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
+import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import { CareGuideActiveSectionProvider } from '@/components/care-guide/care-guide-active-section-context';
@@ -288,9 +289,38 @@ async function getCareGuide(slug: string) {
     conditionerTip: waterRow ? (waterRow.conditioner_tip as string | null) : null,
   };
 
-  // 10. Build section content (housing, lighting, temperature, water handled separately above)
+  // 10. Fetch diet data
+  const { data: dietRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_diet')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: feedingSchedulesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_feeding_schedules')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const dietData = {
+    introText: dietRow ? (dietRow.intro_text as string | null) : null,
+    feedingSchedules: (feedingSchedulesRaw || []).map(s => ({
+      life_stage: s.life_stage as string,
+      protein_pct: s.protein_pct as number | null,
+      vegetable_pct: s.vegetable_pct as number | null,
+      protein_frequency: s.protein_frequency as string | null,
+      vegetable_frequency: s.vegetable_frequency as string | null,
+    })),
+    portionProtein: dietRow ? (dietRow.portion_protein as string | null) : null,
+    portionVegetables: dietRow ? (dietRow.portion_vegetables as string | null) : null,
+    portionPellets: dietRow ? (dietRow.portion_pellets as string | null) : null,
+    calciumSupplements: dietRow ? (dietRow.calcium_supplements as string | null) : null,
+  };
+
+  // 11. Build section content (housing, lighting, temperature, water, diet handled separately above)
   const sectionContent = {
-    diet: str(row, 'diet_content'),
     handling: str(row, 'handling_content'),
     health: str(row, 'health_content'),
   };
@@ -309,6 +339,7 @@ async function getCareGuide(slug: string) {
     lightingData,
     temperatureData,
     waterData,
+    dietData,
     sectionContent,
     relatedGuides,
   };
@@ -351,7 +382,6 @@ const SECTIONS: NavSection[] = [
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  diet: 'Diet & Nutrition',
   handling: 'Handling',
   health: 'Health & Issues',
 };
@@ -439,6 +469,16 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               waterSchedules={guide.waterData.waterSchedules}
               feedingTip={guide.waterData.feedingTip}
               conditionerTip={guide.waterData.conditionerTip}
+            />
+
+            {/* Diet & Nutrition */}
+            <CareGuideDiet
+              introText={guide.dietData.introText}
+              feedingSchedules={guide.dietData.feedingSchedules}
+              portionProtein={guide.dietData.portionProtein}
+              portionVegetables={guide.dietData.portionVegetables}
+              portionPellets={guide.dietData.portionPellets}
+              calciumSupplements={guide.dietData.calciumSupplements}
             />
 
             {/* Remaining content sections */}
