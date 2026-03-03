@@ -39,6 +39,7 @@ export type LineIconName =
   | 'information-circle'
   | 'instagram'
   | 'kettlebell'
+  | 'lightbulb-flex-line'
   | 'lighting'
   | 'male'
   | 'map-marks'
@@ -56,6 +57,7 @@ export type LineIconName =
   | 'split-2'
   | 'split-3'
   | 'split'
+  | 'sun-flex-line'
   | 'temperature'
   | 'tree'
   | 'turtle'
@@ -76,14 +78,15 @@ export type FilledIconName =
   | 'facebook'
   | 'flow-arrow-1'
   | 'hand-shake-heart'
+  | 'info-circle-flex-solid'
   | 'linkedin'
   | 'lock'
   | 'marine-turtle'
   | 'outdoors-tree-valley'
   | 'trip-map-markers'
   | 'vegetables-salad'
-  | 'warning'
   | 'warning-triangle'
+  | 'warning'
   | 'youtube';
 
 export type ColorIconName = 
