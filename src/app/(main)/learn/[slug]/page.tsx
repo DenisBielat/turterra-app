@@ -5,6 +5,7 @@ import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
 import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
 import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
+import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
@@ -225,9 +226,39 @@ async function getCareGuide(slug: string) {
     outdoorHousingNote: lightingRow ? (lightingRow.outdoor_housing_note as string | null) : null,
   };
 
-  // 8. Build section content (housing + lighting handled separately above)
+  // 8. Fetch temperature data
+  const { data: temperatureRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_temperature')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: tempZonesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_temp_zones')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const temperatureData = {
+    introText: temperatureRow ? (temperatureRow.intro_text as string | null) : null,
+    tempZones: (tempZonesRaw || []).map(z => ({
+      zone_name: z.zone_name as string,
+      temp_min_f: z.temp_min_f as number,
+      temp_max_f: z.temp_max_f as number,
+      temp_min_c: z.temp_min_c as number | null,
+      temp_max_c: z.temp_max_c as number | null,
+      notes: z.notes as string | null,
+    })),
+    heatLampTips: Array.isArray(temperatureRow?.heat_lamp_tips) ? temperatureRow.heat_lamp_tips as string[] : [],
+    waterHeaterTips: Array.isArray(temperatureRow?.water_heater_tips) ? temperatureRow.water_heater_tips as string[] : [],
+    thermometerTips: Array.isArray(temperatureRow?.thermometer_tips) ? temperatureRow.thermometer_tips as string[] : [],
+    safetyWarning: temperatureRow ? (temperatureRow.safety_warning as string | null) : null,
+  };
+
+  // 9. Build section content (housing, lighting, temperature handled separately above)
   const sectionContent = {
-    temperature: str(row, 'temperature_content'),
     water: str(row, 'water_content'),
     diet: str(row, 'diet_content'),
     handling: str(row, 'handling_content'),
@@ -246,6 +277,7 @@ async function getCareGuide(slug: string) {
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
     housingData,
     lightingData,
+    temperatureData,
     sectionContent,
     relatedGuides,
   };
@@ -288,7 +320,6 @@ const SECTIONS: NavSection[] = [
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  temperature: 'Temps & Heating',
   water: 'Water Quality',
   diet: 'Diet & Nutrition',
   handling: 'Handling',
@@ -355,6 +386,16 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               summerLightHours={guide.lightingData.summerLightHours}
               winterLightHours={guide.lightingData.winterLightHours}
               outdoorHousingNote={guide.lightingData.outdoorHousingNote}
+            />
+
+            {/* Temperature & Heating */}
+            <CareGuideTemperature
+              introText={guide.temperatureData.introText}
+              tempZones={guide.temperatureData.tempZones}
+              heatLampTips={guide.temperatureData.heatLampTips}
+              waterHeaterTips={guide.temperatureData.waterHeaterTips}
+              thermometerTips={guide.temperatureData.thermometerTips}
+              safetyWarning={guide.temperatureData.safetyWarning}
             />
 
             {/* Remaining content sections */}
