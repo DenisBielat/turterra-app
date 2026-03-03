@@ -1,6 +1,9 @@
+'use client';
+
 import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 import type { IconNameMap } from '@/types/icons';
 
 interface StatCard {
@@ -17,6 +20,8 @@ interface CareGuideAtAGlanceProps {
 }
 
 export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuideAtAGlanceProps) {
+  const { activeSection } = useCareGuideActiveSection();
+
   return (
     <section id="at-a-glance" className="scroll-mt-40">
       {/* Heading */}
@@ -60,7 +65,7 @@ export function CareGuideAtAGlance({ introText, stats, commitWarning }: CareGuid
 
       {/* Before You Commit callout */}
       {commitWarning && (
-        <CareGuideCallout variant="red" title="Before You Commit">
+        <CareGuideCallout variant="red" title="Before You Commit" dimmed={activeSection !== 'at-a-glance'}>
           {commitWarning}
         </CareGuideCallout>
       )}

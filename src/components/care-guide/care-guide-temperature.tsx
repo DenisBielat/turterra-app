@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 /* ------------------------------------------------------------------
    Types
@@ -157,6 +158,7 @@ export function CareGuideTemperature({
 
   const chartRef = useRef<HTMLDivElement>(null);
   const [barsVisible, setBarsVisible] = useState(false);
+  const { activeSection } = useCareGuideActiveSection();
 
   useEffect(() => {
     const el = chartRef.current;
@@ -220,7 +222,7 @@ export function CareGuideTemperature({
 
       {/* Safety warning callout */}
       {safetyWarning && (
-        <CareGuideCallout variant="red" title="Safety Warning">
+        <CareGuideCallout variant="red" title="Safety Warning" dimmed={activeSection !== 'temperature'}>
           {safetyWarning}
         </CareGuideCallout>
       )}

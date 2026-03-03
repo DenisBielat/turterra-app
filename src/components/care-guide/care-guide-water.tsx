@@ -1,6 +1,9 @@
+'use client';
+
 import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 /* ------------------------------------------------------------------
    Types
@@ -36,6 +39,7 @@ export function CareGuideWater({
   feedingTip,
   conditionerTip,
 }: CareGuideWaterProps) {
+  const { activeSection } = useCareGuideActiveSection();
   const hasFiltration = filtrationText || filtrationExample || filtrationTips.length > 0;
   const hasWaterChanges = waterChangesText || waterSchedules.length > 0;
   const hasTips = feedingTip || conditionerTip;
@@ -148,12 +152,12 @@ export function CareGuideWater({
       {hasTips && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {feedingTip && (
-            <CareGuideCallout variant="blue" title="Feed in a Separate Container">
+            <CareGuideCallout variant="blue" title="Feed in a Separate Container" dimmed={activeSection !== 'water'}>
               {feedingTip}
             </CareGuideCallout>
           )}
           {conditionerTip && (
-            <CareGuideCallout variant="green" title="Water Conditioner">
+            <CareGuideCallout variant="green" title="Water Conditioner" dimmed={activeSection !== 'water'}>
               {conditionerTip}
             </CareGuideCallout>
           )}

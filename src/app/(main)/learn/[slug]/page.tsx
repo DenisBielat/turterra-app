@@ -9,6 +9,7 @@ import { CareGuideTemperature } from '@/components/care-guide/care-guide-tempera
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
+import { CareGuideActiveSectionProvider } from '@/components/care-guide/care-guide-active-section-context';
 import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
 import type { IconNameMap } from '@/types/icons';
 
@@ -380,7 +381,8 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
 
       {/* Main content area */}
       <div className="max-w-8xl mx-auto px-4 lg:px-10 py-10 md:py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <CareGuideActiveSectionProvider sections={SECTIONS}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Main content — 8 cols */}
           <div className="lg:col-span-8 flex flex-col gap-12 md:gap-16">
             {/* At a Glance */}
@@ -469,6 +471,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
             />
           </div>
         </div>
+        </CareGuideActiveSectionProvider>
       </div>
     </div>
   );

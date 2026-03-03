@@ -8,6 +8,8 @@ interface CareGuideCalloutProps {
   title: string;
   /** Body content. Pass a string from the DB; use **bold** in the text for bold. */
   children: React.ReactNode;
+  /** When true, card is shown at 10% opacity (e.g. when section is not in view). */
+  dimmed?: boolean;
 }
 
 const variantConfig: Record<
@@ -52,11 +54,14 @@ export function CareGuideCallout({
   variant = 'amber',
   title,
   children,
+  dimmed = false,
 }: CareGuideCalloutProps) {
   const config = variantConfig[variant];
 
   return (
-    <div className={`relative rounded-2xl overflow-hidden ${config.bodyBg}`}>
+    <div
+      className={`relative rounded-2xl overflow-hidden transition-opacity duration-300 ${config.bodyBg} ${dimmed ? 'opacity-10' : 'opacity-100'}`}
+    >
       {/* Header overlays the top of the card for a seamless look */}
       <div className={`absolute inset-x-0 top-0 z-10 rounded-t-2xl ${config.headerBg}`}>
         <div

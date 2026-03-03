@@ -1,6 +1,9 @@
+'use client';
+
 import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 interface CareGuideLightingProps {
   introText: string | null;
@@ -80,6 +83,8 @@ export function CareGuideLighting({
   const hasContent = introText || hasUvb || hasDaylight || hasPhotoperiod || outdoorHousingNote;
 
   if (!hasContent) return null;
+
+  const { activeSection } = useCareGuideActiveSection();
 
   return (
     <section id="lighting" className="scroll-mt-40">
@@ -171,7 +176,7 @@ export function CareGuideLighting({
 
       {/* Outdoor housing callout */}
       {outdoorHousingNote && (
-        <CareGuideCallout variant="green" title="Natural Sunlight & Outdoor Housing">
+        <CareGuideCallout variant="green" title="Natural Sunlight & Outdoor Housing" dimmed={activeSection !== 'lighting'}>
           {outdoorHousingNote}
         </CareGuideCallout>
       )}

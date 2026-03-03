@@ -1,6 +1,9 @@
+'use client';
+
 import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 interface EnclosureSize {
   life_stage: string;
@@ -27,6 +30,8 @@ export function CareGuideHousing({
 }: CareGuideHousingProps) {
   const hasContent = introText || essentials.length > 0 || commonMistakes.length > 0 || cohabitationNotes || enclosureSizes.length > 0;
   if (!hasContent) return null;
+
+  const { activeSection } = useCareGuideActiveSection();
 
   return (
     <section id="housing" className="scroll-mt-40">
@@ -120,7 +125,7 @@ export function CareGuideHousing({
 
       {/* A Note on Cohabitation callout */}
       {cohabitationNotes && (
-        <CareGuideCallout variant="amber" title="A Note on Cohabitation">
+        <CareGuideCallout variant="amber" title="A Note on Cohabitation" dimmed={activeSection !== 'housing'}>
           {cohabitationNotes}
         </CareGuideCallout>
       )}

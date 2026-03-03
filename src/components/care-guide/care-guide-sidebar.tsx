@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Icon } from '@/components/Icon';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 import type { NavSection } from './care-guide-section-nav';
 
 interface RelatedGuide {
@@ -26,41 +26,7 @@ export function CareGuideSidebar({
   commonName,
   imageUrl,
 }: CareGuideSidebarProps) {
-  const [activeSection, setActiveSection] = useState(sections[0]?.id ?? '');
-
-  const handleScroll = useCallback(() => {
-    const OFFSET = 160;
-    let current = sections[0]?.id ?? '';
-    let minDistance = Infinity;
-
-    for (const section of sections) {
-      const el = document.getElementById(section.id);
-      if (!el) continue;
-      const distance = Math.abs(el.getBoundingClientRect().top - OFFSET);
-      if (distance < minDistance) {
-        minDistance = distance;
-        current = section.id;
-      }
-    }
-
-    setActiveSection(current);
-  }, [sections]);
-
-  useEffect(() => {
-    let ticking = false;
-    const onScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          handleScroll();
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [handleScroll]);
+  const { activeSection } = useCareGuideActiveSection();
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
