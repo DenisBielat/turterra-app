@@ -9,6 +9,7 @@ import { CareGuideTemperature } from '@/components/care-guide/care-guide-tempera
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
 import { CareGuideHandling } from '@/components/care-guide/care-guide-handling';
+import { CareGuideHealth } from '@/components/care-guide/care-guide-health';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import { CareGuideActiveSectionProvider } from '@/components/care-guide/care-guide-active-section-context';
@@ -360,10 +361,53 @@ async function getCareGuide(slug: string) {
     salmonellaWarning: handlingRow ? (handlingRow.salmonella_warning as string | null) : null,
   };
 
-  // 12. Build section content (housing, lighting, temperature, water, diet, handling handled separately above)
-  const sectionContent = {
-    health: str(row, 'health_content'),
+  // 12. Fetch health data
+  const { data: healthRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_health')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: healthIssuesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_health_issues')
+    .select('severity, common_cause, signs, sort_order, health_issues(name)')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  type HealthIssueRow = {
+    severity: string;
+    common_cause?: string | null;
+    signs?: string | null;
+    sort_order?: number;
+    health_issues?: { name: string } | { name: string }[] | null;
   };
+  const healthIssueRows = (healthIssuesRaw || []) as HealthIssueRow[];
+  const healthIssues = healthIssueRows
+    .map((r) => {
+      const issue = Array.isArray(r.health_issues) ? r.health_issues[0] : r.health_issues;
+      return issue
+        ? {
+            name: issue.name,
+            severity: r.severity as 'monitor' | 'moderate' | 'urgent',
+            common_cause: r.common_cause ?? null,
+            signs: r.signs ?? null,
+          }
+        : null;
+    })
+    .filter((r): r is NonNullable<typeof r> => r != null);
+
+  const healthData = {
+    introText: healthRow ? (healthRow.intro_text as string | null) : null,
+    subtitleText: healthRow ? (healthRow.subtitle_text as string | null ?? null) : null,
+    healthIssues,
+    whenToSeeVet: healthRow ? (healthRow.when_to_see_vet as string | null) : null,
+    preventiveCare: Array.isArray(healthRow?.preventive_care) ? healthRow.preventive_care as string[] : [],
+  };
+
+  // 13. Build section content (all major sections now handled separately above)
+  const sectionContent: Record<string, string | null> = {};
 
   return {
     commonName: species?.species_common_name ?? 'Unknown Species',
@@ -381,6 +425,7 @@ async function getCareGuide(slug: string) {
     waterData,
     dietData,
     handlingData,
+    healthData,
     sectionContent,
     relatedGuides,
   };
@@ -422,9 +467,7 @@ const SECTIONS: NavSection[] = [
   { id: 'references', label: 'References', icon: 'book-open' },
 ];
 
-const SECTION_TITLES: Record<string, string> = {
-  health: 'Health & Issues',
-};
+const SECTION_TITLES: Record<string, string> = {};
 
 /* ------------------------------------------------------------------
    Page
@@ -532,6 +575,15 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               salmonellaWarning={guide.handlingData.salmonellaWarning}
             />
 
+            {/* Health & Common Issues */}
+            <CareGuideHealth
+              introText={guide.healthData.introText}
+              subtitleText={guide.healthData.subtitleText}
+              healthIssues={guide.healthData.healthIssues}
+              whenToSeeVet={guide.healthData.whenToSeeVet}
+              preventiveCare={guide.healthData.preventiveCare}
+            />
+
             {/* Remaining content sections */}
             {Object.entries(guide.sectionContent).map(([key, content]) => (
               <CareGuideSection
@@ -541,15 +593,6 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
                 content={content}
               />
             ))}
-
-            {/* Placeholder for sections without content */}
-            {Object.values(guide.sectionContent).every(v => !v) && (
-              <div className="text-center py-12">
-                <p className="text-gray-400 text-sm">
-                  Detailed care sections are coming soon for this species.
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Sidebar — 4 cols */}
