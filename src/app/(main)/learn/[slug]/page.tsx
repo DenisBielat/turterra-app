@@ -304,8 +304,24 @@ async function getCareGuide(slug: string) {
     .eq('care_guide_id', row.id)
     .order('sort_order', { ascending: true });
 
+  const { data: guideFoodsRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_foods')
+    .select('notes, sort_order, foods(name, category)')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const guideFoods = (guideFoodsRaw || []) as { notes?: string | null; sort_order?: number; foods?: { name: string; category: string } | null }[];
+  const proteinFoods = guideFoods
+    .filter((r) => r.foods && r.foods.category === 'protein')
+    .map((r) => (r.notes ? `${r.foods!.name} (${r.notes})` : r.foods!.name));
+  const vegetableFoods = guideFoods
+    .filter((r) => r.foods && r.foods.category === 'vegetable')
+    .map((r) => (r.notes ? `${r.foods!.name} (${r.notes})` : r.foods!.name));
+
   const dietData = {
     introText: dietRow ? (dietRow.intro_text as string | null) : null,
+    subtitleText: dietRow ? (dietRow.subtitle_text as string | null) : null,
     feedingSchedules: (feedingSchedulesRaw || []).map(s => ({
       life_stage: s.life_stage as string,
       protein_pct: s.protein_pct as number | null,
@@ -316,6 +332,8 @@ async function getCareGuide(slug: string) {
     portionProtein: dietRow ? (dietRow.portion_protein as string | null) : null,
     portionVegetables: dietRow ? (dietRow.portion_vegetables as string | null) : null,
     portionPellets: dietRow ? (dietRow.portion_pellets as string | null) : null,
+    proteinFoods,
+    vegetableFoods,
     calciumSupplements: dietRow ? (dietRow.calcium_supplements as string | null) : null,
   };
 
@@ -474,10 +492,13 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
             {/* Diet & Nutrition */}
             <CareGuideDiet
               introText={guide.dietData.introText}
+              subtitleText={guide.dietData.subtitleText}
               feedingSchedules={guide.dietData.feedingSchedules}
               portionProtein={guide.dietData.portionProtein}
               portionVegetables={guide.dietData.portionVegetables}
               portionPellets={guide.dietData.portionPellets}
+              proteinFoods={guide.dietData.proteinFoods}
+              vegetableFoods={guide.dietData.vegetableFoods}
               calciumSupplements={guide.dietData.calciumSupplements}
             />
 

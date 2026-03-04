@@ -233,11 +233,16 @@ CREATE TABLE care_guide_diet (
     id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     care_guide_id   uuid NOT NULL UNIQUE REFERENCES care_guides(id) ON DELETE CASCADE,
     intro_text      text,
+    subtitle_text   text,                   -- e.g. "Variety is the key to a healthy, balanced diet"
 
     -- Portion size descriptions
     portion_protein     text,               -- e.g. "What they eat in 5-10 min"
     portion_vegetables  text,               -- e.g. "Same size as the shell"
     portion_pellets     text,               -- e.g. "Same size as the head"
+
+    -- Food lists (displayed as two-column lists)
+    protein_foods       jsonb DEFAULT '[]', -- e.g. ["Crickets", "Dubia roaches", ...]
+    vegetable_foods     jsonb DEFAULT '[]', -- e.g. ["Collard greens", "Endive & escarole", ...]
 
     -- Calcium & supplements callout
     calcium_supplements text,

@@ -3,11 +3,11 @@ import { IconStyle, IconNameMap } from '@/types/icons';
 interface IconProps<T extends IconStyle> {
   name: IconNameMap[T];
   style: T;
-  size?: 'xsm' | 'sm' | 'base' | 'lg' | 'xlg';
+  size?: 'xsm' | 'sm' | 'base' | 'lg' | 'xlg' | 'xs';
   className?: string;
 }
 
-const sizeMap = {
+const sizeMap: Record<'xsm' | 'sm' | 'base' | 'lg' | 'xlg', string> = {
   xsm: '0.5rem',
   sm: '0.875rem',
   base: '1rem',
@@ -42,8 +42,8 @@ export const Icon = <T extends IconStyle>({
         backgroundPosition: !useCurrentColor ? 'center' : undefined,
         backgroundRepeat: !useCurrentColor ? 'no-repeat' : undefined,
         backgroundSize: !useCurrentColor ? 'contain' : undefined,
-        width: sizeMap[size],
-        height: sizeMap[size],
+        width: sizeMap[size === 'xs' ? 'xsm' : size],
+        height: sizeMap[size === 'xs' ? 'xsm' : size],
         verticalAlign: 'middle'
       }}
     />
