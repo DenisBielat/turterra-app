@@ -1,5 +1,9 @@
+'use client';
+
 import { Icon } from '@/components/Icon';
+import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 interface EnclosureSize {
   life_stage: string;
@@ -27,6 +31,8 @@ export function CareGuideHousing({
   const hasContent = introText || essentials.length > 0 || commonMistakes.length > 0 || cohabitationNotes || enclosureSizes.length > 0;
   if (!hasContent) return null;
 
+  const { activeSection } = useCareGuideActiveSection();
+
   return (
     <section id="housing" className="scroll-mt-40">
       {/* Section header */}
@@ -36,9 +42,9 @@ export function CareGuideHousing({
 
       {/* Intro paragraph */}
       {introText && (
-        <p className="text-base md:text-lg leading-relaxed mb-8">
-          {introText}
-        </p>
+        <div className="text-base md:text-lg leading-relaxed mb-8">
+          <CareGuideMarkdown>{introText}</CareGuideMarkdown>
+        </div>
       )}
 
       {/* Minimum Enclosure Sizing table */}
@@ -88,7 +94,7 @@ export function CareGuideHousing({
                 {essentials.map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-base text-gray-700">
                     <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
-                    {item}
+                    <CareGuideMarkdown inline>{item}</CareGuideMarkdown>
                   </li>
                 ))}
               </ul>
@@ -108,7 +114,7 @@ export function CareGuideHousing({
                 {commonMistakes.map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-base text-gray-700">
                     <span className="text-red-400 mt-0.5 flex-shrink-0">•</span>
-                    {item}
+                    <CareGuideMarkdown inline>{item}</CareGuideMarkdown>
                   </li>
                 ))}
               </ul>
@@ -119,7 +125,7 @@ export function CareGuideHousing({
 
       {/* A Note on Cohabitation callout */}
       {cohabitationNotes && (
-        <CareGuideCallout variant="amber" title="A Note on Cohabitation">
+        <CareGuideCallout variant="amber" title="A Note on Cohabitation" dimmed={activeSection !== 'housing'}>
           {cohabitationNotes}
         </CareGuideCallout>
       )}

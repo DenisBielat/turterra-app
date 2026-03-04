@@ -1,21 +1,26 @@
 import { Icon } from '@/components/Icon';
+import { CareGuideMarkdown } from './care-guide-markdown';
 
-type CalloutVariant = 'amber' | 'red';
+type CalloutVariant = 'amber' | 'red' | 'green' | 'blue';
 
 interface CareGuideCalloutProps {
   variant?: CalloutVariant;
   title: string;
+  /** Body content. Pass a string from the DB; use **bold** in the text for bold. */
   children: React.ReactNode;
+  /** When true, card is shown at 10% opacity (e.g. when section is not in view). */
+  dimmed?: boolean;
 }
 
 const variantConfig: Record<
   CalloutVariant,
-  { headerBg: string; bodyBg: string; iconColor: string; texture: string; textureOpacity: number }
+  { headerBg: string; bodyBg: string; iconColor: string; iconName: string; texture: string; textureOpacity: number }
 > = {
   amber: {
     headerBg: 'bg-orange-600',
     bodyBg: 'bg-[#E79319]',
     iconColor: 'text-orange-500',
+    iconName: 'warning-triangle',
     texture: '/images/textures/topo-1-dark.png',
     textureOpacity: 0.10,
   },
@@ -23,7 +28,24 @@ const variantConfig: Record<
     headerBg: 'bg-red-900',
     bodyBg: 'bg-red-800',
     iconColor: 'text-orange-500',
+    iconName: 'warning-triangle',
     texture: '/images/textures/topo-2-dark.png',
+    textureOpacity: 0.10,
+  },
+  green: {
+    headerBg: 'bg-green-800',
+    bodyBg: 'bg-green-700',
+    iconColor: 'text-green-400',
+    iconName: 'info-circle-flex-solid',
+    texture: '/images/textures/topo-green-1.png',
+    textureOpacity: 0.10,
+  },
+  blue: {
+    headerBg: 'bg-blue-800',
+    bodyBg: 'bg-blue-600',
+    iconColor: 'text-blue-200',
+    iconName: 'info-circle-flex-solid',
+    texture: '/images/textures/topo-blue-1.png',
     textureOpacity: 0.10,
   },
 };
@@ -32,11 +54,14 @@ export function CareGuideCallout({
   variant = 'amber',
   title,
   children,
+  dimmed = false,
 }: CareGuideCalloutProps) {
   const config = variantConfig[variant];
 
   return (
-    <div className={`relative rounded-2xl overflow-hidden ${config.bodyBg}`}>
+    <div
+      className={`relative rounded-2xl overflow-hidden transition-opacity duration-300 ${config.bodyBg} ${dimmed ? 'opacity-10' : 'opacity-100'}`}
+    >
       {/* Header overlays the top of the card for a seamless look */}
       <div className={`absolute inset-x-0 top-0 z-10 rounded-t-2xl ${config.headerBg}`}>
         <div
@@ -51,7 +76,7 @@ export function CareGuideCallout({
         />
         <div className="relative flex items-center gap-3 px-5 py-4">
           <Icon
-            name="warning-triangle"
+            name={config.iconName as 'warning-triangle' | 'info-circle-flex-solid'}
             style="filled"
             size="lg"
             className={`flex-shrink-0 ${config.iconColor}`}
@@ -64,7 +89,9 @@ export function CareGuideCallout({
 
       {/* Body: padding-top reserves space so text sits below the header */}
       <div className="relative rounded-b-2xl px-5 pt-[72px] pb-4">
-        <div className="text-white text-base leading-relaxed">{children}</div>
+        <div className="text-white text-base leading-relaxed">
+          <CareGuideMarkdown>{children}</CareGuideMarkdown>
+        </div>
       </div>
     </div>
   );

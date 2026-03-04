@@ -4,8 +4,13 @@ import { supabase } from '@/lib/db/supabaseClient';
 import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
 import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
+import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
+import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
+import { CareGuideWater } from '@/components/care-guide/care-guide-water';
+import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
+import { CareGuideActiveSectionProvider } from '@/components/care-guide/care-guide-active-section-context';
 import type { NavSection } from '@/components/care-guide/care-guide-section-nav';
 import type { IconNameMap } from '@/types/icons';
 
@@ -199,12 +204,148 @@ async function getCareGuide(slug: string) {
     })),
   };
 
-  // 7. Build section content (housing handled separately above)
+  // 7. Fetch lighting data
+  const { data: lightingRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_lighting')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const lightingData = {
+    introText: lightingRow ? (lightingRow.intro_text as string | null) : null,
+    uvbBulbType: lightingRow ? (lightingRow.uvb_bulb_type as string | null) : null,
+    uvbTargetUviMin: lightingRow?.uvb_target_uvi_min != null ? Number(lightingRow.uvb_target_uvi_min) : null,
+    uvbTargetUviMax: lightingRow?.uvb_target_uvi_max != null ? Number(lightingRow.uvb_target_uvi_max) : null,
+    uvbTargetNotes: lightingRow ? (lightingRow.uvb_target_notes as string | null) : null,
+    uvbDistance: lightingRow ? (lightingRow.uvb_distance as string | null) : null,
+    uvbReplacement: lightingRow ? (lightingRow.uvb_replacement as string | null) : null,
+    daylightType: lightingRow ? (lightingRow.daylight_type as string | null) : null,
+    daylightCoverage: lightingRow ? (lightingRow.daylight_coverage as string | null) : null,
+    daylightPurpose: lightingRow ? (lightingRow.daylight_purpose as string | null) : null,
+    daylightNote: lightingRow ? (lightingRow.daylight_note as string | null) : null,
+    summerLightHours: lightingRow?.summer_light_hours != null ? Number(lightingRow.summer_light_hours) : null,
+    winterLightHours: lightingRow?.winter_light_hours != null ? Number(lightingRow.winter_light_hours) : null,
+    outdoorHousingNote: lightingRow ? (lightingRow.outdoor_housing_note as string | null) : null,
+  };
+
+  // 8. Fetch temperature data
+  const { data: temperatureRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_temperature')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: tempZonesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_temp_zones')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const temperatureData = {
+    introText: temperatureRow ? (temperatureRow.intro_text as string | null) : null,
+    tempZones: (tempZonesRaw || []).map(z => ({
+      zone_name: z.zone_name as string,
+      temp_min_f: z.temp_min_f as number,
+      temp_max_f: z.temp_max_f as number,
+      temp_min_c: z.temp_min_c as number | null,
+      temp_max_c: z.temp_max_c as number | null,
+      notes: z.notes as string | null,
+    })),
+    heatLampTips: Array.isArray(temperatureRow?.heat_lamp_tips) ? temperatureRow.heat_lamp_tips as string[] : [],
+    waterHeaterTips: Array.isArray(temperatureRow?.water_heater_tips) ? temperatureRow.water_heater_tips as string[] : [],
+    thermometerTips: Array.isArray(temperatureRow?.thermometer_tips) ? temperatureRow.thermometer_tips as string[] : [],
+    safetyWarning: temperatureRow ? (temperatureRow.safety_warning as string | null) : null,
+  };
+
+  // 9. Fetch water quality data
+  const { data: waterRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_water')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: waterSchedulesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_water_schedules')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const waterData = {
+    introText: waterRow ? (waterRow.intro_text as string | null) : null,
+    filtrationText: waterRow ? (waterRow.filtration_text as string | null) : null,
+    filtrationExample: waterRow ? (waterRow.filtration_example as string | null) : null,
+    filtrationTips: Array.isArray(waterRow?.filtration_tips) ? waterRow.filtration_tips as string[] : [],
+    waterChangesText: waterRow ? (waterRow.water_changes_text as string | null) : null,
+    waterSchedules: (waterSchedulesRaw || []).map(s => ({
+      tank_size: s.tank_size as string,
+      frequency: s.frequency as string,
+    })),
+    feedingTip: waterRow ? (waterRow.feeding_tip as string | null) : null,
+    conditionerTip: waterRow ? (waterRow.conditioner_tip as string | null) : null,
+  };
+
+  // 10. Fetch diet data
+  const { data: dietRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_diet')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: feedingSchedulesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_feeding_schedules')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const { data: guideFoodsRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_foods')
+    .select('notes, sort_order, foods(name, category)')
+    .eq('care_guide_id', row.id);
+
+  type GuideFoodRow = { notes?: string | null; sort_order?: number; foods?: { name: string; category: string } | { name: string; category: string }[] | null };
+  const rawRows = (guideFoodsRaw || []) as GuideFoodRow[];
+  const guideFoods = rawRows.map((r) => {
+    const food = Array.isArray(r.foods) ? r.foods[0] : r.foods;
+    return { notes: r.notes ?? null, food };
+  }).filter((r): r is { notes: string | null; food: { name: string; category: string } } => r.food != null);
+
+  const proteinFoods = guideFoods
+    .filter((r) => r.food.category === 'protein')
+    .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+  const vegetableFoods = guideFoods
+    .filter((r) => r.food.category === 'vegetable')
+    .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
+  const dietData = {
+    introText: dietRow ? (dietRow.intro_text as string | null) : null,
+    subtitleText: dietRow ? (dietRow.subtitle_text as string | null) : null,
+    feedingSchedules: (feedingSchedulesRaw || []).map(s => ({
+      life_stage: s.life_stage as string,
+      protein_pct: s.protein_pct as number | null,
+      vegetable_pct: s.vegetable_pct as number | null,
+      protein_frequency: s.protein_frequency as string | null,
+      vegetable_frequency: s.vegetable_frequency as string | null,
+    })),
+    portionProtein: dietRow ? (dietRow.portion_protein as string | null) : null,
+    portionVegetables: dietRow ? (dietRow.portion_vegetables as string | null) : null,
+    portionPellets: dietRow ? (dietRow.portion_pellets as string | null) : null,
+    proteinFoods,
+    vegetableFoods,
+    calciumSupplements: dietRow ? (dietRow.calcium_supplements as string | null) : null,
+  };
+
+  // 11. Build section content (housing, lighting, temperature, water, diet handled separately above)
   const sectionContent = {
-    lighting: str(row, 'lighting_content'),
-    temperature: str(row, 'temperature_content'),
-    water: str(row, 'water_content'),
-    diet: str(row, 'diet_content'),
     handling: str(row, 'handling_content'),
     health: str(row, 'health_content'),
   };
@@ -220,6 +361,10 @@ async function getCareGuide(slug: string) {
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
     housingData,
+    lightingData,
+    temperatureData,
+    waterData,
+    dietData,
     sectionContent,
     relatedGuides,
   };
@@ -262,10 +407,6 @@ const SECTIONS: NavSection[] = [
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  lighting: 'Lighting & UVB',
-  temperature: 'Temps & Heating',
-  water: 'Water Quality',
-  diet: 'Diet & Nutrition',
   handling: 'Handling',
   health: 'Health & Issues',
 };
@@ -295,7 +436,8 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
 
       {/* Main content area */}
       <div className="max-w-8xl mx-auto px-4 lg:px-10 py-10 md:py-14">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <CareGuideActiveSectionProvider sections={SECTIONS}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Main content — 8 cols */}
           <div className="lg:col-span-8 flex flex-col gap-12 md:gap-16">
             {/* At a Glance */}
@@ -312,6 +454,59 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               commonMistakes={guide.housingData.commonMistakes}
               cohabitationNotes={guide.housingData.cohabitationNotes}
               enclosureSizes={guide.housingData.enclosureSizes}
+            />
+
+            {/* Lighting & UVB */}
+            <CareGuideLighting
+              introText={guide.lightingData.introText}
+              uvbBulbType={guide.lightingData.uvbBulbType}
+              uvbTargetUviMin={guide.lightingData.uvbTargetUviMin}
+              uvbTargetUviMax={guide.lightingData.uvbTargetUviMax}
+              uvbTargetNotes={guide.lightingData.uvbTargetNotes}
+              uvbDistance={guide.lightingData.uvbDistance}
+              uvbReplacement={guide.lightingData.uvbReplacement}
+              daylightType={guide.lightingData.daylightType}
+              daylightCoverage={guide.lightingData.daylightCoverage}
+              daylightPurpose={guide.lightingData.daylightPurpose}
+              daylightNote={guide.lightingData.daylightNote}
+              summerLightHours={guide.lightingData.summerLightHours}
+              winterLightHours={guide.lightingData.winterLightHours}
+              outdoorHousingNote={guide.lightingData.outdoorHousingNote}
+            />
+
+            {/* Temperature & Heating */}
+            <CareGuideTemperature
+              introText={guide.temperatureData.introText}
+              tempZones={guide.temperatureData.tempZones}
+              heatLampTips={guide.temperatureData.heatLampTips}
+              waterHeaterTips={guide.temperatureData.waterHeaterTips}
+              thermometerTips={guide.temperatureData.thermometerTips}
+              safetyWarning={guide.temperatureData.safetyWarning}
+            />
+
+            {/* Water Quality & Maintenance */}
+            <CareGuideWater
+              introText={guide.waterData.introText}
+              filtrationText={guide.waterData.filtrationText}
+              filtrationExample={guide.waterData.filtrationExample}
+              filtrationTips={guide.waterData.filtrationTips}
+              waterChangesText={guide.waterData.waterChangesText}
+              waterSchedules={guide.waterData.waterSchedules}
+              feedingTip={guide.waterData.feedingTip}
+              conditionerTip={guide.waterData.conditionerTip}
+            />
+
+            {/* Diet & Nutrition */}
+            <CareGuideDiet
+              introText={guide.dietData.introText}
+              subtitleText={guide.dietData.subtitleText}
+              feedingSchedules={guide.dietData.feedingSchedules}
+              portionProtein={guide.dietData.portionProtein}
+              portionVegetables={guide.dietData.portionVegetables}
+              portionPellets={guide.dietData.portionPellets}
+              proteinFoods={guide.dietData.proteinFoods}
+              vegetableFoods={guide.dietData.vegetableFoods}
+              calciumSupplements={guide.dietData.calciumSupplements}
             />
 
             {/* Remaining content sections */}
@@ -344,6 +539,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
             />
           </div>
         </div>
+        </CareGuideActiveSectionProvider>
       </div>
     </div>
   );

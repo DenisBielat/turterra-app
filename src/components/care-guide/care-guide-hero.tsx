@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { CareGuideMarkdown } from './care-guide-markdown';
 
 interface CareGuideHeroProps {
   commonName: string;
@@ -83,9 +84,9 @@ export function CareGuideHero({
 
             {/* Intro text */}
             {introText && (
-              <p className="text-base md:text-lg leading-relaxed max-w-2xl text-gray-700">
-                {introText}
-              </p>
+              <div className="text-base md:text-lg leading-relaxed max-w-2xl text-gray-700">
+                <CareGuideMarkdown>{introText}</CareGuideMarkdown>
+              </div>
             )}
           </div>
         </div>
