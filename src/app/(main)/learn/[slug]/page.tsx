@@ -10,6 +10,8 @@ import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
 import { CareGuideHandling } from '@/components/care-guide/care-guide-handling';
 import { CareGuideHealth } from '@/components/care-guide/care-guide-health';
+import { CareGuideReferences } from '@/components/care-guide/care-guide-references';
+import type { CareGuideReference } from '@/components/care-guide/care-guide-references';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import { CareGuideActiveSectionProvider } from '@/components/care-guide/care-guide-active-section-context';
@@ -404,7 +406,30 @@ async function getCareGuide(slug: string) {
     preventiveCare: Array.isArray(healthRow?.preventive_care) ? healthRow.preventive_care as string[] : [],
   };
 
-  // 13. Build section content (all major sections now handled separately above)
+  // 13. Fetch references
+  const { data: referencesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_references')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const references: CareGuideReference[] = (referencesRaw || []).map((r) => ({
+    id: r.id as number,
+    referenceType: r.reference_type as string | null,
+    citationFull: r.citation_full as string | null,
+    citationShort: r.citation_short as string | null,
+    authors: r.authors as string | null,
+    year: r.year as string | null,
+    title: r.title as string | null,
+    sourceName: r.source_name as string | null,
+    url: r.url as string | null,
+    doi: r.doi as string | null,
+    accessDate: r.access_date as string | null,
+    notes: r.notes as string | null,
+  }));
+
+  // 14. Build section content (all major sections now handled separately above)
   const sectionContent: Record<string, string | null> = {};
 
   return {
@@ -424,6 +449,7 @@ async function getCareGuide(slug: string) {
     dietData,
     handlingData,
     healthData,
+    references,
     sectionContent,
     relatedGuides,
   };
@@ -581,6 +607,9 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               whenToSeeVet={guide.healthData.whenToSeeVet}
               preventiveCare={guide.healthData.preventiveCare}
             />
+
+            {/* References */}
+            <CareGuideReferences references={guide.references} />
 
             {/* Remaining content sections */}
             {Object.entries(guide.sectionContent).map(([key, content]) => (
