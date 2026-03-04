@@ -308,16 +308,23 @@ async function getCareGuide(slug: string) {
     .schema('care_guides')
     .from('care_guide_foods')
     .select('notes, sort_order, foods(name, category)')
-    .eq('care_guide_id', row.id)
-    .order('sort_order', { ascending: true });
+    .eq('care_guide_id', row.id);
 
-  const guideFoods = (guideFoodsRaw || []) as { notes?: string | null; sort_order?: number; foods?: { name: string; category: string } | null }[];
+  type GuideFoodRow = { notes?: string | null; sort_order?: number; foods?: { name: string; category: string } | { name: string; category: string }[] | null };
+  const rawRows = (guideFoodsRaw || []) as GuideFoodRow[];
+  const guideFoods = rawRows.map((r) => {
+    const food = Array.isArray(r.foods) ? r.foods[0] : r.foods;
+    return { notes: r.notes ?? null, food };
+  }).filter((r): r is { notes: string | null; food: { name: string; category: string } } => r.food != null);
+
   const proteinFoods = guideFoods
-    .filter((r) => r.foods && r.foods.category === 'protein')
-    .map((r) => (r.notes ? `${r.foods!.name} (${r.notes})` : r.foods!.name));
+    .filter((r) => r.food.category === 'protein')
+    .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
   const vegetableFoods = guideFoods
-    .filter((r) => r.foods && r.foods.category === 'vegetable')
-    .map((r) => (r.notes ? `${r.foods!.name} (${r.notes})` : r.foods!.name));
+    .filter((r) => r.food.category === 'vegetable')
+    .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
+    .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
   const dietData = {
     introText: dietRow ? (dietRow.intro_text as string | null) : null,
