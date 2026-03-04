@@ -8,6 +8,7 @@ import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
+import { CareGuideHandling } from '@/components/care-guide/care-guide-handling';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import { CareGuideActiveSectionProvider } from '@/components/care-guide/care-guide-active-section-context';
@@ -344,9 +345,23 @@ async function getCareGuide(slug: string) {
     calciumSupplements: dietRow ? (dietRow.calcium_supplements as string | null) : null,
   };
 
-  // 11. Build section content (housing, lighting, temperature, water, diet handled separately above)
+  // 11. Fetch handling data
+  const { data: handlingRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_handling')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const handlingData = {
+    introText: handlingRow ? (handlingRow.intro_text as string | null) : null,
+    dos: Array.isArray(handlingRow?.dos) ? handlingRow.dos as string[] : [],
+    donts: Array.isArray(handlingRow?.donts) ? handlingRow.donts as string[] : [],
+    salmonellaWarning: handlingRow ? (handlingRow.salmonella_warning as string | null) : null,
+  };
+
+  // 12. Build section content (housing, lighting, temperature, water, diet, handling handled separately above)
   const sectionContent = {
-    handling: str(row, 'handling_content'),
     health: str(row, 'health_content'),
   };
 
@@ -365,6 +380,7 @@ async function getCareGuide(slug: string) {
     temperatureData,
     waterData,
     dietData,
+    handlingData,
     sectionContent,
     relatedGuides,
   };
@@ -407,7 +423,6 @@ const SECTIONS: NavSection[] = [
 ];
 
 const SECTION_TITLES: Record<string, string> = {
-  handling: 'Handling',
   health: 'Health & Issues',
 };
 
@@ -507,6 +522,14 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               proteinFoods={guide.dietData.proteinFoods}
               vegetableFoods={guide.dietData.vegetableFoods}
               calciumSupplements={guide.dietData.calciumSupplements}
+            />
+
+            {/* Handling & Interaction */}
+            <CareGuideHandling
+              introText={guide.handlingData.introText}
+              dos={guide.handlingData.dos}
+              donts={guide.handlingData.donts}
+              salmonellaWarning={guide.handlingData.salmonellaWarning}
             />
 
             {/* Remaining content sections */}
