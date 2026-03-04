@@ -372,17 +372,14 @@ async function getCareGuide(slug: string) {
   const { data: healthIssuesRaw } = await supabase
     .schema('care_guides')
     .from('care_guide_health_issues')
-    .select('severity, common_cause, signs, sort_order, health_issues(name)')
-    .eq('care_guide_id', row.id)
-    .order('sort_order', { ascending: true });
+    .select('notes, health_issues(name, severity, common_cause, signs)')
+    .eq('care_guide_id', row.id);
 
   type HealthIssueRow = {
-    severity: string;
-    common_cause?: string | null;
-    signs?: string | null;
-    sort_order?: number;
-    health_issues?: { name: string } | { name: string }[] | null;
+    notes?: string | null;
+    health_issues?: { name: string; severity: string; common_cause?: string | null; signs?: string | null } | { name: string; severity: string; common_cause?: string | null; signs?: string | null }[] | null;
   };
+  const severityOrder: Record<string, number> = { urgent: 0, moderate: 1, monitor: 2 };
   const healthIssueRows = (healthIssuesRaw || []) as HealthIssueRow[];
   const healthIssues = healthIssueRows
     .map((r) => {
@@ -390,13 +387,14 @@ async function getCareGuide(slug: string) {
       return issue
         ? {
             name: issue.name,
-            severity: r.severity as 'monitor' | 'moderate' | 'urgent',
-            common_cause: r.common_cause ?? null,
-            signs: r.signs ?? null,
+            severity: issue.severity as 'monitor' | 'moderate' | 'urgent',
+            common_cause: issue.common_cause ?? null,
+            signs: issue.signs ?? null,
           }
         : null;
     })
-    .filter((r): r is NonNullable<typeof r> => r != null);
+    .filter((r): r is NonNullable<typeof r> => r != null)
+    .sort((a, b) => (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3));
 
   const healthData = {
     introText: healthRow ? (healthRow.intro_text as string | null) : null,

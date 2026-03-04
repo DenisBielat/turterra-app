@@ -332,25 +332,25 @@ CREATE INDEX idx_care_guide_foods_guide ON care_guide_foods(care_guide_id);
 -- ============================================================================
 -- 10. SHARED REFERENCE: HEALTH ISSUES
 -- ============================================================================
--- Master list of common health issues. Severity and specific notes
--- can vary per care guide via the junction table.
+-- Master list of common health issues with severity, cause, and signs.
+-- Shared across all care guides — link via the junction table.
 
 CREATE TABLE health_issues (
     id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name            text NOT NULL UNIQUE,   -- e.g. "Metabolic Bone Disease (MBD)"
     description     text,                   -- General description of the condition
+    severity        health_issue_severity NOT NULL,  -- urgent, moderate, monitor
+    common_cause    text,                   -- e.g. "Insufficient UVB or calcium"
+    signs           text,                   -- e.g. "Soft shell, deformed limbs, lethargy"
     created_at      timestamptz NOT NULL DEFAULT now()
 );
 
--- Junction: health issues per care guide, with guide-specific details
+-- Junction: health issues per care guide
 CREATE TABLE care_guide_health_issues (
     id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     care_guide_id   uuid NOT NULL REFERENCES care_guides(id) ON DELETE CASCADE,
     health_issue_id uuid NOT NULL REFERENCES health_issues(id) ON DELETE CASCADE,
-    severity        health_issue_severity NOT NULL,  -- urgent, moderate, monitor
-    common_cause    text,                   -- Guide-specific cause, e.g. "Insufficient UVB or calcium"
-    signs           text,                   -- Guide-specific signs, e.g. "Soft shell, deformed limbs, lethargy"
-    sort_order      int NOT NULL DEFAULT 0,
+    notes           text,                   -- Optional guide-specific notes
     created_at      timestamptz NOT NULL DEFAULT now(),
 
     UNIQUE(care_guide_id, health_issue_id)

@@ -99,11 +99,8 @@ function PreventiveCareChecklist({ items }: { items: string[] }) {
   const col2 = items.slice(mid);
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden flex">
-      {/* Green left accent border */}
-      <div className="w-1 bg-green-600 flex-shrink-0" />
-
-      <div className="flex-1 px-5 py-4">
+    <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+      <div className="px-5 py-4">
         <div className="flex items-center gap-2 mb-4">
           <Icon name="checkmark" style="filled" size="base" className="text-green-700" />
           <h3 className="font-heading font-bold text-black text-lg">
