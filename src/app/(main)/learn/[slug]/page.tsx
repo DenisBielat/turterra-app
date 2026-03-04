@@ -10,6 +10,8 @@ import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
 import { CareGuideHandling } from '@/components/care-guide/care-guide-handling';
 import { CareGuideHealth } from '@/components/care-guide/care-guide-health';
+import { CareGuideProducts } from '@/components/care-guide/care-guide-products';
+import type { SetupType, ProductCategory, ProductItem } from '@/components/care-guide/care-guide-products';
 import { CareGuideReferences } from '@/components/care-guide/care-guide-references';
 import type { CareGuideReference } from '@/components/care-guide/care-guide-references';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
@@ -406,7 +408,144 @@ async function getCareGuide(slug: string) {
     preventiveCare: Array.isArray(healthRow?.preventive_care) ? healthRow.preventive_care as string[] : [],
   };
 
-  // 13. Fetch references
+  // 13. Fetch recommended products
+  const { data: setupTypesRaw } = await supabase
+    .schema('care_guides')
+    .from('setup_types')
+    .select('*')
+    .order('sort_order', { ascending: true });
+
+  const setupTypes: SetupType[] = (setupTypesRaw || []).map((s) => ({
+    id: s.id as string,
+    name: s.name as string,
+    slug: s.slug as string,
+    isActive: s.is_active as boolean,
+  }));
+
+  // Fetch care_guide_product_items with nested product_items → product_categories
+  const { data: guideProductItemsRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_product_items')
+    .select(`
+      id,
+      setup_type_id,
+      priority,
+      has_diy,
+      notes,
+      sort_order,
+      product_items(
+        id,
+        name,
+        product_categories(
+          id,
+          name,
+          slug,
+          icon,
+          sort_order
+        )
+      )
+    `)
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  // Fetch category notes for this guide
+  const { data: categoryNotesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_category_notes')
+    .select('category_id, notes')
+    .eq('care_guide_id', row.id);
+
+  const categoryNotesMap = new Map(
+    (categoryNotesRaw || []).map((n) => [n.category_id as string, n.notes as string])
+  );
+
+  // Build categoriesBySetup: Record<setupTypeId, ProductCategory[]>
+  type GuideProductItemRow = {
+    id: string;
+    setup_type_id: string;
+    priority: string;
+    has_diy: boolean;
+    notes: string | null;
+    sort_order: number;
+    product_items?: {
+      id: string;
+      name: string;
+      product_categories?: {
+        id: string;
+        name: string;
+        slug: string;
+        icon: string | null;
+        sort_order: number;
+      } | {
+        id: string;
+        name: string;
+        slug: string;
+        icon: string | null;
+        sort_order: number;
+      }[] | null;
+    } | {
+      id: string;
+      name: string;
+      product_categories?: unknown;
+    }[] | null;
+  };
+
+  const categoriesBySetup: Record<string, ProductCategory[]> = {};
+  const guideItems = (guideProductItemsRaw || []) as GuideProductItemRow[];
+
+  for (const gpi of guideItems) {
+    const setupId = gpi.setup_type_id;
+    const productItem = Array.isArray(gpi.product_items) ? gpi.product_items[0] : gpi.product_items;
+    if (!productItem) continue;
+
+    const catRaw = Array.isArray((productItem as { product_categories?: unknown }).product_categories)
+      ? ((productItem as { product_categories: { id: string; name: string; slug: string; icon: string | null; sort_order: number }[] }).product_categories)[0]
+      : (productItem as { product_categories?: { id: string; name: string; slug: string; icon: string | null; sort_order: number } | null }).product_categories;
+    if (!catRaw) continue;
+
+    if (!categoriesBySetup[setupId]) categoriesBySetup[setupId] = [];
+
+    const item: ProductItem = {
+      id: gpi.id,
+      name: productItem.name,
+      priority: gpi.priority as ProductItem['priority'],
+      hasDiy: gpi.has_diy,
+      notes: gpi.notes,
+    };
+
+    // Find or create category in the list for this setup type
+    let category = categoriesBySetup[setupId].find((c) => c.id === catRaw.id);
+    if (!category) {
+      category = {
+        id: catRaw.id,
+        name: catRaw.name,
+        slug: catRaw.slug,
+        icon: catRaw.icon,
+        items: [],
+        categoryNote: categoryNotesMap.get(catRaw.id) ?? null,
+      };
+      categoriesBySetup[setupId].push(category);
+    }
+    category.items.push(item);
+  }
+
+  // Sort categories by their sort_order (from the original category data)
+  const categoryOrderMap = new Map<string, number>();
+  for (const gpi of guideItems) {
+    const productItem = Array.isArray(gpi.product_items) ? gpi.product_items[0] : gpi.product_items;
+    if (!productItem) continue;
+    const catRaw = Array.isArray((productItem as { product_categories?: unknown }).product_categories)
+      ? ((productItem as { product_categories: { id: string; sort_order: number }[] }).product_categories)[0]
+      : (productItem as { product_categories?: { id: string; sort_order: number } | null }).product_categories;
+    if (catRaw) categoryOrderMap.set(catRaw.id, catRaw.sort_order);
+  }
+  for (const setupId of Object.keys(categoriesBySetup)) {
+    categoriesBySetup[setupId].sort(
+      (a, b) => (categoryOrderMap.get(a.id) ?? 0) - (categoryOrderMap.get(b.id) ?? 0)
+    );
+  }
+
+  // 14. Fetch references
   const { data: referencesRaw } = await supabase
     .schema('care_guides')
     .from('care_guide_references')
@@ -449,6 +588,8 @@ async function getCareGuide(slug: string) {
     dietData,
     handlingData,
     healthData,
+    setupTypes,
+    categoriesBySetup,
     references,
     sectionContent,
     relatedGuides,
@@ -606,6 +747,12 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               healthIssues={guide.healthData.healthIssues}
               whenToSeeVet={guide.healthData.whenToSeeVet}
               preventiveCare={guide.healthData.preventiveCare}
+            />
+
+            {/* Recommended Products / Shopping Checklist */}
+            <CareGuideProducts
+              setupTypes={guide.setupTypes}
+              categoriesBySetup={guide.categoriesBySetup}
             />
 
             {/* References */}
