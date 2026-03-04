@@ -33,8 +33,8 @@ const severityConfig: Record<
   { bg: string; text: string; label: string }
 > = {
   urgent: { bg: 'bg-red-100', text: 'text-red-700', label: 'Urgent' },
-  moderate: { bg: 'bg-amber-100', text: 'text-amber-700', label: 'Moderate' },
-  monitor: { bg: 'bg-green-100', text: 'text-green-700', label: 'Monitor' },
+  moderate: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Moderate' },
+  monitor: { bg: 'bg-gray-100', text: 'text-gray-600', label: 'Monitor' },
 };
 
 function SeverityBadge({ severity }: { severity: HealthIssue['severity'] }) {
@@ -51,13 +51,10 @@ function SeverityBadge({ severity }: { severity: HealthIssue['severity'] }) {
 function HealthIssueCard({ issue }: { issue: HealthIssue }) {
   return (
     <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden flex">
-      {/* Green left accent border */}
-      <div className="w-1 bg-green-600 flex-shrink-0" />
-
       <div className="flex-1 px-5 py-4">
         {/* Name + severity badge */}
         <div className="flex items-start justify-between gap-3 mb-3">
-          <h4 className="font-heading font-bold text-black text-base">
+          <h4 className="font-heading font-semibold text-black text-base">
             {issue.name}
           </h4>
           <SeverityBadge severity={issue.severity} />
@@ -102,7 +99,7 @@ function PreventiveCareChecklist({ items }: { items: string[] }) {
     <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
       <div className="px-5 py-4">
         <div className="flex items-center gap-2 mb-4">
-          <Icon name="checkmark" style="filled" size="base" className="text-green-700" />
+          <Icon name="heart-list" style="line" size="base" className="text-black" />
           <h3 className="font-heading font-bold text-black text-lg">
             Preventive Care Checklist
           </h3>

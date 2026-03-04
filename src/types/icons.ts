@@ -35,6 +35,7 @@ export type LineIconName =
   | 'hand-shake-heart'
   | 'handling'
   | 'health'
+  | 'heart-list'
   | 'heat-lamp-flex-line'
   | 'hierarchy'
   | 'information-circle'
