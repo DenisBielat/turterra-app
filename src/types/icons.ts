@@ -35,6 +35,7 @@ export type LineIconName =
   | 'hand-shake-heart'
   | 'handling'
   | 'health'
+  | 'heart-list'
   | 'heat-lamp-flex-line'
   | 'hierarchy'
   | 'information-circle'
@@ -75,7 +76,8 @@ export type LineIconName =
   | 'water-droplet'
   | 'water-filter-flex-line'
   | 'water-heat-flex-line'
-  | 'water';
+  | 'water'
+  | 'wrench';
 
 export type FilledIconName = 
   | 'arrow-right'

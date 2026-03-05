@@ -14,39 +14,58 @@ interface CareGuideCalloutProps {
 
 const variantConfig: Record<
   CalloutVariant,
-  { headerBg: string; bodyBg: string; iconColor: string; iconName: string; texture: string; textureOpacity: number }
+  {
+    headerBg: string;
+    bodyBg: string;
+    iconColor: string;
+    iconName: string;
+    texture: string;
+    textureOpacity: number;
+    /** Tailwind text color class for the header title */
+    headerTextColor: string;
+    /** Tailwind text color class for the body content */
+    bodyTextColor: string;
+  }
 > = {
   amber: {
     headerBg: 'bg-orange-600',
-    bodyBg: 'bg-[#E79319]',
+    bodyBg: 'bg-[#E79319]/20',
     iconColor: 'text-orange-500',
     iconName: 'warning-triangle',
     texture: '/images/textures/topo-1-dark.png',
     textureOpacity: 0.10,
+    headerTextColor: 'text-white',
+    bodyTextColor: 'text-black',
   },
   red: {
     headerBg: 'bg-red-900',
-    bodyBg: 'bg-red-800',
+    bodyBg: 'bg-red-800/20',
     iconColor: 'text-orange-500',
     iconName: 'warning-triangle',
     texture: '/images/textures/topo-2-dark.png',
     textureOpacity: 0.10,
+    headerTextColor: 'text-white',
+    bodyTextColor: 'text-black',
   },
   green: {
     headerBg: 'bg-green-800',
-    bodyBg: 'bg-green-700',
+    bodyBg: 'bg-green-700/20',
     iconColor: 'text-green-400',
     iconName: 'info-circle-flex-solid',
     texture: '/images/textures/topo-green-1.png',
     textureOpacity: 0.10,
+    headerTextColor: 'text-white',
+    bodyTextColor: 'text-black',
   },
   blue: {
     headerBg: 'bg-blue-800',
-    bodyBg: 'bg-blue-600',
+    bodyBg: 'bg-blue-600/20',
     iconColor: 'text-blue-200',
     iconName: 'info-circle-flex-solid',
     texture: '/images/textures/topo-blue-1.png',
     textureOpacity: 0.10,
+    headerTextColor: 'text-white',
+    bodyTextColor: 'text-black',
   },
 };
 
@@ -81,7 +100,7 @@ export function CareGuideCallout({
             size="lg"
             className={`flex-shrink-0 ${config.iconColor}`}
           />
-          <h3 className="font-heading font-bold text-white text-base md:text-lg">
+          <h3 className={`font-heading font-bold text-base md:text-lg ${config.headerTextColor}`}>
             {title}
           </h3>
         </div>
@@ -89,7 +108,7 @@ export function CareGuideCallout({
 
       {/* Body: padding-top reserves space so text sits below the header */}
       <div className="relative rounded-b-2xl px-5 pt-[72px] pb-4">
-        <div className="text-white text-base leading-relaxed">
+        <div className={`${config.bodyTextColor} text-base leading-relaxed`}>
           <CareGuideMarkdown>{children}</CareGuideMarkdown>
         </div>
       </div>

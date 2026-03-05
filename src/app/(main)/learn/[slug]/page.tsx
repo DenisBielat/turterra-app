@@ -8,6 +8,12 @@ import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
+import { CareGuideHandling } from '@/components/care-guide/care-guide-handling';
+import { CareGuideHealth } from '@/components/care-guide/care-guide-health';
+import { CareGuideProducts } from '@/components/care-guide/care-guide-products';
+import type { SetupType, ProductCategory, ProductItem } from '@/components/care-guide/care-guide-products';
+import { CareGuideReferences } from '@/components/care-guide/care-guide-references';
+import type { CareGuideReference } from '@/components/care-guide/care-guide-references';
 import { CareGuideSection } from '@/components/care-guide/care-guide-section';
 import { CareGuideSidebar } from '@/components/care-guide/care-guide-sidebar';
 import { CareGuideActiveSectionProvider } from '@/components/care-guide/care-guide-active-section-context';
@@ -344,11 +350,226 @@ async function getCareGuide(slug: string) {
     calciumSupplements: dietRow ? (dietRow.calcium_supplements as string | null) : null,
   };
 
-  // 11. Build section content (housing, lighting, temperature, water, diet handled separately above)
-  const sectionContent = {
-    handling: str(row, 'handling_content'),
-    health: str(row, 'health_content'),
+  // 11. Fetch handling data
+  const { data: handlingRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_handling')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const handlingData = {
+    introText: handlingRow ? (handlingRow.intro_text as string | null) : null,
+    dos: Array.isArray(handlingRow?.dos) ? handlingRow.dos as string[] : [],
+    donts: Array.isArray(handlingRow?.donts) ? handlingRow.donts as string[] : [],
+    salmonellaWarning: handlingRow ? (handlingRow.salmonella_warning as string | null) : null,
   };
+
+  // 12. Fetch health data
+  const { data: healthRow } = await supabase
+    .schema('care_guides')
+    .from('care_guide_health')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .single();
+
+  const { data: healthIssuesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_health_issues')
+    .select('notes, health_issues(name, severity, common_cause, signs)')
+    .eq('care_guide_id', row.id);
+
+  type HealthIssueRow = {
+    notes?: string | null;
+    health_issues?: { name: string; severity: string; common_cause?: string | null; signs?: string | null } | { name: string; severity: string; common_cause?: string | null; signs?: string | null }[] | null;
+  };
+  const severityOrder: Record<string, number> = { urgent: 0, moderate: 1, monitor: 2 };
+  const healthIssueRows = (healthIssuesRaw || []) as HealthIssueRow[];
+  const healthIssues = healthIssueRows
+    .map((r) => {
+      const issue = Array.isArray(r.health_issues) ? r.health_issues[0] : r.health_issues;
+      return issue
+        ? {
+            name: issue.name,
+            severity: issue.severity as 'monitor' | 'moderate' | 'urgent',
+            common_cause: issue.common_cause ?? null,
+            signs: issue.signs ?? null,
+          }
+        : null;
+    })
+    .filter((r): r is NonNullable<typeof r> => r != null)
+    .sort((a, b) => (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3));
+
+  const healthData = {
+    introText: healthRow ? (healthRow.intro_text as string | null) : null,
+    subtitleText: healthRow ? (healthRow.subtitle_text as string | null ?? null) : null,
+    healthIssues,
+    whenToSeeVet: healthRow ? (healthRow.when_to_see_vet as string | null) : null,
+    preventiveCare: Array.isArray(healthRow?.preventive_care) ? healthRow.preventive_care as string[] : [],
+  };
+
+  // 13. Fetch recommended products
+  const { data: setupTypesRaw } = await supabase
+    .schema('care_guides')
+    .from('setup_types')
+    .select('*')
+    .order('sort_order', { ascending: true });
+
+  const setupTypes: SetupType[] = (setupTypesRaw || []).map((s) => ({
+    id: s.id as string,
+    name: s.name as string,
+    slug: s.slug as string,
+    isActive: s.is_active as boolean,
+  }));
+
+  // Fetch care_guide_product_items with nested product_items → product_categories
+  const { data: guideProductItemsRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_product_items')
+    .select(`
+      id,
+      setup_type_id,
+      priority,
+      has_diy,
+      notes,
+      sort_order,
+      product_items(
+        id,
+        name,
+        product_categories(
+          id,
+          name,
+          slug,
+          icon,
+          sort_order
+        )
+      )
+    `)
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  // Fetch category notes for this guide
+  const { data: categoryNotesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_category_notes')
+    .select('category_id, notes')
+    .eq('care_guide_id', row.id);
+
+  const categoryNotesMap = new Map(
+    (categoryNotesRaw || []).map((n) => [n.category_id as string, n.notes as string])
+  );
+
+  // Build categoriesBySetup: Record<setupTypeId, ProductCategory[]>
+  type GuideProductItemRow = {
+    id: string;
+    setup_type_id: string;
+    priority: string;
+    has_diy: boolean;
+    notes: string | null;
+    sort_order: number;
+    product_items?: {
+      id: string;
+      name: string;
+      product_categories?: {
+        id: string;
+        name: string;
+        slug: string;
+        icon: string | null;
+        sort_order: number;
+      } | {
+        id: string;
+        name: string;
+        slug: string;
+        icon: string | null;
+        sort_order: number;
+      }[] | null;
+    } | {
+      id: string;
+      name: string;
+      product_categories?: unknown;
+    }[] | null;
+  };
+
+  const categoriesBySetup: Record<string, ProductCategory[]> = {};
+  const guideItems = (guideProductItemsRaw || []) as GuideProductItemRow[];
+
+  for (const gpi of guideItems) {
+    const setupId = gpi.setup_type_id;
+    const productItem = Array.isArray(gpi.product_items) ? gpi.product_items[0] : gpi.product_items;
+    if (!productItem) continue;
+
+    const catRaw = Array.isArray((productItem as { product_categories?: unknown }).product_categories)
+      ? ((productItem as { product_categories: { id: string; name: string; slug: string; icon: string | null; sort_order: number }[] }).product_categories)[0]
+      : (productItem as { product_categories?: { id: string; name: string; slug: string; icon: string | null; sort_order: number } | null }).product_categories;
+    if (!catRaw) continue;
+
+    if (!categoriesBySetup[setupId]) categoriesBySetup[setupId] = [];
+
+    const item: ProductItem = {
+      id: gpi.id,
+      name: productItem.name,
+      priority: gpi.priority as ProductItem['priority'],
+      hasDiy: gpi.has_diy,
+      notes: gpi.notes,
+    };
+
+    // Find or create category in the list for this setup type
+    let category = categoriesBySetup[setupId].find((c) => c.id === catRaw.id);
+    if (!category) {
+      category = {
+        id: catRaw.id,
+        name: catRaw.name,
+        slug: catRaw.slug,
+        icon: catRaw.icon,
+        items: [],
+        categoryNote: categoryNotesMap.get(catRaw.id) ?? null,
+      };
+      categoriesBySetup[setupId].push(category);
+    }
+    category.items.push(item);
+  }
+
+  // Sort categories by their sort_order (from the original category data)
+  const categoryOrderMap = new Map<string, number>();
+  for (const gpi of guideItems) {
+    const productItem = Array.isArray(gpi.product_items) ? gpi.product_items[0] : gpi.product_items;
+    if (!productItem) continue;
+    const catRaw = Array.isArray((productItem as { product_categories?: unknown }).product_categories)
+      ? ((productItem as { product_categories: { id: string; sort_order: number }[] }).product_categories)[0]
+      : (productItem as { product_categories?: { id: string; sort_order: number } | null }).product_categories;
+    if (catRaw) categoryOrderMap.set(catRaw.id, catRaw.sort_order);
+  }
+  for (const setupId of Object.keys(categoriesBySetup)) {
+    categoriesBySetup[setupId].sort(
+      (a, b) => (categoryOrderMap.get(a.id) ?? 0) - (categoryOrderMap.get(b.id) ?? 0)
+    );
+  }
+
+  // 14. Fetch references
+  const { data: referencesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_references')
+    .select('*')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const references: CareGuideReference[] = (referencesRaw || []).map((r) => ({
+    id: r.id as number,
+    referenceType: r.reference_type as string | null,
+    citationFull: r.citation_full as string | null,
+    citationShort: r.citation_short as string | null,
+    authors: r.authors as string | null,
+    year: r.year as string | null,
+    title: r.title as string | null,
+    sourceName: r.source_name as string | null,
+    url: r.url as string | null,
+    doi: r.doi as string | null,
+    accessDate: r.access_date as string | null,
+    notes: r.notes as string | null,
+  }));
+
+  // 14. Build section content (all major sections now handled separately above)
+  const sectionContent: Record<string, string | null> = {};
 
   return {
     commonName: species?.species_common_name ?? 'Unknown Species',
@@ -365,6 +586,11 @@ async function getCareGuide(slug: string) {
     temperatureData,
     waterData,
     dietData,
+    handlingData,
+    healthData,
+    setupTypes,
+    categoriesBySetup,
+    references,
     sectionContent,
     relatedGuides,
   };
@@ -402,14 +628,11 @@ const SECTIONS: NavSection[] = [
   { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
   { id: 'health', label: 'Health & Issues', icon: 'health' },
-  { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
+  { id: 'shopping-checklist', label: 'Product Guide', icon: 'shop' },
   { id: 'references', label: 'References', icon: 'book-open' },
 ];
 
-const SECTION_TITLES: Record<string, string> = {
-  handling: 'Handling',
-  health: 'Health & Issues',
-};
+const SECTION_TITLES: Record<string, string> = {};
 
 /* ------------------------------------------------------------------
    Page
@@ -509,6 +732,32 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               calciumSupplements={guide.dietData.calciumSupplements}
             />
 
+            {/* Handling & Interaction */}
+            <CareGuideHandling
+              introText={guide.handlingData.introText}
+              dos={guide.handlingData.dos}
+              donts={guide.handlingData.donts}
+              salmonellaWarning={guide.handlingData.salmonellaWarning}
+            />
+
+            {/* Health & Common Issues */}
+            <CareGuideHealth
+              introText={guide.healthData.introText}
+              subtitleText={guide.healthData.subtitleText}
+              healthIssues={guide.healthData.healthIssues}
+              whenToSeeVet={guide.healthData.whenToSeeVet}
+              preventiveCare={guide.healthData.preventiveCare}
+            />
+
+            {/* Recommended Products / Shopping Checklist */}
+            <CareGuideProducts
+              setupTypes={guide.setupTypes}
+              categoriesBySetup={guide.categoriesBySetup}
+            />
+
+            {/* References */}
+            <CareGuideReferences references={guide.references} />
+
             {/* Remaining content sections */}
             {Object.entries(guide.sectionContent).map(([key, content]) => (
               <CareGuideSection
@@ -518,15 +767,6 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
                 content={content}
               />
             ))}
-
-            {/* Placeholder for sections without content */}
-            {Object.values(guide.sectionContent).every(v => !v) && (
-              <div className="text-center py-12">
-                <p className="text-gray-400 text-sm">
-                  Detailed care sections are coming soon for this species.
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Sidebar — 4 cols */}

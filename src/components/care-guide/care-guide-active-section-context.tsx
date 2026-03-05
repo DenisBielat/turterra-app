@@ -6,6 +6,9 @@ import type { NavSection } from './care-guide-section-nav';
 interface CareGuideActiveSectionContextValue {
   activeSection: string;
   sections: NavSection[];
+  /** When set, Product Guide should open this category (slug); consumed then cleared */
+  requestedProductCategory: string | null;
+  setRequestedProductCategory: (slug: string | null) => void;
 }
 
 const CareGuideActiveSectionContext = createContext<CareGuideActiveSectionContextValue | null>(null);
@@ -18,9 +21,11 @@ interface CareGuideActiveSectionProviderProps {
 /**
  * Tracks which section is "active" based on scroll (same logic as sidebar nav).
  * Callouts use this to dim when their section is not active.
+ * Also supports requestedProductCategory so Shop buttons can request a category to open without URL delay.
  */
 export function CareGuideActiveSectionProvider({ sections, children }: CareGuideActiveSectionProviderProps) {
   const [activeSection, setActiveSection] = useState(sections[0]?.id ?? '');
+  const [requestedProductCategory, setRequestedProductCategory] = useState<string | null>(null);
 
   const handleScroll = useCallback(() => {
     const OFFSET = 160;
@@ -58,7 +63,7 @@ export function CareGuideActiveSectionProvider({ sections, children }: CareGuide
   }, [handleScroll]);
 
   return (
-    <CareGuideActiveSectionContext.Provider value={{ activeSection, sections }}>
+    <CareGuideActiveSectionContext.Provider value={{ activeSection, sections, requestedProductCategory, setRequestedProductCategory }}>
       {children}
     </CareGuideActiveSectionContext.Provider>
   );
@@ -67,7 +72,12 @@ export function CareGuideActiveSectionProvider({ sections, children }: CareGuide
 export function useCareGuideActiveSection(): CareGuideActiveSectionContextValue {
   const ctx = useContext(CareGuideActiveSectionContext);
   if (!ctx) {
-    return { activeSection: '', sections: [] };
+    return {
+      activeSection: '',
+      sections: [],
+      requestedProductCategory: null,
+      setRequestedProductCategory: () => {},
+    };
   }
   return ctx;
 }
