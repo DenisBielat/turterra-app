@@ -222,7 +222,8 @@ ADD COLUMN IF NOT EXISTS drinking_water text;                    -- "Drinking Wa
 ALTER TABLE care_guides
 ADD COLUMN IF NOT EXISTS enclosure_min_sq_ft int,               -- e.g. 23 (for terrestrial)
 ADD COLUMN IF NOT EXISTS humidity_min_pct int,                  -- e.g. 60 (for At a Glance display)
-ADD COLUMN IF NOT EXISTS humidity_max_pct int;                  -- e.g. 80
+ADD COLUMN IF NOT EXISTS humidity_max_pct int,                  -- e.g. 80
+ADD COLUMN IF NOT EXISTS humidity_notes text;                   -- e.g. "Ambient; humid hide should be higher"
 
 
 -- ============================================================================

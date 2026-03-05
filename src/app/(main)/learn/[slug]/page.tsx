@@ -152,6 +152,7 @@ async function getCareGuide(slug: string) {
         icon: 'water-droplet',
         label: 'Humidity',
         value: formatRange(num(row, 'humidity_min_pct'), num(row, 'humidity_max_pct'), '%')?.replace(' %', '%') ?? '—',
+        description: str(row, 'humidity_notes'),
       }
     : {
         icon: 'water',
