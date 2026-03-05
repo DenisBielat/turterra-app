@@ -71,10 +71,10 @@ async function getCareGuide(slug: string) {
 
   const row = guide as CareGuideRow;
 
-  // 2. Fetch species info
+  // 2. Fetch species info (include slug for Species Guide link)
   const { data: species } = await supabase
     .from('turtle_species')
-    .select('id, species_common_name, species_scientific_name, avatar_image_full_url, avatar_image_circle_url, tax_parent_genus')
+    .select('id, slug, species_common_name, species_scientific_name, avatar_image_full_url, avatar_image_circle_url, tax_parent_genus')
     .eq('id', row.species_id)
     .single();
 
@@ -574,6 +574,7 @@ async function getCareGuide(slug: string) {
   return {
     commonName: species?.species_common_name ?? 'Unknown Species',
     scientificName: species?.species_scientific_name ?? '',
+    speciesSlug: species?.slug ?? null,
     avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || row.banner_image_url || PLACEHOLDER_IMAGE,
     avatarCircleUrl: species?.avatar_image_circle_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
     category: familyCommon,
@@ -655,6 +656,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
         category={guide.category}
         imageUrl={guide.avatarImageUrl}
         introText={guide.heroText}
+        speciesSlug={guide.speciesSlug}
       />
 
       {/* Main content area */}

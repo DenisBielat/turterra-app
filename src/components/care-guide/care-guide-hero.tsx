@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 
 interface CareGuideHeroProps {
@@ -8,6 +9,8 @@ interface CareGuideHeroProps {
   category: string | null;
   imageUrl: string;
   introText?: string | null;
+  /** Species slug for the Species Guide link (turtle-guide/[slug]); button hidden if null */
+  speciesSlug?: string | null;
 }
 
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
@@ -18,6 +21,7 @@ export function CareGuideHero({
   category,
   imageUrl,
   introText,
+  speciesSlug,
 }: CareGuideHeroProps) {
   return (
     <header className="bg-warm">
@@ -60,7 +64,8 @@ export function CareGuideHero({
           {/* Content */}
           <div className="w-full md:w-7/12">
             {/* Care Guide badge */}
-            <span className="inline-block border border-violet-400 text-violet-500 text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
+            <span className="inline-flex items-center gap-2 bg-violet-500 text-white text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
+              <Icon name="care-guide-icon" style="line" size="sm" className="text-white flex-shrink-0" />
               Care Guide
             </span>
 
@@ -87,6 +92,17 @@ export function CareGuideHero({
               <div className="text-base md:text-lg leading-relaxed max-w-2xl text-gray-700">
                 <CareGuideMarkdown>{introText}</CareGuideMarkdown>
               </div>
+            )}
+
+            {/* View Species Guide — same styling as Shop button */}
+            {speciesSlug && (
+              <Link
+                href={`/turtle-guide/${speciesSlug}`}
+                className="mt-6 inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-warm px-3 py-2 text-sm font-semibold text-gray-800 shadow-sm transition-colors hover:bg-green-800 hover:text-white hover:border-green-800"
+              >
+                View Species Guide
+                <Icon name="arrow-right-1" style="line" size="sm" className="[color:inherit]" />
+              </Link>
             )}
           </div>
         </div>

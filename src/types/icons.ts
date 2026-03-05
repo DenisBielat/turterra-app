@@ -43,6 +43,7 @@ export type LineIconName =
   | 'kettlebell'
   | 'lightbulb-flex-line'
   | 'lighting'
+  | 'love-care'
   | 'male'
   | 'map-marks'
   | 'move-back'
@@ -94,9 +95,11 @@ export type FilledIconName =
   | 'marine-turtle'
   | 'outdoors-tree-valley'
   | 'trip-map-markers'
+  | 'turtle-flex-fill'
   | 'vegetables-salad'
   | 'warning-triangle'
   | 'warning'
+  | 'wrench-flex-fill'
   | 'youtube';
 
 export type ColorIconName = 
