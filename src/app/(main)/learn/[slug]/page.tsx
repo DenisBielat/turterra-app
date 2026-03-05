@@ -628,7 +628,7 @@ const SECTIONS: NavSection[] = [
   { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
   { id: 'health', label: 'Health & Issues', icon: 'health' },
-  { id: 'shopping-checklist', label: 'Shopping Checklist', icon: 'shop' },
+  { id: 'shopping-checklist', label: 'Product Guide', icon: 'shop' },
   { id: 'references', label: 'References', icon: 'book-open' },
 ];
 

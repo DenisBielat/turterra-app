@@ -76,7 +76,8 @@ export type LineIconName =
   | 'water-droplet'
   | 'water-filter-flex-line'
   | 'water-heat-flex-line'
-  | 'water';
+  | 'water'
+  | 'wrench';
 
 export type FilledIconName = 
   | 'arrow-right'
