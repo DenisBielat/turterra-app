@@ -65,7 +65,7 @@ export function CareGuideHero({
           <div className="w-full md:w-7/12">
             {/* Care Guide badge */}
             <span className="inline-flex items-center gap-2 bg-violet-500 text-white text-xs font-semibold tracking-wide uppercase px-3 py-1 rounded-full mb-4">
-              <Icon name="care-guide-icon" style="line" size="sm" className="text-white flex-shrink-0" />
+              <Icon name="care-flex-fill" style="filled" size="sm" className="text-white flex-shrink-0" />
               Care Guide
             </span>
 

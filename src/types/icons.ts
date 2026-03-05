@@ -82,6 +82,7 @@ export type LineIconName =
 
 export type FilledIconName = 
   | 'arrow-right'
+  | 'care-flex-fill'
   | 'checkmark-2'
   | 'checkmark'
   | 'close'

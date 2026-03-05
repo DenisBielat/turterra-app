@@ -16,6 +16,8 @@ interface CareGuideSidebarProps {
   relatedGuides?: RelatedGuide[];
   commonName: string;
   imageUrl: string;
+  /** Species slug for the Species Guide link (turtle-guide/[slug]); button hidden if null */
+  speciesSlug?: string | null;
 }
 
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
@@ -25,6 +27,7 @@ export function CareGuideSidebar({
   relatedGuides = [],
   commonName,
   imageUrl,
+  speciesSlug = null,
 }: CareGuideSidebarProps) {
   const { activeSection } = useCareGuideActiveSection();
 
@@ -41,7 +44,7 @@ export function CareGuideSidebar({
 
   return (
     <aside className="hidden lg:block h-full">
-      <div className="sticky top-36 rounded-2xl w-full max-w-[15rem]">
+      <div className="sticky top-36 rounded-2xl w-full max-w-[17rem]">
         {/* Profile image + name */}
         <div className="flex flex-col gap-3 items-center text-center mb-6">
           <Image
@@ -108,6 +111,27 @@ export function CareGuideSidebar({
             <Icon name="share" style="line" size="sm" />
             Share Guide
           </button>
+          {speciesSlug && (
+            <Link
+              href={`/turtle-guide/${speciesSlug}`}
+              className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-left hover:bg-gray-50 transition-colors"
+            >
+              <Image
+                src="/images/nav-menu-icons/species-guide.png"
+                alt=""
+                width={24}
+                height={24}
+                className="flex-shrink-0 w-6 h-6 object-contain"
+              />
+              <div className="flex-1 min-w-0">
+                <span className="font-heading font-bold text-gray-900 block text-sm">Species Guide</span>
+                <span className="text-xs text-gray-600 block">
+                  Learn about {commonName.endsWith('s') ? commonName : `${commonName}s`}.
+                </span>
+              </div>
+              <Icon name="arrow-right-1" style="line" size="base" className="text-gray-600 flex-shrink-0" />
+            </Link>
+          )}
         </div>
 
         {/* Related care guides */}
