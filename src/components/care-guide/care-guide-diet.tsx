@@ -3,6 +3,7 @@
 import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { CareGuideShopButton } from './care-guide-shop-button';
 import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 /* ------------------------------------------------------------------
@@ -137,14 +138,17 @@ export function CareGuideDiet({
 
   return (
     <section id="diet" className="scroll-mt-40">
-      {/* Section header — no icon */}
-      <div className="mb-2">
-        <h2 className="font-heading text-3xl md:text-5xl font-bold text-black">
-          Diet & Nutrition
-        </h2>
-        {subtitleText && (
-          <p className="text-base text-gray-500 mt-1">{subtitleText}</p>
-        )}
+      {/* Section header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+        <div>
+          <h2 className="font-heading text-3xl md:text-5xl font-bold text-black">
+            Diet & Nutrition
+          </h2>
+          {subtitleText && (
+            <p className="text-base text-gray-500 mt-1">{subtitleText}</p>
+          )}
+        </div>
+        <CareGuideShopButton productCategorySlug="food" className="flex-shrink-0" />
       </div>
 
       {/* Intro paragraph */}

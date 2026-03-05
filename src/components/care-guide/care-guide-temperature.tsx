@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
+import { CareGuideShopButton } from './care-guide-shop-button';
 import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 /* ------------------------------------------------------------------
@@ -176,9 +177,12 @@ export function CareGuideTemperature({
   return (
     <section id="temperature" className="scroll-mt-40">
       {/* Section header */}
-      <h2 className="font-heading text-3xl md:text-5xl font-bold text-black mb-4">
-        Temperature & Heating
-      </h2>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 className="font-heading text-3xl md:text-5xl font-bold text-black">
+          Temperature & Heating
+        </h2>
+        <CareGuideShopButton productCategorySlug="heating-temp" className="flex-shrink-0" />
+      </div>
 
       {/* Intro paragraph */}
       {introText && (

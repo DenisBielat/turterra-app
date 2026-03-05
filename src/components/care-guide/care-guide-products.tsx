@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Icon } from '@/components/Icon';
 import type { IconNameMap } from '@/types/icons';
 import { CareGuideMarkdown } from './care-guide-markdown';
+import { useCareGuideActiveSection } from './care-guide-active-section-context';
 
 /* ------------------------------------------------------------------
    Types
@@ -294,6 +296,8 @@ export function CareGuideProducts({
   setupTypes,
   categoriesBySetup,
 }: CareGuideProductsProps) {
+  const searchParams = useSearchParams();
+  const { setRequestedProductCategory, requestedProductCategory } = useCareGuideActiveSection();
   const firstActive = setupTypes.find((s) => s.isActive);
   const [activeSetup, setActiveSetup] = useState(firstActive?.id ?? setupTypes[0]?.id ?? '');
   const categories = categoriesBySetup[activeSetup] || [];
@@ -304,6 +308,22 @@ export function CareGuideProducts({
   useEffect(() => {
     setOpenCategoryId(firstCategoryId);
   }, [activeSetup, firstCategoryId]);
+
+  // When Shop button sets requestedProductCategory, open that accordion immediately (no URL delay)
+  useEffect(() => {
+    if (!requestedProductCategory || categories.length === 0) return;
+    const category = categories.find((c) => c.slug === requestedProductCategory);
+    if (category) setOpenCategoryId(category.id);
+    setRequestedProductCategory(null);
+  }, [requestedProductCategory, categories, setRequestedProductCategory]);
+
+  // When openCategory slug is in URL (e.g. shared link), open that accordion
+  useEffect(() => {
+    const slug = searchParams.get('openCategory');
+    if (!slug || categories.length === 0) return;
+    const category = categories.find((c) => c.slug === slug);
+    if (category) setOpenCategoryId(category.id);
+  }, [searchParams, categories]);
 
   const hasContent = setupTypes.length > 0 && Object.values(categoriesBySetup).some((cats) => cats.length > 0);
   if (!hasContent) return null;
