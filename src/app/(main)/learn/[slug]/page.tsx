@@ -31,7 +31,6 @@ interface CareGuideRow {
   id: string;
   species_id: number;
   slug: string;
-  banner_image_url: string | null;
   status: string;
   adult_size_min_inches: number | null;
   adult_size_max_inches: number | null;
@@ -596,7 +595,7 @@ async function getCareGuide(slug: string) {
     commonName: species?.species_common_name ?? 'Unknown Species',
     scientificName: species?.species_scientific_name ?? '',
     speciesSlug: species?.slug ?? null,
-    avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || row.banner_image_url || PLACEHOLDER_IMAGE,
+    avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || PLACEHOLDER_IMAGE,
     avatarCircleUrl: species?.avatar_image_circle_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
     category: familyCommon,
     heroText: str(row, 'hero_text'),
