@@ -130,6 +130,36 @@ async function getCareGuide(slug: string) {
     .filter(g => g.commonName !== 'Unknown');
 
   // 5. Build stat cards — always 8 cards matching the schema
+  // Terrestrial guides use sq ft instead of gallons and humidity instead of water temp
+  const isTerrestrial = num(row, 'enclosure_min_sq_ft') != null;
+
+  const enclosureCard: { icon: IconNameMap['line']; label: string; value: string; description?: string | null } = isTerrestrial
+    ? {
+        icon: 'enclosure',
+        label: 'Enclosure',
+        value: `${num(row, 'enclosure_min_sq_ft')}+ sq ft`,
+        description: str(row, 'enclosure_notes'),
+      }
+    : {
+        icon: 'enclosure',
+        label: 'Enclosure',
+        value: num(row, 'enclosure_min_gallons') != null ? `${num(row, 'enclosure_min_gallons')}+ gallons` : '—',
+        description: str(row, 'enclosure_notes'),
+      };
+
+  const waterTempOrHumidityCard: { icon: IconNameMap['line']; label: string; value: string; description?: string | null } = isTerrestrial
+    ? {
+        icon: 'water-droplet',
+        label: 'Humidity',
+        value: formatRange(num(row, 'humidity_min_pct'), num(row, 'humidity_max_pct'), '%')?.replace(' %', '%') ?? '—',
+      }
+    : {
+        icon: 'water',
+        label: 'Water Temp',
+        value: formatRange(num(row, 'water_temp_min_f'), num(row, 'water_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
+        description: str(row, 'water_temp_notes'),
+      };
+
   const stats: { icon: IconNameMap['line']; label: string; value: string; description?: string | null }[] = [
     {
       icon: 'ruler',
@@ -143,23 +173,13 @@ async function getCareGuide(slug: string) {
       value: formatRange(row.lifespan_min_years, row.lifespan_max_years, 'years') ?? '—',
       description: str(row, 'lifespan_notes'),
     },
-    {
-      icon: 'enclosure',
-      label: 'Enclosure',
-      value: num(row, 'enclosure_min_gallons') != null ? `${num(row, 'enclosure_min_gallons')}+ gallons` : '—',
-      description: str(row, 'enclosure_notes'),
-    },
+    enclosureCard,
     {
       icon: 'temperature',
       label: 'Basking Temp',
       value: formatRange(num(row, 'basking_temp_min_f'), num(row, 'basking_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
     },
-    {
-      icon: 'water',
-      label: 'Water Temp',
-      value: formatRange(num(row, 'water_temp_min_f'), num(row, 'water_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
-      description: str(row, 'water_temp_notes'),
-    },
+    waterTempOrHumidityCard,
     {
       icon: 'lighting',
       label: 'UVB',
