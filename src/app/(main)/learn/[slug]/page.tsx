@@ -532,7 +532,7 @@ async function getCareGuide(slug: string) {
     .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
   const vegetableFoods = guideFoods
-    .filter((r) => r.food.category === 'vegetable')
+    .filter((r) => r.food.category === 'vegetable' || r.food.category === 'fruit')
     .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
