@@ -11,7 +11,8 @@ export type ProductCategorySlug =
   | 'heating-temp'
   | 'filtration'
   | 'food'
-  | 'substrate';
+  | 'substrate'
+  | 'humidity';
 
 interface CareGuideShopButtonProps {
   /** Slug of the product category to open in the Product Guide (e.g. enclosure, lighting-uvb) */

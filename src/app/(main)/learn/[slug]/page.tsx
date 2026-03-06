@@ -8,6 +8,7 @@ import { CareGuideHousingTerrestrial } from '@/components/care-guide/care-guide-
 import { CareGuideSubstrate } from '@/components/care-guide/care-guide-substrate';
 import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
+import { CareGuideHumidity } from '@/components/care-guide/care-guide-humidity';
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
 import { CareGuideHandling } from '@/components/care-guide/care-guide-handling';
@@ -413,6 +414,62 @@ async function getCareGuide(slug: string) {
     hibernationNote: temperatureRow ? (temperatureRow.hibernation_note as string | null) ?? null : null,
   };
 
+  // 8b. Fetch humidity data (terrestrial only)
+  let humidityData: {
+    introText: string | null;
+    humidityZones: { zone_name: string; humidity_min_pct: number; humidity_max_pct: number | null; notes: string | null }[];
+    humidHideTips: string[];
+    dailyMistingTips: string[];
+    substrateTips: string[];
+    monitoringText: string | null;
+    humidityTargets: { time_label: string; target: string }[];
+    inadequateHumidityWarning: string | null;
+    outdoorNote: string | null;
+  } | null = null;
+
+  if (isTerrestrial) {
+    const { data: humidityRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_humidity')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: humidityZonesRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_humidity_zones')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    const { data: humidityTargetsRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_humidity_targets')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    humidityData = {
+      introText: humidityRow ? (humidityRow.intro_text as string | null) : null,
+      humidityZones: (humidityZonesRaw || []).map(z => ({
+        zone_name: z.zone_name as string,
+        humidity_min_pct: z.humidity_min_pct as number,
+        humidity_max_pct: z.humidity_max_pct as number | null,
+        notes: z.notes as string | null,
+      })),
+      humidHideTips: Array.isArray(humidityRow?.humid_hide_tips) ? humidityRow.humid_hide_tips as string[] : [],
+      dailyMistingTips: Array.isArray(humidityRow?.daily_misting_tips) ? humidityRow.daily_misting_tips as string[] : [],
+      substrateTips: Array.isArray(humidityRow?.substrate_tips) ? humidityRow.substrate_tips as string[] : [],
+      monitoringText: humidityRow ? (humidityRow.monitoring_text as string | null) : null,
+      humidityTargets: (humidityTargetsRaw || []).map(t => ({
+        time_label: t.time_label as string,
+        target: t.target as string,
+      })),
+      inadequateHumidityWarning: humidityRow ? (humidityRow.inadequate_humidity_warning as string | null) : null,
+      outdoorNote: humidityRow ? (humidityRow.outdoor_note as string | null) : null,
+    };
+  }
+
   // 9. Fetch water quality data
   const { data: waterRow } = await supabase
     .schema('care_guides')
@@ -735,6 +792,7 @@ async function getCareGuide(slug: string) {
     substrateData,
     lightingData,
     temperatureData,
+    humidityData,
     waterData,
     dietData,
     handlingData,
@@ -789,6 +847,7 @@ const TERRESTRIAL_SECTIONS: NavSection[] = [
   { id: 'substrate', label: 'Substrate', icon: 'substrate' },
   { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
   { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
+  { id: 'humidity', label: 'Humidity', icon: 'water-droplet' },
   { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
   { id: 'health', label: 'Health & Issues', icon: 'health' },
@@ -903,6 +962,21 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               outdoorHeatingNote={guide.temperatureData.outdoorHeatingNote}
               hibernationNote={guide.temperatureData.hibernationNote}
             />
+
+            {/* Humidity (terrestrial only) */}
+            {guide.humidityData && (
+              <CareGuideHumidity
+                introText={guide.humidityData.introText}
+                humidityZones={guide.humidityData.humidityZones}
+                humidHideTips={guide.humidityData.humidHideTips}
+                dailyMistingTips={guide.humidityData.dailyMistingTips}
+                substrateTips={guide.humidityData.substrateTips}
+                monitoringText={guide.humidityData.monitoringText}
+                humidityTargets={guide.humidityData.humidityTargets}
+                inadequateHumidityWarning={guide.humidityData.inadequateHumidityWarning}
+                outdoorNote={guide.humidityData.outdoorNote}
+              />
+            )}
 
             {/* Water Quality & Maintenance */}
             <CareGuideWater
