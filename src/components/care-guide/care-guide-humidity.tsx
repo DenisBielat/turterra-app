@@ -39,13 +39,13 @@ interface CareGuideHumidityProps {
    Helpers
    ------------------------------------------------------------------ */
 
-/** Bar color based on humidity level — higher humidity = deeper teal. */
+/** Bar color by zone: top two (humid hide, substrate) = blue; ambient = teal; minimum = orange. */
 function getBarStyleForZone(zoneName: string): { bg: string; text: string } {
   const name = zoneName.toLowerCase();
-  if (name.includes('humid hide')) return { bg: 'bg-teal-300', text: 'text-teal-900' };
-  if (name.includes('substrate')) return { bg: 'bg-teal-200', text: 'text-teal-800' };
-  if (name.includes('ambient')) return { bg: 'bg-cyan-200', text: 'text-cyan-800' };
-  if (name.includes('minimum')) return { bg: 'bg-orange-200', text: 'text-orange-800' };
+  if (name.includes('humid hide')) return { bg: 'bg-blue-200', text: 'text-blue-900' };
+  if (name.includes('substrate')) return { bg: 'bg-blue-200', text: 'text-blue-900' };
+  if (name.includes('ambient')) return { bg: 'bg-teal-500/30', text: 'text-teal-800' };
+  if (name.includes('minimum')) return { bg: 'bg-orange-500/40', text: 'text-orange-700' };
   return { bg: 'bg-gray-200', text: 'text-gray-800' };
 }
 
