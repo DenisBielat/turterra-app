@@ -43,9 +43,11 @@ function getBarStyleForZone(zoneName: string): { bg: string; text: string } {
   const name = zoneName.toLowerCase();
   if (name.includes('basking')) return { bg: 'bg-red-200', text: 'text-red-700' };
   if (name.includes('warm')) return { bg: 'bg-orange-500/40', text: 'text-orange-700' };
+  if (name.includes('cool')) return { bg: 'bg-teal-500/30', text: 'text-teal-800' }; // cool side air
   if (name.includes('air')) return { bg: 'bg-orange-500/40', text: 'text-orange-700' };
-  if (name.includes('cool')) return { bg: 'bg-green-200', text: 'text-green-800' };
   if (name.includes('water')) return { bg: 'bg-blue-200', text: 'text-blue-900' };
+  if (name.includes('night') && name.includes('indoor')) return { bg: 'bg-blue-500/20', text: 'text-blue-800' };
+  if (name.includes('night') && name.includes('outdoor')) return { bg: 'bg-gray-500/20', text: 'text-gray-800' };
   if (name.includes('night')) return { bg: 'bg-gray-500/20', text: 'text-gray-800' };
   return { bg: 'bg-gray-200', text: 'text-gray-800' };
 }
@@ -136,8 +138,8 @@ function EquipmentCard({
       </div>
       <ul className="space-y-2">
         {tips.map((tip, i) => (
-          <li key={i} className="flex items-start gap-2 text-base text-gray-700">
-            <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
+          <li key={i} className="flex items-baseline gap-2 text-base text-gray-700">
+            <span className="text-green-600 flex-shrink-0 leading-none">•</span>
             <CareGuideMarkdown inline>{tip}</CareGuideMarkdown>
           </li>
         ))}
@@ -268,7 +270,7 @@ export function CareGuideTemperature({
       {/* Hibernation (Brumation) callout (terrestrial) */}
       {hibernationNote && (
         <div className="mb-8">
-          <CareGuideCallout variant="green" iconName="info-circle-flex-solid" title="Hibernation (Brumation)" dimmed={activeSection !== 'temperature'}>
+          <CareGuideCallout variant="green" title="Hibernation (Brumation)" dimmed={activeSection !== 'temperature'}>
             {hibernationNote}
           </CareGuideCallout>
         </div>

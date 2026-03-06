@@ -91,26 +91,28 @@ export function CareGuideSidebar({
 
         {/* Action buttons */}
         <div className="flex flex-col gap-2 mb-6">
-          <button
-            onClick={() => window.print()}
-            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <Icon name="print" style="line" size="sm" />
-            Print Guide
-          </button>
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: document.title, url: window.location.href });
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-              }
-            }}
-            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <Icon name="share" style="line" size="sm" />
-            Share Guide
-          </button>
+          <div className="flex flex-row gap-2">
+            <button
+              onClick={() => window.print()}
+              className="flex items-center justify-center gap-2 flex-1 px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Icon name="print" style="line" size="sm" />
+              Print
+            </button>
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: document.title, url: window.location.href });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                }
+              }}
+              className="flex items-center justify-center gap-2 flex-1 px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Icon name="share" style="line" size="sm" />
+              Share
+            </button>
+          </div>
           {speciesSlug && (
             <Link
               href={`/turtle-guide/${speciesSlug}`}
