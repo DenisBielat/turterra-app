@@ -4,6 +4,7 @@ import { supabase } from '@/lib/db/supabaseClient';
 import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
 import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
+import { CareGuideHousingTerrestrial } from '@/components/care-guide/care-guide-housing-terrestrial';
 import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
@@ -201,34 +202,92 @@ async function getCareGuide(slug: string) {
     },
   ];
 
-  // 6. Fetch housing data
-  const { data: housingRow } = await supabase
-    .schema('care_guides')
-    .from('care_guide_housing')
-    .select('*')
-    .eq('care_guide_id', row.id)
-    .single();
+  // 6. Fetch housing data (aquatic OR terrestrial based on guide type)
+  let housingData: {
+    introText: string | null;
+    essentials: string[];
+    commonMistakes: string[];
+    cohabitationNotes: string | null;
+    enclosureSizes: { life_stage: string; size_range: string | null; min_gallons: number; max_gallons: number | null; notes: string | null }[];
+  } | null = null;
 
-  const { data: enclosureSizesRaw } = await supabase
-    .schema('care_guides')
-    .from('care_guide_enclosure_sizes')
-    .select('*')
-    .eq('care_guide_id', row.id)
-    .order('sort_order', { ascending: true });
+  let housingTerrestrialData: {
+    introText: string | null;
+    enclosureSizes: { scenario: string; size_range: string | null; dimensions: string | null; min_sq_ft: number | null; notes: string | null }[];
+    outdoorTitle: string | null;
+    outdoorDescription: string | null;
+    outdoorTips: string[];
+    indoorTitle: string | null;
+    indoorDescription: string | null;
+    indoorTips: string[];
+    essentials: string[];
+    commonMistakes: string[];
+    cohabitationNotes: string | null;
+  } | null = null;
 
-  const housingData = {
-    introText: housingRow ? (housingRow.intro_text as string | null) : null,
-    essentials: Array.isArray(housingRow?.essentials) ? housingRow.essentials as string[] : [],
-    commonMistakes: Array.isArray(housingRow?.common_mistakes) ? housingRow.common_mistakes as string[] : [],
-    cohabitationNotes: housingRow ? (housingRow.cohabitation_notes as string | null) : null,
-    enclosureSizes: (enclosureSizesRaw || []).map(s => ({
-      life_stage: s.life_stage as string,
-      size_range: s.size_range as string | null,
-      min_gallons: s.min_gallons as number,
-      max_gallons: s.max_gallons as number | null,
-      notes: s.notes as string | null,
-    })),
-  };
+  if (isTerrestrial) {
+    const { data: housingTerrRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_housing_terrestrial')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: enclosureSizesTerrRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_enclosure_sizes_terrestrial')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    housingTerrestrialData = {
+      introText: housingTerrRow ? (housingTerrRow.intro_text as string | null) : null,
+      enclosureSizes: (enclosureSizesTerrRaw || []).map(s => ({
+        scenario: s.scenario as string,
+        size_range: s.size_range as string | null,
+        dimensions: s.dimensions as string | null,
+        min_sq_ft: s.min_sq_ft as number | null,
+        notes: s.notes as string | null,
+      })),
+      outdoorTitle: housingTerrRow ? (housingTerrRow.outdoor_title as string | null) : null,
+      outdoorDescription: housingTerrRow ? (housingTerrRow.outdoor_description as string | null) : null,
+      outdoorTips: Array.isArray(housingTerrRow?.outdoor_tips) ? housingTerrRow.outdoor_tips as string[] : [],
+      indoorTitle: housingTerrRow ? (housingTerrRow.indoor_title as string | null) : null,
+      indoorDescription: housingTerrRow ? (housingTerrRow.indoor_description as string | null) : null,
+      indoorTips: Array.isArray(housingTerrRow?.indoor_tips) ? housingTerrRow.indoor_tips as string[] : [],
+      essentials: Array.isArray(housingTerrRow?.essentials) ? housingTerrRow.essentials as string[] : [],
+      commonMistakes: Array.isArray(housingTerrRow?.common_mistakes) ? housingTerrRow.common_mistakes as string[] : [],
+      cohabitationNotes: housingTerrRow ? (housingTerrRow.cohabitation_notes as string | null) : null,
+    };
+  } else {
+    const { data: housingRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_housing')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: enclosureSizesRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_enclosure_sizes')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    housingData = {
+      introText: housingRow ? (housingRow.intro_text as string | null) : null,
+      essentials: Array.isArray(housingRow?.essentials) ? housingRow.essentials as string[] : [],
+      commonMistakes: Array.isArray(housingRow?.common_mistakes) ? housingRow.common_mistakes as string[] : [],
+      cohabitationNotes: housingRow ? (housingRow.cohabitation_notes as string | null) : null,
+      enclosureSizes: (enclosureSizesRaw || []).map(s => ({
+        life_stage: s.life_stage as string,
+        size_range: s.size_range as string | null,
+        min_gallons: s.min_gallons as number,
+        max_gallons: s.max_gallons as number | null,
+        notes: s.notes as string | null,
+      })),
+    };
+  }
 
   // 7. Fetch lighting data
   const { data: lightingRow } = await supabase
@@ -602,7 +661,9 @@ async function getCareGuide(slug: string) {
     atAGlanceText: str(row, 'at_a_glance_section_text'),
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
+    isTerrestrial,
     housingData,
+    housingTerrestrialData,
     lightingData,
     temperatureData,
     waterData,
@@ -693,13 +754,29 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
             />
 
             {/* Housing & Enclosure */}
-            <CareGuideHousing
-              introText={guide.housingData.introText}
-              essentials={guide.housingData.essentials}
-              commonMistakes={guide.housingData.commonMistakes}
-              cohabitationNotes={guide.housingData.cohabitationNotes}
-              enclosureSizes={guide.housingData.enclosureSizes}
-            />
+            {guide.isTerrestrial && guide.housingTerrestrialData ? (
+              <CareGuideHousingTerrestrial
+                introText={guide.housingTerrestrialData.introText}
+                enclosureSizes={guide.housingTerrestrialData.enclosureSizes}
+                outdoorTitle={guide.housingTerrestrialData.outdoorTitle}
+                outdoorDescription={guide.housingTerrestrialData.outdoorDescription}
+                outdoorTips={guide.housingTerrestrialData.outdoorTips}
+                indoorTitle={guide.housingTerrestrialData.indoorTitle}
+                indoorDescription={guide.housingTerrestrialData.indoorDescription}
+                indoorTips={guide.housingTerrestrialData.indoorTips}
+                essentials={guide.housingTerrestrialData.essentials}
+                commonMistakes={guide.housingTerrestrialData.commonMistakes}
+                cohabitationNotes={guide.housingTerrestrialData.cohabitationNotes}
+              />
+            ) : guide.housingData ? (
+              <CareGuideHousing
+                introText={guide.housingData.introText}
+                essentials={guide.housingData.essentials}
+                commonMistakes={guide.housingData.commonMistakes}
+                cohabitationNotes={guide.housingData.cohabitationNotes}
+                enclosureSizes={guide.housingData.enclosureSizes}
+              />
+            ) : null}
 
             {/* Lighting & UVB */}
             <CareGuideLighting
