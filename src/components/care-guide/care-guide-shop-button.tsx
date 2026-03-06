@@ -10,7 +10,8 @@ export type ProductCategorySlug =
   | 'lighting-uvb'
   | 'heating-temp'
   | 'filtration'
-  | 'food';
+  | 'food'
+  | 'substrate';
 
 interface CareGuideShopButtonProps {
   /** Slug of the product category to open in the Product Guide (e.g. enclosure, lighting-uvb) */

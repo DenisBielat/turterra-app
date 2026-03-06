@@ -64,6 +64,7 @@ export type LineIconName =
   | 'split-2'
   | 'split-3'
   | 'split'
+  | 'substrate'
   | 'sun-flex-line'
   | 'temperature'
   | 'thermometer-flex-line'

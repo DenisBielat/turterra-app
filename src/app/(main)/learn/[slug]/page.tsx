@@ -5,6 +5,7 @@ import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
 import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
 import { CareGuideHousingTerrestrial } from '@/components/care-guide/care-guide-housing-terrestrial';
+import { CareGuideSubstrate } from '@/components/care-guide/care-guide-substrate';
 import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
@@ -286,6 +287,68 @@ async function getCareGuide(slug: string) {
         max_gallons: s.max_gallons as number | null,
         notes: s.notes as string | null,
       })),
+    };
+  }
+
+  // 6b. Fetch substrate data (terrestrial only)
+  let substrateData: {
+    introText: string | null;
+    depths: { label: string; depth: string; description: string | null }[];
+    options: { name: string; description: string | null; is_recommended: boolean; pros: string[]; cons: string[] }[];
+    leafLitterText: string | null;
+    maintenanceSchedules: { frequency: string; tasks: string[] }[];
+    quarantineNote: string | null;
+  } | null = null;
+
+  if (isTerrestrial) {
+    const { data: substrateRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: depthsRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate_depths')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    const { data: optionsRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate_options')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    const { data: maintenanceRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate_maintenance')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    substrateData = {
+      introText: substrateRow ? (substrateRow.intro_text as string | null) : null,
+      depths: (depthsRaw || []).map(d => ({
+        label: d.label as string,
+        depth: d.depth as string,
+        description: d.description as string | null,
+      })),
+      options: (optionsRaw || []).map(o => ({
+        name: o.name as string,
+        description: o.description as string | null,
+        is_recommended: o.is_recommended as boolean,
+        pros: Array.isArray(o.pros) ? o.pros as string[] : [],
+        cons: Array.isArray(o.cons) ? o.cons as string[] : [],
+      })),
+      leafLitterText: substrateRow ? (substrateRow.leaf_litter_text as string | null) : null,
+      maintenanceSchedules: (maintenanceRaw || []).map(m => ({
+        frequency: m.frequency as string,
+        tasks: Array.isArray(m.tasks) ? m.tasks as string[] : [],
+      })),
+      quarantineNote: substrateRow ? (substrateRow.quarantine_note as string | null) : null,
     };
   }
 
@@ -664,6 +727,7 @@ async function getCareGuide(slug: string) {
     isTerrestrial,
     housingData,
     housingTerrestrialData,
+    substrateData,
     lightingData,
     temperatureData,
     waterData,
@@ -701,12 +765,25 @@ export async function generateMetadata(
    Section definitions
    ------------------------------------------------------------------ */
 
-const SECTIONS: NavSection[] = [
+const AQUATIC_SECTIONS: NavSection[] = [
   { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
   { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
   { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
   { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
   { id: 'water', label: 'Water Quality', icon: 'water' },
+  { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
+  { id: 'handling', label: 'Handling', icon: 'handling' },
+  { id: 'health', label: 'Health & Issues', icon: 'health' },
+  { id: 'shopping-checklist', label: 'Product Guide', icon: 'shop' },
+  { id: 'references', label: 'References', icon: 'book-open' },
+];
+
+const TERRESTRIAL_SECTIONS: NavSection[] = [
+  { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
+  { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
+  { id: 'substrate', label: 'Substrate', icon: 'substrate' },
+  { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
+  { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
   { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
   { id: 'health', label: 'Health & Issues', icon: 'health' },
@@ -742,7 +819,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
 
       {/* Main content area */}
       <div className="max-w-8xl mx-auto px-4 lg:px-10 py-10 md:py-14">
-        <CareGuideActiveSectionProvider sections={SECTIONS}>
+        <CareGuideActiveSectionProvider sections={guide.isTerrestrial ? TERRESTRIAL_SECTIONS : AQUATIC_SECTIONS}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Main content — 8 cols */}
           <div className="lg:col-span-8 flex flex-col gap-12 md:gap-16">
@@ -777,6 +854,18 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
                 enclosureSizes={guide.housingData.enclosureSizes}
               />
             ) : null}
+
+            {/* Substrate (terrestrial only) */}
+            {guide.substrateData && (
+              <CareGuideSubstrate
+                introText={guide.substrateData.introText}
+                depths={guide.substrateData.depths}
+                options={guide.substrateData.options}
+                leafLitterText={guide.substrateData.leafLitterText}
+                maintenanceSchedules={guide.substrateData.maintenanceSchedules}
+                quarantineNote={guide.substrateData.quarantineNote}
+              />
+            )}
 
             {/* Lighting & UVB */}
             <CareGuideLighting
@@ -871,7 +960,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
           {/* Sidebar — 4 cols */}
           <div className="lg:col-span-4">
             <CareGuideSidebar
-              sections={SECTIONS}
+              sections={guide.isTerrestrial ? TERRESTRIAL_SECTIONS : AQUATIC_SECTIONS}
               relatedGuides={guide.relatedGuides}
               commonName={guide.commonName}
               imageUrl={guide.avatarCircleUrl}
