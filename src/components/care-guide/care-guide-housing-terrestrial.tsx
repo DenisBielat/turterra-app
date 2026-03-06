@@ -116,9 +116,9 @@ export function CareGuideHousingTerrestrial({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           {/* Outdoor Enclosure */}
           {hasOutdoor && (
-            <div className="rounded-xl border border-green-200 bg-green-50/50 shadow-sm px-5 py-4">
+            <div className="rounded-xl border border-green-600 bg-green-500/10 shadow-sm px-5 py-4">
               <div className="flex items-center gap-2 mb-3">
-                <Icon name="outdoor" style="line" size="base" className="text-orange-500" />
+                <Icon name="outdoor" style="line" size="base" className="text-green-800" />
                 <h3 className="font-heading font-bold text-black text-lg">
                   {outdoorTitle ?? 'Outdoor Enclosure'}
                 </h3>

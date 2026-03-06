@@ -10,6 +10,8 @@ interface CareGuideCalloutProps {
   children: React.ReactNode;
   /** When true, card is shown at 10% opacity (e.g. when section is not in view). */
   dimmed?: boolean;
+  /** Override the variant's default icon (e.g. use info icon on amber callout). */
+  iconName?: 'warning-triangle' | 'info-circle-flex-solid';
 }
 
 const variantConfig: Record<
@@ -74,8 +76,10 @@ export function CareGuideCallout({
   title,
   children,
   dimmed = false,
+  iconName: iconNameOverride,
 }: CareGuideCalloutProps) {
   const config = variantConfig[variant];
+  const iconName = iconNameOverride ?? config.iconName;
 
   return (
     <div
@@ -95,7 +99,7 @@ export function CareGuideCallout({
         />
         <div className="relative flex items-center gap-3 px-5 py-4">
           <Icon
-            name={config.iconName as 'warning-triangle' | 'info-circle-flex-solid'}
+            name={iconName as 'warning-triangle' | 'info-circle-flex-solid'}
             style="filled"
             size="lg"
             className={`flex-shrink-0 ${config.iconColor}`}
