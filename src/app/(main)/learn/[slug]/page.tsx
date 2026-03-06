@@ -406,6 +406,11 @@ async function getCareGuide(slug: string) {
     waterHeaterTips: Array.isArray(temperatureRow?.water_heater_tips) ? temperatureRow.water_heater_tips as string[] : [],
     thermometerTips: Array.isArray(temperatureRow?.thermometer_tips) ? temperatureRow.thermometer_tips as string[] : [],
     safetyWarning: temperatureRow ? (temperatureRow.safety_warning as string | null) : null,
+    // Terrestrial-specific fields (nullable — only present after ALTER TABLE)
+    lightCycleTips: Array.isArray(temperatureRow?.light_cycle_tips) ? temperatureRow.light_cycle_tips as string[] : [],
+    indoorHeatingNote: temperatureRow ? (temperatureRow.indoor_heating_note as string | null) ?? null : null,
+    outdoorHeatingNote: temperatureRow ? (temperatureRow.outdoor_heating_note as string | null) ?? null : null,
+    hibernationNote: temperatureRow ? (temperatureRow.hibernation_note as string | null) ?? null : null,
   };
 
   // 9. Fetch water quality data
@@ -893,6 +898,10 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               waterHeaterTips={guide.temperatureData.waterHeaterTips}
               thermometerTips={guide.temperatureData.thermometerTips}
               safetyWarning={guide.temperatureData.safetyWarning}
+              lightCycleTips={guide.temperatureData.lightCycleTips}
+              indoorHeatingNote={guide.temperatureData.indoorHeatingNote}
+              outdoorHeatingNote={guide.temperatureData.outdoorHeatingNote}
+              hibernationNote={guide.temperatureData.hibernationNote}
             />
 
             {/* Water Quality & Maintenance */}
