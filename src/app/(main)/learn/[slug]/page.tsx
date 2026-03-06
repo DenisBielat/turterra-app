@@ -545,6 +545,7 @@ async function getCareGuide(slug: string) {
       vegetable_pct: s.vegetable_pct as number | null,
       protein_frequency: s.protein_frequency as string | null,
       vegetable_frequency: s.vegetable_frequency as string | null,
+      description: s.description as string | null ?? null,
     })),
     portionProtein: dietRow ? (dietRow.portion_protein as string | null) : null,
     portionVegetables: dietRow ? (dietRow.portion_vegetables as string | null) : null,
@@ -552,6 +553,14 @@ async function getCareGuide(slug: string) {
     proteinFoods,
     vegetableFoods,
     calciumSupplements: dietRow ? (dietRow.calcium_supplements as string | null) : null,
+    // Terrestrial-specific fields
+    compositionProteinPct: dietRow?.composition_protein_pct != null ? Number(dietRow.composition_protein_pct) : null,
+    compositionPlantPct: dietRow?.composition_plant_pct != null ? Number(dietRow.composition_plant_pct) : null,
+    compositionNote: dietRow ? (dietRow.composition_note as string | null) ?? null : null,
+    foodsToAvoid: Array.isArray(dietRow?.foods_to_avoid) ? dietRow.foods_to_avoid as string[] : [],
+    commercialDiets: Array.isArray(dietRow?.commercial_diets) ? dietRow.commercial_diets as string[] : [],
+    commercialDietsNote: dietRow ? (dietRow.commercial_diets_note as string | null) ?? null : null,
+    drinkingWater: dietRow ? (dietRow.drinking_water as string | null) ?? null : null,
   };
 
   // 11. Fetch handling data
@@ -1001,6 +1010,13 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               proteinFoods={guide.dietData.proteinFoods}
               vegetableFoods={guide.dietData.vegetableFoods}
               calciumSupplements={guide.dietData.calciumSupplements}
+              compositionProteinPct={guide.dietData.compositionProteinPct}
+              compositionPlantPct={guide.dietData.compositionPlantPct}
+              compositionNote={guide.dietData.compositionNote}
+              foodsToAvoid={guide.dietData.foodsToAvoid}
+              commercialDiets={guide.dietData.commercialDiets}
+              commercialDietsNote={guide.dietData.commercialDietsNote}
+              drinkingWater={guide.dietData.drinkingWater}
             />
 
             {/* Handling & Interaction */}
