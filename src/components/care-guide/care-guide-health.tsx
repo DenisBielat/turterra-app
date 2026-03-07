@@ -106,14 +106,14 @@ function PreventiveCareChecklist({ items }: { items: string[] }) {
         </div>
         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-base text-gray-700">
           {col1.map((item, i) => (
-            <li key={`a-${i}`} className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 bg-green-500" />
+            <li key={`a-${i}`} className="flex items-baseline gap-2">
+              <span className="text-green-600 flex-shrink-0 leading-none">•</span>
               <CareGuideMarkdown inline>{item}</CareGuideMarkdown>
             </li>
           ))}
           {col2.map((item, i) => (
-            <li key={`b-${i}`} className="flex items-start gap-2">
-              <span className="mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 bg-green-500" />
+            <li key={`b-${i}`} className="flex items-baseline gap-2">
+              <span className="text-green-600 flex-shrink-0 leading-none">•</span>
               <CareGuideMarkdown inline>{item}</CareGuideMarkdown>
             </li>
           ))}
