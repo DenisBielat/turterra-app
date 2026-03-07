@@ -81,12 +81,12 @@ function FoodListCard({
   title,
   items,
   iconName,
-  bulletColor,
+  bulletTextColor,
 }: {
   title: string;
   items: string[];
   iconName: 'shrimp-line' | 'vegetable-line';
-  bulletColor: string;
+  bulletTextColor: string;
 }) {
   if (items.length === 0) return null;
   const mid = Math.ceil(items.length / 2);
@@ -101,14 +101,14 @@ function FoodListCard({
       </div>
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-base text-gray-700">
         {col1.map((item, i) => (
-          <li key={`a-${i}`} className="flex items-start gap-2">
-            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${bulletColor}`} />
+          <li key={`a-${i}`} className="flex items-baseline gap-2">
+            <span className={`flex-shrink-0 leading-none ${bulletTextColor}`}>•</span>
             {item}
           </li>
         ))}
         {col2.map((item, i) => (
-          <li key={`b-${i}`} className="flex items-start gap-2">
-            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${bulletColor}`} />
+          <li key={`b-${i}`} className="flex items-baseline gap-2">
+            <span className={`flex-shrink-0 leading-none ${bulletTextColor}`}>•</span>
             {item}
           </li>
         ))}
@@ -260,13 +260,13 @@ export function CareGuideDiet({
           <h3 className="font-heading font-bold text-black text-lg mb-3">Diet Composition</h3>
           <div className="flex rounded-lg overflow-hidden h-10 mb-3">
             <div
-              className="bg-orange-400 flex items-center justify-center"
+              className="bg-red-500/40 flex items-center justify-center"
               style={{ width: `${compositionProteinPct}%` }}
             >
               <span className="text-sm font-bold text-red-800">{compositionProteinPct}% Animal Protein</span>
             </div>
             <div
-              className="bg-green-400 flex items-center justify-center"
+              className="bg-green-500/40 flex items-center justify-center"
               style={{ width: `${compositionPlantPct}%` }}
             >
               <span className="text-sm font-bold text-green-800">{compositionPlantPct}% Plant Matter</span>
@@ -315,13 +315,13 @@ export function CareGuideDiet({
             title={useCardSchedule ? 'Animal Protein' : 'Protein Foods'}
             items={proteinFoods}
             iconName="shrimp-line"
-            bulletColor="bg-red-500"
+            bulletTextColor="text-red-600"
           />
           <FoodListCard
             title={useCardSchedule ? 'Plants, Fruits & Vegetables' : 'Vegetable Foods'}
             items={vegetableFoods}
             iconName="vegetable-line"
-            bulletColor="bg-green-500"
+            bulletTextColor="text-green-600"
           />
         </div>
       )}
@@ -329,15 +329,8 @@ export function CareGuideDiet({
       {/* Foods to Avoid (terrestrial) */}
       {foodsToAvoid.length > 0 && (
         <div className="mb-8 rounded-xl border border-red-200 bg-red-50 shadow-sm overflow-hidden p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-500 flex-shrink-0" />
-            <h3 className="font-heading font-bold text-red-800 text-lg">Foods to Avoid</h3>
-          </div>
-          <ul className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-1.5 text-base text-gray-700">
-            {foodsToAvoid.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
+          <h3 className="font-heading font-bold text-red-800 text-lg mb-3">Foods to Avoid</h3>
+          <p className="text-base text-gray-700">{foodsToAvoid.join(', ')}</p>
         </div>
       )}
 
@@ -353,7 +346,7 @@ export function CareGuideDiet({
               {commercialDiets.map((diet, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center rounded-full border border-green-800/30 bg-white px-3 py-1 text-sm font-medium text-gray-800"
+                  className="inline-flex items-center rounded-full bg-green-900/20 px-3 py-1 text-sm font-medium text-gray-800"
                 >
                   {diet}
                 </span>

@@ -52,7 +52,7 @@ export function CareGuideHandling({
           {dos.length > 0 && (
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
               <div className="flex items-center gap-2 mb-3">
-                <Icon name="checkmark" style="filled" size="base" className="text-green-700" />
+                <Icon name="checkmark" style="filled" size="sm" className="text-green-700" />
                 <h3 className="font-heading font-bold text-black text-lg">Do</h3>
               </div>
               <ul className="space-y-2">
@@ -70,7 +70,7 @@ export function CareGuideHandling({
           {donts.length > 0 && (
             <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
               <div className="flex items-center gap-2 mb-3">
-                <Icon name="close" style="filled" size="base" className="text-red-500" />
+                <Icon name="close" style="filled" size="sm" className="text-red-500" />
                 <h3 className="font-heading font-bold text-black text-lg">Don&apos;t</h3>
               </div>
               <ul className="space-y-2">
