@@ -187,7 +187,7 @@ CREATE INDEX idx_cgid_item ON care_guide_item_diy(care_guide_product_item_id);
 -- feeder fish, and insects, see our detailed feeding recommendations in
 -- the Diet & Nutrition section."
 
-CREATE TABLE care_guide_category_notes (
+CREATE TABLE care_guide_product_category_notes (
     id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     care_guide_id   uuid NOT NULL REFERENCES care_guides(id) ON DELETE CASCADE,
     category_id     uuid NOT NULL REFERENCES product_categories(id) ON DELETE CASCADE,
@@ -198,7 +198,7 @@ CREATE TABLE care_guide_category_notes (
     UNIQUE(care_guide_id, category_id)
 );
 
-CREATE INDEX idx_category_notes_guide ON care_guide_category_notes(care_guide_id);
+CREATE INDEX idx_category_notes_guide ON care_guide_product_category_notes(care_guide_id);
 
 
 -- ============================================================================
@@ -211,7 +211,7 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON commercial_products
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON diy_options
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON care_guide_category_notes
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON care_guide_product_category_notes
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 
@@ -227,7 +227,7 @@ ALTER TABLE diy_options ENABLE ROW LEVEL SECURITY;
 ALTER TABLE care_guide_product_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE care_guide_item_commercial ENABLE ROW LEVEL SECURITY;
 ALTER TABLE care_guide_item_diy ENABLE ROW LEVEL SECURITY;
-ALTER TABLE care_guide_category_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE care_guide_product_category_notes ENABLE ROW LEVEL SECURITY;
 
 -- Reference tables: public read
 CREATE POLICY "Public can read setup types"
@@ -258,7 +258,7 @@ CREATE POLICY "Public can read item diy for published guides"
         WHERE care_guide_id IN (SELECT id FROM care_guides WHERE status = 'published')
     ));
 CREATE POLICY "Public can read category notes for published guides"
-    ON care_guide_category_notes FOR SELECT
+    ON care_guide_product_category_notes FOR SELECT
     USING (care_guide_id IN (SELECT id FROM care_guides WHERE status = 'published'));
 
 

@@ -675,7 +675,7 @@ async function getCareGuide(slug: string) {
   // Fetch category notes for this guide
   const { data: categoryNotesRaw } = await supabase
     .schema('care_guides')
-    .from('care_guide_category_notes')
+    .from('care_guide_product_category_notes')
     .select('category_id, notes')
     .eq('care_guide_id', row.id);
 
