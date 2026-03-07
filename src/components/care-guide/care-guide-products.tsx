@@ -68,6 +68,8 @@ const categoryStyleMap: Record<
   'heating-temp': { icon: 'temperature', iconColor: 'text-red-800' },
   filtration: { icon: 'water-filter-flex-line', iconColor: 'text-blue-800' },
   food: { icon: 'diet', iconColor: 'text-green-800' },
+  substrate: { icon: 'substrate', iconColor: 'text-teal-800' },
+  humidity: { icon: 'water-droplet', iconColor: 'text-blue-800' },
 };
 
 /* ------------------------------------------------------------------

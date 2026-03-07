@@ -200,6 +200,19 @@ CREATE TABLE care_guide_product_category_notes (
 
 CREATE INDEX idx_category_notes_guide ON care_guide_product_category_notes(care_guide_id);
 
+-- Which product tabs (setup types) to show per care guide; order by sort_order
+CREATE TABLE care_guide_setup_types (
+    id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    care_guide_id   uuid NOT NULL REFERENCES care_guides(id) ON DELETE CASCADE,
+    setup_type_id   uuid NOT NULL REFERENCES setup_types(id) ON DELETE CASCADE,
+    sort_order      int NOT NULL DEFAULT 0,
+    created_at      timestamptz NOT NULL DEFAULT now(),
+    updated_at      timestamptz NOT NULL DEFAULT now(),
+    UNIQUE(care_guide_id, setup_type_id)
+);
+
+CREATE INDEX idx_care_guide_setup_types_guide ON care_guide_setup_types(care_guide_id);
+
 
 -- ============================================================================
 -- 10. UPDATED_AT TRIGGERS
@@ -212,6 +225,8 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON commercial_products
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON diy_options
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON care_guide_product_category_notes
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON care_guide_setup_types
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 
@@ -228,6 +243,7 @@ ALTER TABLE care_guide_product_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE care_guide_item_commercial ENABLE ROW LEVEL SECURITY;
 ALTER TABLE care_guide_item_diy ENABLE ROW LEVEL SECURITY;
 ALTER TABLE care_guide_product_category_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE care_guide_setup_types ENABLE ROW LEVEL SECURITY;
 
 -- Reference tables: public read
 CREATE POLICY "Public can read setup types"
@@ -259,6 +275,9 @@ CREATE POLICY "Public can read item diy for published guides"
     ));
 CREATE POLICY "Public can read category notes for published guides"
     ON care_guide_product_category_notes FOR SELECT
+    USING (care_guide_id IN (SELECT id FROM care_guides WHERE status = 'published'));
+CREATE POLICY "Public can read setup types for published guides"
+    ON care_guide_setup_types FOR SELECT
     USING (care_guide_id IN (SELECT id FROM care_guides WHERE status = 'published'));
 
 

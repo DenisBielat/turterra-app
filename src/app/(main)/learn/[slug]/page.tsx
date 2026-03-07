@@ -632,19 +632,35 @@ async function getCareGuide(slug: string) {
     preventiveCare: Array.isArray(healthRow?.preventive_care) ? healthRow.preventive_care as string[] : [],
   };
 
-  // 13. Fetch recommended products
+  // 13. Fetch recommended products — setup types and per-guide tab config
   const { data: setupTypesRaw } = await supabase
     .schema('care_guides')
     .from('setup_types')
     .select('*')
     .order('sort_order', { ascending: true });
 
-  const setupTypes: SetupType[] = (setupTypesRaw || []).map((s) => ({
+  const allSetupTypes: SetupType[] = (setupTypesRaw || []).map((s) => ({
     id: s.id as string,
     name: s.name as string,
     slug: s.slug as string,
     isActive: s.is_active as boolean,
   }));
+
+  // Which tabs to show for this guide (care_guide_setup_types); order by sort_order
+  const { data: guideSetupTypesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_setup_types')
+    .select('setup_type_id, sort_order')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const guideSetupTypeIds = (guideSetupTypesRaw || []).map((r) => r.setup_type_id as string);
+  const setupTypes =
+    guideSetupTypeIds.length > 0
+      ? guideSetupTypeIds
+          .map((id) => allSetupTypes.find((s) => s.id === id))
+          .filter((s): s is SetupType => s != null)
+      : allSetupTypes;
 
   // Fetch care_guide_product_items with nested product_items → product_categories
   const { data: guideProductItemsRaw } = await supabase
