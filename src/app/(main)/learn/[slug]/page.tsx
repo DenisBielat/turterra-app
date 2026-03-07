@@ -589,12 +589,16 @@ async function getCareGuide(slug: string) {
   const { data: healthIssuesRaw } = await supabase
     .schema('care_guides')
     .from('care_guide_health_issues')
-    .select('notes, health_issues(name, severity, common_cause, signs)')
+    .select('severity, common_cause, signs, sort_order, notes, health_issues(name)')
     .eq('care_guide_id', row.id);
 
   type HealthIssueRow = {
+    severity: string;
+    common_cause?: string | null;
+    signs?: string | null;
+    sort_order?: number | null;
     notes?: string | null;
-    health_issues?: { name: string; severity: string; common_cause?: string | null; signs?: string | null } | { name: string; severity: string; common_cause?: string | null; signs?: string | null }[] | null;
+    health_issues?: { name: string } | { name: string }[] | null;
   };
   const severityOrder: Record<string, number> = { urgent: 0, moderate: 1, monitor: 2 };
   const healthIssueRows = (healthIssuesRaw || []) as HealthIssueRow[];
@@ -604,14 +608,21 @@ async function getCareGuide(slug: string) {
       return issue
         ? {
             name: issue.name,
-            severity: issue.severity as 'monitor' | 'moderate' | 'urgent',
-            common_cause: issue.common_cause ?? null,
-            signs: issue.signs ?? null,
+            severity: r.severity as 'monitor' | 'moderate' | 'urgent',
+            common_cause: r.common_cause ?? null,
+            signs: r.signs ?? null,
+            sort_order: r.sort_order ?? null,
           }
         : null;
     })
     .filter((r): r is NonNullable<typeof r> => r != null)
-    .sort((a, b) => (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3));
+    .sort((a, b) => {
+      // Sort by sort_order first if available, then by severity
+      if (a.sort_order != null && b.sort_order != null) return a.sort_order - b.sort_order;
+      if (a.sort_order != null) return -1;
+      if (b.sort_order != null) return 1;
+      return (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3);
+    });
 
   const healthData = {
     introText: healthRow ? (healthRow.intro_text as string | null) : null,
