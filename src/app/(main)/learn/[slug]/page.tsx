@@ -116,20 +116,27 @@ async function getCareGuide(slug: string) {
   const { data: relatedSpecies } = relatedSpeciesIds.length > 0
     ? await supabase
         .from('turtle_species')
-        .select('id, species_common_name')
+        .select('id, species_common_name, avatar_image_circle_url, avatar_image_full_url')
         .in('id', relatedSpeciesIds)
     : { data: [] };
 
   const relatedSpeciesMap = new Map(
-    (relatedSpecies || []).map(s => [s.id, s.species_common_name])
+    (relatedSpecies || []).map(s => [
+      s.id,
+      {
+        commonName: s.species_common_name,
+        imageUrl: s.avatar_image_circle_url || s.avatar_image_full_url || PLACEHOLDER_IMAGE,
+      },
+    ])
   );
 
   const relatedGuides = (allGuides || [])
-    .map(g => ({
-      slug: g.slug,
-      commonName: relatedSpeciesMap.get(g.species_id) || 'Unknown',
-    }))
-    .filter(g => g.commonName !== 'Unknown');
+    .map(g => {
+      const info = relatedSpeciesMap.get(g.species_id);
+      if (!info || info.commonName === 'Unknown') return null;
+      return { slug: g.slug, commonName: info.commonName, imageUrl: info.imageUrl };
+    })
+    .filter((g): g is { slug: string; commonName: string; imageUrl: string } => g != null);
 
   // 5. Build stat cards — always 8 cards matching the schema
   // Terrestrial guides use sq ft instead of gallons and humidity instead of water temp
@@ -688,16 +695,23 @@ async function getCareGuide(slug: string) {
     .eq('care_guide_id', row.id)
     .order('sort_order', { ascending: true });
 
-  // Fetch category notes for this guide
+  // Fetch category notes for this guide (per setup type + category; null setup_type_id = note for all setup types)
   const { data: categoryNotesRaw } = await supabase
     .schema('care_guides')
     .from('care_guide_product_category_notes')
-    .select('category_id, notes')
+    .select('setup_type_id, category_id, notes')
     .eq('care_guide_id', row.id);
 
-  const categoryNotesMap = new Map(
-    (categoryNotesRaw || []).map((n) => [n.category_id as string, n.notes as string])
-  );
+  const categoryNotesMap = new Map<string, string>();
+  for (const n of categoryNotesRaw || []) {
+    const catId = n.category_id as string;
+    const notes = n.notes as string;
+    if (n.setup_type_id != null) {
+      categoryNotesMap.set(`${n.setup_type_id}:${catId}`, notes);
+    } else {
+      categoryNotesMap.set(`:${catId}`, notes);
+    }
+  }
 
   // Build categoriesBySetup: Record<setupTypeId, ProductCategory[]>
   type GuideProductItemRow = {
@@ -762,7 +776,7 @@ async function getCareGuide(slug: string) {
         slug: catRaw.slug,
         icon: catRaw.icon,
         items: [],
-        categoryNote: categoryNotesMap.get(catRaw.id) ?? null,
+        categoryNote: categoryNotesMap.get(`${setupId}:${catRaw.id}`) ?? categoryNotesMap.get(`:${catRaw.id}`) ?? null,
       };
       categoriesBySetup[setupId].push(category);
     }

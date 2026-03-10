@@ -190,12 +190,13 @@ CREATE INDEX idx_cgid_item ON care_guide_item_diy(care_guide_product_item_id);
 CREATE TABLE care_guide_product_category_notes (
     id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     care_guide_id   uuid NOT NULL REFERENCES care_guides(id) ON DELETE CASCADE,
+    setup_type_id   uuid REFERENCES setup_types(id) ON DELETE CASCADE,
     category_id     uuid NOT NULL REFERENCES product_categories(id) ON DELETE CASCADE,
     notes           text NOT NULL,
     created_at      timestamptz NOT NULL DEFAULT now(),
     updated_at      timestamptz NOT NULL DEFAULT now(),
 
-    UNIQUE(care_guide_id, category_id)
+    UNIQUE(care_guide_id, setup_type_id, category_id)
 );
 
 CREATE INDEX idx_category_notes_guide ON care_guide_product_category_notes(care_guide_id);
