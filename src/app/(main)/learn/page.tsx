@@ -16,7 +16,7 @@ async function getCareGuides(): Promise<CareGuide[]> {
   const { data: guides, error: guidesError } = await supabase
     .schema('care_guides')
     .from('care_guides')
-    .select('id, species_id, slug, banner_image_url, adult_size_min_inches, adult_size_max_inches, lifespan_min_years, lifespan_max_years')
+    .select('id, species_id, slug, adult_size_min_inches, adult_size_max_inches, lifespan_min_years, lifespan_max_years')
     .eq('status', 'published')
     .order('created_at', { ascending: false });
 
@@ -89,7 +89,7 @@ async function getCareGuides(): Promise<CareGuide[]> {
       slug: guide.slug,
       commonName: sp?.species_common_name ?? 'Unknown Species',
       scientificName: sp?.species_scientific_name ?? '',
-      imageUrl: sp?.avatar_image_full_url || sp?.avatar_image_circle_url || guide.banner_image_url || PLACEHOLDER_IMAGE,
+      imageUrl: sp?.avatar_image_full_url || sp?.avatar_image_circle_url || PLACEHOLDER_IMAGE,
       category: familyCommon,
       sizeRange,
       lifespan,

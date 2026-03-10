@@ -4,8 +4,11 @@ import { supabase } from '@/lib/db/supabaseClient';
 import { CareGuideHero } from '@/components/care-guide/care-guide-hero';
 import { CareGuideAtAGlance } from '@/components/care-guide/care-guide-at-a-glance';
 import { CareGuideHousing } from '@/components/care-guide/care-guide-housing';
+import { CareGuideHousingTerrestrial } from '@/components/care-guide/care-guide-housing-terrestrial';
+import { CareGuideSubstrate } from '@/components/care-guide/care-guide-substrate';
 import { CareGuideLighting } from '@/components/care-guide/care-guide-lighting';
 import { CareGuideTemperature } from '@/components/care-guide/care-guide-temperature';
+import { CareGuideHumidity } from '@/components/care-guide/care-guide-humidity';
 import { CareGuideWater } from '@/components/care-guide/care-guide-water';
 import { CareGuideDiet } from '@/components/care-guide/care-guide-diet';
 import { CareGuideHandling } from '@/components/care-guide/care-guide-handling';
@@ -31,7 +34,6 @@ interface CareGuideRow {
   id: string;
   species_id: number;
   slug: string;
-  banner_image_url: string | null;
   status: string;
   adult_size_min_inches: number | null;
   adult_size_max_inches: number | null;
@@ -114,22 +116,60 @@ async function getCareGuide(slug: string) {
   const { data: relatedSpecies } = relatedSpeciesIds.length > 0
     ? await supabase
         .from('turtle_species')
-        .select('id, species_common_name')
+        .select('id, species_common_name, avatar_image_circle_url, avatar_image_full_url')
         .in('id', relatedSpeciesIds)
     : { data: [] };
 
   const relatedSpeciesMap = new Map(
-    (relatedSpecies || []).map(s => [s.id, s.species_common_name])
+    (relatedSpecies || []).map(s => [
+      s.id,
+      {
+        commonName: s.species_common_name,
+        imageUrl: s.avatar_image_circle_url || s.avatar_image_full_url || PLACEHOLDER_IMAGE,
+      },
+    ])
   );
 
   const relatedGuides = (allGuides || [])
-    .map(g => ({
-      slug: g.slug,
-      commonName: relatedSpeciesMap.get(g.species_id) || 'Unknown',
-    }))
-    .filter(g => g.commonName !== 'Unknown');
+    .map(g => {
+      const info = relatedSpeciesMap.get(g.species_id);
+      if (!info || info.commonName === 'Unknown') return null;
+      return { slug: g.slug, commonName: info.commonName, imageUrl: info.imageUrl };
+    })
+    .filter((g): g is { slug: string; commonName: string; imageUrl: string } => g != null);
 
   // 5. Build stat cards — always 8 cards matching the schema
+  // Terrestrial guides use sq ft instead of gallons and humidity instead of water temp
+  const isTerrestrial = num(row, 'enclosure_min_sq_ft') != null;
+
+  const enclosureCard: { icon: IconNameMap['line']; label: string; value: string; description?: string | null } = isTerrestrial
+    ? {
+        icon: 'enclosure',
+        label: 'Enclosure',
+        value: `${num(row, 'enclosure_min_sq_ft')}+ sq ft`,
+        description: str(row, 'enclosure_notes'),
+      }
+    : {
+        icon: 'enclosure',
+        label: 'Enclosure',
+        value: num(row, 'enclosure_min_gallons') != null ? `${num(row, 'enclosure_min_gallons')}+ gallons` : '—',
+        description: str(row, 'enclosure_notes'),
+      };
+
+  const waterTempOrHumidityCard: { icon: IconNameMap['line']; label: string; value: string; description?: string | null } = isTerrestrial
+    ? {
+        icon: 'water-droplet',
+        label: 'Humidity',
+        value: formatRange(num(row, 'humidity_min_pct'), num(row, 'humidity_max_pct'), '%')?.replace(' %', '%') ?? '—',
+        description: str(row, 'humidity_notes'),
+      }
+    : {
+        icon: 'water',
+        label: 'Water Temp',
+        value: formatRange(num(row, 'water_temp_min_f'), num(row, 'water_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
+        description: str(row, 'water_temp_notes'),
+      };
+
   const stats: { icon: IconNameMap['line']; label: string; value: string; description?: string | null }[] = [
     {
       icon: 'ruler',
@@ -143,23 +183,13 @@ async function getCareGuide(slug: string) {
       value: formatRange(row.lifespan_min_years, row.lifespan_max_years, 'years') ?? '—',
       description: str(row, 'lifespan_notes'),
     },
-    {
-      icon: 'enclosure',
-      label: 'Enclosure',
-      value: num(row, 'enclosure_min_gallons') != null ? `${num(row, 'enclosure_min_gallons')}+ gallons` : '—',
-      description: str(row, 'enclosure_notes'),
-    },
+    enclosureCard,
     {
       icon: 'temperature',
       label: 'Basking Temp',
       value: formatRange(num(row, 'basking_temp_min_f'), num(row, 'basking_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
     },
-    {
-      icon: 'water',
-      label: 'Water Temp',
-      value: formatRange(num(row, 'water_temp_min_f'), num(row, 'water_temp_max_f'), '°F')?.replace(' °F', '°F') ?? '—',
-      description: str(row, 'water_temp_notes'),
-    },
+    waterTempOrHumidityCard,
     {
       icon: 'lighting',
       label: 'UVB',
@@ -181,34 +211,154 @@ async function getCareGuide(slug: string) {
     },
   ];
 
-  // 6. Fetch housing data
-  const { data: housingRow } = await supabase
-    .schema('care_guides')
-    .from('care_guide_housing')
-    .select('*')
-    .eq('care_guide_id', row.id)
-    .single();
+  // 6. Fetch housing data (aquatic OR terrestrial based on guide type)
+  let housingData: {
+    introText: string | null;
+    essentials: string[];
+    commonMistakes: string[];
+    cohabitationNotes: string | null;
+    enclosureSizes: { life_stage: string; size_range: string | null; min_gallons: number; max_gallons: number | null; notes: string | null }[];
+  } | null = null;
 
-  const { data: enclosureSizesRaw } = await supabase
-    .schema('care_guides')
-    .from('care_guide_enclosure_sizes')
-    .select('*')
-    .eq('care_guide_id', row.id)
-    .order('sort_order', { ascending: true });
+  let housingTerrestrialData: {
+    introText: string | null;
+    enclosureSizes: { scenario: string; size_range: string | null; dimensions: string | null; min_sq_ft: number | null; notes: string | null }[];
+    outdoorTitle: string | null;
+    outdoorDescription: string | null;
+    outdoorTips: string[];
+    indoorTitle: string | null;
+    indoorDescription: string | null;
+    indoorTips: string[];
+    essentials: string[];
+    commonMistakes: string[];
+    cohabitationNotes: string | null;
+  } | null = null;
 
-  const housingData = {
-    introText: housingRow ? (housingRow.intro_text as string | null) : null,
-    essentials: Array.isArray(housingRow?.essentials) ? housingRow.essentials as string[] : [],
-    commonMistakes: Array.isArray(housingRow?.common_mistakes) ? housingRow.common_mistakes as string[] : [],
-    cohabitationNotes: housingRow ? (housingRow.cohabitation_notes as string | null) : null,
-    enclosureSizes: (enclosureSizesRaw || []).map(s => ({
-      life_stage: s.life_stage as string,
-      size_range: s.size_range as string | null,
-      min_gallons: s.min_gallons as number,
-      max_gallons: s.max_gallons as number | null,
-      notes: s.notes as string | null,
-    })),
-  };
+  if (isTerrestrial) {
+    const { data: housingTerrRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_housing_terrestrial')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: enclosureSizesTerrRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_enclosure_sizes_terrestrial')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    housingTerrestrialData = {
+      introText: housingTerrRow ? (housingTerrRow.intro_text as string | null) : null,
+      enclosureSizes: (enclosureSizesTerrRaw || []).map(s => ({
+        scenario: s.scenario as string,
+        size_range: s.size_range as string | null,
+        dimensions: s.dimensions as string | null,
+        min_sq_ft: s.min_sq_ft as number | null,
+        notes: s.notes as string | null,
+      })),
+      outdoorTitle: housingTerrRow ? (housingTerrRow.outdoor_title as string | null) : null,
+      outdoorDescription: housingTerrRow ? (housingTerrRow.outdoor_description as string | null) : null,
+      outdoorTips: Array.isArray(housingTerrRow?.outdoor_tips) ? housingTerrRow.outdoor_tips as string[] : [],
+      indoorTitle: housingTerrRow ? (housingTerrRow.indoor_title as string | null) : null,
+      indoorDescription: housingTerrRow ? (housingTerrRow.indoor_description as string | null) : null,
+      indoorTips: Array.isArray(housingTerrRow?.indoor_tips) ? housingTerrRow.indoor_tips as string[] : [],
+      essentials: Array.isArray(housingTerrRow?.essentials) ? housingTerrRow.essentials as string[] : [],
+      commonMistakes: Array.isArray(housingTerrRow?.common_mistakes) ? housingTerrRow.common_mistakes as string[] : [],
+      cohabitationNotes: housingTerrRow ? (housingTerrRow.cohabitation_notes as string | null) : null,
+    };
+  } else {
+    const { data: housingRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_housing')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: enclosureSizesRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_enclosure_sizes')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    housingData = {
+      introText: housingRow ? (housingRow.intro_text as string | null) : null,
+      essentials: Array.isArray(housingRow?.essentials) ? housingRow.essentials as string[] : [],
+      commonMistakes: Array.isArray(housingRow?.common_mistakes) ? housingRow.common_mistakes as string[] : [],
+      cohabitationNotes: housingRow ? (housingRow.cohabitation_notes as string | null) : null,
+      enclosureSizes: (enclosureSizesRaw || []).map(s => ({
+        life_stage: s.life_stage as string,
+        size_range: s.size_range as string | null,
+        min_gallons: s.min_gallons as number,
+        max_gallons: s.max_gallons as number | null,
+        notes: s.notes as string | null,
+      })),
+    };
+  }
+
+  // 6b. Fetch substrate data (terrestrial only)
+  let substrateData: {
+    introText: string | null;
+    depths: { label: string; depth: string; description: string | null }[];
+    options: { name: string; description: string | null; is_recommended: boolean; pros: string[]; cons: string[] }[];
+    leafLitterText: string | null;
+    maintenanceSchedules: { frequency: string; tasks: string[] }[];
+    quarantineNote: string | null;
+  } | null = null;
+
+  if (isTerrestrial) {
+    const { data: substrateRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: depthsRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate_depths')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    const { data: optionsRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate_options')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    const { data: maintenanceRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_substrate_maintenance')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    substrateData = {
+      introText: substrateRow ? (substrateRow.intro_text as string | null) : null,
+      depths: (depthsRaw || []).map(d => ({
+        label: d.label as string,
+        depth: d.depth as string,
+        description: d.description as string | null,
+      })),
+      options: (optionsRaw || []).map(o => ({
+        name: o.name as string,
+        description: o.description as string | null,
+        is_recommended: o.is_recommended as boolean,
+        pros: Array.isArray(o.pros) ? o.pros as string[] : [],
+        cons: Array.isArray(o.cons) ? o.cons as string[] : [],
+      })),
+      leafLitterText: substrateRow ? (substrateRow.leaf_litter_text as string | null) : null,
+      maintenanceSchedules: (maintenanceRaw || []).map(m => ({
+        frequency: m.frequency as string,
+        tasks: Array.isArray(m.tasks) ? m.tasks as string[] : [],
+      })),
+      quarantineNote: substrateRow ? (substrateRow.quarantine_note as string | null) : null,
+    };
+  }
 
   // 7. Fetch lighting data
   const { data: lightingRow } = await supabase
@@ -264,7 +414,68 @@ async function getCareGuide(slug: string) {
     waterHeaterTips: Array.isArray(temperatureRow?.water_heater_tips) ? temperatureRow.water_heater_tips as string[] : [],
     thermometerTips: Array.isArray(temperatureRow?.thermometer_tips) ? temperatureRow.thermometer_tips as string[] : [],
     safetyWarning: temperatureRow ? (temperatureRow.safety_warning as string | null) : null,
+    // Terrestrial-specific fields (nullable — only present after ALTER TABLE)
+    lightCycleTips: Array.isArray(temperatureRow?.light_cycle_tips) ? temperatureRow.light_cycle_tips as string[] : [],
+    indoorHeatingNote: temperatureRow ? (temperatureRow.indoor_heating_note as string | null) ?? null : null,
+    outdoorHeatingNote: temperatureRow ? (temperatureRow.outdoor_heating_note as string | null) ?? null : null,
+    hibernationNote: temperatureRow ? (temperatureRow.hibernation_note as string | null) ?? null : null,
   };
+
+  // 8b. Fetch humidity data (terrestrial only)
+  let humidityData: {
+    introText: string | null;
+    humidityZones: { zone_name: string; humidity_min_pct: number; humidity_max_pct: number | null; notes: string | null }[];
+    humidHideTips: string[];
+    dailyMistingTips: string[];
+    substrateTips: string[];
+    monitoringText: string | null;
+    humidityTargets: { time_label: string; target: string }[];
+    inadequateHumidityWarning: string | null;
+    outdoorNote: string | null;
+  } | null = null;
+
+  if (isTerrestrial) {
+    const { data: humidityRow } = await supabase
+      .schema('care_guides')
+      .from('care_guide_humidity')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .single();
+
+    const { data: humidityZonesRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_humidity_zones')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    const { data: humidityTargetsRaw } = await supabase
+      .schema('care_guides')
+      .from('care_guide_humidity_targets')
+      .select('*')
+      .eq('care_guide_id', row.id)
+      .order('sort_order', { ascending: true });
+
+    humidityData = {
+      introText: humidityRow ? (humidityRow.intro_text as string | null) : null,
+      humidityZones: (humidityZonesRaw || []).map(z => ({
+        zone_name: z.zone_name as string,
+        humidity_min_pct: z.humidity_min_pct as number,
+        humidity_max_pct: z.humidity_max_pct as number | null,
+        notes: z.notes as string | null,
+      })),
+      humidHideTips: Array.isArray(humidityRow?.humid_hide_tips) ? humidityRow.humid_hide_tips as string[] : [],
+      dailyMistingTips: Array.isArray(humidityRow?.daily_misting_tips) ? humidityRow.daily_misting_tips as string[] : [],
+      substrateTips: Array.isArray(humidityRow?.substrate_tips) ? humidityRow.substrate_tips as string[] : [],
+      monitoringText: humidityRow ? (humidityRow.monitoring_text as string | null) : null,
+      humidityTargets: (humidityTargetsRaw || []).map(t => ({
+        time_label: t.time_label as string,
+        target: t.target as string,
+      })),
+      inadequateHumidityWarning: humidityRow ? (humidityRow.inadequate_humidity_warning as string | null) : null,
+      outdoorNote: humidityRow ? (humidityRow.outdoor_note as string | null) : null,
+    };
+  }
 
   // 9. Fetch water quality data
   const { data: waterRow } = await supabase
@@ -328,7 +539,7 @@ async function getCareGuide(slug: string) {
     .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
   const vegetableFoods = guideFoods
-    .filter((r) => r.food.category === 'vegetable')
+    .filter((r) => r.food.category === 'vegetable' || r.food.category === 'fruit')
     .map((r) => (r.notes ? `${r.food.name} (${r.notes})` : r.food.name))
     .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
 
@@ -341,6 +552,7 @@ async function getCareGuide(slug: string) {
       vegetable_pct: s.vegetable_pct as number | null,
       protein_frequency: s.protein_frequency as string | null,
       vegetable_frequency: s.vegetable_frequency as string | null,
+      description: s.description as string | null ?? null,
     })),
     portionProtein: dietRow ? (dietRow.portion_protein as string | null) : null,
     portionVegetables: dietRow ? (dietRow.portion_vegetables as string | null) : null,
@@ -348,6 +560,14 @@ async function getCareGuide(slug: string) {
     proteinFoods,
     vegetableFoods,
     calciumSupplements: dietRow ? (dietRow.calcium_supplements as string | null) : null,
+    // Terrestrial-specific fields
+    compositionProteinPct: dietRow?.composition_protein_pct != null ? Number(dietRow.composition_protein_pct) : null,
+    compositionPlantPct: dietRow?.composition_plant_pct != null ? Number(dietRow.composition_plant_pct) : null,
+    compositionNote: dietRow ? (dietRow.composition_note as string | null) ?? null : null,
+    foodsToAvoid: Array.isArray(dietRow?.foods_to_avoid) ? dietRow.foods_to_avoid as string[] : [],
+    commercialDiets: Array.isArray(dietRow?.commercial_diets) ? dietRow.commercial_diets as string[] : [],
+    commercialDietsNote: dietRow ? (dietRow.commercial_diets_note as string | null) ?? null : null,
+    drinkingWater: dietRow ? (dietRow.drinking_water as string | null) ?? null : null,
   };
 
   // 11. Fetch handling data
@@ -376,12 +596,16 @@ async function getCareGuide(slug: string) {
   const { data: healthIssuesRaw } = await supabase
     .schema('care_guides')
     .from('care_guide_health_issues')
-    .select('notes, health_issues(name, severity, common_cause, signs)')
+    .select('severity, common_cause, signs, sort_order, notes, health_issues(name)')
     .eq('care_guide_id', row.id);
 
   type HealthIssueRow = {
+    severity: string;
+    common_cause?: string | null;
+    signs?: string | null;
+    sort_order?: number | null;
     notes?: string | null;
-    health_issues?: { name: string; severity: string; common_cause?: string | null; signs?: string | null } | { name: string; severity: string; common_cause?: string | null; signs?: string | null }[] | null;
+    health_issues?: { name: string } | { name: string }[] | null;
   };
   const severityOrder: Record<string, number> = { urgent: 0, moderate: 1, monitor: 2 };
   const healthIssueRows = (healthIssuesRaw || []) as HealthIssueRow[];
@@ -391,14 +615,21 @@ async function getCareGuide(slug: string) {
       return issue
         ? {
             name: issue.name,
-            severity: issue.severity as 'monitor' | 'moderate' | 'urgent',
-            common_cause: issue.common_cause ?? null,
-            signs: issue.signs ?? null,
+            severity: r.severity as 'monitor' | 'moderate' | 'urgent',
+            common_cause: r.common_cause ?? null,
+            signs: r.signs ?? null,
+            sort_order: r.sort_order ?? null,
           }
         : null;
     })
     .filter((r): r is NonNullable<typeof r> => r != null)
-    .sort((a, b) => (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3));
+    .sort((a, b) => {
+      // Sort by sort_order first if available, then by severity
+      if (a.sort_order != null && b.sort_order != null) return a.sort_order - b.sort_order;
+      if (a.sort_order != null) return -1;
+      if (b.sort_order != null) return 1;
+      return (severityOrder[a.severity] ?? 3) - (severityOrder[b.severity] ?? 3);
+    });
 
   const healthData = {
     introText: healthRow ? (healthRow.intro_text as string | null) : null,
@@ -408,19 +639,35 @@ async function getCareGuide(slug: string) {
     preventiveCare: Array.isArray(healthRow?.preventive_care) ? healthRow.preventive_care as string[] : [],
   };
 
-  // 13. Fetch recommended products
+  // 13. Fetch recommended products — setup types and per-guide tab config
   const { data: setupTypesRaw } = await supabase
     .schema('care_guides')
     .from('setup_types')
     .select('*')
     .order('sort_order', { ascending: true });
 
-  const setupTypes: SetupType[] = (setupTypesRaw || []).map((s) => ({
+  const allSetupTypes: SetupType[] = (setupTypesRaw || []).map((s) => ({
     id: s.id as string,
     name: s.name as string,
     slug: s.slug as string,
     isActive: s.is_active as boolean,
   }));
+
+  // Which tabs to show for this guide (care_guide_setup_types); order by sort_order
+  const { data: guideSetupTypesRaw } = await supabase
+    .schema('care_guides')
+    .from('care_guide_setup_types')
+    .select('setup_type_id, sort_order')
+    .eq('care_guide_id', row.id)
+    .order('sort_order', { ascending: true });
+
+  const guideSetupTypeIds = (guideSetupTypesRaw || []).map((r) => r.setup_type_id as string);
+  const setupTypes =
+    guideSetupTypeIds.length > 0
+      ? guideSetupTypeIds
+          .map((id) => allSetupTypes.find((s) => s.id === id))
+          .filter((s): s is SetupType => s != null)
+      : allSetupTypes;
 
   // Fetch care_guide_product_items with nested product_items → product_categories
   const { data: guideProductItemsRaw } = await supabase
@@ -448,16 +695,23 @@ async function getCareGuide(slug: string) {
     .eq('care_guide_id', row.id)
     .order('sort_order', { ascending: true });
 
-  // Fetch category notes for this guide
+  // Fetch category notes for this guide (per setup type + category; null setup_type_id = note for all setup types)
   const { data: categoryNotesRaw } = await supabase
     .schema('care_guides')
-    .from('care_guide_category_notes')
-    .select('category_id, notes')
+    .from('care_guide_product_category_notes')
+    .select('setup_type_id, category_id, notes')
     .eq('care_guide_id', row.id);
 
-  const categoryNotesMap = new Map(
-    (categoryNotesRaw || []).map((n) => [n.category_id as string, n.notes as string])
-  );
+  const categoryNotesMap = new Map<string, string>();
+  for (const n of categoryNotesRaw || []) {
+    const catId = n.category_id as string;
+    const notes = n.notes as string;
+    if (n.setup_type_id != null) {
+      categoryNotesMap.set(`${n.setup_type_id}:${catId}`, notes);
+    } else {
+      categoryNotesMap.set(`:${catId}`, notes);
+    }
+  }
 
   // Build categoriesBySetup: Record<setupTypeId, ProductCategory[]>
   type GuideProductItemRow = {
@@ -522,7 +776,7 @@ async function getCareGuide(slug: string) {
         slug: catRaw.slug,
         icon: catRaw.icon,
         items: [],
-        categoryNote: categoryNotesMap.get(catRaw.id) ?? null,
+        categoryNote: categoryNotesMap.get(`${setupId}:${catRaw.id}`) ?? categoryNotesMap.get(`:${catRaw.id}`) ?? null,
       };
       categoriesBySetup[setupId].push(category);
     }
@@ -575,16 +829,20 @@ async function getCareGuide(slug: string) {
     commonName: species?.species_common_name ?? 'Unknown Species',
     scientificName: species?.species_scientific_name ?? '',
     speciesSlug: species?.slug ?? null,
-    avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || row.banner_image_url || PLACEHOLDER_IMAGE,
+    avatarImageUrl: species?.avatar_image_full_url || species?.avatar_image_circle_url || PLACEHOLDER_IMAGE,
     avatarCircleUrl: species?.avatar_image_circle_url || species?.avatar_image_full_url || PLACEHOLDER_IMAGE,
     category: familyCommon,
     heroText: str(row, 'hero_text'),
     atAGlanceText: str(row, 'at_a_glance_section_text'),
     stats,
     commitWarning: str(row, 'before_you_commit') ?? str(row, 'commit_warning'),
+    isTerrestrial,
     housingData,
+    housingTerrestrialData,
+    substrateData,
     lightingData,
     temperatureData,
+    humidityData,
     waterData,
     dietData,
     handlingData,
@@ -620,12 +878,26 @@ export async function generateMetadata(
    Section definitions
    ------------------------------------------------------------------ */
 
-const SECTIONS: NavSection[] = [
+const AQUATIC_SECTIONS: NavSection[] = [
   { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
   { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
   { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
   { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
   { id: 'water', label: 'Water Quality', icon: 'water' },
+  { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
+  { id: 'handling', label: 'Handling', icon: 'handling' },
+  { id: 'health', label: 'Health & Issues', icon: 'health' },
+  { id: 'shopping-checklist', label: 'Product Guide', icon: 'shop' },
+  { id: 'references', label: 'References', icon: 'book-open' },
+];
+
+const TERRESTRIAL_SECTIONS: NavSection[] = [
+  { id: 'at-a-glance', label: 'At a Glance', icon: 'at-a-glance' },
+  { id: 'housing', label: 'Housing & Enclosure', icon: 'enclosure' },
+  { id: 'substrate', label: 'Substrate', icon: 'substrate' },
+  { id: 'lighting', label: 'Lighting & UVB', icon: 'lighting' },
+  { id: 'temperature', label: 'Temps & Heating', icon: 'temperature' },
+  { id: 'humidity', label: 'Humidity', icon: 'water-droplet' },
   { id: 'diet', label: 'Diet & Nutrition', icon: 'diet' },
   { id: 'handling', label: 'Handling', icon: 'handling' },
   { id: 'health', label: 'Health & Issues', icon: 'health' },
@@ -661,7 +933,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
 
       {/* Main content area */}
       <div className="max-w-8xl mx-auto px-4 lg:px-10 py-10 md:py-14">
-        <CareGuideActiveSectionProvider sections={SECTIONS}>
+        <CareGuideActiveSectionProvider sections={guide.isTerrestrial ? TERRESTRIAL_SECTIONS : AQUATIC_SECTIONS}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Main content — 8 cols */}
           <div className="lg:col-span-8 flex flex-col gap-12 md:gap-16">
@@ -673,13 +945,41 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
             />
 
             {/* Housing & Enclosure */}
-            <CareGuideHousing
-              introText={guide.housingData.introText}
-              essentials={guide.housingData.essentials}
-              commonMistakes={guide.housingData.commonMistakes}
-              cohabitationNotes={guide.housingData.cohabitationNotes}
-              enclosureSizes={guide.housingData.enclosureSizes}
-            />
+            {guide.isTerrestrial && guide.housingTerrestrialData ? (
+              <CareGuideHousingTerrestrial
+                introText={guide.housingTerrestrialData.introText}
+                enclosureSizes={guide.housingTerrestrialData.enclosureSizes}
+                outdoorTitle={guide.housingTerrestrialData.outdoorTitle}
+                outdoorDescription={guide.housingTerrestrialData.outdoorDescription}
+                outdoorTips={guide.housingTerrestrialData.outdoorTips}
+                indoorTitle={guide.housingTerrestrialData.indoorTitle}
+                indoorDescription={guide.housingTerrestrialData.indoorDescription}
+                indoorTips={guide.housingTerrestrialData.indoorTips}
+                essentials={guide.housingTerrestrialData.essentials}
+                commonMistakes={guide.housingTerrestrialData.commonMistakes}
+                cohabitationNotes={guide.housingTerrestrialData.cohabitationNotes}
+              />
+            ) : guide.housingData ? (
+              <CareGuideHousing
+                introText={guide.housingData.introText}
+                essentials={guide.housingData.essentials}
+                commonMistakes={guide.housingData.commonMistakes}
+                cohabitationNotes={guide.housingData.cohabitationNotes}
+                enclosureSizes={guide.housingData.enclosureSizes}
+              />
+            ) : null}
+
+            {/* Substrate (terrestrial only) */}
+            {guide.substrateData && (
+              <CareGuideSubstrate
+                introText={guide.substrateData.introText}
+                depths={guide.substrateData.depths}
+                options={guide.substrateData.options}
+                leafLitterText={guide.substrateData.leafLitterText}
+                maintenanceSchedules={guide.substrateData.maintenanceSchedules}
+                quarantineNote={guide.substrateData.quarantineNote}
+              />
+            )}
 
             {/* Lighting & UVB */}
             <CareGuideLighting
@@ -707,7 +1007,26 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               waterHeaterTips={guide.temperatureData.waterHeaterTips}
               thermometerTips={guide.temperatureData.thermometerTips}
               safetyWarning={guide.temperatureData.safetyWarning}
+              lightCycleTips={guide.temperatureData.lightCycleTips}
+              indoorHeatingNote={guide.temperatureData.indoorHeatingNote}
+              outdoorHeatingNote={guide.temperatureData.outdoorHeatingNote}
+              hibernationNote={guide.temperatureData.hibernationNote}
             />
+
+            {/* Humidity (terrestrial only) */}
+            {guide.humidityData && (
+              <CareGuideHumidity
+                introText={guide.humidityData.introText}
+                humidityZones={guide.humidityData.humidityZones}
+                humidHideTips={guide.humidityData.humidHideTips}
+                dailyMistingTips={guide.humidityData.dailyMistingTips}
+                substrateTips={guide.humidityData.substrateTips}
+                monitoringText={guide.humidityData.monitoringText}
+                humidityTargets={guide.humidityData.humidityTargets}
+                inadequateHumidityWarning={guide.humidityData.inadequateHumidityWarning}
+                outdoorNote={guide.humidityData.outdoorNote}
+              />
+            )}
 
             {/* Water Quality & Maintenance */}
             <CareGuideWater
@@ -732,6 +1051,13 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
               proteinFoods={guide.dietData.proteinFoods}
               vegetableFoods={guide.dietData.vegetableFoods}
               calciumSupplements={guide.dietData.calciumSupplements}
+              compositionProteinPct={guide.dietData.compositionProteinPct}
+              compositionPlantPct={guide.dietData.compositionPlantPct}
+              compositionNote={guide.dietData.compositionNote}
+              foodsToAvoid={guide.dietData.foodsToAvoid}
+              commercialDiets={guide.dietData.commercialDiets}
+              commercialDietsNote={guide.dietData.commercialDietsNote}
+              drinkingWater={guide.dietData.drinkingWater}
             />
 
             {/* Handling & Interaction */}
@@ -774,7 +1100,7 @@ export default async function CareGuidePage(props: { params: Promise<{ slug: str
           {/* Sidebar — 4 cols */}
           <div className="lg:col-span-4">
             <CareGuideSidebar
-              sections={SECTIONS}
+              sections={guide.isTerrestrial ? TERRESTRIAL_SECTIONS : AQUATIC_SECTIONS}
               relatedGuides={guide.relatedGuides}
               commonName={guide.commonName}
               imageUrl={guide.avatarCircleUrl}

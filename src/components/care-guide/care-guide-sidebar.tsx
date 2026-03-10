@@ -9,6 +9,7 @@ import type { NavSection } from './care-guide-section-nav';
 interface RelatedGuide {
   slug: string;
   commonName: string;
+  imageUrl?: string;
 }
 
 interface CareGuideSidebarProps {
@@ -59,7 +60,7 @@ export function CareGuideSidebar({
         </div>
 
         {/* Section navigation */}
-        <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-col gap-4 mb-0">
           {sections.map((section) => (
             <button
               key={section.id}
@@ -87,34 +88,37 @@ export function CareGuideSidebar({
             </div>
             Back to Top
           </button>
+          <hr className="border-0 border-t border-gray-200 mt-0 mb-4" />
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-col gap-2 mb-6">
-          <button
-            onClick={() => window.print()}
-            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <Icon name="print" style="line" size="sm" />
-            Print Guide
-          </button>
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: document.title, url: window.location.href });
-              } else {
-                navigator.clipboard.writeText(window.location.href);
-              }
-            }}
-            className="flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            <Icon name="share" style="line" size="sm" />
-            Share Guide
-          </button>
+        <div className="flex flex-col gap-4 mb-0">
+          <div className="flex flex-row gap-2">
+            <button
+              onClick={() => window.print()}
+              className="flex items-center justify-center gap-2 flex-1 px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-green-900/10 transition-colors"
+            >
+              <Icon name="print" style="line" size="sm" />
+              Print
+            </button>
+            <button
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: document.title, url: window.location.href });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                }
+              }}
+              className="flex items-center justify-center gap-2 flex-1 px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-green-900/10 transition-colors"
+            >
+              <Icon name="share" style="line" size="sm" />
+              Share
+            </button>
+          </div>
           {speciesSlug && (
             <Link
               href={`/turtle-guide/${speciesSlug}`}
-              className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-left hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-3 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-left hover:bg-green-900/10 transition-colors"
             >
               <Image
                 src="/images/nav-menu-icons/species-guide.png"
@@ -132,23 +136,26 @@ export function CareGuideSidebar({
               <Icon name="arrow-right-1" style="line" size="base" className="text-gray-600 flex-shrink-0" />
             </Link>
           )}
+          {speciesSlug && <hr className="border-0 border-t border-gray-200 mt-0 mb-4" />}
         </div>
 
         {/* Related care guides */}
         {relatedGuides.length > 0 && (
-          <div>
+          <div className="rounded-lg border border-gray-200 bg-white p-4">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
               Related Care Guides
             </h3>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2">
               {relatedGuides.map((guide) => (
                 <Link
                   key={guide.slug}
                   href={`/learn/${guide.slug}`}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-between gap-3 w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-left hover:bg-green-900/10 transition-colors"
                 >
-                  <Icon name="turtle" style="line" size="sm" className="text-green-700" />
-                  {guide.commonName}
+                  <span className="font-heading font-bold text-gray-900 text-sm">
+                    {guide.commonName}
+                  </span>
+                  <Icon name="arrow-corner-left" style="line" size="sm" className="text-gray-600 flex-shrink-0 rotate-180" />
                 </Link>
               ))}
             </div>

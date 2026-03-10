@@ -27,6 +27,11 @@ interface CareGuideTemperatureProps {
   waterHeaterTips: string[];
   thermometerTips: string[];
   safetyWarning: string | null;
+  /* Terrestrial-specific fields (all optional) */
+  lightCycleTips?: string[];
+  indoorHeatingNote?: string | null;
+  outdoorHeatingNote?: string | null;
+  hibernationNote?: string | null;
 }
 
 /* ------------------------------------------------------------------
@@ -37,8 +42,12 @@ interface CareGuideTemperatureProps {
 function getBarStyleForZone(zoneName: string): { bg: string; text: string } {
   const name = zoneName.toLowerCase();
   if (name.includes('basking')) return { bg: 'bg-red-200', text: 'text-red-700' };
+  if (name.includes('warm')) return { bg: 'bg-orange-500/40', text: 'text-orange-700' };
+  if (name.includes('cool')) return { bg: 'bg-teal-500/30', text: 'text-teal-800' }; // cool side air
   if (name.includes('air')) return { bg: 'bg-orange-500/40', text: 'text-orange-700' };
   if (name.includes('water')) return { bg: 'bg-blue-200', text: 'text-blue-900' };
+  if (name.includes('night') && name.includes('indoor')) return { bg: 'bg-blue-500/20', text: 'text-blue-800' };
+  if (name.includes('night') && name.includes('outdoor')) return { bg: 'bg-gray-500/20', text: 'text-gray-800' };
   if (name.includes('night')) return { bg: 'bg-gray-500/20', text: 'text-gray-800' };
   return { bg: 'bg-gray-200', text: 'text-gray-800' };
 }
@@ -65,9 +74,11 @@ function TempZoneRow({
 
   // Format the °F label
   const fLabel =
-    zone.temp_min_f < 0
-      ? `${zone.temp_min_f} to ${zone.temp_max_f}°F`
-      : `${zone.temp_min_f}–${zone.temp_max_f}°F`;
+    zone.temp_min_f === zone.temp_max_f
+      ? `Down to ${zone.temp_max_f}°F`
+      : zone.temp_min_f < 0
+        ? `${zone.temp_min_f} to ${zone.temp_max_f}°F`
+        : `${zone.temp_min_f}–${zone.temp_max_f}°F`;
 
   // Format the °C label (use notes as fallback for special rows like nighttime drop)
   let cLabel: string | null = null;
@@ -116,7 +127,7 @@ function EquipmentCard({
 }: {
   title: string;
   tips: string[];
-  iconName: 'heat-lamp-flex-line' | 'water-heat-flex-line' | 'thermometer-flex-line';
+  iconName: 'heat-lamp-flex-line' | 'water-heat-flex-line' | 'thermometer-flex-line' | 'sun-flex-line';
 }) {
   if (tips.length === 0) return null;
   return (
@@ -127,8 +138,8 @@ function EquipmentCard({
       </div>
       <ul className="space-y-2">
         {tips.map((tip, i) => (
-          <li key={i} className="flex items-start gap-2 text-base text-gray-700">
-            <span className="text-green-600 mt-0.5 flex-shrink-0">•</span>
+          <li key={i} className="flex items-baseline gap-2 text-base text-gray-700">
+            <span className="text-green-600 flex-shrink-0 leading-none">•</span>
             <CareGuideMarkdown inline>{tip}</CareGuideMarkdown>
           </li>
         ))}
@@ -148,9 +159,14 @@ export function CareGuideTemperature({
   waterHeaterTips,
   thermometerTips,
   safetyWarning,
+  lightCycleTips = [],
+  indoorHeatingNote,
+  outdoorHeatingNote,
+  hibernationNote,
 }: CareGuideTemperatureProps) {
-  const hasEquipment = heatLampTips.length > 0 || waterHeaterTips.length > 0 || thermometerTips.length > 0;
-  const hasContent = introText || tempZones.length > 0 || hasEquipment || safetyWarning;
+  const hasEquipment = heatLampTips.length > 0 || waterHeaterTips.length > 0 || thermometerTips.length > 0 || lightCycleTips.length > 0;
+  const hasHeatingNotes = !!indoorHeatingNote || !!outdoorHeatingNote;
+  const hasContent = introText || tempZones.length > 0 || hasEquipment || hasHeatingNotes || hibernationNote || safetyWarning;
 
   if (!hasContent) return null;
 
@@ -219,8 +235,44 @@ export function CareGuideTemperature({
       {hasEquipment && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <EquipmentCard title="Heat Lamps" tips={heatLampTips} iconName="heat-lamp-flex-line" />
-          <EquipmentCard title="Water Heater" tips={waterHeaterTips} iconName="water-heat-flex-line" />
+          {waterHeaterTips.length > 0 && (
+            <EquipmentCard title="Water Heater" tips={waterHeaterTips} iconName="water-heat-flex-line" />
+          )}
           <EquipmentCard title="Thermometers" tips={thermometerTips} iconName="thermometer-flex-line" />
+          {lightCycleTips.length > 0 && (
+            <EquipmentCard title="Light Cycle" tips={lightCycleTips} iconName="sun-flex-line" />
+          )}
+        </div>
+      )}
+
+      {/* Indoor Heating & Outdoor Pens — side by side (terrestrial) */}
+      {hasHeatingNotes && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          {indoorHeatingNote && (
+            <div className="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
+              <h4 className="font-heading font-bold text-black text-lg mb-2">Indoor Heating</h4>
+              <div className="text-base text-gray-700 leading-relaxed">
+                <CareGuideMarkdown>{indoorHeatingNote}</CareGuideMarkdown>
+              </div>
+            </div>
+          )}
+          {outdoorHeatingNote && (
+            <div className="rounded-xl border border-green-600 bg-green-500/10 shadow-sm px-5 py-4">
+              <h4 className="font-heading font-bold text-black text-lg mb-2">Outdoor Pens</h4>
+              <div className="text-base text-gray-700 leading-relaxed">
+                <CareGuideMarkdown>{outdoorHeatingNote}</CareGuideMarkdown>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Hibernation (Brumation) callout (terrestrial) */}
+      {hibernationNote && (
+        <div className="mb-8">
+          <CareGuideCallout variant="green" title="Hibernation (Brumation)" dimmed={activeSection !== 'temperature'}>
+            {hibernationNote}
+          </CareGuideCallout>
         </div>
       )}
 

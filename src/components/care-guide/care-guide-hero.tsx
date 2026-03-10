@@ -74,16 +74,16 @@ export function CareGuideHero({
               {commonName} Care Guide
             </h1>
 
-            {/* Scientific name & family */}
-            {(scientificName || category) && (
+            {/* Family & scientific name */}
+            {(category || scientificName) && (
               <p className="text-gray-500 text-base md:text-lg mb-5">
+                {category}
+                {category && scientificName && (
+                  <span> | </span>
+                )}
                 {scientificName && (
                   <span className="italic">{scientificName}</span>
                 )}
-                {scientificName && category && (
-                  <span> | </span>
-                )}
-                {category}
               </p>
             )}
 

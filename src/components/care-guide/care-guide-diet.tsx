@@ -16,6 +16,7 @@ export interface FeedingSchedule {
   vegetable_pct: number | null;
   protein_frequency: string | null;
   vegetable_frequency: string | null;
+  description: string | null;
 }
 
 interface CareGuideDietProps {
@@ -28,6 +29,14 @@ interface CareGuideDietProps {
   proteinFoods?: string[];
   vegetableFoods?: string[];
   calciumSupplements: string | null;
+  /* Terrestrial-specific fields (all optional) */
+  compositionProteinPct?: number | null;
+  compositionPlantPct?: number | null;
+  compositionNote?: string | null;
+  foodsToAvoid?: string[];
+  commercialDiets?: string[];
+  commercialDietsNote?: string | null;
+  drinkingWater?: string | null;
 }
 
 /* ------------------------------------------------------------------
@@ -72,12 +81,12 @@ function FoodListCard({
   title,
   items,
   iconName,
-  bulletColor,
+  bulletTextColor,
 }: {
   title: string;
   items: string[];
   iconName: 'shrimp-line' | 'vegetable-line';
-  bulletColor: string;
+  bulletTextColor: string;
 }) {
   if (items.length === 0) return null;
   const mid = Math.ceil(items.length / 2);
@@ -92,14 +101,14 @@ function FoodListCard({
       </div>
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-base text-gray-700">
         {col1.map((item, i) => (
-          <li key={`a-${i}`} className="flex items-start gap-2">
-            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${bulletColor}`} />
+          <li key={`a-${i}`} className="flex items-baseline gap-2">
+            <span className={`flex-shrink-0 leading-none ${bulletTextColor}`}>•</span>
             {item}
           </li>
         ))}
         {col2.map((item, i) => (
-          <li key={`b-${i}`} className="flex items-start gap-2">
-            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full flex-shrink-0 ${bulletColor}`} />
+          <li key={`b-${i}`} className="flex items-baseline gap-2">
+            <span className={`flex-shrink-0 leading-none ${bulletTextColor}`}>•</span>
             {item}
           </li>
         ))}
@@ -122,17 +131,31 @@ export function CareGuideDiet({
   proteinFoods = [],
   vegetableFoods = [],
   calciumSupplements,
+  compositionProteinPct,
+  compositionPlantPct,
+  compositionNote,
+  foodsToAvoid = [],
+  commercialDiets = [],
+  commercialDietsNote,
+  drinkingWater,
 }: CareGuideDietProps) {
   const { activeSection } = useCareGuideActiveSection();
   const hasPortions = portionProtein || portionVegetables || portionPellets;
   const hasFoodLists = proteinFoods.length > 0 || vegetableFoods.length > 0;
+  const hasComposition = compositionProteinPct != null && compositionPlantPct != null;
+  // Use card-style feeding schedule when any schedule has a description field
+  const useCardSchedule = feedingSchedules.some(s => s.description != null);
   const hasContent =
     introText ||
     subtitleText ||
     feedingSchedules.length > 0 ||
     hasPortions ||
     hasFoodLists ||
-    calciumSupplements;
+    hasComposition ||
+    foodsToAvoid.length > 0 ||
+    commercialDiets.length > 0 ||
+    calciumSupplements ||
+    drinkingWater;
 
   if (!hasContent) return null;
 
@@ -158,8 +181,36 @@ export function CareGuideDiet({
         </div>
       )}
 
-      {/* Feeding Schedule by Age — table with title row + column labels */}
-      {feedingSchedules.length > 0 && (
+      {/* Feeding Schedule — card-style (terrestrial) */}
+      {feedingSchedules.length > 0 && useCardSchedule && (
+        <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+          <div className="bg-white px-5 py-3 border-b border-gray-100">
+            <h3 className="font-heading font-bold text-black text-lg">
+              Feeding Schedule
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5">
+            {feedingSchedules.map((schedule, i) => (
+              <div
+                key={i}
+                className={`rounded-xl border px-5 py-4 ${
+                  i === 0 ? 'border-green-600 bg-green-500/10' : 'border-gray-100 bg-warm'
+                }`}
+              >
+                <h4 className="font-heading font-bold text-black text-base mb-1">
+                  {schedule.life_stage}
+                </h4>
+                {schedule.description && (
+                  <p className="text-base text-gray-700">{schedule.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Feeding Schedule by Age — table (aquatic) */}
+      {feedingSchedules.length > 0 && !useCardSchedule && (
         <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
           <table className="w-full text-base">
             <thead>
@@ -203,6 +254,30 @@ export function CareGuideDiet({
         </div>
       )}
 
+      {/* Diet Composition bar (terrestrial) */}
+      {hasComposition && (
+        <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden p-5">
+          <h3 className="font-heading font-bold text-black text-lg mb-3">Diet Composition</h3>
+          <div className="flex rounded-lg overflow-hidden h-10 mb-3">
+            <div
+              className="bg-red-500/40 flex items-center justify-center"
+              style={{ width: `${compositionProteinPct}%` }}
+            >
+              <span className="text-sm font-bold text-red-800">{compositionProteinPct}% Animal Protein</span>
+            </div>
+            <div
+              className="bg-green-500/40 flex items-center justify-center"
+              style={{ width: `${compositionPlantPct}%` }}
+            >
+              <span className="text-sm font-bold text-green-800">{compositionPlantPct}% Plant Matter</span>
+            </div>
+          </div>
+          {compositionNote && (
+            <p className="text-base text-gray-700">{compositionNote}</p>
+          )}
+        </div>
+      )}
+
       {/* Portion Sizes — white container with food-type boxes inside (bg-warm) */}
       {hasPortions && (
         <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden p-5">
@@ -237,24 +312,63 @@ export function CareGuideDiet({
       {hasFoodLists && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <FoodListCard
-            title="Protein Foods"
+            title={useCardSchedule ? 'Animal Protein' : 'Protein Foods'}
             items={proteinFoods}
             iconName="shrimp-line"
-            bulletColor="bg-red-500"
+            bulletTextColor="text-red-600"
           />
           <FoodListCard
-            title="Vegetable Foods"
+            title={useCardSchedule ? 'Plants, Fruits & Vegetables' : 'Vegetable Foods'}
             items={vegetableFoods}
             iconName="vegetable-line"
-            bulletColor="bg-green-500"
+            bulletTextColor="text-green-600"
           />
         </div>
       )}
 
-      {/* Calcium & Supplements callout */}
+      {/* Foods to Avoid (terrestrial) */}
+      {foodsToAvoid.length > 0 && (
+        <div className="mb-8 rounded-xl border border-red-200 bg-red-50 shadow-sm overflow-hidden p-5">
+          <h3 className="font-heading font-bold text-red-800 text-lg mb-3">Foods to Avoid</h3>
+          <p className="text-base text-gray-700">{foodsToAvoid.join(', ')}</p>
+        </div>
+      )}
+
+      {/* Commercial Diets (terrestrial) */}
+      {(commercialDiets.length > 0 || commercialDietsNote) && (
+        <div className="mb-8 rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden p-5">
+          <h3 className="font-heading font-bold text-black text-lg mb-2">Commercial Diets</h3>
+          {commercialDietsNote && (
+            <p className="text-base text-gray-700 mb-3">{commercialDietsNote}</p>
+          )}
+          {commercialDiets.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {commercialDiets.map((diet, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center rounded-full bg-green-900/20 px-3 py-1 text-sm font-medium text-gray-800"
+                >
+                  {diet}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Supplements & Calcium callout */}
       {calciumSupplements && (
-        <CareGuideCallout variant="green" title="Calcium & Supplements" dimmed={activeSection !== 'diet'}>
-          {calciumSupplements}
+        <div className="mb-8">
+          <CareGuideCallout variant="green" title="Supplements & Calcium" dimmed={activeSection !== 'diet'}>
+            {calciumSupplements}
+          </CareGuideCallout>
+        </div>
+      )}
+
+      {/* Drinking Water callout (terrestrial) */}
+      {drinkingWater && (
+        <CareGuideCallout variant="blue" title="Drinking Water" dimmed={activeSection !== 'diet'}>
+          {drinkingWater}
         </CareGuideCallout>
       )}
     </section>
