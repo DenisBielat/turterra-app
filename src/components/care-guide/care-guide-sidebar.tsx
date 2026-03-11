@@ -60,19 +60,19 @@ export function CareGuideSidebar({
         </div>
 
         {/* Section navigation */}
-        <div className="flex flex-col gap-4 mb-0">
+        <div className="flex flex-col gap-1.5 mb-0">
           {sections.map((section) => (
             <button
               key={section.id}
               onClick={() => scrollToSection(section.id)}
-              className={`flex items-center gap-4 w-full px-4 py-2 rounded-lg transition-all duration-200 font-heading uppercase text-sm font-semibold ${
+              className={`flex items-center gap-2 w-full px-3 py-1.5 rounded-md transition-all duration-200 font-heading uppercase text-sm font-semibold ${
                 activeSection === section.id
                   ? 'bg-green-800 text-white'
                   : 'hover:bg-green-800 hover:text-white'
               }`}
             >
-              <div className="w-5 h-5 flex items-center justify-center">
-                <Icon name={section.icon} style="line" size="base" />
+              <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
+                <Icon name={section.icon} style="line" size="sm" />
               </div>
               {section.label}
             </button>
@@ -81,10 +81,10 @@ export function CareGuideSidebar({
           {/* Back to Top */}
           <button
             onClick={scrollToTop}
-            className="flex items-center gap-4 w-full px-4 py-2 rounded-lg transition-all duration-200 font-heading uppercase text-sm font-semibold hover:bg-green-800 hover:text-white"
+            className="flex items-center gap-2 w-full px-3 py-1.5 rounded-md transition-all duration-200 font-heading uppercase text-sm font-semibold hover:bg-green-800 hover:text-white"
           >
-            <div className="w-5 h-5 flex items-center justify-center -rotate-90">
-              <Icon name="arrow-right-1" style="line" size="base" />
+            <div className="w-4 h-4 flex items-center justify-center flex-shrink-0 -rotate-90">
+              <Icon name="arrow-right-1" style="line" size="sm" />
             </div>
             Back to Top
           </button>
@@ -142,7 +142,7 @@ export function CareGuideSidebar({
         {/* Related care guides */}
         {relatedGuides.length > 0 && (
           <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+            <h3 className="text-sm text-gray-600 mb-3">
               Related Care Guides
             </h3>
             <div className="flex flex-col gap-2">
