@@ -86,6 +86,13 @@ export default function TaxonomyPopup({
             scientific={taxonomy.species.scientific}
             rank="Species"
           />
+          {taxonomy.subspecies && (
+            <TaxonomyRow
+              common={taxonomy.subspecies.common}
+              scientific={taxonomy.subspecies.scientific}
+              rank="Subspecies"
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -44,6 +44,9 @@ export async function GET() {
         avatar_image_circle_url,
         avatar_image_full_url,
         tax_parent_genus,
+        is_subspecies,
+        parent_species_id,
+        subspecies_name,
         turtle_species_section_descriptions(
           at_a_glance
         ),
@@ -125,8 +128,21 @@ export async function GET() {
       .select('region_name')
       .order('region_name', { ascending: true });
 
+    // Build a set of parent species IDs that have subspecies children
+    // These umbrella species should be hidden in favor of their subspecies
+    const parentSpeciesIds = new Set(
+      (turtles || [])
+        .filter(t => t.is_subspecies && t.parent_species_id)
+        .map(t => t.parent_species_id as number)
+    );
+
+    // Filter out parent species that have subspecies entries
+    const visibleTurtles = (turtles || []).filter(
+      turtle => !parentSpeciesIds.has(turtle.id)
+    );
+
     // Transform turtle data
-    const transformedTurtles: TurtleGuideSpecies[] = (turtles || []).map(turtle => {
+    const transformedTurtles: TurtleGuideSpecies[] = visibleTurtles.map(turtle => {
       // Get conservation status (most recent)
       const conservationHistoryRaw = turtle.turtle_species_conservation_history as unknown as Array<{
         year_status_assigned: string;

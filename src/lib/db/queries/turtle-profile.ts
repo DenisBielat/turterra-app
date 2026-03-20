@@ -50,6 +50,9 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
       avatar_image_circle_url,
       avatar_image_full_url,
       tax_parent_genus,
+      is_subspecies,
+      parent_species_id,
+      subspecies_name,
       limited_information_toggle,
       limited_information_description,
       turtle_species_section_descriptions (
@@ -233,7 +236,8 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
 async function fetchTaxonomyData(
   genusId: number,
   speciesCommonName: string,
-  speciesScientificName: string
+  speciesScientificName: string,
+  subspeciesInfo?: { isSubspecies: boolean; subspeciesName: string | null; parentSpeciesId: number | null }
 ): Promise<TaxonomyData | null> {
   // Fetch genus data
   const { data: genus, error: genusError } = await supabase
@@ -283,7 +287,7 @@ async function fetchTaxonomyData(
     return null;
   }
 
-  return {
+  const taxonomyData: TaxonomyData = {
     order: {
       scientific: order.order_scientific || 'Unknown',
       common: order.order_common_name || 'Unknown'
@@ -305,6 +309,29 @@ async function fetchTaxonomyData(
       common: speciesCommonName
     }
   };
+
+  // If this is a subspecies, fetch the parent species name for the species rank
+  // and show the current entry as the subspecies rank
+  if (subspeciesInfo?.isSubspecies && subspeciesInfo.parentSpeciesId) {
+    const { data: parentSpecies } = await supabase
+      .from('turtle_species')
+      .select('species_common_name, species_scientific_name')
+      .eq('id', subspeciesInfo.parentSpeciesId)
+      .single();
+
+    if (parentSpecies) {
+      taxonomyData.species = {
+        scientific: parentSpecies.species_scientific_name,
+        common: parentSpecies.species_common_name
+      };
+      taxonomyData.subspecies = {
+        scientific: speciesScientificName,
+        common: speciesCommonName
+      };
+    }
+  }
+
+  return taxonomyData;
 }
 
 function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) {
@@ -840,7 +867,12 @@ export async function getTurtleData(slug: string) {
       fetchTaxonomyData(
         turtle.tax_parent_genus,
         turtle.species_common_name,
-        turtle.species_scientific_name
+        turtle.species_scientific_name,
+        {
+          isSubspecies: turtle.is_subspecies,
+          subspeciesName: turtle.subspecies_name,
+          parentSpeciesId: turtle.parent_species_id
+        }
       )
     ]);
 
@@ -900,7 +932,12 @@ export async function getTurtleDataByScientificName(scientificName: string) {
       fetchTaxonomyData(
         turtle.tax_parent_genus,
         turtle.species_common_name,
-        turtle.species_scientific_name
+        turtle.species_scientific_name,
+        {
+          isSubspecies: turtle.is_subspecies,
+          subspeciesName: turtle.subspecies_name,
+          parentSpeciesId: turtle.parent_species_id
+        }
       )
     ]);
 

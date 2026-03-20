@@ -33,6 +33,8 @@ interface SpeciesRow {
   species_common_name: string;
   species_scientific_name: string;
   avatar_image_circle_url: string | null;
+  is_subspecies: boolean;
+  parent_species_id: number | null;
   turtle_species_conservation_history: ConservationHistory[];
   turtle_species_habitat_types: HabitatTypeRelation[];
 }
@@ -53,6 +55,8 @@ export async function GET(request: Request) {
         species_common_name,
         species_scientific_name,
         avatar_image_circle_url,
+        is_subspecies,
+        parent_species_id,
         turtle_species_conservation_history(
           year_status_assigned,
           out_of_date,
@@ -96,8 +100,17 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
+    // Filter out parent species that have subspecies entries
+    const allSpecies = (species || []) as SpeciesRow[];
+    const parentSpeciesIds = new Set(
+      allSpecies
+        .filter(s => s.is_subspecies && s.parent_species_id)
+        .map(s => s.parent_species_id as number)
+    );
+    const visibleSpecies = allSpecies.filter(s => !parentSpeciesIds.has(s.id));
+
     // Transform and filter results
-    let results = ((species || []) as SpeciesRow[]).map((s) => {
+    let results = visibleSpecies.map((s) => {
       // Get the most recent conservation status
       const conservationHistory = s.turtle_species_conservation_history || [];
       const sortedHistory = [...conservationHistory].sort(
