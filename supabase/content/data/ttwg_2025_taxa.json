@@ -1,0 +1,3872 @@
+{
+ "source": "Turtle Taxonomy Working Group 2025. Turtles of the World: Annotated Checklist and Atlas of Taxonomy, Synonymy, Distribution, and Conservation Status (10th Ed.). Chelonian Research Monographs 10:1-575.",
+ "source_url": "https://iucn-tftsg.org/checklists/turtles-of-the-world-checklist-10th-edition/",
+ "extracted_on": "2026-11-18",
+ "note": "Accepted species and named subspecies extracted from the checklist text: 364 species and 188 named subspecies (the checklist also counts one unnamed subspecies of Chelonoidis niger). Common name is the first English name the checklist gives.",
+ "taxa": [
+  {
+   "scientific_name": "Acanthochelys macrocephala",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Pantanal Swamp Turtle"
+  },
+  {
+   "scientific_name": "Acanthochelys pallidipectoris",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Chaco Side-necked Turtle"
+  },
+  {
+   "scientific_name": "Acanthochelys radiolata",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Brazilian Radiolated Swamp Turtle"
+  },
+  {
+   "scientific_name": "Acanthochelys spixii",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Black Spiny-necked Turtle"
+  },
+  {
+   "scientific_name": "Actinemys marmorata",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Northern Pacific Pond Turtle"
+  },
+  {
+   "scientific_name": "Actinemys pallida",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Southern Pacific Pond Turtle"
+  },
+  {
+   "scientific_name": "Aldabrachelys gigantea",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Aldabrachelys gigantea arnoldi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Arnold’s Giant Tortoise"
+  },
+  {
+   "scientific_name": "Aldabrachelys gigantea daudinii",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Daudin’s Giant Tortoise"
+  },
+  {
+   "scientific_name": "Aldabrachelys gigantea gigantea",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Aldabra Giant Tortoise"
+  },
+  {
+   "scientific_name": "Aldabrachelys gigantea hololissa",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Seychelles Giant Tortoise"
+  },
+  {
+   "scientific_name": "Amyda cartilaginea",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Asiatic Softshell Turtle"
+  },
+  {
+   "scientific_name": "Amyda cartilaginea cartilaginea",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "South Sundas Softshell Turtle"
+  },
+  {
+   "scientific_name": "Amyda cartilaginea maculosa",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "North Sundas Softshell Turtle"
+  },
+  {
+   "scientific_name": "Amyda ornata",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Southeast Asian Softshell Turtle"
+  },
+  {
+   "scientific_name": "Amyda ornata jongli",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Northwest Asian Softshell Turtle"
+  },
+  {
+   "scientific_name": "Amyda ornata ornata",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Indochinese Softshell Turtle"
+  },
+  {
+   "scientific_name": "Amyda ornata phayrei",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Myanmar Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone ferox",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Florida Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone mutica",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Smooth Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone mutica calvata",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Gulf Coast Smooth Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone mutica mutica",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Midland Smooth Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone spinifera",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Spiny Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone spinifera aspera",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Gulf Coast Spiny Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone spinifera atra",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Black Spiny Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone spinifera emoryi",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Texas Spiny Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone spinifera guadalupensis",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Guadalupe Spiny Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone spinifera pallida",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Pallid Spiny Softshell Turtle"
+  },
+  {
+   "scientific_name": "Apalone spinifera spinifera",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Northern Spiny Softshell Turtle"
+  },
+  {
+   "scientific_name": "Astrochelys radiata",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Radiated Tortoise"
+  },
+  {
+   "scientific_name": "Astrochelys yniphora",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Ploughshare Tortoise"
+  },
+  {
+   "scientific_name": "Batagur affinis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Southern River Terrapin"
+  },
+  {
+   "scientific_name": "Batagur affinis affinis",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Western Malay River Terrapin"
+  },
+  {
+   "scientific_name": "Batagur affinis edwardmolli",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Eastern Malay River Terrapin"
+  },
+  {
+   "scientific_name": "Batagur baska",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Northern River Terrapin"
+  },
+  {
+   "scientific_name": "Batagur borneoensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Painted Terrapin"
+  },
+  {
+   "scientific_name": "Batagur dhongoka",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Three-striped Roofed Turtle"
+  },
+  {
+   "scientific_name": "Batagur kachuga",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Red-crowned Roofed Turtle"
+  },
+  {
+   "scientific_name": "Batagur trivittata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Myanmar Roofed Turtle"
+  },
+  {
+   "scientific_name": "Caretta caretta",
+   "rank": "species",
+   "family": "Cheloniidae",
+   "subfamily": null,
+   "common_name": "Loggerhead"
+  },
+  {
+   "scientific_name": "Carettochelys insculpta",
+   "rank": "species",
+   "family": "Carettochelyidae",
+   "subfamily": null,
+   "common_name": "Pig-nosed Turtle"
+  },
+  {
+   "scientific_name": "Centrochelys sulcata",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Chelodina burrungandjii",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Arnhem Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina canni",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Cann’s Long-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina expansa",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Broad-shelled Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina gunaleni",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Gunalen’s Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina kuchlingi",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Kuchling’s Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina kurrichalpongo",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Darwin Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina longicollis",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Eastern Long-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina mccordi",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Chelodina mccordi mccordi",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Roti Island Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina mccordi timorensis",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Timor Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina novaeguineae",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "New Guinea Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina oblonga",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Southwestern Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina parkeri",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Parker’s Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina pritchardi",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Pritchard’s Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina reimanni",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Reimann’s Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina rugosa",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Northern Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelodina steindachneri",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelodininae",
+   "common_name": "Western Long-necked Turtle"
+  },
+  {
+   "scientific_name": "Chelonia mydas",
+   "rank": "species",
+   "family": "Cheloniidae",
+   "subfamily": "Cheloniinae",
+   "common_name": "Green Turtle"
+  },
+  {
+   "scientific_name": "Chelonoidis carbonarius",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Chelonoidis chilensis",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Chaco Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis denticulatus",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Yellow-footed Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Chelonoidis niger abingdonii",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Pinta Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger becki",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Volcán Wolf Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger chathamensis",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Chelonoidis niger darwini",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Santiago Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger donfaustoi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Eastern Santa Cruz Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger duncanensis",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Pinzón Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger guntheri",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Sierra Negra Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger hoodensis",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Española Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger microphyes",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Chelonoidis niger niger",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Floreana Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger phantasticus",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Fernandina Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger porteri",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Western Santa Cruz Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelonoidis niger vandenburghi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Chelonoidis niger vicina",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Cerro Azul Giant Tortoise"
+  },
+  {
+   "scientific_name": "Chelus fimbriata",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Amazon Matamata"
+  },
+  {
+   "scientific_name": "Chelus orinocensis",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Orinoco Matamata"
+  },
+  {
+   "scientific_name": "Chelydra acutirostris",
+   "rank": "species",
+   "family": "Chelydridae",
+   "subfamily": null,
+   "common_name": "South American Snapping Turtle"
+  },
+  {
+   "scientific_name": "Chelydra rossignonii",
+   "rank": "species",
+   "family": "Chelydridae",
+   "subfamily": null,
+   "common_name": "Central American Snapping Turtle"
+  },
+  {
+   "scientific_name": "Chelydra serpentina",
+   "rank": "species",
+   "family": "Chelydridae",
+   "subfamily": null,
+   "common_name": "North American Snapping Turtle"
+  },
+  {
+   "scientific_name": "Chersina angulata",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Angulate Tortoise"
+  },
+  {
+   "scientific_name": "Chersobius boulengeri",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Karoo Dwarf Tortoise"
+  },
+  {
+   "scientific_name": "Chersobius signatus",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Speckled Dwarf Tortoise"
+  },
+  {
+   "scientific_name": "Chersobius solus",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Nama Tortoise"
+  },
+  {
+   "scientific_name": "Chitra chitra",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Asian Narrow-headed Softshell Turtle"
+  },
+  {
+   "scientific_name": "Chitra chitra chitra",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Siamese Narrow-headed Softshell Turtle"
+  },
+  {
+   "scientific_name": "Chitra chitra javanensis",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Javanese Narrow-headed Softshell Turtle"
+  },
+  {
+   "scientific_name": "Chitra indica",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Indian Narrow-headed Softshell Turtle"
+  },
+  {
+   "scientific_name": "Chitra vandijki",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Burmese Narrow-headed Softshell Turtle"
+  },
+  {
+   "scientific_name": "Chrysemys dorsalis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Southern Painted Turtle"
+  },
+  {
+   "scientific_name": "Chrysemys picta",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Painted Turtle"
+  },
+  {
+   "scientific_name": "Chrysemys picta bellii",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Western Painted Turtle"
+  },
+  {
+   "scientific_name": "Chrysemys picta marginata",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Midland Painted Turtle"
+  },
+  {
+   "scientific_name": "Chrysemys picta picta",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Eastern Painted Turtle"
+  },
+  {
+   "scientific_name": "Claudius angustatus",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Staurotypinae",
+   "common_name": "Narrow-bridged Musk Turtle"
+  },
+  {
+   "scientific_name": "Clemmys guttata",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Spotted Turtle"
+  },
+  {
+   "scientific_name": "Cuora amboinensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "East Indonesian Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora amboinensis amboinensis",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "East Indonesian Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora amboinensis aurantiae",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Palu Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora aurocapitata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Yellow-headed Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora aurocapitata aurocapitata",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Eastern Yellow-headed Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora aurocapitata dabieshani",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Western Yellow-headed Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora bourreti",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Bourret’s Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora couro",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Southeast Asian Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora couro couro",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Indo-Malayan Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora couro kamaroma",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Southeast Asian Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora cyclornata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Vietnamese Three-striped Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora cyclornata annamitica",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Central Vietnamese Three-striped Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora cyclornata cyclornata",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Southern Vietnamese Three-striped Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora cyclornata meieri",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Northern Vietnamese Three-striped Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora flavomarginata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Yellow-margined Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora flavomarginata evelynae",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Ryukyu Yellow-margined Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora flavomarginata flavomarginata",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Yellow-margined Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora galbinifrons",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Indochinese Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora lineata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Myanmar Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora mccordi",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "McCord’s Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora mouhotii",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Keeled Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora mouhotii mouhotii",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Northern Keeled Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora mouhotii obsti",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Southern Keeled Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora pani",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Pan’s Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora philippinensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Philippine Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora picturata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Southern Vietnam Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora praschagi",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Assam Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora trifasciata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Chinese Three-striped Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora trifasciata luteocephala",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Hainan Three-striped Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora trifasciata trifasciata",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Chinese Three-striped Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora yunnanensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Yunnan Box Turtle"
+  },
+  {
+   "scientific_name": "Cuora zhoui",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Zhou’s Box Turtle"
+  },
+  {
+   "scientific_name": "Cyclanorbis elegans",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Nubian Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Cyclanorbis senegalensis",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Sahelian Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Cyclemys atripons",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Western Black-bridged Leaf Turtle"
+  },
+  {
+   "scientific_name": "Cyclemys dentata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Asian Leaf Turtle"
+  },
+  {
+   "scientific_name": "Cyclemys enigmatica",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Enigmatic Leaf Turtle"
+  },
+  {
+   "scientific_name": "Cyclemys fusca",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Myanmar Brown Leaf Turtle"
+  },
+  {
+   "scientific_name": "Cyclemys gemeli",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Assam Leaf Turtle"
+  },
+  {
+   "scientific_name": "Cyclemys oldhamii",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Southeast Asian Leaf Turtle"
+  },
+  {
+   "scientific_name": "Cyclemys pulchristriata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Eastern Black-bridged Leaf Turtle"
+  },
+  {
+   "scientific_name": "Cycloderma aubryi",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Aubry’s Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Cycloderma frenatum",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Zambezi Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Cylindraspis indica",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Reunion Giant Tortoise"
+  },
+  {
+   "scientific_name": "Cylindraspis inepta",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Mauritius Giant Domed Tortoise"
+  },
+  {
+   "scientific_name": "Cylindraspis peltastes",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Rodrigues Domed Tortoise"
+  },
+  {
+   "scientific_name": "Cylindraspis triserrata",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Mauritius Giant Flat-shelled Tortoise"
+  },
+  {
+   "scientific_name": "Cylindraspis vosmaeri",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Rodrigues Giant Saddleback Tortoise"
+  },
+  {
+   "scientific_name": "Deirochelys reticularia",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Chicken Turtle"
+  },
+  {
+   "scientific_name": "Deirochelys reticularia chrysea",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Florida Chicken Turtle"
+  },
+  {
+   "scientific_name": "Deirochelys reticularia miaria",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Western Chicken Turtle"
+  },
+  {
+   "scientific_name": "Deirochelys reticularia reticularia",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Eastern Chicken Turtle"
+  },
+  {
+   "scientific_name": "Dermatemys mawii",
+   "rank": "species",
+   "family": "Dermatemydidae",
+   "subfamily": null,
+   "common_name": "Central American River Turtle"
+  },
+  {
+   "scientific_name": "Dermochelys coriacea",
+   "rank": "species",
+   "family": "Dermochelyidae",
+   "subfamily": null,
+   "common_name": "Leatherback"
+  },
+  {
+   "scientific_name": "Dogania subplana",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Malayan Softshell Turtle"
+  },
+  {
+   "scientific_name": "Elseya albagula",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "White-throated Snapping Turtle"
+  },
+  {
+   "scientific_name": "Elseya branderhorsti",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "White-bellied Snapping Turtle"
+  },
+  {
+   "scientific_name": "Elseya dentata",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Elseya flaviventralis",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Yellow-bellied Snapping Turtle"
+  },
+  {
+   "scientific_name": "Elseya irwini",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Irwin’s Snapping Turtle"
+  },
+  {
+   "scientific_name": "Elseya lavarackorum",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Gulf Snapping Turtle"
+  },
+  {
+   "scientific_name": "Elseya novaeguineae",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Elseya rhodini",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Elseya schultzei",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Elusor macrurus",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Mary River Turtle"
+  },
+  {
+   "scientific_name": "Emydoidea blandingii",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Blanding’s Turtle"
+  },
+  {
+   "scientific_name": "Emydura australis",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Northern Red-faced Turtle"
+  },
+  {
+   "scientific_name": "Emydura gunaleni",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Gunalen’s Short-necked Turtle"
+  },
+  {
+   "scientific_name": "Emydura macquarii",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Eastern Short-necked Turtle"
+  },
+  {
+   "scientific_name": "Emydura macquarii emmotti",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Cooper Creek Turtle"
+  },
+  {
+   "scientific_name": "Emydura macquarii krefftii",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Krefft’s River Turtle"
+  },
+  {
+   "scientific_name": "Emydura macquarii macquarii",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Macquarie River Turtle"
+  },
+  {
+   "scientific_name": "Emydura macquarii nigra",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Fraser Island Short-necked Turtle"
+  },
+  {
+   "scientific_name": "Emydura subglobosa",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Red-bellied Short-necked Turtle"
+  },
+  {
+   "scientific_name": "Emydura subglobosa subglobosa",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "New Guinea Red-bellied Short-necked Turtle"
+  },
+  {
+   "scientific_name": "Emydura subglobosa worrelli",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Worrell’s Short-necked Turtle"
+  },
+  {
+   "scientific_name": "Emydura tanybaraga",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Northern Yellow-faced Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "European Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis eiselti",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Eiselt’s Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis galloitalica",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Franco-Italian Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis hellenica",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Hellenic Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis ingauna",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Ligurian Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis occidentalis",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Western Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis orbicularis",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "European Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys orbicularis persica",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Eastern Pond Turtle"
+  },
+  {
+   "scientific_name": "Emys trinacris",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Sicilian Pond Turtle"
+  },
+  {
+   "scientific_name": "Eretmochelys imbricata",
+   "rank": "species",
+   "family": "Cheloniidae",
+   "subfamily": null,
+   "common_name": "Hawksbill Turtle"
+  },
+  {
+   "scientific_name": "Erymnochelys madagascariensis",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": null,
+   "common_name": "Madagascan Big-headed Turtle"
+  },
+  {
+   "scientific_name": "Geochelone elegans",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Indian Star Tortoise"
+  },
+  {
+   "scientific_name": "Geochelone elegans actinodes",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Northwestern Indian Star Tortoise"
+  },
+  {
+   "scientific_name": "Geochelone elegans elegans",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Southern Indian Star Tortoise"
+  },
+  {
+   "scientific_name": "Geochelone platynota",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Burmese Star Tortoise"
+  },
+  {
+   "scientific_name": "Geoclemys hamiltonii",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Spotted Pond Turtle"
+  },
+  {
+   "scientific_name": "Geoemyda japonica",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Ryukyu Black-breasted Leaf Turtle"
+  },
+  {
+   "scientific_name": "Geoemyda spengleri",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Black-breasted Leaf Turtle"
+  },
+  {
+   "scientific_name": "Glyptemys insculpta",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Wood Turtle"
+  },
+  {
+   "scientific_name": "Glyptemys muhlenbergii",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Bog Turtle"
+  },
+  {
+   "scientific_name": "Gopherus agassizii",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Xerobatinae",
+   "common_name": "Mojave Desert Tortoise"
+  },
+  {
+   "scientific_name": "Gopherus berlandieri",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Xerobatinae",
+   "common_name": "Texas Tortoise"
+  },
+  {
+   "scientific_name": "Gopherus evgoodei",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Xerobatinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Gopherus flavomarginatus",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Xerobatinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Gopherus morafkai",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Xerobatinae",
+   "common_name": "Sonoran Desert Tortoise"
+  },
+  {
+   "scientific_name": "Gopherus polyphemus",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Xerobatinae",
+   "common_name": "Gopher Tortoise"
+  },
+  {
+   "scientific_name": "Graptemys barbouri",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Barbour’s Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys caglei",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Cagle’s Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys ernsti",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Escambia Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys flavimaculata",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Yellow-blotched Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys geographica",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Northern Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys gibbonsi",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Pascagoula Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys nigrinoda",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Black-knobbed Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys oculifera",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Ringed Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys ouachitensis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Ouachita Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys pearlensis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Pearl River Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys pseudogeographica",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "False Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys pseudogeographica kohnii",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Mississippi Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys pseudogeographica pseudogeographica",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Northern False Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys pulchra",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Alabama Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys sabinensis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Sabine Map Turtle"
+  },
+  {
+   "scientific_name": "Graptemys versa",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Texas Map Turtle"
+  },
+  {
+   "scientific_name": "Hardella thurjii",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Crowned River Turtle"
+  },
+  {
+   "scientific_name": "Heosemys annandalii",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Yellow-headed Temple Turtle"
+  },
+  {
+   "scientific_name": "Heosemys depressa",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Arakan Forest Turtle"
+  },
+  {
+   "scientific_name": "Heosemys grandis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Giant Asian Pond Turtle"
+  },
+  {
+   "scientific_name": "Heosemys spinosa",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Spiny Turtle"
+  },
+  {
+   "scientific_name": "Homopus areolatus",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Parrot-beaked Dwarf Tortoise"
+  },
+  {
+   "scientific_name": "Homopus femoralis",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Greater Padloper"
+  },
+  {
+   "scientific_name": "Hydromedusa maximiliani",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Hydromedusinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Hydromedusa tectifera",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Hydromedusinae",
+   "common_name": "South American Snake-necked Turtle"
+  },
+  {
+   "scientific_name": "Indotestudo elongata",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Elongated Tortoise"
+  },
+  {
+   "scientific_name": "Indotestudo forstenii",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Sulawesi Tortoise"
+  },
+  {
+   "scientific_name": "Indotestudo travancorica",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Travancore Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys belliana",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Bell’s Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys erosa",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Forest Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys homeana",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Home’s Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys lobatsiana",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Lobatse Hinged Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys natalensis",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Natal Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys nogueyi",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Western Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys spekii",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Speke’s Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys zombensis",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Southeastern Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys zombensis domerguei",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Madagascan Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinixys zombensis zombensis",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Southeastern Hinge-back Tortoise"
+  },
+  {
+   "scientific_name": "Kinosternon abaxillare",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Kinosternon acutum",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Tabasco Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon alamosae",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Alamos Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon albogulare",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "White-throated Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon angustipons",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Narrow-bridged Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon baurii",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Striped Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon chimalhuaca",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Jalisco Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon cora",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Cora Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon creaseri",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Creaser’s Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon cruentatum",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Atlantic Red-cheeked Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon dunni",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Dunn’s Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon durangoense",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Durango Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon flavescens",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Yellow Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon herrerai",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Herrera’s Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon hirtipes",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Rough-footed Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon hirtipes chapalaense",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Lake Chapala Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon hirtipes hirtipes",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Valley of Mexico Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon hirtipes magdalense",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "San Juanico Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon hirtipes megacephalum",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Viesca Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon hirtipes murrayi",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Mexican Plateau Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon hirtipes tarascense",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Pátzcuaro Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon integrum",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Mexican Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon leucostomum",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "White-lipped Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon leucostomum leucostomum",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Northern White-lipped Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon leucostomum postinguinale",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Southern White-lipped Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon mexicanum",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Pacific Red-cheeked Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon oaxacae",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Oaxaca Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon scorpioides",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Scorpion Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon sonoriense",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Sonora Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon sonoriense longifemorale",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Sonoyta Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon sonoriense sonoriense",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Desert Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon steindachneri",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Kinosternon stejnegeri",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Arizona Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon subrubrum",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Eastern Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon subrubrum hippocrepis",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Mississippi Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon subrubrum subrubrum",
+   "rank": "subspecies",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Southeastern Mud Turtle"
+  },
+  {
+   "scientific_name": "Kinosternon vogti",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Vallarta Mud Turtle"
+  },
+  {
+   "scientific_name": "Lepidochelys kempii",
+   "rank": "species",
+   "family": "Cheloniidae",
+   "subfamily": null,
+   "common_name": "Kemp’s Ridley"
+  },
+  {
+   "scientific_name": "Lepidochelys olivacea",
+   "rank": "species",
+   "family": "Cheloniidae",
+   "subfamily": null,
+   "common_name": "Olive Ridley"
+  },
+  {
+   "scientific_name": "Leucocephalon yuwonoi",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Sulawesi Forest Turtle"
+  },
+  {
+   "scientific_name": "Lissemys ceylonensis",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Sri Lankan Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Lissemys punctata",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Indian Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Lissemys punctata andersoni",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Spotted Northern Indian Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Lissemys punctata punctata",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Southern Indian Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Lissemys punctata vittata",
+   "rank": "subspecies",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Central Indian Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Lissemys scutata",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Cyclanorbinae",
+   "common_name": "Burmese Flapshell Turtle"
+  },
+  {
+   "scientific_name": "Macrochelys suwanniensis",
+   "rank": "species",
+   "family": "Chelydridae",
+   "subfamily": null,
+   "common_name": null
+  },
+  {
+   "scientific_name": "Macrochelys temminckii",
+   "rank": "species",
+   "family": "Chelydridae",
+   "subfamily": null,
+   "common_name": "Western Alligator Snapping Turtle"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin centrata",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Carolina Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin littoralis",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Texas Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin macrospilota",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Ornate Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin pileata",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Mississippi Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin rhizophorarum",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Mangrove Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin tequesta",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Eastern Florida Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malaclemys terrapin terrapin",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Northern Diamondback Terrapin"
+  },
+  {
+   "scientific_name": "Malacochersus tornieri",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Pancake Tortoise"
+  },
+  {
+   "scientific_name": "Malayemys khoratensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Khorat Snail-eating Turtle"
+  },
+  {
+   "scientific_name": "Malayemys macrocephala",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Malayan Snail-eating Turtle"
+  },
+  {
+   "scientific_name": "Malayemys subtrijuga",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Mekong Snail-eating Turtle"
+  },
+  {
+   "scientific_name": "Manouria emys",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Manouriinae",
+   "common_name": "Asian Giant Tortoise"
+  },
+  {
+   "scientific_name": "Manouria emys emys",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Manouriinae",
+   "common_name": "Asian Brown Giant Tortoise"
+  },
+  {
+   "scientific_name": "Manouria emys phayrei",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Manouriinae",
+   "common_name": "Burmese Black Giant Tortoise"
+  },
+  {
+   "scientific_name": "Manouria impressa",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Manouriinae",
+   "common_name": "Impressed Tortoise"
+  },
+  {
+   "scientific_name": "Mauremys annamensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Vietnamese Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys caspica",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Caspian Turtle"
+  },
+  {
+   "scientific_name": "Mauremys japonica",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Japanese Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys leprosa",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Mediterranean Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys leprosa leprosa",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Mediterranean Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys leprosa saharica",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Saharan Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys mutica",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Yellow Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys mutica kami",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Ryukyu Yellow Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys mutica mutica",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Yellow Pond Turtle"
+  },
+  {
+   "scientific_name": "Mauremys nigricans",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Chinese Red-necked Turtle"
+  },
+  {
+   "scientific_name": "Mauremys reevesii",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Reeves’ Turtle"
+  },
+  {
+   "scientific_name": "Mauremys rivulata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Western Caspian Turtle"
+  },
+  {
+   "scientific_name": "Mauremys sinensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Chinese Stripe-necked Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys tricarinata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Tricarinate Hill Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys trijuga",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Indian Black Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys trijuga coronata",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Cochin Black Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys trijuga edeniana",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Burmese Black Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys trijuga indopeninsularis",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Bengal Black Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys trijuga parkeri",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Parker’s Black Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys trijuga thermalis",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Sri Lanka Black Turtle"
+  },
+  {
+   "scientific_name": "Melanochelys trijuga trijuga",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Indian Black Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys dahli",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Dahl’s Toad-headed Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys gibba",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Gibba Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys nasuta",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Guyanan Toad-headed Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys perplexa",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Cerrado Side-necked Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys raniceps",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Amazon Toad-headed Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys tuberculata",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Tuberculate Toad-headed Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys vanderhaegei",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Vanderhaege’s Toad-headed Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys wermuthi",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Wermuth’s Toad-headed Turtle"
+  },
+  {
+   "scientific_name": "Mesoclemmys zuliae",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Zulia Toad-headed Turtle"
+  },
+  {
+   "scientific_name": "Morenia ocellata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Burmese Eyed Turtle"
+  },
+  {
+   "scientific_name": "Morenia petersi",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Indian Eyed Turtle"
+  },
+  {
+   "scientific_name": "Myuchelys bellii",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Bell’s Sawshelled Turtle"
+  },
+  {
+   "scientific_name": "Myuchelys georgesi",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Bellinger River Sawshelled Turtle"
+  },
+  {
+   "scientific_name": "Myuchelys latisternum",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Sawshelled Turtle"
+  },
+  {
+   "scientific_name": "Myuchelys purvisi",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Emydurinae",
+   "common_name": "Manning River Sawshelled Turtle"
+  },
+  {
+   "scientific_name": "Natator depressus",
+   "rank": "species",
+   "family": "Cheloniidae",
+   "subfamily": "Cheloniinae",
+   "common_name": "Flatback"
+  },
+  {
+   "scientific_name": "Nilssonia formosa",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Burmese Peacock Softshell Turtle"
+  },
+  {
+   "scientific_name": "Nilssonia gangetica",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Indian Softshell Turtle"
+  },
+  {
+   "scientific_name": "Nilssonia hurum",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Indian Peacock Softshell Turtle"
+  },
+  {
+   "scientific_name": "Nilssonia leithii",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Leith’s Softshell Turtle"
+  },
+  {
+   "scientific_name": "Nilssonia nigricans",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Black Softshell Turtle"
+  },
+  {
+   "scientific_name": "Notochelys platynota",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Malayan Flat-shelled Turtle"
+  },
+  {
+   "scientific_name": "Orlitia borneensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Malaysian Giant Turtle"
+  },
+  {
+   "scientific_name": "Palea steindachneri",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Wattle-necked Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pangshura smithii",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Brown Roofed Turtle"
+  },
+  {
+   "scientific_name": "Pangshura smithii pallidipes",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Pale-footed Roofed Turtle"
+  },
+  {
+   "scientific_name": "Pangshura smithii smithii",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Brown Roofed Turtle"
+  },
+  {
+   "scientific_name": "Pangshura sylhetensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Assam Roofed Turtle"
+  },
+  {
+   "scientific_name": "Pangshura tecta",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Indian Roofed Turtle"
+  },
+  {
+   "scientific_name": "Pangshura tentoria",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Indian Tent Turtle"
+  },
+  {
+   "scientific_name": "Pangshura tentoria circumdata",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Pink-ringed Tent Turtle"
+  },
+  {
+   "scientific_name": "Pangshura tentoria flaviventer",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Yellow-bellied Tent Turtle"
+  },
+  {
+   "scientific_name": "Pangshura tentoria tentoria",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Indian Tent Turtle"
+  },
+  {
+   "scientific_name": "Pelochelys bibroni",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Southern New Guinea Giant Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelochelys cantorii",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Asian Giant Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelochelys signifera",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Northern New Guinea Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelodiscus axenaria",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Hunan Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelodiscus huangshanensis",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Huangshan Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelodiscus maackii",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Amur Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelodiscus parviformis",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Lesser Chinese Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelodiscus shipian",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Chinese Stone Slab Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelodiscus sinensis",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Chinese Softshell Turtle"
+  },
+  {
+   "scientific_name": "Pelodiscus variegatus",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Pelomedusa barbata",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Arabian Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa galeata",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "South African Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa gehafie",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Eritrean Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa kobe",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Tanzanian Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa neumanni",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "East African Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa olivacea",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Sahelian Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa schweinfurthi",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Central African Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa somalica",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Somalian Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa subrufa",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Pelomedusa variabilis",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "West African Helmeted Turtle"
+  },
+  {
+   "scientific_name": "Peltocephalus dumerilianus",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": "Peltocephalinae",
+   "common_name": "South American Big-headed Turtle"
+  },
+  {
+   "scientific_name": "Pelusios adansonii",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Adanson’s Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios bechuanicus",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Okavango Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios broadleyi",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Turkana Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios carinatus",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "African Keeled Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios castaneus",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "West African Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios castanoides",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Yellow-bellied Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios castanoides castanoides",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "East African Yellow-bellied Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios castanoides intergularis",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Seychelles Yellow-bellied Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios chapini",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Central African Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios cupulatta",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Ivory Coast Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios gabonensis",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "African Forest Turtle"
+  },
+  {
+   "scientific_name": "Pelusios marani",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Gabon Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios nanus",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "African Dwarf Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios niger",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "West African Black Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios rhodesianus",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Variable Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios sinuatus",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Serrated Hinged Terrapin"
+  },
+  {
+   "scientific_name": "Pelusios sinuatus bottegi",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Northern Serrated Hinged Terrapin"
+  },
+  {
+   "scientific_name": "Pelusios sinuatus sinuatus",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Southern Serrated Hinged Terrapin"
+  },
+  {
+   "scientific_name": "Pelusios subniger",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "East African Black Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios subniger parietalis",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Seychelles Black Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios subniger subniger",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "East African Black Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios upembae",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Upemba Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios williamsi",
+   "rank": "species",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Williams’ Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios williamsi laurenti",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Ukerewe Island Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios williamsi lutescens",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Albert Nile Mud Turtle"
+  },
+  {
+   "scientific_name": "Pelusios williamsi williamsi",
+   "rank": "subspecies",
+   "family": "Pelomedusidae",
+   "subfamily": null,
+   "common_name": "Lake Victoria Mud Turtle"
+  },
+  {
+   "scientific_name": "Phrynops geoffroanus",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Geoffroy’s Side-necked Turtle"
+  },
+  {
+   "scientific_name": "Phrynops hilarii",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Hilaire’s Side-necked Turtle"
+  },
+  {
+   "scientific_name": "Phrynops tuberosus",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Phrynops williamsi",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Williams’ Side-necked Turtle"
+  },
+  {
+   "scientific_name": "Platemys platycephala",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Twist-necked Turtle"
+  },
+  {
+   "scientific_name": "Platemys platycephala melanonota",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Black-backed Twist-necked Turtle"
+  },
+  {
+   "scientific_name": "Platemys platycephala platycephala",
+   "rank": "subspecies",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Eastern Twist-necked Turtle"
+  },
+  {
+   "scientific_name": "Platysternon megacephalum",
+   "rank": "species",
+   "family": "Platysternidae",
+   "subfamily": null,
+   "common_name": "Asian Big-headed Turtle"
+  },
+  {
+   "scientific_name": "Platysternon megacephalum megacephalum",
+   "rank": "subspecies",
+   "family": "Platysternidae",
+   "subfamily": null,
+   "common_name": "Chinese Big-headed Turtle"
+  },
+  {
+   "scientific_name": "Platysternon megacephalum peguense",
+   "rank": "subspecies",
+   "family": "Platysternidae",
+   "subfamily": null,
+   "common_name": "Southeast Asian Big-headed Turtle"
+  },
+  {
+   "scientific_name": "Platysternon megacephalum shiui",
+   "rank": "subspecies",
+   "family": "Platysternidae",
+   "subfamily": null,
+   "common_name": "Vietnamese Big-headed Turtle"
+  },
+  {
+   "scientific_name": "Podocnemis erythrocephala",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": "Podocnemidinae",
+   "common_name": "Red-headed Amazon River Turtle"
+  },
+  {
+   "scientific_name": "Podocnemis expansa",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": "Podocnemidinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Podocnemis lewyana",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": "Podocnemidinae",
+   "common_name": "Magdalena River Turtle"
+  },
+  {
+   "scientific_name": "Podocnemis sextuberculata",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": "Podocnemidinae",
+   "common_name": "Six-tubercled Amazon River Turtle"
+  },
+  {
+   "scientific_name": "Podocnemis unifilis",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": "Podocnemidinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Podocnemis vogli",
+   "rank": "species",
+   "family": "Podocnemididae",
+   "subfamily": "Podocnemidinae",
+   "common_name": "Llanos Sideneck Turtle"
+  },
+  {
+   "scientific_name": "Psammobates geometricus",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Geometric Tortoise"
+  },
+  {
+   "scientific_name": "Psammobates oculifer",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Serrated Tent Tortoise"
+  },
+  {
+   "scientific_name": "Psammobates tentorius",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Tent Tortoise"
+  },
+  {
+   "scientific_name": "Psammobates tentorius tentorius",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Southern Tent Tortoise"
+  },
+  {
+   "scientific_name": "Psammobates tentorius trimeni",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Western Tent Tortoise"
+  },
+  {
+   "scientific_name": "Psammobates tentorius verroxii",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Northern Tent Tortoise"
+  },
+  {
+   "scientific_name": "Pseudemydura umbrina",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Pseudemydurinae",
+   "common_name": "Western Swamp Turtle"
+  },
+  {
+   "scientific_name": "Pseudemys alabamensis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Alabama Red-bellied Turtle"
+  },
+  {
+   "scientific_name": "Pseudemys concinna",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "River Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys concinna concinna",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Eastern River Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys concinna suwanniensis",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Suwannee Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys floridana",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Coastal Plain Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys gorzugi",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Rio Grande Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys nelsoni",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Florida Red-bellied Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys peninsularis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Peninsula Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys rubriventris",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Northern Red-bellied Cooter"
+  },
+  {
+   "scientific_name": "Pseudemys texana",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Texas Cooter"
+  },
+  {
+   "scientific_name": "Pyxis arachnoides",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Spider Tortoise"
+  },
+  {
+   "scientific_name": "Pyxis arachnoides arachnoides",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Spider Tortoise"
+  },
+  {
+   "scientific_name": "Pyxis arachnoides brygooi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Northern Spider Tortoise"
+  },
+  {
+   "scientific_name": "Pyxis arachnoides oblonga",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Southern Spider Tortoise"
+  },
+  {
+   "scientific_name": "Pyxis planicauda",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Flat-tailed Tortoise"
+  },
+  {
+   "scientific_name": "Rafetus euphraticus",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Euphrates Softshell Turtle"
+  },
+  {
+   "scientific_name": "Rafetus swinhoei",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "Red River Giant Softshell Turtle"
+  },
+  {
+   "scientific_name": "Ranacephala hogei",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": "Hoge’s Side-necked Turtle"
+  },
+  {
+   "scientific_name": "Rheodytes leukops",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Pseudemydurinae",
+   "common_name": "Fitzroy River Turtle"
+  },
+  {
+   "scientific_name": "Rhinemys rufipes",
+   "rank": "species",
+   "family": "Chelidae",
+   "subfamily": "Chelinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Rhinoclemmys annulata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Brown Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys areolata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Furrowed Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys diademata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Maracaibo Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys funerea",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Black Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys melanosterna",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Colombian Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys nasuta",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Large-nosed Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys pulcherrima",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Painted Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys pulcherrima incisa",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Incised Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys pulcherrima manni",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Central American Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys pulcherrima pulcherrima",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Guerrero Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys pulcherrima rogerbarbouri",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Western Mexican Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys punctularia",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Spot-legged Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys punctularia flammigera",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Rhinoclemmys punctularia punctularia",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Eastern Spot-legged Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys rubida",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Mexican Spotted Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys rubida perixantha",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Colima Wood Turtle"
+  },
+  {
+   "scientific_name": "Rhinoclemmys rubida rubida",
+   "rank": "subspecies",
+   "family": "Geoemydidae",
+   "subfamily": "Rhinoclemmydinae",
+   "common_name": "Oaxaca Wood Turtle"
+  },
+  {
+   "scientific_name": "Sacalia bealei",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Beale’s Eyed Turtle"
+  },
+  {
+   "scientific_name": "Sacalia quadriocellata",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Four-eyed Turtle"
+  },
+  {
+   "scientific_name": "Siebenrockiella crassicollis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Batagurinae",
+   "common_name": "Black Marsh Turtle"
+  },
+  {
+   "scientific_name": "Siebenrockiella leytensis",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Palawan Forest Turtle"
+  },
+  {
+   "scientific_name": "Staurotypus salvinii",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Staurotypinae",
+   "common_name": "Pacific Coast Giant Musk Turtle"
+  },
+  {
+   "scientific_name": "Staurotypus triporcatus",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Staurotypinae",
+   "common_name": "Northern Giant Musk Turtle"
+  },
+  {
+   "scientific_name": "Sternotherus carinatus",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Razor-backed Musk Turtle"
+  },
+  {
+   "scientific_name": "Sternotherus depressus",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Flattened Musk Turtle"
+  },
+  {
+   "scientific_name": "Sternotherus intermedius",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Intermediate Musk Turtle"
+  },
+  {
+   "scientific_name": "Sternotherus minor",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Loggerhead Musk Turtle"
+  },
+  {
+   "scientific_name": "Sternotherus odoratus",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Musk Turtle"
+  },
+  {
+   "scientific_name": "Sternotherus peltifer",
+   "rank": "species",
+   "family": "Kinosternidae",
+   "subfamily": "Kinosterninae",
+   "common_name": "Stripe-necked Musk Turtle"
+  },
+  {
+   "scientific_name": "Stigmochelys pardalis",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Leopard Tortoise"
+  },
+  {
+   "scientific_name": "Terrapene carolina",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "American Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene carolina bauri",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Florida Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene carolina carolina",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Terrapene carolina major",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Gulf Coast Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene coahuila",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Coahuilan Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene mexicana",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Mexican Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene nelsoni",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Terrapene nelsoni klauberi",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Northern Spotted Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene nelsoni nelsoni",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Southern Spotted Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene ornata",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Ornate Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene triunguis",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Three-toed Box Turtle"
+  },
+  {
+   "scientific_name": "Terrapene yucatana",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Emydinae",
+   "common_name": "Yucatan Box Turtle"
+  },
+  {
+   "scientific_name": "Testudo graeca",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Spur-thighed Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca armeniaca",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Armenian Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca buxtoni",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Zagros Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca cyrenaica",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Cyrenaican Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca graeca",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Souss Valley Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca ibera",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Anatolian Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca marokkensis",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Moroccan Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca nabeulensis",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Tunisian Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca terrestris",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Levantine Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca tripolitania",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Tripolitanian Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca whitei",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Mediterranean Spur-thighed Tortoise"
+  },
+  {
+   "scientific_name": "Testudo graeca zarudnyi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Kerman Tortoise"
+  },
+  {
+   "scientific_name": "Testudo hermanni",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Hermann’s Tortoise"
+  },
+  {
+   "scientific_name": "Testudo hermanni boettgeri",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Eastern Hermann’s Tortoise"
+  },
+  {
+   "scientific_name": "Testudo hermanni hermanni",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Western Hermann’s Tortoise"
+  },
+  {
+   "scientific_name": "Testudo horsfieldii",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Central Asian Tortoise"
+  },
+  {
+   "scientific_name": "Testudo horsfieldii bogdanovi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Fergana Valley Steppe Tortoise"
+  },
+  {
+   "scientific_name": "Testudo horsfieldii horsfieldii",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Central Asian Tortoise"
+  },
+  {
+   "scientific_name": "Testudo horsfieldii kazachstanica",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Kazakhstan Steppe Tortoise"
+  },
+  {
+   "scientific_name": "Testudo horsfieldii kuznetzovi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Turkmenistan Steppe Tortoise"
+  },
+  {
+   "scientific_name": "Testudo horsfieldii rustamovi",
+   "rank": "subspecies",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Kopet-Dag Steppe Tortoise"
+  },
+  {
+   "scientific_name": "Testudo kleinmanni",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Egyptian Tortoise"
+  },
+  {
+   "scientific_name": "Testudo marginata",
+   "rank": "species",
+   "family": "Testudinidae",
+   "subfamily": "Testudininae",
+   "common_name": "Marginated Tortoise"
+  },
+  {
+   "scientific_name": "Trachemys adiutrix",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Maranhao Slider"
+  },
+  {
+   "scientific_name": "Trachemys callirostris",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Colombian Slider"
+  },
+  {
+   "scientific_name": "Trachemys callirostris callirostris",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Colombian Slider"
+  },
+  {
+   "scientific_name": "Trachemys callirostris chichiriviche",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Venezuelan Slider"
+  },
+  {
+   "scientific_name": "Trachemys decorata",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Hispaniolan Slider"
+  },
+  {
+   "scientific_name": "Trachemys decussata",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Cuban Slider"
+  },
+  {
+   "scientific_name": "Trachemys decussata angusta",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Western Cuban Slider"
+  },
+  {
+   "scientific_name": "Trachemys decussata decussata",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Eastern Cuban Slider"
+  },
+  {
+   "scientific_name": "Trachemys dorbigni",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "D’Orbigny’s Slider"
+  },
+  {
+   "scientific_name": "Trachemys gaigeae",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Big Bend Slider"
+  },
+  {
+   "scientific_name": "Trachemys grayi",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Western Central American Slider"
+  },
+  {
+   "scientific_name": "Trachemys grayi emolli",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Nicaraguan Slider"
+  },
+  {
+   "scientific_name": "Trachemys grayi grayi",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Gray’s Slider"
+  },
+  {
+   "scientific_name": "Trachemys grayi panamensis",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Panamanian Slider"
+  },
+  {
+   "scientific_name": "Trachemys hartwegi",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Nazas Slider"
+  },
+  {
+   "scientific_name": "Trachemys medemi",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Atrato Slider"
+  },
+  {
+   "scientific_name": "Trachemys nebulosa",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Baja California Slider"
+  },
+  {
+   "scientific_name": "Trachemys nebulosa hiltoni",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Fuerte Slider"
+  },
+  {
+   "scientific_name": "Trachemys nebulosa nebulosa",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Baja California Slider"
+  },
+  {
+   "scientific_name": "Trachemys ornata",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": null
+  },
+  {
+   "scientific_name": "Trachemys scripta",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Pond Slider"
+  },
+  {
+   "scientific_name": "Trachemys scripta elegans",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Red-eared Slider"
+  },
+  {
+   "scientific_name": "Trachemys scripta scripta",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Yellow-bellied Slider"
+  },
+  {
+   "scientific_name": "Trachemys scripta troostii",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Cumberland Slider"
+  },
+  {
+   "scientific_name": "Trachemys stejnegeri",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Central Antillean Slider"
+  },
+  {
+   "scientific_name": "Trachemys stejnegeri malonei",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Inagua Slider"
+  },
+  {
+   "scientific_name": "Trachemys stejnegeri stejnegeri",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Puerto Rican Slider"
+  },
+  {
+   "scientific_name": "Trachemys stejnegeri vicina",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Dominican Slider"
+  },
+  {
+   "scientific_name": "Trachemys taylori",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Cuatro Cienegas Slider"
+  },
+  {
+   "scientific_name": "Trachemys terrapen",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Jamaican Slider"
+  },
+  {
+   "scientific_name": "Trachemys venusta",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Eastern Central American Slider"
+  },
+  {
+   "scientific_name": "Trachemys venusta cataspila",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Huastecan Slider"
+  },
+  {
+   "scientific_name": "Trachemys venusta iversoni",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Yucatan Slider"
+  },
+  {
+   "scientific_name": "Trachemys venusta uhrigi",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Uhrig’s Slider"
+  },
+  {
+   "scientific_name": "Trachemys venusta venusta",
+   "rank": "subspecies",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Central American Slider"
+  },
+  {
+   "scientific_name": "Trachemys yaquia",
+   "rank": "species",
+   "family": "Emydidae",
+   "subfamily": "Deirochelyinae",
+   "common_name": "Yaqui Slider"
+  },
+  {
+   "scientific_name": "Trionyx triunguis",
+   "rank": "species",
+   "family": "Trionychidae",
+   "subfamily": "Trionychinae",
+   "common_name": "African Softshell Turtle"
+  },
+  {
+   "scientific_name": "Vijayachelys silvatica",
+   "rank": "species",
+   "family": "Geoemydidae",
+   "subfamily": "Geoemydinae",
+   "common_name": "Cochin Forest Cane Turtle"
+  }
+ ]
+}

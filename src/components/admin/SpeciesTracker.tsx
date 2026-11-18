@@ -305,9 +305,10 @@ export default function SpeciesTracker({ rows }: { rows: SpeciesProgressRow[] })
         </div>
 
         <p className="mt-4 text-xs text-gray-500 max-w-3xl">
-          Checklist names, taxonomy and status come from the Turtle Conservancy&apos;s Turtles of the
-          World list. Families shown here follow Turterra&apos;s own taxonomy tables where the genus
-          is known.
+          Taxa follow Turtles of the World, 10th Ed. (Turtle Taxonomy Working Group 2025).
+          Conservation status comes from the Turtle Conservancy&apos;s Turtles of the World list
+          where it covers the taxon. Families shown here follow Turterra&apos;s own taxonomy tables
+          where the genus is known.
         </p>
       </div>
     </div>
@@ -362,7 +363,7 @@ function TrackerTableRow({ item }: { item: TrackerRow }) {
           <div className="mt-1 text-xs text-orange-800">Profile is not linked to a checklist entry</div>
         )}
         {row.source?.startsWith("Turterra") && (
-          <div className="mt-1 text-xs text-gray-500">Not on the source list</div>
+          <div className="mt-1 text-xs text-gray-500">Not in the checklist</div>
         )}
       </td>
       <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{row.family || "—"}</td>

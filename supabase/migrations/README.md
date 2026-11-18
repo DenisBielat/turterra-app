@@ -60,7 +60,10 @@ a fix, the checklist seed), so it can be reviewed before it is run and the repo
 keeps a copy of what was entered.
 
 `species_checklist_seed.sql` is generated; rebuild it with
-`npm run db:checklist-seed` rather than editing it.
+`npm run db:checklist-seed` rather than editing it. Its list of taxa is
+`supabase/content/data/ttwg_2025_taxa.json` (364 species and 188 named
+subspecies from Turtles of the World, 10th Ed., TTWG 2025); conservation
+status is added from the Turtle Conservancy list for the taxa it covers.
 
 ## Schema reference
 

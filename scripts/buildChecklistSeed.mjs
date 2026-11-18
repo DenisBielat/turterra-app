@@ -1,15 +1,21 @@
 // scripts/buildChecklistSeed.mjs
 //
-// Builds supabase/content/species_checklist_seed.sql from the Turtle
-// Conservancy "Turtles of the World" list
-// (https://www.turtleconservancy.org/turtlesoftheworld/).
+// Builds supabase/content/species_checklist_seed.sql.
 //
-// Only names, taxonomy and conservation status are taken. Their species
+// The list of taxa comes from the published checklist:
+//   Turtle Taxonomy Working Group 2025, Turtles of the World (10th Ed.),
+//   extracted into supabase/content/data/ttwg_2025_taxa.json
+//   (364 species and 188 named subspecies).
+//
+// Conservation status, CITES appendix and continents are added from the
+// Turtle Conservancy "Turtles of the World" list
+// (https://www.turtleconservancy.org/turtlesoftheworld/) for the taxa it
+// covers. Only names, taxonomy and status are taken from it; its species
 // accounts, photographs and range maps are theirs and are NOT copied.
 //
 // Usage:
-//   node scripts/buildChecklistSeed.mjs                 # fetches the list
-//   node scripts/buildChecklistSeed.mjs records.json    # uses a saved copy
+//   npm run db:checklist-seed                 # fetches the Turtle Conservancy list
+//   npm run db:checklist-seed -- records.json # uses a saved copy of it
 //
 // The generated SQL is safe to re-run: it updates the taxonomy/status columns
 // of existing rows and never touches turtle_species_id, skip_reason or notes.
@@ -18,12 +24,29 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const SOURCE_URL = 'https://turtle-encylopedia-api-production.up.railway.app/api/records';
-const SOURCE_NAME = 'Turtle Conservancy, Turtles of the World';
-const OUT_FILE = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '..', 'supabase', 'content', 'species_checklist_seed.sql'
-);
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const STATUS_SOURCE_URL = 'https://turtle-encylopedia-api-production.up.railway.app/api/records';
+const SOURCE_NAME = 'Turtles of the World, 10th Ed. (TTWG 2025)';
+const TAXA_FILE = path.join(HERE, '..', 'supabase', 'content', 'data', 'ttwg_2025_taxa.json');
+const OUT_FILE = path.join(HERE, '..', 'supabase', 'content', 'species_checklist_seed.sql');
+
+// Higher classification by family, as grouped in the checklist.
+const FAMILY_GROUPS = {
+  Chelidae: ['Cheloidea', 'Pleurodira'],
+  Pelomedusidae: ['Pelomedusoidea', 'Pleurodira'],
+  Podocnemididae: ['Pelomedusoidea', 'Pleurodira'],
+  Cheloniidae: ['Chelonioidea', 'Cryptodira'],
+  Dermochelyidae: ['Chelonioidea', 'Cryptodira'],
+  Chelydridae: ['Chelydroidea', 'Cryptodira'],
+  Dermatemydidae: ['Chelydroidea', 'Cryptodira'],
+  Kinosternidae: ['Chelydroidea', 'Cryptodira'],
+  Emydidae: ['Testudinoidea', 'Cryptodira'],
+  Platysternidae: ['Testudinoidea', 'Cryptodira'],
+  Geoemydidae: ['Testudinoidea', 'Cryptodira'],
+  Testudinidae: ['Testudinoidea', 'Cryptodira'],
+  Carettochelyidae: ['Trionychoidea', 'Cryptodira'],
+  Trionychidae: ['Trionychoidea', 'Cryptodira'],
+};
 
 const EMPTY = new Set(['', '-', '\\-', 'NONE', 'none', 'N/A']);
 
@@ -47,40 +70,55 @@ async function loadRecords(localPath) {
   if (localPath) {
     return JSON.parse(await readFile(localPath, 'utf8'));
   }
-  const response = await fetch(SOURCE_URL);
+  const response = await fetch(STATUS_SOURCE_URL);
   if (!response.ok) throw new Error(`Fetch failed: ${response.status} ${response.statusText}`);
   return response.json();
 }
 
-function toRow(record) {
+/** Status details for one taxon from a Turtle Conservancy record. */
+function toStatus(record) {
   const f = record.fields ?? {};
-  const scientificName = clean(f['scientific name']);
-  if (!scientificName) return { problem: `record ${record.id} has no scientific name` };
+  const subfamily = clean(f['Subfamily']);
+  return {
+    scientific_name: clean(f['scientific name']),
+    common_name: clean(f['Common Names']),
+    // Their subfamily column holds a family name for a few taxa; ignore those.
+    subfamily: subfamily && subfamily.endsWith('inae') ? subfamily : null,
+    conservation_status: clean(f['IUCN or TFTSG Current Status']),
+    iucn_red_list: clean(f['Current IUCN Red List']),
+    tftsg_provisional: clean(f['TFTSG Provisional Assess']),
+    cites_appendix: clean(f['CITES']),
+    continents: Array.isArray(f['Continent (taxa)']) ? [...f['Continent (taxa)']].sort() : null,
+    source_record_id: record.id,
+  };
+}
 
-  const parts = scientificName.split(' ');
-  if (parts.length < 2 || parts.length > 3 || !/^[A-Z][a-z]+( [a-z-]+){1,2}$/.test(scientificName)) {
-    return { problem: `unexpected name format: "${scientificName}" (record ${record.id})` };
+/** One checklist row: the taxon from the checklist, plus status details where known. */
+function toRow(taxon, status) {
+  const parts = taxon.scientific_name.split(' ');
+  if (!/^[A-Z][a-z]+( [a-z-]+){1,2}$/.test(taxon.scientific_name)) {
+    return { problem: `unexpected name format: "${taxon.scientific_name}"` };
   }
+  const group = FAMILY_GROUPS[taxon.family];
+  if (!group) return { problem: `no classification known for family "${taxon.family}" (${taxon.scientific_name})` };
 
   return {
     row: {
-      scientific_name: scientificName,
+      scientific_name: taxon.scientific_name,
       taxon_rank: parts.length === 3 ? 'subspecies' : 'species',
       parent_species: parts.length === 3 ? `${parts[0]} ${parts[1]}` : null,
-      // The list's own "Genus" column is out of date for a few taxa, so the
-      // genus comes from the name itself.
       genus: parts[0],
-      family: clean(f['Family']),
-      subfamily: clean(f['Subfamily']),
-      superfamily: clean(f['Superfamily']),
-      suborder: clean(f['Suborder']),
-      common_name: clean(f['Common Names']),
-      conservation_status: clean(f['IUCN or TFTSG Current Status']),
-      iucn_red_list: clean(f['Current IUCN Red List']),
-      tftsg_provisional: clean(f['TFTSG Provisional Assess']),
-      cites_appendix: clean(f['CITES']),
-      continents: Array.isArray(f['Continent (taxa)']) ? [...f['Continent (taxa)']].sort() : null,
-      source_record_id: record.id,
+      family: taxon.family,
+      subfamily: status?.subfamily ?? taxon.subfamily ?? null,
+      superfamily: group[0],
+      suborder: group[1],
+      common_name: status?.common_name ?? taxon.common_name ?? null,
+      conservation_status: status?.conservation_status ?? null,
+      iucn_red_list: status?.iucn_red_list ?? null,
+      tftsg_provisional: status?.tftsg_provisional ?? null,
+      cites_appendix: status?.cites_appendix ?? null,
+      continents: status?.continents ?? null,
+      source_record_id: status?.source_record_id ?? null,
     },
   };
 }
@@ -103,6 +141,7 @@ function buildSql(rows, retrievedOn) {
 
   const updatable = columns.filter((c) => c !== 'scientific_name');
   const species = rows.filter((r) => r.taxon_rank === 'species').length;
+  const withStatus = rows.filter((r) => r.source_record_id !== null).length;
 
   return `-- ============================================================================
 -- CONTENT: species checklist seed
@@ -110,14 +149,15 @@ function buildSql(rows, retrievedOn) {
 -- GENERATED by scripts/buildChecklistSeed.mjs. Do not edit by hand; re-run the
 -- script instead.
 --
--- Source:    ${SOURCE_NAME}
---            https://www.turtleconservancy.org/turtlesoftheworld/
--- Retrieved: ${retrievedOn}
+-- Taxa:      Turtle Taxonomy Working Group 2025. Turtles of the World:
+--            Annotated Checklist and Atlas of Taxonomy, Synonymy, Distribution,
+--            and Conservation Status (10th Ed.). Chelonian Research
+--            Monographs 10:1-575.
+-- Status:    conservation status, CITES appendix and continents from the
+--            Turtle Conservancy "Turtles of the World" list, for the
+--            ${withStatus} taxa it covers (retrieved ${retrievedOn}). The other
+--            ${rows.length - withStatus} taxa have no status recorded yet.
 -- Rows:      ${rows.length} taxa (${species} species, ${rows.length - species} subspecies)
---
--- Only names, taxonomy and conservation status are taken from the source.
--- The list is not yet the complete Turtles of the World checklist, so step 3
--- adds any Turterra species it does not contain.
 --
 -- Requires migration 20261118_003. Safe to re-run: existing rows get their
 -- taxonomy/status refreshed; turtle_species_id, skip_reason and notes are
@@ -126,7 +166,7 @@ function buildSql(rows, retrievedOn) {
 
 begin;
 
--- 1. Taxa from the source list ------------------------------------------------
+-- 1. Taxa from the checklist ----------------------------------------------------
 insert into public.species_checklist
   (${columns.join(', ')})
 values
@@ -147,7 +187,7 @@ where c.turtle_species_id is null
     select 1 from public.species_checklist linked where linked.turtle_species_id = s.id
   );
 
--- 3. Turterra profiles the source list does not contain ------------------------
+-- 3. Turterra profiles the checklist does not contain --------------------------
 insert into public.species_checklist
   (scientific_name, taxon_rank, parent_species, genus, common_name, source, turtle_species_id)
 select
@@ -156,7 +196,7 @@ select
   case when n.word_count >= 3 then split_part(n.clean_name, ' ', 1) || ' ' || split_part(n.clean_name, ' ', 2) end,
   split_part(n.clean_name, ' ', 1),
   s.species_common_name,
-  'Turterra (not in the source list)',
+  'Turterra (not in the checklist)',
   s.id
 from public.turtle_species s
 cross join lateral (
@@ -188,20 +228,33 @@ commit;
 }
 
 async function main() {
+  const checklist = JSON.parse(await readFile(TAXA_FILE, 'utf8'));
   const payload = await loadRecords(process.argv[2]);
   const records = Array.isArray(payload) ? payload : payload.data;
   if (!Array.isArray(records)) throw new Error('Unexpected response shape: no record list found');
+
+  const statusByName = new Map();
+  for (const record of records) {
+    const status = toStatus(record);
+    if (status.scientific_name) statusByName.set(status.scientific_name, status);
+  }
 
   const rows = [];
   const problems = [];
   const seen = new Set();
 
-  for (const record of records) {
-    const { row, problem } = toRow(record);
+  for (const taxon of checklist.taxa) {
+    if (seen.has(taxon.scientific_name)) { problems.push(`duplicate name: ${taxon.scientific_name}`); continue; }
+    seen.add(taxon.scientific_name);
+    const { row, problem } = toRow(taxon, statusByName.get(taxon.scientific_name));
     if (problem) { problems.push(problem); continue; }
-    if (seen.has(row.scientific_name)) { problems.push(`duplicate name: ${row.scientific_name}`); continue; }
-    seen.add(row.scientific_name);
     rows.push(row);
+  }
+
+  // A name on the Turtle Conservancy list that the checklist does not have
+  // would mean one of the two has changed; surface it instead of guessing.
+  for (const name of statusByName.keys()) {
+    if (!seen.has(name)) problems.push(`on the Turtle Conservancy list but not in the checklist: ${name}`);
   }
 
   rows.sort((a, b) => a.scientific_name.localeCompare(b.scientific_name));
@@ -212,7 +265,7 @@ async function main() {
 
   console.log(`Wrote ${rows.length} taxa to ${path.relative(process.cwd(), OUT_FILE)}`);
   if (problems.length > 0) {
-    console.log(`\n${problems.length} record(s) skipped:`);
+    console.log(`\n${problems.length} problem(s):`);
     for (const p of problems) console.log(`  - ${p}`);
     process.exitCode = 1;
   }
