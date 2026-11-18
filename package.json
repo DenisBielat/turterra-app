@@ -10,7 +10,8 @@
     "generate-icons": "tsx scripts/generate-icon-types.ts",
     "import-range-maps": "node scripts/importRangeMaps.js",
     "db:snapshot": "node scripts/snapshotSchema.mjs",
-    "db:checklist-seed": "node scripts/buildChecklistSeed.mjs"
+    "db:checklist-seed": "node scripts/buildChecklistSeed.mjs",
+    "db:species": "node scripts/buildSpeciesSql.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
