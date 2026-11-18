@@ -25,7 +25,7 @@ function TaxonomyRow({ common, scientific, rank }: TaxonomyRowProps) {
   return (
     <div className="flex items-start justify-between py-3 border-b border-gray-200 last:border-b-0">
       <div className="flex flex-col gap-0.5">
-        <span className="font-heading font-bold text-base text-gray-900">{common}</span>
+        {common && <span className="font-heading font-bold text-base text-gray-900">{common}</span>}
         <span className="italic text-gray-600 text-sm">{scientific}</span>
       </div>
       <span className="text-xs font-medium text-gray-500 italic">{rank}</span>
@@ -298,6 +298,13 @@ export default function MobileProfileNavigation({
                     scientific={taxonomy.species.scientific}
                     rank="Species"
                   />
+                  {taxonomy.subspecies && (
+                    <TaxonomyRow
+                      common={taxonomy.subspecies.common}
+                      scientific={taxonomy.subspecies.scientific}
+                      rank="Subspecies"
+                    />
+                  )}
                 </div>
               )}
             </div>

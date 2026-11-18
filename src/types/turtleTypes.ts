@@ -155,6 +155,8 @@ export interface Variant {
     avatar_image_circle_url: string | null;
     avatar_image_full_url: string | null;
     tax_parent_genus: number;
+    taxon_rank?: 'species' | 'subspecies' | null;
+    parent_species_id?: number | null;
     limited_information_toggle?: boolean | null;
     limited_information_description?: string | null;
     // The next fields often get attached programmatically in the transform
@@ -409,4 +411,17 @@ export interface Variant {
       scientific: string;
       common: string;
     };
+    /** Only present on a subspecies profile; `species` is then its parent species. */
+    subspecies?: {
+      scientific: string;
+      common: string;
+    };
+  }
+
+  /** Another profile this one points to: its parent species, or one of its subspecies. */
+  export interface LinkedTaxon {
+    commonName: string;
+    scientificName: string;
+    slug: string;
+    avatarUrl: string | null;
   }

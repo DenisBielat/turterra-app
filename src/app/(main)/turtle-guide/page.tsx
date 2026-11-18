@@ -22,6 +22,7 @@ async function getTurtleGuideData(): Promise<{
       avatar_image_circle_url,
       avatar_image_full_url,
       tax_parent_genus,
+      taxon_rank,
       turtle_species_section_descriptions(
         at_a_glance
       ),
@@ -178,7 +179,8 @@ async function getTurtleGuideData(): Promise<{
         status: conservationStatusData.status
       } : null,
       habitats,
-      regions
+      regions,
+      isSubspecies: turtle.taxon_rank === 'subspecies'
     };
   });
 

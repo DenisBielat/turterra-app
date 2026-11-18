@@ -26,7 +26,7 @@ function TaxonomyRow({ common, scientific, rank }: TaxonomyRowProps) {
   return (
     <div className="flex items-start justify-between py-4 border-b border-gray-200 last:border-b-0">
       <div className="flex flex-col gap-1">
-        <span className="font-heading font-bold text-lg text-gray-900">{common}</span>
+        {common && <span className="font-heading font-bold text-lg text-gray-900">{common}</span>}
         <span className="italic text-gray-600">{scientific}</span>
       </div>
       <span className="text-sm font-medium text-gray-500 italic">{rank}</span>
@@ -86,6 +86,13 @@ export default function TaxonomyPopup({
             scientific={taxonomy.species.scientific}
             rank="Species"
           />
+          {taxonomy.subspecies && (
+            <TaxonomyRow
+              common={taxonomy.subspecies.common}
+              scientific={taxonomy.subspecies.scientific}
+              rank="Subspecies"
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>

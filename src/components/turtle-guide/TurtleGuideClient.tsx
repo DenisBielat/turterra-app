@@ -175,6 +175,7 @@ export default function TurtleGuideClient({
                 description={turtle.description}
                 conservationStatus={turtle.conservationStatus}
                 habitats={turtle.habitats}
+                isSubspecies={turtle.isSubspecies}
                 viewMode={viewMode}
               />
             </div>

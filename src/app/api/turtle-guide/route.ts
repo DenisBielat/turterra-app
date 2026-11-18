@@ -17,6 +17,8 @@ export interface TurtleGuideSpecies {
   } | null;
   habitats: string[];
   regions: string[];
+  /** True for a subspecies profile; shown with a small marker in the guide. */
+  isSubspecies?: boolean;
 }
 
 export interface TurtleGuideFilters {

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Icon } from '@/components/Icon';
 
 interface TurtleCardProps {
   commonName: string;
@@ -17,7 +18,26 @@ interface TurtleCardProps {
     status: string;
   } | null;
   habitats?: string[];
+  /** Subspecies get a small marker so they can be told apart from species. */
+  isSubspecies?: boolean;
   viewMode?: 'grid' | 'list' | 'compact';
+}
+
+/** Small "this is a subspecies" marker: an icon, plus the word where there is room. */
+function SubspeciesMarker({ showLabel = false, className = '' }: { showLabel?: boolean; className?: string }) {
+  return (
+    <span
+      title="Subspecies"
+      className={`inline-flex items-center gap-1 align-middle text-green-400 ${className}`}
+    >
+      <Icon name="hierarchy" style="line" size="sm" />
+      {showLabel ? (
+        <span className="text-[10px] font-semibold uppercase tracking-wider">Subspecies</span>
+      ) : (
+        <span className="sr-only">Subspecies</span>
+      )}
+    </span>
+  );
 }
 
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
@@ -73,6 +93,7 @@ export default function TurtleCard({
   description,
   conservationStatus,
   habitats = [],
+  isSubspecies = false,
   viewMode = 'grid'
 }: TurtleCardProps) {
   const [imgSrc, setImgSrc] = useState(imageUrl || PLACEHOLDER_IMAGE);
@@ -122,6 +143,7 @@ export default function TurtleCard({
             </h3>
             {scientificName && (
               <p className="text-gray-400 text-sm italic mt-0.5 truncate">
+                {isSubspecies && <SubspeciesMarker className="mr-1.5 not-italic" />}
                 {scientificName}
               </p>
             )}
@@ -190,6 +212,7 @@ export default function TurtleCard({
                 {scientificName}
               </p>
             )}
+            {isSubspecies && <SubspeciesMarker showLabel className="mt-1.5" />}
           </div>
 
           {/* Conservation Status */}
@@ -278,6 +301,14 @@ export default function TurtleCard({
           <p className="hidden sm:block text-gray-400 text-sm italic mt-1">
             {scientificName}
           </p>
+        )}
+
+        {/* Subspecies marker - icon only on mobile, with the word from sm up */}
+        {isSubspecies && (
+          <>
+            <SubspeciesMarker className="sm:hidden mt-1" />
+            <SubspeciesMarker showLabel className="hidden sm:inline-flex mt-1.5" />
+          </>
         )}
       </div>
     </Link>

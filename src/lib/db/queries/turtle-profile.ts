@@ -7,7 +7,8 @@ import {
   PhysicalFeatureData,
   PhysicalFeature,
   Variant,
-  TaxonomyData
+  TaxonomyData,
+  LinkedTaxon
 } from '@/types/turtleTypes';
 
 function normalizeValue(value: unknown): string | null {
@@ -55,6 +56,8 @@ async function fetchRawTurtleRow(
       avatar_image_circle_url,
       avatar_image_full_url,
       tax_parent_genus,
+      taxon_rank,
+      parent_species_id,
       limited_information_toggle,
       limited_information_description,
       turtle_species_section_descriptions (
@@ -317,6 +320,51 @@ async function fetchTaxonomyData(
       common: speciesCommonName
     }
   };
+}
+
+/**
+ * The profiles this one is linked to through the species/subspecies hierarchy:
+ * its parent species (for a subspecies) or its subspecies (for a species).
+ * Only profiles the viewer is allowed to see come back, so unpublished ones
+ * are simply absent for the public.
+ */
+async function fetchLinkedTaxa(
+  turtle: TurtleData,
+  client: SupabaseClient = supabase
+): Promise<{ parentSpecies: LinkedTaxon | null; subspecies: LinkedTaxon[] }> {
+  const columns = 'species_common_name, species_scientific_name, slug, avatar_image_circle_url';
+  type Row = {
+    species_common_name: string;
+    species_scientific_name: string;
+    slug: string;
+    avatar_image_circle_url: string | null;
+  };
+  const toLinked = (row: Row): LinkedTaxon => ({
+    commonName: row.species_common_name,
+    scientificName: row.species_scientific_name,
+    slug: row.slug,
+    avatarUrl: row.avatar_image_circle_url
+  });
+
+  if (turtle.taxon_rank === 'subspecies') {
+    if (!turtle.parent_species_id) return { parentSpecies: null, subspecies: [] };
+    const { data, error } = await client
+      .from('turtle_species')
+      .select(columns)
+      .eq('id', turtle.parent_species_id)
+      .maybeSingle<Row>();
+    if (error) console.warn('Error fetching parent species:', error.message);
+    return { parentSpecies: data ? toLinked(data) : null, subspecies: [] };
+  }
+
+  const { data, error } = await client
+    .from('turtle_species')
+    .select(columns)
+    .eq('parent_species_id', turtle.id)
+    .order('species_common_name', { ascending: true })
+    .returns<Row[]>();
+  if (error) console.warn('Error fetching subspecies:', error.message);
+  return { parentSpecies: null, subspecies: (data ?? []).map(toLinked) };
 }
 
 function pickReferenceAndOtherVariants(physicalFeatures: PhysicalFeatureData[]) {
@@ -854,15 +902,36 @@ export async function getTurtleData(slug: string, client: SupabaseClient = supab
     const turtle = await fetchRawTurtleRow('slug', slug, client);
     if (!turtle) return null;
 
-    const [relatedData, taxonomyData] = await Promise.all([
+    const [relatedData, baseTaxonomy, linkedTaxa] = await Promise.all([
       fetchRelatedTurtleData(turtle, client),
       fetchTaxonomyData(
         turtle.tax_parent_genus,
         turtle.species_common_name,
         turtle.species_scientific_name,
         client
-      )
+      ),
+      fetchLinkedTaxa(turtle, client)
     ]);
+
+    const isSubspecies = turtle.taxon_rank === 'subspecies';
+    // "Terrapene carolina carolina" -> "Terrapene carolina"
+    const parentScientificName = isSubspecies
+      ? linkedTaxa.parentSpecies?.scientificName
+        ?? turtle.species_scientific_name.split(' ').slice(0, 2).join(' ')
+      : null;
+
+    // On a subspecies profile the species level is the parent species, and
+    // the profile itself is one level further down.
+    const taxonomyData: TaxonomyData | null = baseTaxonomy && isSubspecies && parentScientificName
+      ? {
+          ...baseTaxonomy,
+          species: {
+            scientific: parentScientificName,
+            common: linkedTaxa.parentSpecies?.commonName ?? ''
+          },
+          subspecies: baseTaxonomy.species
+        }
+      : baseTaxonomy;
 
     const profileData = transformTurtleDataToProfile(turtle, {
       ...relatedData,
@@ -876,7 +945,14 @@ export async function getTurtleData(slug: string, client: SupabaseClient = supab
         // For now, show family common name as the "Category" in At a Glance
         category: taxonomyData?.family.common || 'Unknown'
       },
-      taxonomy: taxonomyData
+      taxonomy: taxonomyData,
+      isSubspecies,
+      /** Scientific name of the parent species (subspecies profiles only). */
+      parentScientificName,
+      /** The parent species' profile, when it exists and the viewer can see it. */
+      parentSpecies: linkedTaxa.parentSpecies,
+      /** Subspecies profiles of this species that the viewer can see. */
+      subspecies: linkedTaxa.subspecies
     };
   } catch (error) {
     console.error('Error in getTurtleData:', error);

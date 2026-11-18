@@ -11,6 +11,7 @@ import Habitat from "@/components/turtle-profile/content-sections/Habitat";
 import Behavior from "@/components/turtle-profile/content-sections/Behavior";
 import Conservation from "@/components/turtle-profile/content-sections/Conservation";
 import References from "@/components/turtle-profile/content-sections/References";
+import { ParentSpeciesLink, SubspeciesList } from "@/components/turtle-profile/SubspeciesLinks";
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
@@ -66,12 +67,24 @@ export default async function TurtlePage(props: { params: Promise<{ slug: string
 
               {/* Right content area */}
               <div className="col-span-1 lg:col-span-9 flex flex-col">
+                {data.isSubspecies && data.parentScientificName && (
+                  <ParentSpeciesLink
+                    parentSpecies={data.parentSpecies}
+                    parentScientificName={data.parentScientificName}
+                  />
+                )}
+
                 <TurtleAtAGlance 
                   description={data.description}
                   limitedInformation={data.limitedInformation}
                   conservationStatus={data.conservationStatus}
                   stats={data.stats}
                   commonNames={data.commonNames}
+                />
+
+                <SubspeciesList
+                  speciesCommonName={data.commonName}
+                  subspecies={data.subspecies}
                 />
                 
                 {/* Divider - hidden on mobile */}

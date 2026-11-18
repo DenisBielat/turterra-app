@@ -7,9 +7,11 @@
 //
 // Usage:  npm run db:snapshot
 //
-// Reads NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY from .env.local
-// (the same public key the site uses). It only reads the API description; it
-// does not read or change any data.
+// Reads NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from .env.local.
+// Supabase only serves the API description to a secret key (the new
+// sb_secret_... key, or the legacy service_role key), so this has to be run
+// from your own machine, not from the site or a browser. It only reads the
+// API description; it does not read or change any data.
 //
 // Not included (the API description does not carry them): unique and check
 // constraints, indexes, row-level security policies, functions' bodies.
@@ -25,10 +27,10 @@ const SCHEMAS = ['public', 'care_guides'];
 const OUT_FILE = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'docs', 'supabase-schema.md');
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !key) {
-  console.error('NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY must be set (see .env.local).');
+  console.error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set (see .env.local).');
   process.exit(1);
 }
 
@@ -117,9 +119,15 @@ async function main() {
     console.log(`Schema "${schema}": ${Object.keys(spec.definitions).length} tables and views`);
   }
 
+  // Never replace a good snapshot with a partial or empty one.
+  if (failures > 0) {
+    console.error(`\nNot writing ${path.relative(process.cwd(), OUT_FILE)}: ${failures} of ${SCHEMAS.length} schemas could not be read.`);
+    console.error('A 401 here usually means the key is not a secret key.');
+    process.exit(1);
+  }
+
   await writeFile(OUT_FILE, lines.join('\n'));
   console.log(`Wrote ${path.relative(process.cwd(), OUT_FILE)}`);
-  if (failures === SCHEMAS.length) process.exit(1);
 }
 
 main().catch((error) => {

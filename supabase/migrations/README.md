@@ -49,6 +49,8 @@ Run these in order. Each one is safe to run more than once.
 | 1 | `20261118_001_admin_helper_and_lock_profile_role.sql` | `is_admin()` helper; stops users changing their own `role` / `is_verified` |
 | 2 | `20261118_002_add_species_status.sql` | `turtle_species.status` (`draft` / `published`); existing species stay published, new ones start as drafts |
 | 3 | `20261118_003_create_species_checklist.sql` | `species_checklist` table and the `admin_species_progress` view behind `/admin/species` |
+| 4 | `20261118_004_add_subspecies_support.sql` | `turtle_species.taxon_rank` and `parent_species_id`, so a subspecies has its own profile linked to its species |
+| 5 | `20261118_005_fix_species_slug_function.sql` | The slug generator only hyphenated the first space in a common name; this fixes it |
 
 Then load the checklist: `supabase/content/species_checklist_seed.sql`.
 
@@ -67,5 +69,8 @@ status is added from the Turtle Conservancy list for the taxa it covers.
 
 ## Schema reference
 
-`docs/supabase-schema.md` lists every table and column. Regenerate it after a
-schema change with `npm run db:snapshot`.
+`docs/supabase-schema.md` lists every table and column as of the date at the
+top of the file; anything newer is in the migration files above. Regenerate it
+with `npm run db:snapshot` from your own machine: Supabase only serves the
+schema description to a secret key, so it needs `SUPABASE_SERVICE_ROLE_KEY`
+in `.env.local`.
