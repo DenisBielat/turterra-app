@@ -100,7 +100,7 @@ folder shows on the live page straight away, whatever its permission status.
   values for the fields below.
 - Fields on every photo: `author`, `image_source`, `image_url` (the source
   page), `asset_type`, `life_stage`, `life_stages_descriptor` (sex, when
-  known), `permission_status`. One photo per species has
+  known), `license`, `permission_status`. One photo per species has
   `primary_photo` = `true`.
 - A physical-feature photo also carries one tag: `carapace`, `plastron`,
   `head-and-neck` or `skin-and-limbs`.

@@ -137,6 +137,12 @@ function describe(observation, expect) {
         asset_type: 'photo',
         life_stage: stage === 'egg' ? null : stage,
         life_stages_descriptor: sex,
+        // Option ids of the Cloudinary "License" field: the iNaturalist code with underscores.
+        license: photo.license_code
+          ? LICENCES[photo.license_code]
+            ? photo.license_code.replace(/-/g, '_')
+            : null
+          : 'all_rights_reserved',
         permission_status: licence.status,
       },
     };
