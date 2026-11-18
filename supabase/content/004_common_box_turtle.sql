@@ -48,18 +48,17 @@ select
   null
 where not exists (select 1 from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 
-create temp table _species on commit drop as
-  select id from public.turtle_species where species_scientific_name = 'Terrapene carolina';
-
 do $$ begin
-  if (select count(*) from _species) <> 1 then raise exception 'Expected exactly one profile row for %', 'Terrapene carolina'; end if;
+  if (select count(*) from public.turtle_species where species_scientific_name = 'Terrapene carolina') <> 1 then
+    raise exception 'Expected exactly one profile row for %', 'Terrapene carolina';
+  end if;
 end $$;
 
 update public.turtle_species
 set other_common_names = array['American Box Turtle']::text[],
     limited_information_toggle = false,
     limited_information_description = null
-where id = (select id from _species);
+where id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 
 -- 2. Written sections ----------------------------------------------------------
 --    at_a_glance: Kiester and Willey 2015; TTWG 2025
@@ -73,46 +72,46 @@ where id = (select id from _species);
 --    conservation: TTWG 2025; Kiester and Willey 2015; van Dijk 2011 (IUCN)
 --    predators: Kiester and Willey 2015
 --    threats: Kiester and Willey 2015
-delete from public.turtle_species_section_descriptions where species_id = (select id from _species);
+delete from public.turtle_species_section_descriptions where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_section_descriptions
   (species_id, at_a_glance, identification, distribution, habitat, diet, hibernation, nesting, unique_traits_and_qualities, conservation, predators, threats)
-select id,
+select p.id,
   'The Common Box Turtle is a small land turtle of the eastern United States, best known for the hinged lower shell that lets it shut itself completely inside. Three subspecies are recognised: the Eastern, Florida and Gulf Coast Box Turtles. It lives in a patchwork of forest, clearings and fields, eats almost anything, and can live for many decades. Once thought of as common, it has declined across its range and has been listed as Vulnerable on the IUCN Red List since 2011. Loss of habitat, deaths on roads and collection for the pet trade are the main causes.',
-  $t$The feature that defines a box turtle is its movable plastron, the lower shell. A hinge lets the turtle pull the plastron up against the carapace and close the shell completely and securely. In one anatomical comparison, box turtles had the most advanced closing mechanism of the related turtles examined.
+  replace($t$The feature that defines a box turtle is its movable plastron, the lower shell. A hinge lets the turtle pull the plastron up against the carapace and close the shell completely and securely. In one anatomical comparison, box turtles had the most advanced closing mechanism of the related turtles examined.
 
 The carapace has a keel along the midline and is deepest behind the hinge. Colour and pattern vary enormously, between the subspecies and within each of them. Shells range from brown to black, with yellow, orange or white stripes or splashes, and old Gulf Coast Box Turtles can turn almost uniformly black. Hatchlings often have a single light dot in the centre of each scute.
 
 Males often have a larger tail, with the vent set further back, and a more concave plastron than females. They are usually the more brightly coloured sex, except in the Florida and Gulf Coast subspecies, where males may instead have white or blue heads. Many males have a bright red iris and most females a brown one, but some females have red eyes too, so eye colour alone does not settle the sex. Young animals cannot be sexed from the outside.
 
-The longest shells on record are 23.5 cm for a male, a captive Gulf Coast Box Turtle, and 19.8 cm for a female, an Eastern Box Turtle. Size differs between the subspecies, and so does which sex grows larger.$t$,
-  $t$The Common Box Turtle is found across the eastern United States. The 2025 checklist of the world's turtles records it from 25 states: from Maine, New Hampshire and Massachusetts south to Florida, and west to Michigan, Illinois, Tennessee, Mississippi and Louisiana.
+The longest shells on record are 23.5 cm for a male, a captive Gulf Coast Box Turtle, and 19.8 cm for a female, an Eastern Box Turtle. Size differs between the subspecies, and so does which sex grows larger.$t$, chr(13), ''),
+  replace($t$The Common Box Turtle is found across the eastern United States. The 2025 checklist of the world's turtles records it from 25 states: from Maine, New Hampshire and Massachusetts south to Florida, and west to Michigan, Illinois, Tennessee, Mississippi and Louisiana.
 
 The Eastern Box Turtle occupies most of that range. The Florida Box Turtle is restricted to Florida, and the Gulf Coast Box Turtle is recorded from Alabama, Florida, Georgia, Louisiana and Mississippi. Where the ranges of the subspecies overlap they intergrade.
 
-The species has been lost from the northern edge of its range. The checklist lists it as extirpated from Ontario, and Canada's wildlife status committee designated it Extirpated in 2014; recent sightings there have been single animals, probably released pets. A 2015 review also found no known functioning populations left in Maine or New Hampshire.$t$,
-  $t$Common Box Turtles live mainly on land. They use forest, open woodland, fields and streamside areas, and they favour forest broken by natural or man-made openings over continuous closed canopy. Open, early-successional and grassy areas matter at certain times of year. Nesting females look for open ground with sandy soil and little vegetation or leaf litter, often in clearings made by people, and hatchlings and juveniles shelter around fallen trees and coarse woody debris.
+The species has been lost from the northern edge of its range. The checklist lists it as extirpated from Ontario, and Canada's wildlife status committee designated it Extirpated in 2014; recent sightings there have been single animals, probably released pets. A 2015 review also found no known functioning populations left in Maine or New Hampshire.$t$, chr(13), ''),
+  replace($t$Common Box Turtles live mainly on land. They use forest, open woodland, fields and streamside areas, and they favour forest broken by natural or man-made openings over continuous closed canopy. Open, early-successional and grassy areas matter at certain times of year. Nesting females look for open ground with sandy soil and little vegetation or leaf litter, often in clearings made by people, and hatchlings and juveniles shelter around fallen trees and coarse woody debris.
 
 Habitat use differs from place to place and from one turtle to the next. The Gulf Coast Box Turtle is the most aquatic of the three subspecies and lives in marshes and pine-palmetto forest. Other box turtles also enter water at times, more often in warm climates and during hot, dry weather.
 
-Because the species depends on a shifting mosaic of forest, openings and fields, it is thought to be suited to a moderate level of disturbance: too much leaves only open ground, and too little leaves closed forest that is too dark.$t$,
-  $t$Common Box Turtles are highly omnivorous and eat an extraordinary variety of food. Recorded items include berries and other fruits, mushrooms, snails, slugs, insects, earthworms and carrion, and now and then a small vertebrate. What they eat changes with the season and may change as they grow, and turtles sometimes gather where food is locally plentiful.
+Because the species depends on a shifting mosaic of forest, openings and fields, it is thought to be suited to a moderate level of disturbance: too much leaves only open ground, and too little leaves closed forest that is too dark.$t$, chr(13), ''),
+  replace($t$Common Box Turtles are highly omnivorous and eat an extraordinary variety of food. Recorded items include berries and other fruits, mushrooms, snails, slugs, insects, earthworms and carrion, and now and then a small vertebrate. What they eat changes with the season and may change as they grow, and turtles sometimes gather where food is locally plentiful.
 
-Because they eat so many fruits and fungi and then move on, box turtles may be important in spreading seeds and fungal spores through their habitat.$t$,
-  $t$Across most of its range the Common Box Turtle spends the winter dormant. In the north, turtles are active from about April to October or November. Further south the active season is longer, and Florida Box Turtles have been found active in every month of the year.
+Because they eat so many fruits and fungi and then move on, box turtles may be important in spreading seeds and fungal spores through their habitat.$t$, chr(13), ''),
+  replace($t$Across most of its range the Common Box Turtle spends the winter dormant. In the north, turtles are active from about April to October or November. Further south the active season is longer, and Florida Box Turtles have been found active in every month of the year.
 
 Most turtles overwinter in forest, burrowed into leaf litter and soil, which stay much warmer than the air. They choose spots that are warmer than their surroundings, and often use stump holes and the pits left by fallen trees. The wintering site may lie outside the area a turtle uses in summer, and many turtles may gather where conditions are suitable.
 
 Laboratory studies have shown that box turtles can survive some freezing: in one experiment a turtle's heart stopped for 25 hours at -2.1 °C and started beating again when it thawed. Even so, some turtles die over winter.
 
-During the active season box turtles are active by day. In warm weather they move in the morning and again in late afternoon, resting through the midday heat, and they are most active when it is warm and humid or after rain.$t$,
-  $t$Mating can take place at any time during the active season. Most box turtles mate on land, but the Gulf Coast Box Turtle customarily mates in water. Females can store sperm and lay fertile eggs long after their last contact with a male.
+During the active season box turtles are active by day. In warm weather they move in the morning and again in late afternoon, resting through the midday heat, and they are most active when it is warm and humid or after rain.$t$, chr(13), ''),
+  replace($t$Mating can take place at any time during the active season. Most box turtles mate on land, but the Gulf Coast Box Turtle customarily mates in water. Females can store sperm and lay fertile eggs long after their last contact with a male.
 
 Nesting usually happens in the evening. Outside Florida, nests are typically dug from late May to early July; in Florida, females have been found carrying shelled eggs from late March to early August. Females choose open ground with sandy soil and little plant cover.
 
 Clutches are small. Florida Box Turtles average fewer than three eggs, while Eastern Box Turtles studied in New York, Illinois and Massachusetts averaged more than five. Two or three clutches a year have often been reported, but near the northern edge of the range females have not been seen to lay more than one.
 
-Reported incubation periods run from 57 to 136 days. Hatchlings typically emerge from late August to early September, though some stay in the nest over winter. In Eastern Box Turtles from Indiana, incubation temperature decided the sex of the hatchlings, with cooler eggs producing males and warmer eggs females.$t$,
-  $t$Few turtles can shut themselves in as completely as a box turtle.
+Reported incubation periods run from 57 to 136 days. Hatchlings typically emerge from late August to early September, though some stay in the nest over winter. In Eastern Box Turtles from Indiana, incubation temperature decided the sex of the hatchlings, with cooler eggs producing males and warmer eggs females.$t$, chr(13), ''),
+  replace($t$Few turtles can shut themselves in as completely as a box turtle.
 
 Box turtles are also very long-lived. Turtles found again decades after someone carved a date into their shell point to ages from 46 to more than 100 years, though these are estimates and not verified records. In one long-studied population in Maryland, females were still breeding when well past 50.
 
@@ -120,18 +119,18 @@ They are known to find their way home when moved, although how they navigate is 
 
 The genus name Terrapene comes from a Powhatan word for a turtle, the same root as "terrapin".
 
-Box turtles are among the best understood of all long-lived reptiles, thanks to long-term field studies. The oldest began in Maryland in 1945 and was approaching its 70th year when the species was last reviewed.$t$,
-  $t$The Common Box Turtle is listed as Vulnerable on the IUCN Red List (criteria A2bcde+4bcde, assessed in 2011); before that it was listed as Near Threatened. The assessment was made when the species was defined more broadly and included box turtles that are now treated as separate species. All box turtles of the genus Terrapene have been listed on Appendix II of CITES since 1995.
+Box turtles are among the best understood of all long-lived reptiles, thanks to long-term field studies. The oldest began in Maryland in 1945 and was approaching its 70th year when the species was last reviewed.$t$, chr(13), ''),
+  replace($t$The Common Box Turtle is listed as Vulnerable on the IUCN Red List (criteria A2bcde+4bcde, assessed in 2011); before that it was listed as Near Threatened. The assessment was made when the species was defined more broadly and included box turtles that are now treated as separate species. All box turtles of the genus Terrapene have been listed on Appendix II of CITES since 1995.
 
 In Canada the species is designated Extirpated. In the United States protection varies by state. As of 2015 it was listed as a species of Special Concern in Connecticut, Indiana, Massachusetts, Michigan, New Hampshire, New Jersey, New York and Ohio, as Protected in Rhode Island and as Endangered in Maine, and many states had closed or limited commercial collecting.
 
 Long-term studies show why there is concern. At a protected site in Maryland the population in 1995 was 23% of what it had been in 1955, and a population in Indiana fell from 4.4–5.7 turtles per hectare in the 1960s to 2.7 in 1983. Of the five populations whose long-term trends had been evaluated by 2015, only one, of Florida Box Turtles, had stayed stable.
 
-Researchers recommend large reserves (one translocated population in Pennsylvania needed at least 800 hectares to contain its movements), land management timed to avoid killing turtles, and coordinated long-term monitoring. The Gulf Coast Box Turtle has never been the subject of a population study.$t$,
-  $t$Recorded predators of box turtles include bald eagles, hogs and snakes, and chipmunks are suspected of taking juveniles. The share of nests lost to predators varies from none to all of them.
+Researchers recommend large reserves (one translocated population in Pennsylvania needed at least 800 hectares to contain its movements), land management timed to avoid killing turtles, and coordinated long-term monitoring. The Gulf Coast Box Turtle has never been the subject of a population study.$t$, chr(13), ''),
+  replace($t$Recorded predators of box turtles include bald eagles, hogs and snakes, and chipmunks are suspected of taking juveniles. The share of nests lost to predators varies from none to all of them.
 
-Predation probably matters more for young turtles than for adults. In most studied populations between 81% and 96% of adults survive from one year to the next, although one Florida population had an annual survival rate as low as 56%. Predation is not thought to be a major cause of decline unless a population is already under stress or predators are unusually numerous.$t$,
-  $t$Habitat loss is the underlying threat. Between 1973 and 2000 an estimated 3.7 million hectares of eastern forest, about 4% of the total, were lost or converted to other uses, and what remains is increasingly fragmented. Where the landscape has become urban or densely suburban, box turtles have dwindled or disappeared.
+Predation probably matters more for young turtles than for adults. In most studied populations between 81% and 96% of adults survive from one year to the next, although one Florida population had an annual survival rate as low as 56%. Predation is not thought to be a major cause of decline unless a population is already under stress or predators are unusually numerous.$t$, chr(13), ''),
+  replace($t$Habitat loss is the underlying threat. Between 1973 and 2000 an estimated 3.7 million hectares of eastern forest, about 4% of the total, were lost or converted to other uses, and what remains is increasingly fragmented. Where the landscape has become urban or densely suburban, box turtles have dwindled or disappeared.
 
 Roads kill turtles and divide populations. A box turtle's own defence may make things worse, because it closes its shell when threatened and stays closed for longer than other turtles. Females searching for nest sites may be hit hardest, and at two long-studied sites the sex ratio became more male-biased as the population declined.
 
@@ -139,35 +138,37 @@ Mowing and haying kill turtles in fields, and so does fire: in Florida, wet-seas
 
 Collection is another drain. An informal U.S. Fish and Wildlife Service estimate reported in 1994 put exports of North American box turtles, this species and the Ornate Box Turtle together, at more than 35,000 a year. A 2007 study counted more than 520 turtle races a year in the United States and estimated that 26,000 box turtles are taken from the wild annually to take part.
 
-Ranavirus in wild and captive box turtles is a growing concern, and released pets may carry disease and non-local genes into wild populations.$t$
-from _species;
+Ranavirus in wild and captive box turtles is a growing concern, and released pets may carry disease and non-local genes into wild populations.$t$, chr(13), '')
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 
 -- 3. Measurements (lengths in cm, weight in g, lifespans in years) -------------
 --    length_female_max_scl: TTWG 2025
 --    length_male_max_scl: TTWG 2025
-delete from public.turtle_species_measurements where species_id = (select id from _species);
+delete from public.turtle_species_measurements where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_measurements
   (species_id, adult_weight, length_female_max_scl, length_male_max_scl, generally_larger, lifespan_wild_min, lifespan_wild_max, lifespan_captivity_min, lifespan_captivity_max)
-select id,
+select p.id,
   null, 19.8, 23.5, null, null, null, null, null
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 
 -- 4. Conservation status and population ----------------------------------------
-delete from public.turtle_species_conservation_history where species_id = (select id from _species);
+delete from public.turtle_species_conservation_history where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 --    VU 2011: TTWG 2025; van Dijk 2011 (IUCN)
 insert into public.turtle_species_conservation_history
   (species_id, conservation_status, year_status_assigned, date_status_assigned, out_of_date, out_of_date_description, self_assigned_conservation_status)
-select _species.id, s.id,
+select p.id, s.id,
   '2011', null, null, null,
   null
-from _species, public.conservation_statuses s where s.abbreviation = 'VU';
-delete from public.turtle_species_population_estimate_history where species_id = (select id from _species);
+from public.turtle_species p, public.conservation_statuses s
+where p.species_scientific_name = 'Terrapene carolina' and s.abbreviation = 'VU';
+delete from public.turtle_species_population_estimate_history where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 --    population 2015: Kiester and Willey 2015
 insert into public.turtle_species_population_estimate_history
   (species_id, year_of_estimate, date_of_estimate, population_estimate, population_trend)
-select id, '2015', null, null, 'Decreasing'::public.population_trend from _species;
+select p.id, '2015', null, null, 'Decreasing'::public.population_trend
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 do $$ begin
-  if (select count(*) from public.turtle_species_conservation_history where species_id = (select id from _species)) <> 1 then
+  if (select count(*) from public.turtle_species_conservation_history where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')) <> 1 then
     raise exception 'A conservation status abbreviation did not match conservation_statuses';
   end if;
 end $$;
@@ -181,69 +182,69 @@ insert into public.habitats (habitat)
 select 'Fields & Grasslands' where not exists (select 1 from public.habitats where habitat = 'Fields & Grasslands');   -- NEW tag
 insert into public.habitats (habitat)
 select 'Riparian Areas' where not exists (select 1 from public.habitats where habitat = 'Riparian Areas');   -- NEW tag
-delete from public.turtle_species_habitats where species_id = (select id from _species);
+delete from public.turtle_species_habitats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_habitats (species_id, habitat)
-select _species.id, v.id from _species, public.habitats v
-where v.habitat in ('Forests', 'Forest Openings & Edges', 'Fields & Grasslands', 'Riparian Areas', 'Wetlands & Marshes');
+select p.id, v.id from public.turtle_species p, public.habitats v
+where p.species_scientific_name = 'Terrapene carolina' and v.habitat in ('Forests', 'Forest Openings & Edges', 'Fields & Grasslands', 'Riparian Areas', 'Wetlands & Marshes');
 do $$ begin
-  if (select count(*) from public.turtle_species_habitats where species_id = (select id from _species)) <> 5 then
+  if (select count(*) from public.turtle_species_habitats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')) <> 5 then
     raise exception 'Expected 5 rows in turtle_species_habitats: a tag name did not match habitats';
   end if;
 end $$;
-delete from public.turtle_species_ecologies where species_id = (select id from _species);
+delete from public.turtle_species_ecologies where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_ecologies (species_id, ecology_id)
-select _species.id, v.id from _species, public.ecologies v
-where v.ecology in ('Terrestrial');
+select p.id, v.id from public.turtle_species p, public.ecologies v
+where p.species_scientific_name = 'Terrapene carolina' and v.ecology in ('Terrestrial');
 do $$ begin
-  if (select count(*) from public.turtle_species_ecologies where species_id = (select id from _species)) <> 1 then
+  if (select count(*) from public.turtle_species_ecologies where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')) <> 1 then
     raise exception 'Expected 1 rows in turtle_species_ecologies: a tag name did not match ecologies';
   end if;
 end $$;
 insert into public.habitat_types (habitat_type)
 select 'Forests' where not exists (select 1 from public.habitat_types where habitat_type = 'Forests');   -- NEW tag
-delete from public.turtle_species_habitat_types where species_id = (select id from _species);
+delete from public.turtle_species_habitat_types where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_habitat_types (species_id, habitat_type_id)
-select _species.id, v.id from _species, public.habitat_types v
-where v.habitat_type in ('Forests', 'Grasslands', 'Inland Wetlands');
+select p.id, v.id from public.turtle_species p, public.habitat_types v
+where p.species_scientific_name = 'Terrapene carolina' and v.habitat_type in ('Forests', 'Grasslands', 'Inland Wetlands');
 do $$ begin
-  if (select count(*) from public.turtle_species_habitat_types where species_id = (select id from _species)) <> 3 then
+  if (select count(*) from public.turtle_species_habitat_types where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')) <> 3 then
     raise exception 'Expected 3 rows in turtle_species_habitat_types: a tag name did not match habitat_types';
   end if;
 end $$;
-delete from public.turtle_species_regions_general where species_id = (select id from _species);
+delete from public.turtle_species_regions_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_regions_general (species_id, region_id)
-select _species.id, v.region_id from _species, public.regions_general v
-where v.region_name in ('Eastern United States', 'Southeastern United States');
+select p.id, v.region_id from public.turtle_species p, public.regions_general v
+where p.species_scientific_name = 'Terrapene carolina' and v.region_name in ('Eastern United States', 'Southeastern United States');
 do $$ begin
-  if (select count(*) from public.turtle_species_regions_general where species_id = (select id from _species)) <> 2 then
+  if (select count(*) from public.turtle_species_regions_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')) <> 2 then
     raise exception 'Expected 2 rows in turtle_species_regions_general: a tag name did not match regions_general';
   end if;
 end $$;
-delete from public.turtle_species_threats where species_id = (select id from _species);
+delete from public.turtle_species_threats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_threats (species_id, threat_id)
-select _species.id, v.id from _species, public.threats_list v
-where v.threat_name in ('Deforestation', 'Urbanization', 'Infrastructure Development', 'Collection/Pet Trade', 'Agriculture', 'Controlled Burns');
+select p.id, v.id from public.turtle_species p, public.threats_list v
+where p.species_scientific_name = 'Terrapene carolina' and v.threat_name in ('Deforestation', 'Urbanization', 'Infrastructure Development', 'Collection/Pet Trade', 'Agriculture', 'Controlled Burns');
 do $$ begin
-  if (select count(*) from public.turtle_species_threats where species_id = (select id from _species)) <> 6 then
+  if (select count(*) from public.turtle_species_threats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')) <> 6 then
     raise exception 'Expected 6 rows in turtle_species_threats: a tag name did not match threats_list';
   end if;
 end $$;
-delete from public.turtle_species_behaviors_general where species_id = (select id from _species);
+delete from public.turtle_species_behaviors_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_behaviors_general (species_id, behavior_id)
-select _species.id, v.id from _species, public.behaviors_general v
-where v.behavior in ('Diurnal');
+select p.id, v.id from public.turtle_species p, public.behaviors_general v
+where p.species_scientific_name = 'Terrapene carolina' and v.behavior in ('Diurnal');
 do $$ begin
-  if (select count(*) from public.turtle_species_behaviors_general where species_id = (select id from _species)) <> 1 then
+  if (select count(*) from public.turtle_species_behaviors_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')) <> 1 then
     raise exception 'Expected 1 rows in turtle_species_behaviors_general: a tag name did not match behaviors_general';
   end if;
 end $$;
 
 -- 6. Physical features (one row per variant) -----------------------------------
-delete from public.turtle_species_physical_features_new where species_id = (select id from _species);
+delete from public.turtle_species_physical_features_new where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 --    adult: Kiester and Willey 2015
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, carapace_shape, carapace_pattern, carapace_colors, marginal_scute_shape, vertebral_keel, hinge_present, hinge_location)
-select id, 'adult', null,
+select p.id, 'adult', null,
   'keeled; deepest behind the plastral hinge',
   'highly variable; stripes or splashes',
   'brown to black with yellow, orange or white markings; almost uniformly black in old Gulf Coast Box Turtles',
@@ -251,11 +252,11 @@ select id, 'adult', null,
   'present',
   'true',
   'plastron'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 --    adult male: Kiester and Willey 2015
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, head_colors, eye_color, tail_length, carapace_shape, carapace_pattern, carapace_colors, marginal_scute_shape, vertebral_keel, hinge_present, hinge_location)
-select id, 'adult', 'male',
+select p.id, 'adult', 'male',
   'may be white or blue in Florida and Gulf Coast Box Turtles',
   'iris often bright red',
   $t$larger than the female's, with the vent further back$t$,
@@ -266,11 +267,11 @@ select id, 'adult', 'male',
   'present',
   'true',
   'plastron'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 --    adult female: Kiester and Willey 2015
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, eye_color, tail_length, carapace_shape, carapace_pattern, carapace_colors, marginal_scute_shape, vertebral_keel, hinge_present, hinge_location)
-select id, 'adult', 'female',
+select p.id, 'adult', 'female',
   'iris usually brown, occasionally red',
   $t$smaller than the male's$t$,
   'keeled; deepest behind the plastral hinge',
@@ -280,47 +281,47 @@ select id, 'adult', 'female',
   'present',
   'true',
   'plastron'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 --    hatchling: Kiester and Willey 2015
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, carapace_pattern, carapace_colors)
-select id, 'hatchling', null,
+select p.id, 'hatchling', null,
   'often a single light dot in the centre of each scute',
   'dark with light dots'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 
 -- 7. References ----------------------------------------------------------------
-delete from public.turtle_species_references where species_id = (select id from _species);
+delete from public.turtle_species_references where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina');
 insert into public.turtle_species_references
   (species_id, reference_type, citation_full, citation_short, authors, year, title, source_name, url, doi, access_date, notes)
-select id, 'TFTSG Account'::public.reference_type,
+select p.id, 'TFTSG Account'::public.reference_type,
   'Kiester, A.R. and Willey, L.L. 2015. Terrapene carolina (Linnaeus 1758) – Eastern Box Turtle, Common Box Turtle. In: Rhodin, A.G.J., Pritchard, P.C.H., van Dijk, P.P., Saumure, R.A., Buhlmann, K.A., Iverson, J.B., and Mittermeier, R.A. (Eds.). Conservation Biology of Freshwater Turtles and Tortoises: A Compilation Project of the IUCN/SSC Tortoise and Freshwater Turtle Specialist Group. Chelonian Research Monographs 5(8):085.1–25, doi:10.3854/crm.5.085.carolina.v1.2015, http://www.iucn-tftsg.org/cbftt/.',
   'Kiester and Willey 2015', 'Kiester, A.R. and Willey, L.L.', '2015',
   'Terrapene carolina (Linnaeus 1758) – Eastern Box Turtle, Common Box Turtle',
   'Chelonian Research Monographs No. 5', 'https://iucn-tftsg.org/cbftt/species-accounts/terrapene-carolina-085/', '10.3854/crm.5.085.carolina.v1.2015', date '2026-11-18', null
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 insert into public.turtle_species_references
   (species_id, reference_type, citation_full, citation_short, authors, year, title, source_name, url, doi, access_date, notes)
-select id, 'Book'::public.reference_type,
+select p.id, 'Book'::public.reference_type,
   'Turtle Taxonomy Working Group [Rhodin, A.G.J., Iverson, J.B., Fritz, U., Gallego-García, N., Georges, A., Shaffer, H.B., and van Dijk, P.P.]. 2025. Turtles of the World: Annotated Checklist and Atlas of Taxonomy, Synonymy, Distribution, and Conservation Status (10th Ed.). In: Rhodin, A.G.J., Iverson, J.B., van Dijk, P.P., Stanford, C.B., Goode, E.V., Buhlmann, K.A., and Mittermeier, R.A. (Eds.). Conservation Biology of Freshwater Turtles and Tortoises: A Compilation Project of the IUCN SSC Tortoise and Freshwater Turtle Specialist Group. Chelonian Research Monographs 10:1–575. doi:10.3854/crm.10.checklist.atlas.v10.2025.',
   'TTWG 2025', 'Turtle Taxonomy Working Group [Rhodin, A.G.J., Iverson, J.B., Fritz, U., Gallego-García, N., Georges, A., Shaffer, H.B., and van Dijk, P.P.]', '2025',
   'Turtles of the World: Annotated Checklist and Atlas of Taxonomy, Synonymy, Distribution, and Conservation Status (10th Ed.)',
   'Chelonian Research Monographs No. 10', 'https://iucn-tftsg.org/checklists/turtles-of-the-world-checklist-10th-edition/', '10.3854/crm.10.checklist.atlas.v10.2025', date '2026-11-18', null
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 insert into public.turtle_species_references
   (species_id, reference_type, citation_full, citation_short, authors, year, title, source_name, url, doi, access_date, notes)
-select id, 'IUCN Assessment'::public.reference_type,
+select p.id, 'IUCN Assessment'::public.reference_type,
   'van Dijk, P.P. 2011. Terrapene carolina. The IUCN Red List of Threatened Species 2011: e.T21641A9303747.',
   'van Dijk 2011 (IUCN)', 'van Dijk, P.P.', '2011',
   'Terrapene carolina',
   'The IUCN Red List of Threatened Species', 'https://www.iucnredlist.org/species/21641/9303747', null, date '2026-11-18', 'Category, criteria and year are given as reported in TTWG 2025 and Kiester and Willey 2015; the assessment itself was not read. It was made when the species also included forms now treated as separate species.'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina';
 
 -- 8. Link the profile to its checklist entry ------------------------------------
 update public.species_checklist c
-set turtle_species_id = _species.id
-from _species
-where c.scientific_name = 'Terrapene carolina' and c.turtle_species_id is null;
+set turtle_species_id = p.id
+from public.turtle_species p
+where p.species_scientific_name = 'Terrapene carolina' and c.scientific_name = 'Terrapene carolina' and c.turtle_species_id is null;
 
 -- 9. Follow-ups: sources to chase for what is still empty ----------------------
 --    Only added when missing (matched on kind and title), so anything changed at

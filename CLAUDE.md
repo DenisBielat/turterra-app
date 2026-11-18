@@ -39,6 +39,16 @@ Both are numbered and run in number order. See `supabase/migrations/README.md`.
 - Rehearse against a scratch Postgres before proposing a file, and ask the
   owner before applying anything to the live database.
 - Code must keep working if it deploys before or after its migration.
+- The owner runs files by pasting them into the Supabase SQL editor, from
+  Windows. Two things follow:
+  - Never create a table that is gone by the end of the script (a temporary
+    table, or one dropped again). The editor appends
+    `ALTER TABLE <name> ENABLE ROW LEVEL SECURITY` after the script for every
+    `create table` it sees, and that fails when the table no longer exists,
+    even though the script itself ran and committed.
+  - Pasted text arrives with CR+LF line endings. Wrap any value that spans
+    lines in `replace(..., chr(13), '')` so carriage returns are not stored.
+    The species generator does both.
 
 ## Species profiles
 

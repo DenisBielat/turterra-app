@@ -16,7 +16,10 @@
 //   - every follow-up names taxa that are on the checklist
 //
 // The SQL it writes is safe to re-run: it replaces this one profile's rows
-// with the contents of the file, inside a single transaction. A new profile
+// with the contents of the file, inside a single transaction. It creates no
+// tables, not even temporary ones: the Supabase SQL editor adds an
+// "enable row level security" statement after the script for every table it
+// sees created, which fails for a table that only lived inside the script. A new profile
 // is created as a draft; an existing profile's draft/published status, slug
 // and avatar are never touched. Follow-ups (sources to chase, listed under
 // followUps) are only ever added, so edits made at /admin/follow-ups are kept.
@@ -86,7 +89,10 @@ function text(value) {
   if (!s.includes("'") && !s.includes('\\') && !s.includes('\n')) return `'${s}'`;
   let tag = 't';
   while (s.includes(`$${tag}$`)) tag += 't';
-  return `$${tag}$${s}$${tag}$`;
+  const quoted = `$${tag}$${s}$${tag}$`;
+  // A file pasted from Windows arrives with CR+LF line endings, which would be
+  // stored inside any value that spans lines. Strip the carriage returns.
+  return s.includes('\n') ? `replace(${quoted}, chr(13), '')` : quoted;
 }
 const number = (value) => (value === null || value === undefined ? 'null' : String(Number(value)));
 const textArray = (values) =>
@@ -244,7 +250,10 @@ function buildSql(species, slug) {
   const refs = species.references;
   const cite = (sources) => (sources ?? []).map((k) => refs[k]?.citationShort ?? k).join('; ');
   const name = species.scientificName;
-  const sp = '(select id from _species)';
+  // The profile this file is about, looked up by name wherever it is needed.
+  const isProfile = `species_scientific_name = ${text(name)}`;
+  const sp = `(select id from public.turtle_species where ${isProfile})`;
+  const fromProfile = `from public.turtle_species p where p.${isProfile}`;
   const out = [];
   const add = (...lines) => out.push(...lines);
 
@@ -303,11 +312,10 @@ function buildSql(species, slug) {
       : '  null',
     `where not exists (select 1 from public.turtle_species where species_scientific_name = ${text(name)});`,
     '',
-    'create temp table _species on commit drop as',
-    `  select id from public.turtle_species where species_scientific_name = ${text(name)};`,
-    '',
     'do $$ begin',
-    `  if (select count(*) from _species) <> 1 then raise exception 'Expected exactly one profile row for %', ${text(name)}; end if;`,
+    `  if (select count(*) from public.turtle_species where ${isProfile}) <> 1 then`,
+    `    raise exception 'Expected exactly one profile row for %', ${text(name)};`,
+    '  end if;',
     'end $$;',
     '',
     'update public.turtle_species',
@@ -327,9 +335,9 @@ function buildSql(species, slug) {
     `delete from public.turtle_species_section_descriptions where species_id = ${sp};`,
     'insert into public.turtle_species_section_descriptions',
     `  (species_id, ${TEXT_SECTIONS.join(', ')})`,
-    'select id,',
+    'select p.id,',
     TEXT_SECTIONS.map((s) => `  ${text(species.text[s] ? species.text[s].body.trim() : null)}`).join(',\n'),
-    'from _species;',
+    `${fromProfile};`,
     ''
   );
 
@@ -342,13 +350,13 @@ function buildSql(species, slug) {
     `delete from public.turtle_species_measurements where species_id = ${sp};`,
     'insert into public.turtle_species_measurements',
     `  (species_id, ${MEASUREMENT_FIELDS.join(', ')})`,
-    'select id,',
+    'select p.id,',
     '  ' + MEASUREMENT_FIELDS.map((f) =>
       f === 'generally_larger'
         ? (species.measurements[f] ? `${text(species.measurements[f])}::public.sex_size_difference` : 'null')
         : number(species.measurements[f])
     ).join(', '),
-    'from _species;',
+    `${fromProfile};`,
     ''
   );
 
@@ -360,12 +368,13 @@ function buildSql(species, slug) {
       `--    ${row.status} ${row.year}: ${cite(row.sources)}`,
       'insert into public.turtle_species_conservation_history',
       '  (species_id, conservation_status, year_status_assigned, date_status_assigned, out_of_date, out_of_date_description, self_assigned_conservation_status)',
-      'select _species.id, s.id,',
+      'select p.id, s.id,',
       `  ${text(String(row.year))}, ${row.date ? `date ${text(row.date)}` : 'null'}, ${row.outOfDate ? 'true' : 'null'}, ${text(row.outOfDateDescription ?? null)},`,
       row.selfAssignedStatus
         ? `  (select id from public.conservation_statuses where abbreviation = ${text(row.selfAssignedStatus)})`
         : '  null',
-      `from _species, public.conservation_statuses s where s.abbreviation = ${text(row.status)};`
+      'from public.turtle_species p, public.conservation_statuses s',
+      `where p.${isProfile} and s.abbreviation = ${text(row.status)};`
     );
   }
   add(`delete from public.turtle_species_population_estimate_history where species_id = ${sp};`);
@@ -374,7 +383,8 @@ function buildSql(species, slug) {
       `--    population ${row.year ?? ''}: ${cite(row.sources)}`,
       'insert into public.turtle_species_population_estimate_history',
       '  (species_id, year_of_estimate, date_of_estimate, population_estimate, population_trend)',
-      `select id, ${text(row.year ? String(row.year) : null)}, null, ${text(row.estimate ?? null)}, ${text(row.trend)}::public.population_trend from _species;`
+      `select p.id, ${text(row.year ? String(row.year) : null)}, null, ${text(row.estimate ?? null)}, ${text(row.trend)}::public.population_trend`,
+      `${fromProfile};`
     );
   }
   add(
@@ -401,8 +411,8 @@ function buildSql(species, slug) {
     if (tags.length > 0) {
       add(
         `insert into public.${vocab.join} (species_id, ${vocab.fk})`,
-        `select _species.id, v.${vocab.pk} from _species, public.${vocab.table} v`,
-        `where v.${vocab.column} in (${list(tags)});`,
+        `select p.id, v.${vocab.pk} from public.turtle_species p, public.${vocab.table} v`,
+        `where p.${isProfile} and v.${vocab.column} in (${list(tags)});`,
         'do $$ begin',
         `  if (select count(*) from public.${vocab.join} where species_id = ${sp}) <> ${tags.length} then`,
         `    raise exception 'Expected ${tags.length} rows in ${vocab.join}: a tag name did not match ${vocab.table}';`,
@@ -422,8 +432,8 @@ function buildSql(species, slug) {
       `--    ${row.life_stage}${row.sex ? ' ' + row.sex : ''}: ${cite(row.sources)}`,
       'insert into public.turtle_species_physical_features_new',
       `  (species_id, life_stage, sex${fields.map((f) => `, ${f}`).join('')})`,
-      `select id, ${text(row.life_stage)}, ${text(row.sex ?? null)}${fields.map((f) => `,\n  ${text(String(row.values[f]))}`).join('')}`,
-      'from _species;'
+      `select p.id, ${text(row.life_stage)}, ${text(row.sex ?? null)}${fields.map((f) => `,\n  ${text(String(row.values[f]))}`).join('')}`,
+      `${fromProfile};`
     );
   }
   add('');
@@ -435,12 +445,12 @@ function buildSql(species, slug) {
     add(
       'insert into public.turtle_species_references',
       '  (species_id, reference_type, citation_full, citation_short, authors, year, title, source_name, url, doi, access_date, notes)',
-      `select id, ${text(ref.type)}::public.reference_type,`,
+      `select p.id, ${text(ref.type)}::public.reference_type,`,
       `  ${text(ref.citationFull)},`,
       `  ${text(ref.citationShort)}, ${text(ref.authors)}, ${text(String(ref.year))},`,
       `  ${text(ref.title)},`,
       `  ${text(ref.sourceName ?? null)}, ${text(ref.url ?? null)}, ${text(ref.doi ?? null)}, date ${text(ref.accessDate)}, ${text(ref.notes ?? null)}`,
-      'from _species;'
+      `${fromProfile};`
     );
   }
   add('');
@@ -449,9 +459,9 @@ function buildSql(species, slug) {
   add(
     '-- 8. Link the profile to its checklist entry ------------------------------------',
     'update public.species_checklist c',
-    'set turtle_species_id = _species.id',
-    'from _species',
-    `where c.scientific_name = ${text(name)} and c.turtle_species_id is null;`,
+    'set turtle_species_id = p.id',
+    'from public.turtle_species p',
+    `where p.${isProfile} and c.scientific_name = ${text(name)} and c.turtle_species_id is null;`,
     ''
   );
 

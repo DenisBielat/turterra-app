@@ -54,18 +54,17 @@ select
   (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina')
 where not exists (select 1 from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 
-create temp table _species on commit drop as
-  select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina';
-
 do $$ begin
-  if (select count(*) from _species) <> 1 then raise exception 'Expected exactly one profile row for %', 'Terrapene carolina carolina'; end if;
+  if (select count(*) from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina') <> 1 then
+    raise exception 'Expected exactly one profile row for %', 'Terrapene carolina carolina';
+  end if;
 end $$;
 
 update public.turtle_species
 set other_common_names = array['Woodland Box Turtle']::text[],
     limited_information_toggle = false,
     limited_information_description = null
-where id = (select id from _species);
+where id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 
 -- 2. Written sections ----------------------------------------------------------
 --    at_a_glance: Kiester and Willey 2015; TTWG 2025
@@ -79,32 +78,32 @@ where id = (select id from _species);
 --    conservation: TTWG 2025; Kiester and Willey 2015; van Dijk 2011 (IUCN)
 --    predators: Kiester and Willey 2015
 --    threats: Kiester and Willey 2015
-delete from public.turtle_species_section_descriptions where species_id = (select id from _species);
+delete from public.turtle_species_section_descriptions where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_section_descriptions
   (species_id, at_a_glance, identification, distribution, habitat, diet, hibernation, nesting, unique_traits_and_qualities, conservation, predators, threats)
-select id,
+select p.id,
   'The Eastern Box Turtle, also called the Woodland Box Turtle, is the most widespread of the three subspecies of the Common Box Turtle and one of the best-known turtles in the world. It is a small land turtle of the eastern United States, recorded from New England to northern Florida and west to Michigan and Illinois, that can close its hinged shell completely. Decades of field study have shown it to be long-lived, with females still breeding past the age of 50. Populations at several long-studied sites have declined, and it has disappeared from the northern edge of its range.',
-  $t$Like all box turtles, the Eastern Box Turtle has a hinged plastron and can close its shell completely. The carapace is keeled along the midline and deepest behind the hinge. Colour and pattern differ greatly from one animal to the next. The shell is dark, brown to black, marked with light lines, spots or blotches in yellow, orange or white. Hatchlings often have a single yellow dot in the centre of each scute.
+  replace($t$Like all box turtles, the Eastern Box Turtle has a hinged plastron and can close its shell completely. The carapace is keeled along the midline and deepest behind the hinge. Colour and pattern differ greatly from one animal to the next. The shell is dark, brown to black, marked with light lines, spots or blotches in yellow, orange or white. Hatchlings often have a single yellow dot in the centre of each scute.
 
 Males often have a larger tail, a vent set further back and a more concave plastron than females, and they are usually the more brightly coloured sex. Many males have a bright red iris and most females a brown one, but some females have red eyes too, so eye colour is a hint and not a rule. Immature animals cannot be sexed by eye.
 
-The longest shell on record is 19.8 cm, listed for a female and matching a 198 mm animal from a New York population that averaged only 133 mm. The largest male on record measured 17.4 cm.$t$,
-  $t$The Eastern Box Turtle has by far the largest range of the three subspecies. The 2025 checklist records it from 24 states: Alabama, Connecticut, Delaware, Florida, Georgia, Illinois, Indiana, Kentucky, Maine, Maryland, Massachusetts, Michigan, Mississippi, New Hampshire, New Jersey, New York, North Carolina, Ohio, Pennsylvania, Rhode Island, South Carolina, Tennessee, Virginia and West Virginia. In the southern states it reaches only the northern parts of Florida, Alabama and Mississippi, and in the west it reaches southern Illinois. Its estimated historical area of occupancy is about 1.4 million square kilometres. It sometimes occurs on offshore islands.
+The longest shell on record is 19.8 cm, listed for a female and matching a 198 mm animal from a New York population that averaged only 133 mm. The largest male on record measured 17.4 cm.$t$, chr(13), ''),
+  replace($t$The Eastern Box Turtle has by far the largest range of the three subspecies. The 2025 checklist records it from 24 states: Alabama, Connecticut, Delaware, Florida, Georgia, Illinois, Indiana, Kentucky, Maine, Maryland, Massachusetts, Michigan, Mississippi, New Hampshire, New Jersey, New York, North Carolina, Ohio, Pennsylvania, Rhode Island, South Carolina, Tennessee, Virginia and West Virginia. In the southern states it reaches only the northern parts of Florida, Alabama and Mississippi, and in the west it reaches southern Illinois. Its estimated historical area of occupancy is about 1.4 million square kilometres. It sometimes occurs on offshore islands.
 
 Further south it meets the Florida and Gulf Coast Box Turtles, and where their ranges overlap the subspecies intergrade.
 
-At the northern edge the turtle has been lost. It is listed as extirpated from Ontario, where recent sightings have been single animals that were probably released pets, and a 2015 review found no known functioning populations left in Maine or New Hampshire.$t$,
-  $t$Eastern Box Turtles live in a mix of forest, forest openings and fields. Studies in New York, Delaware, Massachusetts and Virginia found that open, early-successional and grassy habitat is important at certain times of year. In Delaware, turtles were more numerous at less forested sites, but adults there also survived less well. They enter water at times, as studies in Tennessee, North Carolina and West Virginia have recorded.
+At the northern edge the turtle has been lost. It is listed as extirpated from Ontario, where recent sightings have been single animals that were probably released pets, and a 2015 review found no known functioning populations left in Maine or New Hampshire.$t$, chr(13), ''),
+  replace($t$Eastern Box Turtles live in a mix of forest, forest openings and fields. Studies in New York, Delaware, Massachusetts and Virginia found that open, early-successional and grassy habitat is important at certain times of year. In Delaware, turtles were more numerous at less forested sites, but adults there also survived less well. They enter water at times, as studies in Tennessee, North Carolina and West Virginia have recorded.
 
 A box turtle spends the night in a "form": a resting place made by settling into vegetation, leaf litter or soil until it is hidden and partly buried.
 
-Radio-tracking shows that most turtles keep to a home range and return to much the same one each year. Average home ranges run from under 2 hectares in West Virginia and Tennessee to more than 7 hectares in Illinois, Indiana and Massachusetts, and individual ranges from 0.22 to 187.6 hectares have been measured. The home ranges of males and females do not differ significantly. Turtles in large tracts of forest travel further than those in more open or developed country.$t$,
-  $t$Like other box turtles, the Eastern Box Turtle is an omnivore. Records that are specific to this subspecies include mushrooms eaten on Long Island, New York, and carrion. In eastern Tennessee turtles were seen gathering around a local source of food.
+Radio-tracking shows that most turtles keep to a home range and return to much the same one each year. Average home ranges run from under 2 hectares in West Virginia and Tennessee to more than 7 hectares in Illinois, Indiana and Massachusetts, and individual ranges from 0.22 to 187.6 hectares have been measured. The home ranges of males and females do not differ significantly. Turtles in large tracts of forest travel further than those in more open or developed country.$t$, chr(13), ''),
+  replace($t$Like other box turtles, the Eastern Box Turtle is an omnivore. Records that are specific to this subspecies include mushrooms eaten on Long Island, New York, and carrion. In eastern Tennessee turtles were seen gathering around a local source of food.
 
 One study looked at the dispersal of fungal spores by Eastern Box Turtles, and box turtles in general may be important in spreading seeds and fungi through their habitat.
 
-The broader list of foods recorded for the species, which includes fruits, snails, slugs, insects and earthworms, is given on the Common Box Turtle page.$t$,
-  $t$Eastern Box Turtles spend the winter dormant. Northern populations are active from about April to October or November, and those further south, as in eastern Tennessee, have a longer active season.
+The broader list of foods recorded for the species, which includes fruits, snails, slugs, insects and earthworms, is given on the Common Box Turtle page.$t$, chr(13), ''),
+  replace($t$Eastern Box Turtles spend the winter dormant. Northern populations are active from about April to October or November, and those further south, as in eastern Tennessee, have a longer active season.
 
 Turtles choose wintering spots that are warmer than their surroundings and burrow down into leaf litter and soil, which stay much warmer than the air. Stump holes and the pits left by fallen trees are often used. The wintering site may lie outside a turtle's summer range.
 
@@ -112,32 +111,32 @@ A study of 44 adults in southwest Michigan followed their emergence in spring. T
 
 Hatchlings do not always leave the nest in autumn; in New York some spent their first winter in the nest chamber.
 
-In the active season the turtles are about by day, with a period of activity in the morning and, in hot weather, a midday rest followed by more activity in late afternoon.$t$,
-  $t$Eastern Box Turtles nest in open places with sandy soil and little vegetation or leaf litter, often in openings made by people. Outside Florida, nesting is typical from late May to early July, and it usually takes place in the evening.
+In the active season the turtles are about by day, with a period of activity in the morning and, in hot weather, a midday rest followed by more activity in late afternoon.$t$, chr(13), ''),
+  replace($t$Eastern Box Turtles nest in open places with sandy soil and little vegetation or leaf litter, often in openings made by people. Outside Florida, nesting is typical from late May to early July, and it usually takes place in the evening.
 
 Clutches are larger here than in the Florida Box Turtle. Females studied in New York, Illinois and Massachusetts averaged more than five eggs. Two or three clutches a year have been reported, but near the northern limit of the range, in New York and Massachusetts, females have not been seen to lay more than one, and hormone measurements from a population in Indiana agree.
 
 Hatchlings typically emerge from late August to early September, although some overwinter in the nest. In Eastern Box Turtles from Indiana, the sex of the hatchlings depended on incubation temperature: cooler eggs produced males and warmer eggs females, in a pattern that does not closely match that of any other turtle.
 
-Females keep breeding into old age. In a long-studied population in Maryland they were still reproductively active when well past 50.$t$,
-  $t$The Eastern Box Turtle is the form on which the species was founded. Linnaeus named it in 1758 from a specimen that had been illustrated in 1751, and its name refers to the Carolinas.
+Females keep breeding into old age. In a long-studied population in Maryland they were still reproductively active when well past 50.$t$, chr(13), ''),
+  replace($t$The Eastern Box Turtle is the form on which the species was founded. Linnaeus named it in 1758 from a specimen that had been illustrated in 1751, and its name refers to the Carolinas.
 
 It is also one of the most thoroughly studied reptiles. Lucille Stickel began following the box turtles at Patuxent in Maryland in 1945, and the work continued for decades.
 
 That research has turned up some surprises. Eastern Box Turtles are known to home, and a sick turtle will warm itself above its normal temperature, a behavioural fever. In one study their top walking speed was 0.49 metres per second, reached at 31.9 °C. And although most turtles seem to stay put, a genetic study in Indiana found that the few pairs of siblings it detected were living an average of 11.6 km apart, which suggests that box turtles disperse much further than had been assumed.
 
-Juvenile box turtles are under-counted in surveys. Detection dogs have been observed to find a greater proportion of them.$t$,
-  $t$The Eastern Box Turtle has no Red List assessment of its own. The species it belongs to, the Common Box Turtle, is listed as Vulnerable (assessed in 2011), and like all box turtles it has been on Appendix II of CITES since 1995.
+Juvenile box turtles are under-counted in surveys. Detection dogs have been observed to find a greater proportion of them.$t$, chr(13), ''),
+  replace($t$The Eastern Box Turtle has no Red List assessment of its own. The species it belongs to, the Common Box Turtle, is listed as Vulnerable (assessed in 2011), and like all box turtles it has been on Appendix II of CITES since 1995.
 
 Canada designated the turtle Extirpated in 2014. In the United States, as of 2015, it was listed as a species of Special Concern in Connecticut, Indiana, Massachusetts, Michigan, New Hampshire, New Jersey, New York and Ohio, as Protected in Rhode Island and as Endangered in Maine.
 
 The best evidence of decline comes from sites that have been watched for decades. At Patuxent in Maryland the population in 1995 was 23% of what it had been in 1955. At Allee Memorial Woods in Indiana, density fell from 4.4–5.7 turtles per hectare in the 1960s to 2.7 in 1983. Declines or extirpation have also been reported across large portions of Michigan and Massachusetts.
 
-Densities vary widely, from fewer than one adult per hectare in fragmented populations and at the edge of the range to roughly 19–23 per hectare at a site in Tennessee. Reserves need to be large: a translocated population in Pennsylvania needed at least 800 hectares to contain its movements.$t$,
-  $t$Bald eagles in the Chesapeake Bay region have been recorded taking box turtles, hogs were reported as predators in Indiana more than a century ago, and chipmunks are suspected of preying on juveniles.
+Densities vary widely, from fewer than one adult per hectare in fragmented populations and at the edge of the range to roughly 19–23 per hectare at a site in Tennessee. Reserves need to be large: a translocated population in Pennsylvania needed at least 800 hectares to contain its movements.$t$, chr(13), ''),
+  replace($t$Bald eagles in the Chesapeake Bay region have been recorded taking box turtles, hogs were reported as predators in Indiana more than a century ago, and chipmunks are suspected of preying on juveniles.
 
-Adult Eastern Box Turtles survive well from year to year: about 81% annually in a Delaware study and 96% in one from the Midwest. Predation is thought to weigh more heavily on juveniles. In a Virginia population, 9.8% of the turtles carried injuries.$t$,
-  $t$The Eastern Box Turtle faces the same pressures as the species as a whole, and much of the evidence for them comes from this subspecies.
+Adult Eastern Box Turtles survive well from year to year: about 81% annually in a Delaware study and 96% in one from the Midwest. Predation is thought to weigh more heavily on juveniles. In a Virginia population, 9.8% of the turtles carried injuries.$t$, chr(13), ''),
+  replace($t$The Eastern Box Turtle faces the same pressures as the species as a whole, and much of the evidence for them comes from this subspecies.
 
 Roads are a particular danger. Box turtles close their shells when threatened and stay closed for longer than other turtles, a habit studied in West Virginia that may make them more likely to be killed on roads. Roads may also affect females searching for nest sites more than other turtles. At the long-studied sites in Maryland and Delaware the sex ratio became more male-biased as numbers fell.
 
@@ -145,35 +144,37 @@ Mowing and haying kill turtles in fields, as studies in North Carolina and Delaw
 
 At Allee Memorial Woods in Indiana, incidental collection was suggested as one factor in the decline.
 
-Disease is a growing concern. Chronic bacterial pneumonia and Mycoplasma have been found in wild Eastern Box Turtles, and ranavirus has been detected in wild populations, including at sub-lethal levels in Indiana.$t$
-from _species;
+Disease is a growing concern. Chronic bacterial pneumonia and Mycoplasma have been found in wild Eastern Box Turtles, and ranavirus has been detected in wild populations, including at sub-lethal levels in Indiana.$t$, chr(13), '')
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 
 -- 3. Measurements (lengths in cm, weight in g, lifespans in years) -------------
 --    length_female_max_scl: TTWG 2025
 --    length_male_max_scl: TTWG 2025
-delete from public.turtle_species_measurements where species_id = (select id from _species);
+delete from public.turtle_species_measurements where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_measurements
   (species_id, adult_weight, length_female_max_scl, length_male_max_scl, generally_larger, lifespan_wild_min, lifespan_wild_max, lifespan_captivity_min, lifespan_captivity_max)
-select id,
+select p.id,
   null, 19.8, 17.4, null, null, null, null, null
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 
 -- 4. Conservation status and population ----------------------------------------
-delete from public.turtle_species_conservation_history where species_id = (select id from _species);
+delete from public.turtle_species_conservation_history where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 --    VU 2011: TTWG 2025; van Dijk 2011 (IUCN)
 insert into public.turtle_species_conservation_history
   (species_id, conservation_status, year_status_assigned, date_status_assigned, out_of_date, out_of_date_description, self_assigned_conservation_status)
-select _species.id, s.id,
+select p.id, s.id,
   '2011', null, null, null,
   null
-from _species, public.conservation_statuses s where s.abbreviation = 'VU';
-delete from public.turtle_species_population_estimate_history where species_id = (select id from _species);
+from public.turtle_species p, public.conservation_statuses s
+where p.species_scientific_name = 'Terrapene carolina carolina' and s.abbreviation = 'VU';
+delete from public.turtle_species_population_estimate_history where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 --    population 2015: Kiester and Willey 2015
 insert into public.turtle_species_population_estimate_history
   (species_id, year_of_estimate, date_of_estimate, population_estimate, population_trend)
-select id, '2015', null, null, 'Decreasing'::public.population_trend from _species;
+select p.id, '2015', null, null, 'Decreasing'::public.population_trend
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 do $$ begin
-  if (select count(*) from public.turtle_species_conservation_history where species_id = (select id from _species)) <> 1 then
+  if (select count(*) from public.turtle_species_conservation_history where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina')) <> 1 then
     raise exception 'A conservation status abbreviation did not match conservation_statuses';
   end if;
 end $$;
@@ -185,69 +186,69 @@ insert into public.habitats (habitat)
 select 'Forest Openings & Edges' where not exists (select 1 from public.habitats where habitat = 'Forest Openings & Edges');   -- NEW tag
 insert into public.habitats (habitat)
 select 'Fields & Grasslands' where not exists (select 1 from public.habitats where habitat = 'Fields & Grasslands');   -- NEW tag
-delete from public.turtle_species_habitats where species_id = (select id from _species);
+delete from public.turtle_species_habitats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_habitats (species_id, habitat)
-select _species.id, v.id from _species, public.habitats v
-where v.habitat in ('Forests', 'Forest Openings & Edges', 'Fields & Grasslands');
+select p.id, v.id from public.turtle_species p, public.habitats v
+where p.species_scientific_name = 'Terrapene carolina carolina' and v.habitat in ('Forests', 'Forest Openings & Edges', 'Fields & Grasslands');
 do $$ begin
-  if (select count(*) from public.turtle_species_habitats where species_id = (select id from _species)) <> 3 then
+  if (select count(*) from public.turtle_species_habitats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina')) <> 3 then
     raise exception 'Expected 3 rows in turtle_species_habitats: a tag name did not match habitats';
   end if;
 end $$;
-delete from public.turtle_species_ecologies where species_id = (select id from _species);
+delete from public.turtle_species_ecologies where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_ecologies (species_id, ecology_id)
-select _species.id, v.id from _species, public.ecologies v
-where v.ecology in ('Terrestrial');
+select p.id, v.id from public.turtle_species p, public.ecologies v
+where p.species_scientific_name = 'Terrapene carolina carolina' and v.ecology in ('Terrestrial');
 do $$ begin
-  if (select count(*) from public.turtle_species_ecologies where species_id = (select id from _species)) <> 1 then
+  if (select count(*) from public.turtle_species_ecologies where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina')) <> 1 then
     raise exception 'Expected 1 rows in turtle_species_ecologies: a tag name did not match ecologies';
   end if;
 end $$;
 insert into public.habitat_types (habitat_type)
 select 'Forests' where not exists (select 1 from public.habitat_types where habitat_type = 'Forests');   -- NEW tag
-delete from public.turtle_species_habitat_types where species_id = (select id from _species);
+delete from public.turtle_species_habitat_types where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_habitat_types (species_id, habitat_type_id)
-select _species.id, v.id from _species, public.habitat_types v
-where v.habitat_type in ('Forests', 'Grasslands');
+select p.id, v.id from public.turtle_species p, public.habitat_types v
+where p.species_scientific_name = 'Terrapene carolina carolina' and v.habitat_type in ('Forests', 'Grasslands');
 do $$ begin
-  if (select count(*) from public.turtle_species_habitat_types where species_id = (select id from _species)) <> 2 then
+  if (select count(*) from public.turtle_species_habitat_types where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina')) <> 2 then
     raise exception 'Expected 2 rows in turtle_species_habitat_types: a tag name did not match habitat_types';
   end if;
 end $$;
-delete from public.turtle_species_regions_general where species_id = (select id from _species);
+delete from public.turtle_species_regions_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_regions_general (species_id, region_id)
-select _species.id, v.region_id from _species, public.regions_general v
-where v.region_name in ('Eastern United States', 'Southeastern United States');
+select p.id, v.region_id from public.turtle_species p, public.regions_general v
+where p.species_scientific_name = 'Terrapene carolina carolina' and v.region_name in ('Eastern United States', 'Southeastern United States');
 do $$ begin
-  if (select count(*) from public.turtle_species_regions_general where species_id = (select id from _species)) <> 2 then
+  if (select count(*) from public.turtle_species_regions_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina')) <> 2 then
     raise exception 'Expected 2 rows in turtle_species_regions_general: a tag name did not match regions_general';
   end if;
 end $$;
-delete from public.turtle_species_threats where species_id = (select id from _species);
+delete from public.turtle_species_threats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_threats (species_id, threat_id)
-select _species.id, v.id from _species, public.threats_list v
-where v.threat_name in ('Deforestation', 'Urbanization', 'Infrastructure Development', 'Collection/Pet Trade', 'Agriculture', 'Controlled Burns');
+select p.id, v.id from public.turtle_species p, public.threats_list v
+where p.species_scientific_name = 'Terrapene carolina carolina' and v.threat_name in ('Deforestation', 'Urbanization', 'Infrastructure Development', 'Collection/Pet Trade', 'Agriculture', 'Controlled Burns');
 do $$ begin
-  if (select count(*) from public.turtle_species_threats where species_id = (select id from _species)) <> 6 then
+  if (select count(*) from public.turtle_species_threats where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina')) <> 6 then
     raise exception 'Expected 6 rows in turtle_species_threats: a tag name did not match threats_list';
   end if;
 end $$;
-delete from public.turtle_species_behaviors_general where species_id = (select id from _species);
+delete from public.turtle_species_behaviors_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_behaviors_general (species_id, behavior_id)
-select _species.id, v.id from _species, public.behaviors_general v
-where v.behavior in ('Diurnal');
+select p.id, v.id from public.turtle_species p, public.behaviors_general v
+where p.species_scientific_name = 'Terrapene carolina carolina' and v.behavior in ('Diurnal');
 do $$ begin
-  if (select count(*) from public.turtle_species_behaviors_general where species_id = (select id from _species)) <> 1 then
+  if (select count(*) from public.turtle_species_behaviors_general where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina')) <> 1 then
     raise exception 'Expected 1 rows in turtle_species_behaviors_general: a tag name did not match behaviors_general';
   end if;
 end $$;
 
 -- 6. Physical features (one row per variant) -----------------------------------
-delete from public.turtle_species_physical_features_new where species_id = (select id from _species);
+delete from public.turtle_species_physical_features_new where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 --    adult: Kiester and Willey 2015; TTWG 2025
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, carapace_shape, carapace_pattern, carapace_colors, marginal_scute_shape, vertebral_keel, hinge_present, hinge_location)
-select id, 'adult', null,
+select p.id, 'adult', null,
   'keeled; deepest behind the plastral hinge',
   'variable; light lines, spots or blotches',
   'dark brown to black with yellow, orange or white markings',
@@ -255,11 +256,11 @@ select id, 'adult', null,
   'present',
   'true',
   'plastron'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 --    adult male: Kiester and Willey 2015; TTWG 2025
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, eye_color, tail_length, carapace_shape, carapace_pattern, carapace_colors, marginal_scute_shape, vertebral_keel, hinge_present, hinge_location)
-select id, 'adult', 'male',
+select p.id, 'adult', 'male',
   'iris often bright red',
   $t$larger than the female's, with the vent further back$t$,
   'keeled; deepest behind the plastral hinge',
@@ -269,11 +270,11 @@ select id, 'adult', 'male',
   'present',
   'true',
   'plastron'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 --    adult female: Kiester and Willey 2015; TTWG 2025
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, eye_color, tail_length, carapace_shape, carapace_pattern, carapace_colors, marginal_scute_shape, vertebral_keel, hinge_present, hinge_location)
-select id, 'adult', 'female',
+select p.id, 'adult', 'female',
   'iris usually brown, occasionally red',
   $t$smaller than the male's$t$,
   'keeled; deepest behind the plastral hinge',
@@ -283,46 +284,46 @@ select id, 'adult', 'female',
   'present',
   'true',
   'plastron'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 --    hatchling: Kiester and Willey 2015
 insert into public.turtle_species_physical_features_new
   (species_id, life_stage, sex, carapace_pattern, carapace_colors)
-select id, 'hatchling', null,
+select p.id, 'hatchling', null,
   'often a single yellow dot in the centre of each scute',
   'dark with yellow dots'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 
 -- 7. References ----------------------------------------------------------------
-delete from public.turtle_species_references where species_id = (select id from _species);
+delete from public.turtle_species_references where species_id = (select id from public.turtle_species where species_scientific_name = 'Terrapene carolina carolina');
 insert into public.turtle_species_references
   (species_id, reference_type, citation_full, citation_short, authors, year, title, source_name, url, doi, access_date, notes)
-select id, 'TFTSG Account'::public.reference_type,
+select p.id, 'TFTSG Account'::public.reference_type,
   'Kiester, A.R. and Willey, L.L. 2015. Terrapene carolina (Linnaeus 1758) – Eastern Box Turtle, Common Box Turtle. In: Rhodin, A.G.J., Pritchard, P.C.H., van Dijk, P.P., Saumure, R.A., Buhlmann, K.A., Iverson, J.B., and Mittermeier, R.A. (Eds.). Conservation Biology of Freshwater Turtles and Tortoises: A Compilation Project of the IUCN/SSC Tortoise and Freshwater Turtle Specialist Group. Chelonian Research Monographs 5(8):085.1–25, doi:10.3854/crm.5.085.carolina.v1.2015, http://www.iucn-tftsg.org/cbftt/.',
   'Kiester and Willey 2015', 'Kiester, A.R. and Willey, L.L.', '2015',
   'Terrapene carolina (Linnaeus 1758) – Eastern Box Turtle, Common Box Turtle',
   'Chelonian Research Monographs No. 5', 'https://iucn-tftsg.org/cbftt/species-accounts/terrapene-carolina-085/', '10.3854/crm.5.085.carolina.v1.2015', date '2026-11-18', null
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 insert into public.turtle_species_references
   (species_id, reference_type, citation_full, citation_short, authors, year, title, source_name, url, doi, access_date, notes)
-select id, 'Book'::public.reference_type,
+select p.id, 'Book'::public.reference_type,
   'Turtle Taxonomy Working Group [Rhodin, A.G.J., Iverson, J.B., Fritz, U., Gallego-García, N., Georges, A., Shaffer, H.B., and van Dijk, P.P.]. 2025. Turtles of the World: Annotated Checklist and Atlas of Taxonomy, Synonymy, Distribution, and Conservation Status (10th Ed.). In: Rhodin, A.G.J., Iverson, J.B., van Dijk, P.P., Stanford, C.B., Goode, E.V., Buhlmann, K.A., and Mittermeier, R.A. (Eds.). Conservation Biology of Freshwater Turtles and Tortoises: A Compilation Project of the IUCN SSC Tortoise and Freshwater Turtle Specialist Group. Chelonian Research Monographs 10:1–575. doi:10.3854/crm.10.checklist.atlas.v10.2025.',
   'TTWG 2025', 'Turtle Taxonomy Working Group [Rhodin, A.G.J., Iverson, J.B., Fritz, U., Gallego-García, N., Georges, A., Shaffer, H.B., and van Dijk, P.P.]', '2025',
   'Turtles of the World: Annotated Checklist and Atlas of Taxonomy, Synonymy, Distribution, and Conservation Status (10th Ed.)',
   'Chelonian Research Monographs No. 10', 'https://iucn-tftsg.org/checklists/turtles-of-the-world-checklist-10th-edition/', '10.3854/crm.10.checklist.atlas.v10.2025', date '2026-11-18', null
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 insert into public.turtle_species_references
   (species_id, reference_type, citation_full, citation_short, authors, year, title, source_name, url, doi, access_date, notes)
-select id, 'IUCN Assessment'::public.reference_type,
+select p.id, 'IUCN Assessment'::public.reference_type,
   'van Dijk, P.P. 2011. Terrapene carolina. The IUCN Red List of Threatened Species 2011: e.T21641A9303747.',
   'van Dijk 2011 (IUCN)', 'van Dijk, P.P.', '2011',
   'Terrapene carolina',
   'The IUCN Red List of Threatened Species', 'https://www.iucnredlist.org/species/21641/9303747', null, date '2026-11-18', 'Species-level assessment; the Eastern Box Turtle has no assessment of its own. Category, criteria and year are given as reported in TTWG 2025 and Kiester and Willey 2015; the assessment itself was not read.'
-from _species;
+from public.turtle_species p where p.species_scientific_name = 'Terrapene carolina carolina';
 
 -- 8. Link the profile to its checklist entry ------------------------------------
 update public.species_checklist c
-set turtle_species_id = _species.id
-from _species
-where c.scientific_name = 'Terrapene carolina carolina' and c.turtle_species_id is null;
+set turtle_species_id = p.id
+from public.turtle_species p
+where p.species_scientific_name = 'Terrapene carolina carolina' and c.scientific_name = 'Terrapene carolina carolina' and c.turtle_species_id is null;
 
 commit;
