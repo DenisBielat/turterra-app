@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Map, { Source, Layer, NavigationControl, ViewState, MapRef, MapMouseEvent } from 'react-map-gl/mapbox';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { supabase } from '@/lib/db/supabaseClient';
+import { createClient } from '@/lib/supabase/client';
 import { Icon } from '@/components/Icon';
 import { X } from 'lucide-react';
 import type { FeatureCollection, MultiPolygon, Geometry } from 'geojson';
@@ -104,6 +104,9 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         setSpeciesData([]);
         return;
       }
+
+      // Session-aware client: an admin previewing a draft species gets its data too.
+      const supabase = createClient();
       
       
       const promises = selectedSpeciesIds.map(async (speciesId) => {
@@ -165,6 +168,8 @@ const TurtleDistributionMap: React.FC<TurtleDistributionMapProps> = ({ selectedS
         setRangeMapData([]);
         return;
       }
+
+      const supabase = createClient();
 
       const promises = selectedSpeciesIds.map(async (speciesId) => {
         // Fetch range map using the RPC function

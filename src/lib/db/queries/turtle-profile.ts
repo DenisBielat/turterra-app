@@ -1,3 +1,4 @@
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/lib/db/supabaseClient';
 import { getPhysicalFeatureImages } from '@/lib/db/cloudinary';
 import {
@@ -37,10 +38,14 @@ function normalizeValue(value: unknown): string | null {
   return String(value).toLowerCase().trim().replace(/\s+/g, ' ');
 }
 
-async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', value: string) {
+async function fetchRawTurtleRow(
+  column: 'slug' | 'species_scientific_name',
+  value: string,
+  client: SupabaseClient = supabase
+) {
   // fetching turtle data
   
-  const { data: turtle, error } = await supabase
+  const { data: turtle, error } = await client
     .from('turtle_species')
     .select(`
       id,
@@ -127,6 +132,12 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
     .eq(column, value)
     .single<TurtleData>();
 
+  // No matching row: the species does not exist, or it is a draft and the
+  // viewer is not an admin. Callers treat null as "not found".
+  if (error?.code === 'PGRST116') {
+    return null;
+  }
+
   if (error) {
     console.error('Error fetching turtle data', column, value);
     console.error('Error message:', error.message);
@@ -141,19 +152,19 @@ async function fetchRawTurtleRow(column: 'slug' | 'species_scientific_name', val
   return turtle ?? null;
 }
 
-async function fetchRelatedTurtleData(turtle: TurtleData) {
+async function fetchRelatedTurtleData(turtle: TurtleData, client: SupabaseClient = supabase) {
   // Fetch images
   const categoryImages = await getPhysicalFeatureImages(turtle.species_common_name);
 
   // Fetch physical features and keys from the new tables
   const [physicalFeatures, featureKeys] = await Promise.all([
-    supabase
+    client
       .from('turtle_species_physical_features_new')
       .select('*')
       .eq('species_id', turtle.id)
       .order('life_stage')
       .order('sex'),
-    supabase
+    client
       .from('turtle_species_physical_features_key_new')
       .select('*')
   ]);
@@ -167,7 +178,7 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
   }
 
   // Fetch related species in the same family (with conservation status)
-  const { data: relatedSpecies, error: relatedError } = await supabase
+  const { data: relatedSpecies, error: relatedError } = await client
     .from('turtle_species')
     .select(`
       species_common_name,
@@ -194,7 +205,7 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
   // Fetch behaviors - make it optional so it doesn't break if table doesn't exist
   // Schema: turtle_species_behaviors_general has species_id and behavior_id
   // behaviors_general has behavior, behavior_description, behavior_icon
-  const { data: behaviorsData, error: behaviorsError } = await supabase
+  const { data: behaviorsData, error: behaviorsError } = await client
     .from('turtle_species_behaviors_general')
     .select(`
       behaviors_general(behavior, behavior_description, behavior_icon)
@@ -211,7 +222,7 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
   }
 
   // Fetch all conservation statuses
-  const { data: conservationStatuses, error: conservationStatusesError } = await supabase
+  const { data: conservationStatuses, error: conservationStatusesError } = await client
     .from('conservation_statuses')
     .select('*')
     .order('order_of_concern', { ascending: true });
@@ -233,10 +244,11 @@ async function fetchRelatedTurtleData(turtle: TurtleData) {
 async function fetchTaxonomyData(
   genusId: number,
   speciesCommonName: string,
-  speciesScientificName: string
+  speciesScientificName: string,
+  client: SupabaseClient = supabase
 ): Promise<TaxonomyData | null> {
   // Fetch genus data
-  const { data: genus, error: genusError } = await supabase
+  const { data: genus, error: genusError } = await client
     .from('turtle_taxonomy_genuses')
     .select('*')
     .eq('id', genusId)
@@ -248,7 +260,7 @@ async function fetchTaxonomyData(
   }
 
   // Fetch family data
-  const { data: family, error: familyError } = await supabase
+  const { data: family, error: familyError } = await client
     .from('turtle_taxonomy_families')
     .select('*')
     .eq('id', genus.tax_parent_family)
@@ -260,7 +272,7 @@ async function fetchTaxonomyData(
   }
 
   // Fetch suborder data
-  const { data: suborder, error: suborderError } = await supabase
+  const { data: suborder, error: suborderError } = await client
     .from('turtle_taxonomy_suborders')
     .select('*')
     .eq('id', family.tax_parent_suborder)
@@ -272,7 +284,7 @@ async function fetchTaxonomyData(
   }
 
   // Fetch order data
-  const { data: order, error: orderError } = await supabase
+  const { data: order, error: orderError } = await client
     .from('turtle_taxonomy_orders')
     .select('*')
     .eq('id', suborder.tax_parent_order)
@@ -830,17 +842,25 @@ function transformTurtleDataToProfile(
 }
 
 // Publicly exported functions:
-export async function getTurtleData(slug: string) {
+/**
+ * Loads a species profile by slug.
+ *
+ * Pass the request's Supabase client (from '@/lib/supabase/server') so the
+ * query runs as the signed-in user: admins can then preview draft species.
+ * Without it the anonymous client is used and only published species load.
+ */
+export async function getTurtleData(slug: string, client: SupabaseClient = supabase) {
   try {
-    const turtle = await fetchRawTurtleRow('slug', slug);
+    const turtle = await fetchRawTurtleRow('slug', slug, client);
     if (!turtle) return null;
 
     const [relatedData, taxonomyData] = await Promise.all([
-      fetchRelatedTurtleData(turtle),
+      fetchRelatedTurtleData(turtle, client),
       fetchTaxonomyData(
         turtle.tax_parent_genus,
         turtle.species_common_name,
-        turtle.species_scientific_name
+        turtle.species_scientific_name,
+        client
       )
     ]);
 
@@ -866,27 +886,6 @@ export async function getTurtleData(slug: string) {
     }
     console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
     throw error;
-  }
-}
-
-// Debug function to check available slugs
-export async function debugAvailableSlugs() {
-  try {
-    const { data, error } = await supabase
-      .from('turtle_species')
-      .select('slug, species_common_name')
-      .limit(10);
-    
-    if (error) {
-      console.error('Error fetching slugs:', error);
-      return [];
-    }
-    
-    console.log('📋 Available slugs:', data);
-    return data;
-  } catch (error) {
-    console.error('Error in debugAvailableSlugs:', error);
-    return [];
   }
 }
 

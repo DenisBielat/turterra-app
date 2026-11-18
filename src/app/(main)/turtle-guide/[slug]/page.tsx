@@ -1,4 +1,6 @@
-import { getTurtleData, debugAvailableSlugs } from '@/lib/db/queries/turtle-profile'
+import { notFound } from 'next/navigation'
+import { getTurtleData } from '@/lib/db/queries/turtle-profile'
+import { createClient } from "@/lib/supabase/server";
 import TurtleProfileHero from "@/components/turtle-profile/hero-slider/turtle-profile-hero";
 import TurtleSearchNav from "@/components/turtle-profile/hero-search/SearchNav";
 import TurtleAtAGlance from "@/components/turtle-profile/content-sections/AtAGlance";
@@ -12,43 +14,38 @@ import References from "@/components/turtle-profile/content-sections/References"
 
 export default async function TurtlePage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
-  
-  
-  // Debug: Show available slugs if there's an issue
-  const availableSlugs = await debugAvailableSlugs();
-  
-  const data = await getTurtleData(params.slug);
+
+  // Query as the signed-in user so admins can preview draft species.
+  // Everyone else only ever receives published species from the database.
+  const supabase = await createClient();
+  const data = await getTurtleData(params.slug, supabase);
 
   if (!data) {
-    return (
-      <div className="p-8">
-        <h1 className="text-2xl font-bold mb-4">Turtle Not Found</h1>
-        <p className="mb-4">No turtle data found for slug: <code className="bg-gray-100 px-2 py-1 rounded">{params.slug}</code></p>
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold mb-2">Available slugs:</h2>
-          <ul className="list-disc list-inside">
-            {(availableSlugs as { slug: string; species_common_name: string }[]).map((turtle) => (
-              <li key={turtle.slug}>
-                <a href={`/turtle-guide/${turtle.slug}`} className="text-blue-600 hover:underline">
-                  {turtle.species_common_name} ({turtle.slug})
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    )
+    notFound();
   }
+
+  // Only comes back as 'draft' for an admin looking at an unpublished species.
+  const { data: statusRow } = await supabase
+    .from('turtle_species')
+    .select('status')
+    .eq('slug', params.slug)
+    .maybeSingle();
+  const isDraft = statusRow?.status === 'draft';
 
   return (
     <main>
+      {isDraft && (
+        <div className="bg-orange-100 border-b border-orange-300 px-4 py-2 text-center text-sm text-orange-900">
+          Draft preview. This species is not published, so only admins can see this page.
+        </div>
+      )}
       <TurtleSearchNav
         turtleName={data.commonName}
         turtleSpecies={data.scientificName}
         turtleImageUrl={data.profileImage || "/images/image-placeholder.png"}
         taxonomy={data.taxonomy}
       />
-      <TurtleProfileHero slug={params.slug} />
+      <TurtleProfileHero slug={params.slug} name={data.commonName} />
       <div className="w-full h-8 lg:h-16 bg-green-900"></div>
       <div className="w-full h-6 lg:h-12 bg-green-800"></div>
       <div className="w-full h-4 lg:h-8 bg-orange-500"></div>

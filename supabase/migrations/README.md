@@ -39,3 +39,30 @@ When your project grows, you can use the [Supabase CLI](https://supabase.com/doc
 - Manage multiple environments (dev, staging, prod)
 
 For now, manual SQL execution is fine for getting started.
+
+## Species tracker (November 2026)
+
+Run these in order. Each one is safe to run more than once.
+
+| # | File | Description |
+|---|------|-------------|
+| 1 | `20261118_001_admin_helper_and_lock_profile_role.sql` | `is_admin()` helper; stops users changing their own `role` / `is_verified` |
+| 2 | `20261118_002_add_species_status.sql` | `turtle_species.status` (`draft` / `published`); existing species stay published, new ones start as drafts |
+| 3 | `20261118_003_create_species_checklist.sql` | `species_checklist` table and the `admin_species_progress` view behind `/admin/species` |
+
+Then load the checklist: `supabase/content/species_checklist_seed.sql`.
+
+## Content files (`supabase/content/`)
+
+Schema changes live in `supabase/migrations/`. Data entry lives in
+`supabase/content/`: one re-runnable SQL file per piece of content (a species,
+a fix, the checklist seed), so it can be reviewed before it is run and the repo
+keeps a copy of what was entered.
+
+`species_checklist_seed.sql` is generated; rebuild it with
+`npm run db:checklist-seed` rather than editing it.
+
+## Schema reference
+
+`docs/supabase-schema.md` lists every table and column. Regenerate it after a
+schema change with `npm run db:snapshot`.

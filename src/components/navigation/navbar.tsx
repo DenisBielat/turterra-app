@@ -24,6 +24,7 @@ interface UserProfile {
   username: string;
   display_name: string | null;
   avatar_url: string | null;
+  role?: string | null;
 }
 
 const Navbar = () => {
@@ -48,7 +49,7 @@ const Navbar = () => {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('username, display_name, avatar_url')
+        .select('username, display_name, avatar_url, role')
         .eq('id', authUser.id)
         .single();
 
@@ -314,6 +315,18 @@ const Navbar = () => {
                       </svg>
                       Settings
                     </Link>
+                    {user.role === 'admin' && (
+                      <Link
+                        href="/admin/species"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-green-900 hover:bg-opacity-10 transition-all duration-200"
+                      >
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        Species tracker
+                      </Link>
+                    )}
                   </div>
 
                   <div className="border-t border-gray-200 my-1 mx-2" />

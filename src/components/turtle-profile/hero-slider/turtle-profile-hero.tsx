@@ -30,18 +30,25 @@ interface ImageData {
 
 interface TurtleProfileHeroProps {
   slug: string;
+  /** Common name, when the page already has it. Skips the lookup below. */
+  name?: string;
   onPrimaryImageLoad?: (imageUrl: string) => void;
 }
 
-export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtleProfileHeroProps) {
+export default function TurtleProfileHero({ slug, name, onPrimaryImageLoad }: TurtleProfileHeroProps) {
   const [images, setImages] = useState<ImageData[]>([]);
-  const [turtleName, setTurtleName] = useState<string>("");
+  const [turtleName, setTurtleName] = useState<string>(name ?? "");
   const [activeIndex, setActiveIndex] = useState(0);
   const [initialSlide, setInitialSlide] = useState(0);
   const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
 
-  // Fetch Turtle Name from Supabase
+  // Fetch Turtle Name from Supabase (only when the page did not pass it in)
   useEffect(() => {
+    if (name) {
+      setTurtleName(name);
+      return;
+    }
+
     async function fetchTurtleName() {
       try {
         const { data, error } = await supabase
@@ -60,7 +67,7 @@ export default function TurtleProfileHero({ slug, onPrimaryImageLoad }: TurtlePr
     }
 
     fetchTurtleName();
-  }, [slug]);
+  }, [slug, name]);
 
   // Fetch Images from Cloudinary
   useEffect(() => {
