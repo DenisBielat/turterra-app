@@ -9,6 +9,10 @@ export const metadata: Metadata = {
     'Turtle care guides, habitat tips, diet advice, and everything you need to know about keeping turtles happy and healthy.',
 };
 
+// Rebuild this page in the background at most every 5 minutes, so a care
+// guide that is published in the database shows up without a redeploy.
+export const revalidate = 300;
+
 const PLACEHOLDER_IMAGE = '/images/image-placeholder.png';
 
 async function getCareGuides(): Promise<CareGuide[]> {
@@ -20,8 +24,14 @@ async function getCareGuides(): Promise<CareGuide[]> {
     .eq('status', 'published')
     .order('created_at', { ascending: false });
 
-  if (guidesError || !guides?.length) {
-    if (guidesError) console.error('Error fetching care guides:', guidesError);
+  if (guidesError) {
+    // Throw rather than render an empty list: when a background rebuild
+    // fails, Next.js keeps serving the last good version of the page.
+    console.error('Error fetching care guides:', guidesError);
+    throw new Error(`Could not load care guides: ${guidesError.message}`);
+  }
+
+  if (!guides?.length) {
     return [];
   }
 

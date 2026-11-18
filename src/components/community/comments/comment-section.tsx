@@ -127,7 +127,6 @@ export function CommentSection({
 
 /** Reddit structure: main thread line in its own container (flex justify-center items-center, w-[1px] h-full); curve lives in the "hidden threadline" container that also covers the stem below. */
 const AVATAR_COLUMN_PX = 32; // w-8 in Tailwind
-const GAP_PX = 12; // gap-3
 const HIDDEN_THREADLINE_WIDTH_PX = 44; // w-11
 /** Curve left: center of avatar column so the curve's vertical edge aligns with the main thread line. */
 const CURVE_LEFT_PX = AVATAR_COLUMN_PX / 2;

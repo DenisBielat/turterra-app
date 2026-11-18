@@ -83,9 +83,10 @@ export function CareGuideLighting({
   const hasPhotoperiod = summerLightHours != null || winterLightHours != null;
   const hasContent = introText || hasUvb || hasDaylight || hasPhotoperiod || outdoorHousingNote;
 
-  if (!hasContent) return null;
-
+  // Hooks must run on every render, so this comes before the early return.
   const { activeSection } = useCareGuideActiveSection();
+
+  if (!hasContent) return null;
 
   return (
     <section id="lighting" className="scroll-mt-40">

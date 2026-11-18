@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src",
     "generate-icons": "tsx scripts/generate-icon-types.ts",
     "import-range-maps": "node scripts/importRangeMaps.js",
     "db:snapshot": "node scripts/snapshotSchema.mjs",

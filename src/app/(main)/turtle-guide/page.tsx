@@ -3,6 +3,10 @@ import Image from "next/image";
 import TurtleGuideClient from "@/components/turtle-guide/TurtleGuideClient";
 import type { TurtleGuideSpecies, TurtleGuideFilters } from "@/app/api/turtle-guide/route";
 
+// Rebuild this page in the background at most every 5 minutes, so a species
+// that is published (or edited) in the database shows up without a redeploy.
+export const revalidate = 300;
+
 async function getTurtleGuideData(): Promise<{
   turtles: TurtleGuideSpecies[];
   filters: TurtleGuideFilters;
@@ -43,8 +47,10 @@ async function getTurtleGuideData(): Promise<{
     .order('species_common_name', { ascending: true });
 
   if (turtlesError) {
+    // Throw rather than render an empty guide: when a background rebuild
+    // fails, Next.js keeps serving the last good version of the page.
     console.error('Error fetching turtles:', turtlesError);
-    return { turtles: [], filters: { families: [], habitats: [], regions: [] } };
+    throw new Error(`Could not load the turtle guide: ${turtlesError.message}`);
   }
 
   // Fetch genus -> family mappings

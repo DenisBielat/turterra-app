@@ -168,8 +168,6 @@ export function CareGuideTemperature({
   const hasHeatingNotes = !!indoorHeatingNote || !!outdoorHeatingNote;
   const hasContent = introText || tempZones.length > 0 || hasEquipment || hasHeatingNotes || hibernationNote || safetyWarning;
 
-  if (!hasContent) return null;
-
   // Find the max temp across all zones (for proportional bar widths)
   const maxTempF = tempZones.reduce((max, z) => Math.max(max, z.temp_max_f), 0);
 
@@ -189,6 +187,9 @@ export function CareGuideTemperature({
     observer.observe(el);
     return () => observer.disconnect();
   }, [tempZones.length]);
+
+  // Checked after the hooks above, which must run on every render.
+  if (!hasContent) return null;
 
   return (
     <section id="temperature" className="scroll-mt-40">

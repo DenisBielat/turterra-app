@@ -27,9 +27,10 @@ export function CareGuideHandling({
   salmonellaWarning,
 }: CareGuideHandlingProps) {
   const hasContent = introText || dos.length > 0 || donts.length > 0 || salmonellaWarning;
-  if (!hasContent) return null;
-
+  // Hooks must run on every render, so this comes before the early return.
   const { activeSection } = useCareGuideActiveSection();
+
+  if (!hasContent) return null;
 
   return (
     <section id="handling" className="scroll-mt-40">

@@ -60,9 +60,10 @@ export function CareGuideHousingTerrestrial({
     commonMistakes.length > 0 ||
     cohabitationNotes;
 
-  if (!hasContent) return null;
-
+  // Hooks must run on every render, so this comes before the early return.
   const { activeSection } = useCareGuideActiveSection();
+
+  if (!hasContent) return null;
 
   return (
     <section id="housing" className="scroll-mt-40">

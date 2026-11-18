@@ -148,9 +148,10 @@ export function CareGuideSubstrate({
     maintenanceSchedules.length > 0 ||
     quarantineNote;
 
-  if (!hasContent) return null;
-
+  // Hooks must run on every render, so this comes before the early return.
   const { activeSection } = useCareGuideActiveSection();
+
+  if (!hasContent) return null;
 
   return (
     <section id="substrate" className="scroll-mt-40">

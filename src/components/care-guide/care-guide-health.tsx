@@ -140,9 +140,10 @@ export function CareGuideHealth({
     whenToSeeVet ||
     preventiveCare.length > 0;
 
-  if (!hasContent) return null;
-
+  // Hooks must run on every render, so this comes before the early return.
   const { activeSection } = useCareGuideActiveSection();
+
+  if (!hasContent) return null;
 
   return (
     <section id="health" className="scroll-mt-40">

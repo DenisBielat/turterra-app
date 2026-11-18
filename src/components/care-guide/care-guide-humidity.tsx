@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Icon } from '@/components/Icon';
 import { CareGuideMarkdown } from './care-guide-markdown';
 import { CareGuideCallout } from './care-guide-callout';
 import { CareGuideShopButton } from './care-guide-shop-button';
@@ -159,8 +158,6 @@ export function CareGuideHumidity({
     inadequateHumidityWarning ||
     outdoorNote;
 
-  if (!hasContent) return null;
-
   const maxPct = humidityZones.reduce(
     (max, z) => Math.max(max, z.humidity_max_pct ?? z.humidity_min_pct),
     0,
@@ -182,6 +179,9 @@ export function CareGuideHumidity({
     observer.observe(el);
     return () => observer.disconnect();
   }, [humidityZones.length]);
+
+  // Checked after the hooks above, which must run on every render.
+  if (!hasContent) return null;
 
   return (
     <section id="humidity" className="scroll-mt-40">

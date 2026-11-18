@@ -30,9 +30,10 @@ export function CareGuideHousing({
   enclosureSizes,
 }: CareGuideHousingProps) {
   const hasContent = introText || essentials.length > 0 || commonMistakes.length > 0 || cohabitationNotes || enclosureSizes.length > 0;
-  if (!hasContent) return null;
-
+  // Hooks must run on every render, so this comes before the early return.
   const { activeSection } = useCareGuideActiveSection();
+
+  if (!hasContent) return null;
 
   return (
     <section id="housing" className="scroll-mt-40">
