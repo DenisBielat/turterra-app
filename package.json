@@ -11,7 +11,8 @@
     "import-range-maps": "node scripts/importRangeMaps.js",
     "db:snapshot": "node scripts/snapshotSchema.mjs",
     "db:checklist-seed": "node scripts/buildChecklistSeed.mjs",
-    "db:species": "node scripts/buildSpeciesSql.mjs"
+    "db:species": "node scripts/buildSpeciesSql.mjs",
+    "photo:inat": "node scripts/inatPhoto.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",

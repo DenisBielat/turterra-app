@@ -11,6 +11,7 @@ species photos, Mapbox for range maps.
 - `npm run db:species -- <slug>` builds a species profile's SQL from its source file
 - `npm run db:checklist-seed` rebuilds the species checklist seed
 - `npm run db:snapshot -- <token>` regenerates `docs/supabase-schema.md`
+- `npm run photo:inat -- <observation link>` looks up an iNaturalist photo's licence and credit
 
 ## Database
 
@@ -85,6 +86,30 @@ Rules that matter here:
   (habitats and habitat types only) and pointed out to the owner.
 - Physical features are stored per variant: adult (no sex), adult male,
   adult female, hatchling. Give a value only where a source states it.
+
+## Photos
+
+Species photos live in Cloudinary. A profile's gallery is every image in the
+folder `Turtle Species Photos/<slug>`; the physical-feature photos are in
+`Turtle Species Photos/<slug>/physical-features`. An image in a species
+folder shows on the live page straight away, whatever its permission status.
+
+- The owner chooses the photos and sends links. For iNaturalist that is the
+  observation link (a photo link cannot be looked up):
+  `npm run photo:inat -- <link>` prints the licence, credit, file and the
+  values for the fields below.
+- Fields on every photo: `author`, `image_source`, `image_url` (the source
+  page), `asset_type`, `life_stage`, `life_stages_descriptor` (sex, when
+  known), `permission_status`. One photo per species has
+  `primary_photo` = `true`.
+- A physical-feature photo also carries one tag: `carapace`, `plastron`,
+  `head-and-neck` or `skin-and-limbs`.
+- Only photos whose licence allows reuse go up (CC0, CC BY, CC BY-NC and
+  their share-alike forms). "All rights reserved" needs the photographer's
+  written permission first.
+- Life stage and sex come from the photo and the owner; an iNaturalist
+  annotation is a suggestion, and iNaturalist has no hatchling stage.
+- Ask the owner before uploading, changing or deleting anything in Cloudinary.
 
 ## Conventions
 
