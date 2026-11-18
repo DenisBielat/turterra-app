@@ -1,6 +1,6 @@
 // scripts/buildChecklistSeed.mjs
 //
-// Builds supabase/content/species_checklist_seed.sql.
+// Builds supabase/content/001_species_checklist_seed.sql.
 //
 // The list of taxa comes from the published checklist:
 //   Turtle Taxonomy Working Group 2025, Turtles of the World (10th Ed.),
@@ -28,7 +28,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const STATUS_SOURCE_URL = 'https://turtle-encylopedia-api-production.up.railway.app/api/records';
 const SOURCE_NAME = 'Turtles of the World, 10th Ed. (TTWG 2025)';
 const TAXA_FILE = path.join(HERE, '..', 'supabase', 'content', 'data', 'ttwg_2025_taxa.json');
-const OUT_FILE = path.join(HERE, '..', 'supabase', 'content', 'species_checklist_seed.sql');
+const OUT_FILE = path.join(HERE, '..', 'supabase', 'content', '001_species_checklist_seed.sql');
 
 // Higher classification by family, as grouped in the checklist.
 const FAMILY_GROUPS = {
@@ -159,7 +159,7 @@ function buildSql(rows, retrievedOn) {
 --            ${rows.length - withStatus} taxa have no status recorded yet.
 -- Rows:      ${rows.length} taxa (${species} species, ${rows.length - species} subspecies)
 --
--- Requires migration 20261118_003. Safe to re-run: existing rows get their
+-- Requires migration 019. Safe to re-run: existing rows get their
 -- taxonomy/status refreshed; turtle_species_id, skip_reason and notes are
 -- never overwritten.
 -- ============================================================================

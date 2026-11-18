@@ -1,10 +1,12 @@
 -- ============================================================================
--- CONTENT: American Box Turtle (species) and Eastern Box Turtle (subspecies)
+-- CONTENT: Common Box Turtle (species) and Eastern Box Turtle (subspecies)
 -- ============================================================================
 -- The Eastern Box Turtle profile was stored as a species named
 -- "Terrapene carolina ssp. carolina". It is a subspecies of Terrapene carolina
--- (Turtles of the World, 10th Ed., TTWG 2025: American Box Turtle, with the
--- subspecies carolina, bauri and major).
+-- (Turtles of the World, 10th Ed., TTWG 2025, with the subspecies carolina,
+-- bauri and major). The species is entered as "Common Box Turtle", the name
+-- iNaturalist uses; the checklist's "American Box Turtle" is kept as an
+-- alternate name.
 --
 -- This file:
 --   1. adds a profile row for the species, Terrapene carolina, as a DRAFT
@@ -14,27 +16,28 @@
 --      guide, avatar and published status are unchanged;
 --   3. links the new species row to its checklist entry.
 --
--- Requires migration 20261118_004. Safe to re-run.
+-- Requires migration 020. Safe to re-run.
 -- ============================================================================
 
 begin;
 
 -- 1. The species
 insert into public.turtle_species
-  (species_common_name, species_scientific_name, tax_parent_genus, status, taxon_rank)
-select 'American Box Turtle', 'Terrapene carolina', eastern.tax_parent_genus, 'draft', 'species'
+  (species_common_name, species_scientific_name, other_common_names, tax_parent_genus, status, taxon_rank)
+select 'Common Box Turtle', 'Terrapene carolina', array['American Box Turtle'], eastern.tax_parent_genus, 'draft', 'species'
 from public.turtle_species eastern
 where eastern.slug = 'eastern-box-turtle'
   and not exists (
     select 1 from public.turtle_species where species_scientific_name = 'Terrapene carolina'
   );
 
---    The database fills in the slug from the common name on insert. Set it
---    explicitly as well, so it is right whatever that generator produced.
+--    If the row already exists under the earlier name, bring it in line.
+--    (Changing the common name regenerates the slug: common-box-turtle.)
 update public.turtle_species
-set slug = 'american-box-turtle'
+set species_common_name = 'Common Box Turtle',
+    other_common_names = array['American Box Turtle']
 where species_scientific_name = 'Terrapene carolina'
-  and slug is distinct from 'american-box-turtle';
+  and species_common_name is distinct from 'Common Box Turtle';
 
 -- 2. Eastern Box Turtle becomes its subspecies
 update public.turtle_species eastern

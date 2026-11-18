@@ -2,7 +2,7 @@
  * Species tracker: types and the rules for what counts as "entered".
  *
  * Rows come from the `admin_species_progress` database view
- * (supabase/migrations/20261118_003_create_species_checklist.sql), which
+ * (supabase/migrations/019_create_species_checklist.sql), which
  * counts what exists in each species table. The rules that turn those counts
  * into complete / partial / missing live here, in one place.
  */

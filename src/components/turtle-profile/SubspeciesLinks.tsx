@@ -25,12 +25,17 @@ export function ParentSpeciesLink({
       {parentSpecies ? (
         <span>
           of the{" "}
-          <Link
-            href={`/turtle-guide/${parentSpecies.slug}`}
-            className="font-semibold text-green-800 underline underline-offset-2 hover:text-green-950"
-          >
-            {parentSpecies.commonName}
-          </Link>{" "}
+          {parentSpecies.isPublished === false ? (
+            // The species' own profile is not published yet: name it, but do not link.
+            <span className="font-semibold text-gray-900">{parentSpecies.commonName}</span>
+          ) : (
+            <Link
+              href={`/turtle-guide/${parentSpecies.slug}`}
+              className="font-semibold text-green-800 underline underline-offset-2 hover:text-green-950"
+            >
+              {parentSpecies.commonName}
+            </Link>
+          )}{" "}
           (<em>{parentSpecies.scientificName}</em>)
         </span>
       ) : (

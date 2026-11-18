@@ -5,7 +5,7 @@
 --                       subspecies): the reference list we work through.
 --                       Seeded from the Turtle Conservancy "Turtles of the
 --                       World" list (names, taxonomy and status only) by
---                       supabase/content/species_checklist_seed.sql.
+--                       supabase/content/001_species_checklist_seed.sql.
 --                       A row links to its Turterra profile through
 --                       turtle_species_id once the profile exists.
 --
@@ -14,7 +14,7 @@
 --                       Always computed from the real tables, so it cannot go
 --                       stale. Powers /admin/species.
 --
--- Requires 20261118_001 (is_admin) and 20261118_002 (turtle_species.status).
+-- Requires 017 (is_admin) and 018 (turtle_species.status).
 -- Safe to run more than once.
 -- ============================================================================
 

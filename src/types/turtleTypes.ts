@@ -424,4 +424,6 @@ export interface Variant {
     scientificName: string;
     slug: string;
     avatarUrl: string | null;
+    /** False when that profile is still a draft, so it must not be linked to. */
+    isPublished?: boolean;
   }

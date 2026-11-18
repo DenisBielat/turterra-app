@@ -11,7 +11,7 @@
 --     (profiles.role = 'admin') also see drafts, which is what lets you
 --     preview a draft profile while signed in.
 --
--- Requires 20261118_001 (public.is_admin). Safe to run more than once.
+-- Requires 017 (public.is_admin). Safe to run more than once.
 -- ============================================================================
 
 do $$

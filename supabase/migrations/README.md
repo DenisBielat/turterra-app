@@ -1,76 +1,68 @@
-# Supabase Migrations
+# Supabase SQL files
 
-This folder contains SQL migrations for the Turterra database schema.
+Two folders, both numbered. Run files in number order; every file from 017
+onwards is safe to run more than once.
 
-## How to Run Migrations
+- `supabase/migrations/` changes the **structure** of the database (tables,
+  columns, functions, permissions).
+- `supabase/content/` enters or corrects **data** (species profiles, the
+  checklist, fixes).
 
-For now, run these manually in the **Supabase Dashboard**:
+To run a file by hand: Supabase Dashboard, SQL Editor, New query, paste the
+file, Run.
 
-1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
-2. Select your Turterra project
-3. Navigate to **SQL Editor** (left sidebar)
-4. Click **+ New query**
-5. Copy the contents of each migration file and run them **in order**
+## Migrations
 
-### Migration Order
+| # | File | What it does |
+|---|------|--------------|
+| 001 | `001_create_profiles_table.sql` | Profiles table with row-level security |
+| 002 | `002_create_updated_at_trigger.sql` | Keeps `updated_at` current |
+| 003 | `003_create_username_functions.sql` | Username validation functions |
+| 004 | `004_create_reserved_usernames.sql` | Reserved usernames list |
+| 005 | `005_create_channels_table.sql` | Community channels |
+| 006 | `006_create_posts_table.sql` | Community posts |
+| 007 | `007_create_comments_table.sql` | Comments |
+| 008 | `008_create_votes_table.sql` | Votes |
+| 009 | `009_create_vote_triggers.sql` | Vote score triggers |
+| 010 | `010_create_hot_score_algorithm.sql` | Hot score ranking |
+| 011 | `011_create_comment_count_trigger.sql` | Comment counts |
+| 012 | `012_create_supporting_tables.sql` | Saved posts, reports and other supporting tables |
+| 013 | `013_create_helper_views.sql` | Channel and community statistics views |
+| 014 | `014_create_featured_species_table.sql` | Featured species |
+| 015 | `015_add_icon_svg_to_channels.sql` | Channel icons |
+| 016 | `016_add_role_and_restricted_channels.sql` | User roles; restricted channels |
+| 017 | `017_admin_helper_and_lock_profile_role.sql` | `is_admin()`; users can no longer change their own `role` / `is_verified` |
+| 018 | `018_add_species_status.sql` | `turtle_species.status` (`draft` / `published`); drafts are hidden from the public |
+| 019 | `019_create_species_checklist.sql` | `species_checklist` table and the `admin_species_progress` view behind `/admin/species` |
+| 020 | `020_add_subspecies_support.sql` | `taxon_rank` and `parent_species_id`: a subspecies has its own profile linked to its species |
+| 021 | `021_fix_species_slug_function.sql` | Slug generator hyphenates every space, not just the first |
+| 022 | `022_schema_snapshot_export.sql` | Lets the schema snapshot be produced without a secret key |
+| 023 | `023_parent_species_lookup.sql` | Subspecies pages can name their species while its profile is a draft |
 
-Run these in sequence (each depends on the previous):
+The care guide tables live in the `care_guides` schema; their definitions are
+in `docs/turterra_*_schema.sql`.
 
-| # | File | Description |
-|---|------|-------------|
-| 1 | `20260202_001_create_profiles_table.sql` | Creates profiles table with RLS policies |
-| 2 | `20260202_002_create_updated_at_trigger.sql` | Auto-updates `updated_at` timestamp |
-| 3 | `20260202_003_create_username_functions.sql` | Username validation functions |
-| 4 | `20260202_004_create_reserved_usernames.sql` | Reserved/blocked usernames list |
+## Content
 
-## Verifying Migrations Worked
+| # | File | What it does |
+|---|------|--------------|
+| 001 | `001_species_checklist_seed.sql` | The 552-taxon checklist. Generated: rebuild with `npm run db:checklist-seed`, do not edit |
+| 002 | `002_fix_chrysemys_picta_name.sql` | Scientific name capitalisation |
+| 003 | `003_box_turtle_species_and_subspecies.sql` | Eastern Box Turtle becomes a subspecies of *Terrapene carolina* |
 
-After running all migrations, you can verify in the Supabase Dashboard:
+The checklist's list of taxa is `supabase/content/data/ttwg_2025_taxa.json`
+(364 species and 188 named subspecies from Turtles of the World, 10th Ed.,
+TTWG 2025); conservation status is added from the Turtle Conservancy list for
+the taxa it covers.
 
-1. **Table Editor** → You should see `profiles` and `reserved_usernames` tables
-2. **Database** → **Functions** → You should see `handle_updated_at`, `is_valid_username`, and `is_username_available`
-3. **Authentication** → **Policies** → Click on `profiles` to see the RLS policies
-
-## Future: Automated Migrations
-
-When your project grows, you can use the [Supabase CLI](https://supabase.com/docs/guides/cli) to:
-- Run migrations automatically
-- Generate TypeScript types from your schema
-- Manage multiple environments (dev, staging, prod)
-
-For now, manual SQL execution is fine for getting started.
-
-## Species tracker (November 2026)
-
-Run these in order. Each one is safe to run more than once.
-
-| # | File | Description |
-|---|------|-------------|
-| 1 | `20261118_001_admin_helper_and_lock_profile_role.sql` | `is_admin()` helper; stops users changing their own `role` / `is_verified` |
-| 2 | `20261118_002_add_species_status.sql` | `turtle_species.status` (`draft` / `published`); existing species stay published, new ones start as drafts |
-| 3 | `20261118_003_create_species_checklist.sql` | `species_checklist` table and the `admin_species_progress` view behind `/admin/species` |
-| 4 | `20261118_004_add_subspecies_support.sql` | `turtle_species.taxon_rank` and `parent_species_id`, so a subspecies has its own profile linked to its species |
-| 5 | `20261118_005_fix_species_slug_function.sql` | The slug generator only hyphenated the first space in a common name; this fixes it |
-
-Then load the checklist: `supabase/content/species_checklist_seed.sql`.
-
-## Content files (`supabase/content/`)
-
-Schema changes live in `supabase/migrations/`. Data entry lives in
-`supabase/content/`: one re-runnable SQL file per piece of content (a species,
-a fix, the checklist seed), so it can be reviewed before it is run and the repo
-keeps a copy of what was entered.
-
-`species_checklist_seed.sql` is generated; rebuild it with
-`npm run db:checklist-seed` rather than editing it. Its list of taxa is
-`supabase/content/data/ttwg_2025_taxa.json` (364 species and 188 named
-subspecies from Turtles of the World, 10th Ed., TTWG 2025); conservation
-status is added from the Turtle Conservancy list for the taxa it covers.
+Species profiles are one file each. New species are entered as drafts, so
+running a file never publishes anything by itself.
 
 ## Schema reference
 
-`docs/supabase-schema.md` lists every table and column as of the date at the
-top of the file; anything newer is in the migration files above. Regenerate it
-with `npm run db:snapshot` from your own machine: Supabase only serves the
-schema description to a secret key, so it needs `SUPABASE_SERVICE_ROLE_KEY`
-in `.env.local`.
+`docs/supabase-schema.md` lists every table, column, constraint, policy and
+function as of the date at the top of the file. To refresh it:
+
+1. In the SQL editor run `select private.export_schema_snapshot();` and copy
+   the token it returns (valid for 15 minutes, works once).
+2. `npm run db:snapshot -- <token>`

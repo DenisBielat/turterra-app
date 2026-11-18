@@ -1,20 +1,20 @@
 // scripts/snapshotSchema.mjs
 //
-// Writes docs/supabase-schema.md: every table and view the Supabase API
-// exposes, with columns, types, defaults, primary keys, foreign keys and enum
-// values. The species tables were created in the dashboard and have no
-// migration files, so this file is their record in version control.
+// Writes docs/supabase-schema.md: every table, column, constraint, index,
+// row-level security policy, trigger, view, enum and function in the project's
+// own schemas. It is the record of the database structure kept in the repo.
 //
-// Usage:  npm run db:snapshot
+// The snapshot is produced by the database itself (see
+// supabase/migrations/022_schema_snapshot_export.sql) and collected with a
+// one-time token, so no secret key is needed:
 //
-// Reads NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from .env.local.
-// Supabase only serves the API description to a secret key (the new
-// sb_secret_... key, or the legacy service_role key), so this has to be run
-// from your own machine, not from the site or a browser. It only reads the
-// API description; it does not read or change any data.
+//   1. In the Supabase SQL editor, run:
+//        select private.export_schema_snapshot();
+//      and copy the token it returns (valid for 15 minutes, works once).
+//   2. npm run db:snapshot -- <token>
 //
-// Not included (the API description does not carry them): unique and check
-// constraints, indexes, row-level security policies, functions' bodies.
+// Reads NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY from .env.local
+// (the same public key the site uses).
 
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -23,107 +23,157 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.local' });
 
-const SCHEMAS = ['public', 'care_guides'];
 const OUT_FILE = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'docs', 'supabase-schema.md');
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const key = process.env.NEXT_PUBLIC_SUPABASE_KEY;
+const token = process.argv[2];
 
-if (!url || !key) {
-  console.error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set (see .env.local).');
+function fail(message) {
+  console.error(message);
   process.exit(1);
 }
 
-async function fetchSchema(schema) {
-  const response = await fetch(`${url}/rest/v1/`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Accept-Profile': schema },
-  });
-  if (!response.ok) {
-    return { error: `${response.status} ${(await response.text()).slice(0, 200)}` };
-  }
-  const spec = await response.json();
-  const definitions = spec.definitions ?? {};
-  if (Object.keys(definitions).length === 0) {
-    return { error: 'the key used cannot see any tables in this schema' };
-  }
-  return { spec };
+if (!token || !/^[0-9a-f-]{36}$/i.test(token)) {
+  fail(
+    'Usage: npm run db:snapshot -- <token>\n\n' +
+    'Get a token by running this in the Supabase SQL editor:\n' +
+    '  select private.export_schema_snapshot();'
+  );
+}
+if (!url || !key) {
+  fail('NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY must be set (see .env.local).');
 }
 
-function describeColumn(name, prop, required) {
-  const description = prop.description ?? '';
-  const foreignKey = description.match(/<fk table='([^']+)' column='([^']+)'\/>/);
-  const notes = [];
-  if (description.includes('<pk/>')) notes.push('primary key');
-  if (foreignKey) notes.push(`→ \`${foreignKey[1]}.${foreignKey[2]}\``);
-  if (Array.isArray(prop.enum)) notes.push(`one of: ${prop.enum.map((v) => `\`${v}\``).join(', ')}`);
-
-  const type = prop.format ?? prop.type ?? '';
-  const nullable = required.has(name) ? 'no' : 'yes';
-  const fallback = prop.default === undefined ? '' : `\`${String(prop.default)}\``;
-  return `| \`${name}\` | ${type} | ${nullable} | ${fallback} | ${notes.join('; ')} |`;
+/** Keeps a value on one table row: no pipes or line breaks. */
+function cell(value) {
+  if (value === null || value === undefined || value === '') return '';
+  return String(value).replace(/\|/g, '\\|').replace(/\s*\n\s*/g, ' ');
 }
 
-function renderSchema(schema, spec) {
+function code(value) {
+  return value === null || value === undefined || value === '' ? '' : `\`${cell(value)}\``;
+}
+
+function renderRelation(schema, relation) {
   const lines = [];
-  const tables = Object.keys(spec.definitions).sort();
-  lines.push(`## Schema \`${schema}\``, '', `${tables.length} tables and views.`, '');
+  const facts = [relation.kind];
+  if (relation.kind === 'table') facts.push(relation.rls_enabled ? 'row-level security on' : 'row-level security OFF');
+  lines.push(`### ${schema}.${relation.name}`, '', `_${facts.join(' · ')}_`, '');
+  if (relation.comment) lines.push(relation.comment.trim(), '');
 
-  for (const table of tables) {
-    const definition = spec.definitions[table];
-    const required = new Set(definition.required ?? []);
-    lines.push(`### ${schema}.${table}`, '');
-    if (definition.description) lines.push(definition.description.trim(), '');
-    lines.push('| Column | Type | Nullable | Default | Notes |', '| --- | --- | --- | --- | --- |');
-    for (const [name, prop] of Object.entries(definition.properties ?? {})) {
-      lines.push(describeColumn(name, prop, required));
+  lines.push('| Column | Type | Nullable | Default | Notes |', '| --- | --- | --- | --- | --- |');
+  for (const column of relation.columns) {
+    const notes = [];
+    if (column.identity) notes.push(`identity (${column.identity})`);
+    if (column.comment) notes.push(column.comment);
+    lines.push(
+      `| \`${column.name}\` | ${cell(column.type)} | ${column.nullable ? 'yes' : 'no'} | ${code(column.default)} | ${cell(notes.join('; '))} |`
+    );
+  }
+  lines.push('');
+
+  if (relation.constraints.length > 0) {
+    lines.push('Constraints:', '');
+    for (const c of relation.constraints) lines.push(`- \`${c.name}\` (${c.type}): \`${cell(c.definition)}\``);
+    lines.push('');
+  }
+  if (relation.indexes.length > 0) {
+    lines.push('Indexes:', '');
+    for (const i of relation.indexes) lines.push(`- \`${cell(i.definition)}\``);
+    lines.push('');
+  }
+  if (relation.policies.length > 0) {
+    lines.push('Policies:', '');
+    for (const p of relation.policies) {
+      const parts = [`for ${p.command}`, `to ${p.roles.join(', ')}`];
+      if (p.using) parts.push(`using \`${cell(p.using)}\``);
+      if (p.with_check) parts.push(`with check \`${cell(p.with_check)}\``);
+      lines.push(`- "${p.name}": ${parts.join('; ')}`);
     }
+    lines.push('');
+  } else if (relation.kind === 'table' && relation.rls_enabled) {
+    lines.push('Policies: none, so only the service role and the SQL editor can read or write it.', '');
+  }
+  if (relation.triggers.length > 0) {
+    lines.push('Triggers:', '');
+    for (const t of relation.triggers) lines.push(`- \`${cell(t.definition)}\``);
+    lines.push('');
+  }
+  if (relation.view_definition) {
+    lines.push('Definition:', '', '```sql', relation.view_definition.trim(), '```', '');
+  }
+  return lines;
+}
+
+function renderSchema(schema) {
+  const lines = [];
+  const tables = schema.relations.filter((r) => r.kind === 'table').length;
+  const views = schema.relations.length - tables;
+  lines.push(
+    `## Schema \`${schema.name}\``,
+    '',
+    `${tables} tables, ${views} views, ${schema.enums.length} enums, ${schema.functions.length} functions.`,
+    ''
+  );
+
+  for (const relation of schema.relations) lines.push(...renderRelation(schema.name, relation));
+
+  if (schema.enums.length > 0) {
+    lines.push(`### Enums in \`${schema.name}\``, '');
+    for (const e of schema.enums) lines.push(`- \`${e.name}\`: ${e.values.map((v) => `\`${v}\``).join(', ')}`);
     lines.push('');
   }
 
-  const functions = Object.keys(spec.paths ?? {})
-    .filter((p) => p.startsWith('/rpc/'))
-    .map((p) => p.slice(5))
-    .sort();
-  if (functions.length > 0) {
-    lines.push(`### Functions exposed in \`${schema}\``, '', functions.map((f) => `\`${f}\``).join(', '), '');
+  if (schema.functions.length > 0) {
+    lines.push(`### Functions in \`${schema.name}\``, '');
+    for (const f of schema.functions) {
+      lines.push(
+        `#### ${schema.name}.${f.name}(${f.arguments})`,
+        '',
+        `Returns \`${cell(f.returns)}\`${f.security_definer ? ' · runs with its owner\'s rights (security definer)' : ''}`,
+        '',
+        '```sql',
+        f.definition.replace(/\r\n/g, '\n').trim(),
+        '```',
+        ''
+      );
+    }
   }
   return lines;
 }
 
 async function main() {
-  const today = new Date().toISOString().slice(0, 10);
+  const response = await fetch(`${url}/rest/v1/rpc/claim_export`, {
+    method: 'POST',
+    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_token: token }),
+  });
+  if (!response.ok) {
+    fail(`Could not collect the snapshot: ${response.status} ${(await response.text()).slice(0, 300)}`);
+  }
+
+  const snapshot = await response.json();
+  if (!snapshot || !Array.isArray(snapshot.schemas) || snapshot.schemas.length === 0) {
+    fail(
+      'No snapshot for that token: it is unknown, already used or expired.\n' +
+      'Run this again in the SQL editor for a fresh one:\n  select private.export_schema_snapshot();'
+    );
+  }
+
   const lines = [
     '# Supabase schema snapshot',
     '',
-    `Generated by \`npm run db:snapshot\` on ${today}. Do not edit by hand.`,
+    `Generated by \`npm run db:snapshot\` from the live database on ${snapshot.generated_at.slice(0, 10)} ` +
+      `(Postgres ${snapshot.postgres_version}). Do not edit by hand.`,
     '',
-    'Columns, types, defaults, primary keys, foreign keys and enum values for everything the',
-    'Supabase API exposes. Not included: unique and check constraints, indexes, row-level security',
-    'policies and function bodies. For those, ask in the Supabase dashboard or through the connector.',
+    'Schemas: ' + snapshot.schemas.map((s) => `\`${s.name}\``).join(', ') + '.',
     '',
   ];
-
-  let failures = 0;
-  for (const schema of SCHEMAS) {
-    const { spec, error } = await fetchSchema(schema);
-    if (error) {
-      failures += 1;
-      console.warn(`Could not read schema "${schema}": ${error}`);
-      lines.push(`## Schema \`${schema}\``, '', `Not captured in this run (${error}).`, '');
-      if (schema === 'care_guides') {
-        lines.push('Its table definitions are in `docs/turterra_care_guides_schema.sql`,', '`docs/turterra_terrestrial_schema.sql` and `docs/turterra_products_schema_complete.sql`.', '');
-      }
-      continue;
-    }
-    lines.push(...renderSchema(schema, spec));
-    console.log(`Schema "${schema}": ${Object.keys(spec.definitions).length} tables and views`);
-  }
-
-  // Never replace a good snapshot with a partial or empty one.
-  if (failures > 0) {
-    console.error(`\nNot writing ${path.relative(process.cwd(), OUT_FILE)}: ${failures} of ${SCHEMAS.length} schemas could not be read.`);
-    console.error('A 401 here usually means the key is not a secret key.');
-    process.exit(1);
+  for (const schema of snapshot.schemas) {
+    lines.push(...renderSchema(schema));
+    const tables = schema.relations.filter((r) => r.kind === 'table').length;
+    console.log(`Schema "${schema.name}": ${tables} tables, ${schema.relations.length - tables} views, ${schema.functions.length} functions`);
   }
 
   await writeFile(OUT_FILE, lines.join('\n'));

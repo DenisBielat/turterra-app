@@ -325,8 +325,8 @@ async function fetchTaxonomyData(
 /**
  * The profiles this one is linked to through the species/subspecies hierarchy:
  * its parent species (for a subspecies) or its subspecies (for a species).
- * Only profiles the viewer is allowed to see come back, so unpublished ones
- * are simply absent for the public.
+ * Subspecies the viewer is not allowed to see are simply absent. A parent
+ * species always comes back by name, flagged when its profile is a draft.
  */
 async function fetchLinkedTaxa(
   turtle: TurtleData,
@@ -348,13 +348,16 @@ async function fetchLinkedTaxa(
 
   if (turtle.taxon_rank === 'subspecies') {
     if (!turtle.parent_species_id) return { parentSpecies: null, subspecies: [] };
+    // Goes through get_parent_species() rather than reading the row directly,
+    // so the parent's names are available even while its profile is a draft.
     const { data, error } = await client
-      .from('turtle_species')
-      .select(columns)
-      .eq('id', turtle.parent_species_id)
-      .maybeSingle<Row>();
+      .rpc('get_parent_species', { p_species_id: turtle.id })
+      .maybeSingle<Row & { is_published: boolean }>();
     if (error) console.warn('Error fetching parent species:', error.message);
-    return { parentSpecies: data ? toLinked(data) : null, subspecies: [] };
+    return {
+      parentSpecies: data ? { ...toLinked(data), isPublished: data.is_published } : null,
+      subspecies: []
+    };
   }
 
   const { data, error } = await client

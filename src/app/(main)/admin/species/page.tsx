@@ -58,10 +58,10 @@ export default async function AdminSpeciesPage() {
               files in order (see <code>supabase/migrations/README.md</code>):
             </p>
             <ol className="list-decimal list-inside space-y-1 font-mono text-xs">
-              <li>supabase/migrations/20261118_001_admin_helper_and_lock_profile_role.sql</li>
-              <li>supabase/migrations/20261118_002_add_species_status.sql</li>
-              <li>supabase/migrations/20261118_003_create_species_checklist.sql</li>
-              <li>supabase/content/species_checklist_seed.sql</li>
+              <li>supabase/migrations/017_admin_helper_and_lock_profile_role.sql</li>
+              <li>supabase/migrations/018_add_species_status.sql</li>
+              <li>supabase/migrations/019_create_species_checklist.sql</li>
+              <li>supabase/content/001_species_checklist_seed.sql</li>
             </ol>
             <p className="mt-3 text-gray-600">
               Database message: {error.message}

@@ -14,7 +14,7 @@
 --            177 taxa have no status recorded yet.
 -- Rows:      552 taxa (364 species, 188 subspecies)
 --
--- Requires migration 20261118_003. Safe to re-run: existing rows get their
+-- Requires migration 019. Safe to re-run: existing rows get their
 -- taxonomy/status refreshed; turtle_species_id, skip_reason and notes are
 -- never overwritten.
 -- ============================================================================
