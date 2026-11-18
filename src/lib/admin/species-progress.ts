@@ -2,7 +2,7 @@
  * Species tracker: types and the rules for what counts as "entered".
  *
  * Rows come from the `admin_species_progress` database view
- * (supabase/migrations/019_create_species_checklist.sql), which
+ * (supabase/migrations/019_create_species_checklist.sql, extended in 024), which
  * counts what exists in each species table. The rules that turn those counts
  * into complete / partial / missing live here, in one place.
  */
@@ -50,6 +50,11 @@ export interface SpeciesProgressRow {
   physical_feature_variants: number;
   has_range_map: boolean;
   has_published_care_guide: boolean;
+  /**
+   * Follow-ups still to do for this taxon, its species or its genus. Added by
+   * migration 024, so it is missing until that has been run.
+   */
+  pending_followups?: number;
 }
 
 export type SectionState = 'complete' | 'partial' | 'missing';

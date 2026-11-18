@@ -273,6 +273,31 @@ Ranavirus in wild and captive box turtles is a growing concern, and released pet
     },
   ],
 
+  // Sources that would fill what is empty here. Added to /admin/follow-ups when
+  // this file's SQL is run; after that they are managed there.
+  followUps: [
+    {
+      kind: 'book',
+      taxa: ['Terrapene'],
+      title:
+        'Dodd, C.K., Jr. 2001. North American Box Turtles: A Natural History. Norman, OK: University of Oklahoma Press, 231 pp.',
+      wouldFill:
+        'Physical descriptions of each subspecies (head, neck, limbs, claws, plastron, bridge, where the hinge sits), which the profiles leave empty. Check it too for body mass and lifespan, also empty.',
+      notes:
+        'Kiester and Willey 2015 call it a comprehensive book on the genus and say it and Milstead 1969 give "differential diagnoses and complete descriptions of the subspecies and their variation". No ebook edition, so it means a print copy: pages can be photographed and sent for transcription.',
+    },
+    {
+      kind: 'paper',
+      taxa: ['Terrapene'],
+      title:
+        'Milstead, W.W. 1969. Studies on the evolution of box turtles (genus Terrapene). Bulletin of the Florida State Museum, Biological Sciences Series 14:1–113.',
+      wouldFill:
+        'Diagnoses and descriptions of the subspecies, for the physical-feature fields the profiles leave empty.',
+      notes:
+        'Cited by Kiester and Willey 2015 alongside Dodd 2001 for complete descriptions of the subspecies. A museum bulletin, so it may be free to read online; not yet looked for.',
+    },
+  ],
+
   notes: [
     'Physical features are sparse: neither source gives a full description (the account refers readers to Milstead 1969 and Dodd 2001). Head, neck, limb, claw, plastron and bridge details, and where on the plastron the hinge sits, need a descriptive source before they can be filled in.',
     'Weight and lifespan are left empty. The sources give no body mass. For lifespan they give estimates (46 to over 100 years from dates carved on shells; breeding females past 50) but no verified maximum; say if you would rather show a figure.',

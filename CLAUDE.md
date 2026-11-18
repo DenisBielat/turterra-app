@@ -52,6 +52,12 @@ admins can see. Publishing is the owner's decision.
 The checklist of what exists is `species_checklist` (552 taxa from Turtles of
 the World, 10th Ed., TTWG 2025). Progress is at `/admin/species`.
 
+Sources that could not be used yet (a print-only book, a paper behind a
+paywall, an author to ask) are tracked at `/admin/follow-ups`
+(`species_followups`), filed under a species, subspecies or genus. When a
+profile is left with gaps a known source would fill, list it under
+`followUps` in the species file.
+
 ### Writing a profile
 
 1. Research from primary sources. In order of preference: the IUCN SSC

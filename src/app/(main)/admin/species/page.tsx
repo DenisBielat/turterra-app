@@ -1,6 +1,5 @@
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import SpeciesTracker from "@/components/admin/SpeciesTracker";
+import { requireAdminPage } from "@/lib/admin/auth";
 import type { SpeciesProgressRow } from "@/lib/admin/species-progress";
 
 export const metadata = {
@@ -19,25 +18,7 @@ export const metadata = {
  * so this page never needs the service role key.
  */
 export default async function AdminSpeciesPage() {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (profile?.role !== "admin") {
-    notFound();
-  }
+  const supabase = await requireAdminPage();
 
   const { data, error } = await supabase
     .from("admin_species_progress")

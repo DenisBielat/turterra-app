@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import AdminNav from "@/components/admin/AdminNav";
 import {
   type SectionState,
   type SpeciesProgressRow,
@@ -145,8 +146,9 @@ export default function SpeciesTracker({ rows }: { rows: SpeciesProgressRow[] })
         {/* Header */}
         <header className="mb-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-green-700 mb-1">Admin</p>
-          <h1 className="text-3xl font-bold text-green-950 font-heading">Species tracker</h1>
-          <p className="text-sm text-gray-600 mt-2 max-w-3xl">
+          <h1 className="text-3xl font-bold text-green-950 font-heading mb-4">Species tracker</h1>
+          <AdminNav current="/admin/species" />
+          <p className="text-sm text-gray-600 max-w-3xl">
             Every taxon on the reference checklist, whether it has a Turterra profile, and which
             sections of that profile have been entered. Counts come straight from the species
             tables, so this is always current.
@@ -364,6 +366,23 @@ function TrackerTableRow({ item }: { item: TrackerRow }) {
         )}
         {row.source?.startsWith("Turterra") && (
           <div className="mt-1 text-xs text-gray-500">Not in the checklist</div>
+        )}
+        {/* Only once the database reports the count (migration 024) */}
+        {typeof row.pending_followups === "number" && row.scientific_name && (
+          <div className="mt-1 text-xs">
+            <Link
+              href={`/admin/follow-ups?taxon=${encodeURIComponent(row.scientific_name)}`}
+              className={
+                row.pending_followups > 0
+                  ? "font-semibold text-orange-800 underline underline-offset-2 hover:text-orange-900"
+                  : "text-gray-500 underline decoration-gray-300 underline-offset-2 hover:text-green-950"
+              }
+            >
+              {row.pending_followups > 0
+                ? `${row.pending_followups} follow-up${row.pending_followups === 1 ? "" : "s"} to do`
+                : "Add a follow-up"}
+            </Link>
+          </div>
         )}
       </td>
       <td className="px-4 py-3 text-gray-700 whitespace-nowrap">{row.family || "—"}</td>

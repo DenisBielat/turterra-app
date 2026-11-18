@@ -322,4 +322,27 @@ set turtle_species_id = _species.id
 from _species
 where c.scientific_name = 'Terrapene carolina' and c.turtle_species_id is null;
 
+-- 9. Follow-ups: sources to chase for what is still empty ----------------------
+--    Only added when missing (matched on kind and title), so anything changed at
+--    /admin/follow-ups is kept. Skipped if migration 024 has not been run yet.
+do $followups$
+begin
+  if to_regclass('public.species_followups') is null then
+    raise notice 'species_followups does not exist yet (migration 024): follow-ups not added';
+    return;
+  end if;
+  insert into public.species_followups (taxa, kind, title, would_fill, url, notes)
+  values (array['Terrapene']::text[], 'book',
+    'Dodd, C.K., Jr. 2001. North American Box Turtles: A Natural History. Norman, OK: University of Oklahoma Press, 231 pp.',
+    'Physical descriptions of each subspecies (head, neck, limbs, claws, plastron, bridge, where the hinge sits), which the profiles leave empty. Check it too for body mass and lifespan, also empty.',
+    null, 'Kiester and Willey 2015 call it a comprehensive book on the genus and say it and Milstead 1969 give "differential diagnoses and complete descriptions of the subspecies and their variation". No ebook edition, so it means a print copy: pages can be photographed and sent for transcription.')
+  on conflict (kind, title) do nothing;
+  insert into public.species_followups (taxa, kind, title, would_fill, url, notes)
+  values (array['Terrapene']::text[], 'paper',
+    'Milstead, W.W. 1969. Studies on the evolution of box turtles (genus Terrapene). Bulletin of the Florida State Museum, Biological Sciences Series 14:1–113.',
+    'Diagnoses and descriptions of the subspecies, for the physical-feature fields the profiles leave empty.',
+    null, 'Cited by Kiester and Willey 2015 alongside Dodd 2001 for complete descriptions of the subspecies. A museum bulletin, so it may be free to read online; not yet looked for.')
+  on conflict (kind, title) do nothing;
+end $followups$;
+
 commit;

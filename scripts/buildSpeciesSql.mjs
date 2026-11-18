@@ -13,16 +13,18 @@
 //   - every tag (habitat, region, threat, ...) exists in the database, or is
 //     declared under newVocabulary
 //   - enum values and physical-feature fields are ones the database accepts
+//   - every follow-up names taxa that are on the checklist
 //
 // The SQL it writes is safe to re-run: it replaces this one profile's rows
 // with the contents of the file, inside a single transaction. A new profile
 // is created as a draft; an existing profile's draft/published status, slug
-// and avatar are never touched.
+// and avatar are never touched. Follow-ups (sources to chase, listed under
+// followUps) are only ever added, so edits made at /admin/follow-ups are kept.
 //
 // Reads NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_KEY from .env.local
 // for the tag check (read-only, public key).
 
-import { readdir, writeFile } from 'node:fs/promises';
+import { readFile, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import dotenv from 'dotenv';
@@ -57,6 +59,7 @@ const REFERENCE_TYPES = [
   'IUCN Assessment', 'IUCN Range Map', 'TFTSG Account', 'GBIF', 'iNaturalist', 'Journal Article',
   'Book', 'Website', 'Field Guide', 'Personal Communications',
 ];
+const FOLLOW_UP_KINDS = ['book', 'paper', 'contact', 'data', 'other'];
 const LIFE_STAGES = ['adult', 'juvenile', 'hatchling'];
 const SEXES = [null, 'male', 'female'];
 
@@ -115,7 +118,18 @@ function checkSources(where, sources, references, used) {
   }
 }
 
-function check(species, vocabularies) {
+/** Every scientific name and genus on the checklist (the file the checklist seed is built from). */
+async function loadChecklistNames() {
+  const { taxa } = JSON.parse(await readFile(path.join(CONTENT_DIR, 'data', 'ttwg_2025_taxa.json'), 'utf8'));
+  const names = new Set();
+  for (const taxon of taxa) {
+    names.add(taxon.scientific_name);
+    names.add(taxon.scientific_name.split(' ')[0]);
+  }
+  return names;
+}
+
+function check(species, vocabularies, checklistNames) {
   const used = new Set();
   const references = species.references ?? {};
 
@@ -203,6 +217,20 @@ function check(species, vocabularies) {
       if (!FEATURE_FIELDS.includes(field)) problem(`${label}: "${field}" is not a feature the database has`);
     }
     checkSources(label, row.sources, references, used);
+  }
+
+  const followUpKeys = new Set();
+  for (const [i, item] of (species.followUps ?? []).entries()) {
+    const label = `followUps[${i}]`;
+    if (!FOLLOW_UP_KINDS.includes(item.kind)) problem(`${label}: kind must be one of ${FOLLOW_UP_KINDS.join(', ')}`);
+    if (!item.title || !item.title.trim()) problem(`${label}: title is missing`);
+    if (!Array.isArray(item.taxa) || item.taxa.length === 0) problem(`${label}: taxa is empty (scientific names or a genus)`);
+    for (const taxon of item.taxa ?? []) {
+      if (!checklistNames.has(taxon)) problem(`${label}: "${taxon}" is not a scientific name or genus on the checklist`);
+    }
+    const key = `${item.kind}|${item.title}`;
+    if (followUpKeys.has(key)) problem(`${label}: the same kind and title appear twice`);
+    followUpKeys.add(key);
   }
 
   for (const key of Object.keys(references)) {
@@ -424,10 +452,37 @@ function buildSql(species, slug) {
     'set turtle_species_id = _species.id',
     'from _species',
     `where c.scientific_name = ${text(name)} and c.turtle_species_id is null;`,
-    '',
-    'commit;',
     ''
   );
+
+  // 9. follow-ups
+  const followUps = species.followUps ?? [];
+  if (followUps.length > 0) {
+    add(
+      '-- 9. Follow-ups: sources to chase for what is still empty ----------------------',
+      '--    Only added when missing (matched on kind and title), so anything changed at',
+      '--    /admin/follow-ups is kept. Skipped if migration 024 has not been run yet.',
+      'do $followups$',
+      'begin',
+      "  if to_regclass('public.species_followups') is null then",
+      "    raise notice 'species_followups does not exist yet (migration 024): follow-ups not added';",
+      '    return;',
+      '  end if;'
+    );
+    for (const item of followUps) {
+      add(
+        '  insert into public.species_followups (taxa, kind, title, would_fill, url, notes)',
+        `  values (${textArray(item.taxa)}, ${text(item.kind)},`,
+        `    ${text(item.title.trim())},`,
+        `    ${text(item.wouldFill ?? null)},`,
+        `    ${text(item.url ?? null)}, ${text(item.notes ?? null)})`,
+        '  on conflict (kind, title) do nothing;'
+      );
+    }
+    add('end $followups$;', '');
+  }
+
+  add('commit;', '');
   return out.join('\n');
 }
 
@@ -459,7 +514,7 @@ async function main() {
     console.warn('Skipping the tag check (--no-validate).');
   }
 
-  check(species, vocabularies);
+  check(species, vocabularies, await loadChecklistNames());
   if (problems.length > 0) {
     console.error(`${slug}: ${problems.length} problem(s), no SQL written:`);
     for (const p of problems) console.error(`  - ${p}`);

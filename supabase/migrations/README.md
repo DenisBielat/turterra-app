@@ -38,6 +38,7 @@ file, Run.
 | 021 | `021_fix_species_slug_function.sql` | Slug generator hyphenates every space, not just the first |
 | 022 | `022_schema_snapshot_export.sql` | Lets the schema snapshot be produced without a secret key |
 | 023 | `023_parent_species_lookup.sql` | Subspecies pages can name their species while its profile is a draft |
+| 024 | `024_species_followups.sql` | Admin follow-ups: books, papers and contacts to chase for a species, subspecies or genus |
 
 The care guide tables live in the `care_guides` schema; their definitions are
 in `docs/turterra_*_schema.sql`.
