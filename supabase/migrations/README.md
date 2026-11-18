@@ -49,14 +49,20 @@ in `docs/turterra_*_schema.sql`.
 | 001 | `001_species_checklist_seed.sql` | The 552-taxon checklist. Generated: rebuild with `npm run db:checklist-seed`, do not edit |
 | 002 | `002_fix_chrysemys_picta_name.sql` | Scientific name capitalisation |
 | 003 | `003_box_turtle_species_and_subspecies.sql` | Eastern Box Turtle becomes a subspecies of *Terrapene carolina* |
+| 004 | `004_common_box_turtle.sql` | Common Box Turtle profile (a draft). Generated from `species/common-box-turtle.mjs` |
+| 005 | `005_eastern_box_turtle.sql` | Eastern Box Turtle profile (already published, so running it changes the live page). Generated from `species/eastern-box-turtle.mjs` |
 
 The checklist's list of taxa is `supabase/content/data/ttwg_2025_taxa.json`
 (364 species and 188 named subspecies from Turtles of the World, 10th Ed.,
 TTWG 2025); conservation status is added from the Turtle Conservancy list for
 the taxa it covers.
 
-Species profiles are one file each. New species are entered as drafts, so
-running a file never publishes anything by itself.
+Species profiles are written in `supabase/content/species/<slug>.mjs`, where
+every value sits next to the references it came from and the notes say what
+was left empty and why. `npm run db:species -- <slug>` checks that file and
+writes the numbered SQL. To change a profile, edit the `.mjs` file and rebuild;
+do not edit the generated SQL. New profiles are entered as drafts, so running
+a file never publishes anything by itself.
 
 ## Schema reference
 

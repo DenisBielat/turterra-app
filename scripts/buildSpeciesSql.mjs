@@ -181,7 +181,8 @@ function check(species, vocabularies) {
         }
       }
       for (const tag of added) {
-        if (vocabularies[name].has(tag)) problem(`newVocabulary.${name}: "${tag}" already exists`);
+        // Harmless (the SQL only adds a tag when it is missing), but worth knowing.
+        if (vocabularies[name].has(tag)) console.warn(`Note: newVocabulary.${name} "${tag}" is already in the database.`);
         if (!tags.includes(tag)) problem(`newVocabulary.${name}: "${tag}" is declared but not used`);
       }
     }
